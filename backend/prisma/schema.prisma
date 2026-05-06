@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("client")   // "admin" | "client"
+  avatar    String   @default("")
+  company   String   @default("")
+  phone     String   @default("")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects      Project[]     @relation("ClientProjects")
+  messages      Message[]
+  payments      Payment[]
+  uploadedFiles ProjectFile[]
+  readMessages  MessageRead[]
+}
+
+// ─── Projects ─────────────────────────────────────────────────────────────────
+
+model Project {
+  id           String        @id @default(cuid())
+  title        String
+  description  String
+  clientId     String
+  client       User          @relation("ClientProjects", fields: [clientId], references: [id])
+  type         String        @default("custom")    // landing-page | ecommerce | saas | portfolio | web-app | custom
+  status       String        @default("pending")   // pending | in-progress | review | completed | cancelled
+  progress     Int           @default(0)
+  budget       Float
+  deadline     DateTime?
+  features     String[]
+  package      String        @default("custom")    // starter | pro | premium | custom
+  notes        String?
+  revisions    Int           @default(0)
+  maxRevisions Int           @default(3)
+  // Design preferences (flattened from nested object)
+  designStyle  String?
+  designColors String[]
+  designRefs   String[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  milestones Milestone[]
+  files      ProjectFile[]
+  messages   Message[]
+  payments   Payment[]
+}
+
+// ─── Milestones ───────────────────────────────────────────────────────────────
+
+model Milestone {
+  id          String    @id @default(cuid())
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  amount      Float
+  status      String    @default("pending")  // "pending" | "paid"
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+// ─── Project Files ────────────────────────────────────────────────────────────
+
+model ProjectFile {
+  id           String   @id @default(cuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name         String
+  url          String
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  uploadedAt   DateTime @default(now())
+}
+
+// ─── Messages ─────────────────────────────────────────────────────────────────
+
+model Message {
+  id        String        @id @default(cuid())
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User          @relation(fields: [senderId], references: [id])
+  content   String
+  isRead    Boolean       @default(false)
+  readBy    MessageRead[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model MessageRead {
+  id        String  @id @default(cuid())
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId])
+}
+
+// ─── Payments ─────────────────────────────────────────────────────────────────
+
+model Payment {
+  id                    String    @id @default(cuid())
+  projectId             String
+  project               Project   @relation(fields: [projectId], references: [id])
+  clientId              String
+  client                User      @relation(fields: [clientId], references: [id])
+  amount                Float
+  currency              String    @default("usd")
+  status                String    @default("pending")  // pending | paid | failed | refunded
+  stripePaymentIntentId String?
+  stripeSessionId       String?
+  milestoneTitle        String?
+  description           String?
+  paidAt                DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// ─── Packages (Pricing) ───────────────────────────────────────────────────────
+
+model Package {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  price        Float
+  description  String?
+  features     String[]
+  pages        Int?
+  revisions    Int?
+  deliveryDays Int?
+  popular      Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
