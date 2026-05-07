@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Zap, CreditCard, Shield, Clock, Check,
-  Loader2, AlertCircle, Building2, Copy, ExternalLink,
-  Smartphone, CheckCircle2,
+  Loader2, AlertCircle, Copy, ExternalLink, CheckCircle2,
 } from 'lucide-react';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { orderAPI, paymentAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -40,10 +40,10 @@ const FEATURE_LABELS: Record<string, string> = {
 
 type PayMethod = 'cih_bank' | 'paypal' | 'taptapsend' | 'stripe';
 
-const METHODS: { id: PayMethod; label: string; desc: string; color: string }[] = [
-  { id: 'cih_bank',   label: 'CIH Bank Transfer', desc: 'Direct bank transfer (Morocco)', color: 'text-emerald-400' },
-  { id: 'paypal',     label: 'PayPal',             desc: 'Pay with your PayPal account',  color: 'text-blue-400'    },
-  { id: 'taptapsend', label: 'TapTapSend',         desc: 'Send via TapTapSend app',       color: 'text-purple-400'  },
+const METHODS: { id: PayMethod; label: string; desc: string; logo: string; bg: string }[] = [
+  { id: 'cih_bank',   label: 'CIH Bank Transfer', desc: 'Direct bank transfer (Morocco)', logo: '/images/cih.jpe',    bg: 'bg-white' },
+  { id: 'paypal',     label: 'PayPal',             desc: 'Pay with your PayPal account',  logo: '/images/paypal.jpe', bg: 'bg-white' },
+  { id: 'taptapsend', label: 'TapTapSend',         desc: 'Send via TapTapSend app',       logo: '/images/taptap.jpeg',bg: 'bg-white' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -258,12 +258,17 @@ export default function CheckoutPage() {
                       : 'bg-white/4 border-white/8 hover:border-white/15'
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                    method === m.id ? 'bg-white/10' : 'bg-white/5'
+                  <div className={`w-12 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden px-1 transition-all ${
+                    method === m.id ? 'bg-white' : 'bg-white/90'
                   }`}>
-                    {m.id === 'cih_bank'   && <Building2  className={`w-4 h-4 ${method === m.id ? m.color : 'text-slate-500'}`} />}
-                    {m.id === 'paypal'     && <CreditCard  className={`w-4 h-4 ${method === m.id ? m.color : 'text-slate-500'}`} />}
-                    {m.id === 'taptapsend' && <Smartphone  className={`w-4 h-4 ${method === m.id ? m.color : 'text-slate-500'}`} />}
+                    <Image
+                      src={m.logo}
+                      alt={m.label}
+                      width={40}
+                      height={28}
+                      className="object-contain w-full h-full"
+                      unoptimized
+                    />
                   </div>
                   <div className="flex-1">
                     <div className={`text-sm font-semibold ${method === m.id ? 'text-white' : 'text-slate-400'}`}>{m.label}</div>
@@ -291,7 +296,12 @@ export default function CheckoutPage() {
               >
                 {method === 'cih_bank' && (
                   <>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">CIH Bank Transfer Details</p>
+                    <div className="flex items-center gap-2.5 mb-4">
+                      <div className="w-10 h-7 rounded bg-white flex items-center justify-center px-1 shrink-0">
+                        <Image src="/images/cih.jpe" alt="CIH Bank" width={36} height={24} className="object-contain" unoptimized />
+                      </div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">CIH Bank Transfer Details</p>
+                    </div>
                     <div className="space-y-2.5">
                       {[
                         { label: 'Bank',       value: CIH_BANK.bank,   canCopy: false },
@@ -328,7 +338,12 @@ export default function CheckoutPage() {
 
                 {method === 'paypal' && (
                   <>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">PayPal Instructions</p>
+                    <div className="flex items-center gap-2.5 mb-4">
+                      <div className="w-10 h-7 rounded bg-white flex items-center justify-center px-1 shrink-0">
+                        <Image src="/images/paypal.jpe" alt="PayPal" width={36} height={24} className="object-contain" unoptimized />
+                      </div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">PayPal Instructions</p>
+                    </div>
                     <p className="text-sm text-slate-300 mb-3">
                       Send <span className="text-white font-bold">${order.totalPrice.toLocaleString()} USD</span> to:
                     </p>
@@ -370,7 +385,12 @@ export default function CheckoutPage() {
 
                 {method === 'taptapsend' && (
                   <>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">TapTapSend Instructions</p>
+                    <div className="flex items-center gap-2.5 mb-4">
+                      <div className="w-10 h-7 rounded bg-white flex items-center justify-center px-1 shrink-0">
+                        <Image src="/images/taptap.jpeg" alt="TapTapSend" width={36} height={24} className="object-contain" unoptimized />
+                      </div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">TapTapSend Instructions</p>
+                    </div>
                     <div className="space-y-2">
                       {[
                         { label: 'Send to',   value: TAPTAP_PHONE,  canCopy: true },
