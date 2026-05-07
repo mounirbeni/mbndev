@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Menu, X, Zap, Home, Briefcase, FolderOpen, DollarSign,
-  Info, Mail, LayoutDashboard, ChevronRight, LogIn
+  Info, Mail, LayoutDashboard, ChevronRight, LogIn,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,8 +23,13 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
+  const [mounted, setMounted]     = useState(false);
   const { user } = useAuth();
   const pathname = usePathname();
+
+  // Delay auth-dependent UI until after hydration to prevent text content mismatch.
+  // Server always renders logged-out state; client switches after mount.
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -91,9 +96,9 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Desktop CTAs */}
+            {/* Desktop CTAs — gated on mounted to prevent hydration mismatch */}
             <div className="hidden lg:flex items-center gap-3">
-              {user ? (
+              {mounted && user ? (
                 <Link href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'}>
                   <Button size="md">Dashboard →</Button>
                 </Link>
@@ -109,35 +114,25 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile hamburger */}
+            {/* Mobile hamburger — CSS-only swap avoids framer-motion SSR/hydration mismatch */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden touch-target rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="lg:hidden touch-target rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors relative"
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             >
-              <AnimatePresence mode="wait" initial={false}>
-                {menuOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <X className="w-6 h-6" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <Menu className="w-6 h-6" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Both icons always in DOM; CSS shows/hides — no text content difference between server & client */}
+              <span className="w-6 h-6 relative block">
+                <Menu
+                  className={`w-6 h-6 absolute inset-0 transition-all duration-200 ${
+                    menuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+                  }`}
+                />
+                <X
+                  className={`w-6 h-6 absolute inset-0 transition-all duration-200 ${
+                    menuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
+                  }`}
+                />
+              </span>
             </button>
           </div>
         </div>
@@ -211,9 +206,9 @@ export default function Navbar() {
               {/* Divider */}
               <div className="h-px bg-white/6 mx-3" />
 
-              {/* CTA section */}
+              {/* CTA section — gated on mounted */}
               <div className="px-3 py-3 flex flex-col gap-2">
-                {user ? (
+                {mounted && user ? (
                   <Link
                     href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'}
                     onClick={() => setMenuOpen(false)}

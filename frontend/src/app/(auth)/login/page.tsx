@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -15,13 +15,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPw, setShowPw]     = useState(false);
   const [loading, setLoading]   = useState(false);
+  const [mounted, setMounted]   = useState(false);
   const { login, user } = useAuth();
   const router = useRouter();
 
-  if (user) {
-    router.push(user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
-    return null;
-  }
+  // Wait for client mount before checking auth to prevent hydration mismatch.
+  useEffect(() => { setMounted(true); }, []);
+
+  // Redirect after mount if already logged in
+  useEffect(() => {
+    if (mounted && user) {
+      router.push(user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
+    }
+  }, [mounted, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
