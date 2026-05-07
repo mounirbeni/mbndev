@@ -17,12 +17,14 @@ import Button from '@/components/ui/Button';
 // ── Payment method config ────────────────────────────────────────────────────
 
 const CIH_BANK = {
-  rib:     process.env.NEXT_PUBLIC_CIH_RIB      || 'XXX XXX XXXXXXXXXX XX',
-  account: process.env.NEXT_PUBLIC_CIH_ACCOUNT  || 'Mounir Banni',
-  bank:    'CIH Bank',
+  holder: process.env.NEXT_PUBLIC_CIH_HOLDER || 'MOUNIR BANNI',
+  rib:    process.env.NEXT_PUBLIC_CIH_RIB    || '230 450 3396820211017700 73',
+  iban:   process.env.NEXT_PUBLIC_CIH_IBAN   || 'MA64 2304 5033 9682 0211 0177 0073',
+  swift:  process.env.NEXT_PUBLIC_CIH_SWIFT  || 'CIHMMAMC',
+  bank:   'CIH Bank',
 };
 
-const PAYPAL_ME = process.env.NEXT_PUBLIC_PAYPAL_ME || 'https://www.paypal.me/mbndev';
+const PAYPAL_EMAIL = process.env.NEXT_PUBLIC_PAYPAL_ME || 'mounirbani46@gmail.com';
 const TAPTAP_PHONE = process.env.NEXT_PUBLIC_TAPTAP_PHONE || '+212705914424';
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -290,18 +292,20 @@ export default function CheckoutPage() {
                 {method === 'cih_bank' && (
                   <>
                     <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">CIH Bank Transfer Details</p>
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       {[
-                        { label: 'Bank',      value: CIH_BANK.bank },
-                        { label: 'Account Name', value: CIH_BANK.account },
-                        { label: 'RIB',       value: CIH_BANK.rib, canCopy: true },
-                        { label: 'Amount',    value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
-                        { label: 'Reference', value: `MBN-${orderId.slice(-8).toUpperCase()}`, canCopy: true },
+                        { label: 'Bank',       value: CIH_BANK.bank,   canCopy: false },
+                        { label: 'Titulaire',  value: CIH_BANK.holder, canCopy: true  },
+                        { label: 'RIB',        value: CIH_BANK.rib,    canCopy: true  },
+                        { label: 'IBAN',       value: CIH_BANK.iban,   canCopy: true  },
+                        { label: 'SWIFT',      value: CIH_BANK.swift,  canCopy: true  },
+                        { label: 'Amount',     value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
+                        { label: 'Reference',  value: `MBN-${orderId.slice(-8).toUpperCase()}`, canCopy: true },
                       ].map(({ label, value, canCopy }) => (
                         <div key={label} className="flex items-center justify-between gap-2">
-                          <span className="text-slate-500 text-xs w-24 shrink-0">{label}</span>
+                          <span className="text-slate-500 text-xs w-20 shrink-0">{label}</span>
                           <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-                            <span className="text-white text-sm font-mono truncate">{value}</span>
+                            <span className="text-white text-xs font-mono truncate">{value}</span>
                             {canCopy && (
                               <button
                                 onClick={() => copy(value, label)}
@@ -325,21 +329,40 @@ export default function CheckoutPage() {
                 {method === 'paypal' && (
                   <>
                     <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">PayPal Instructions</p>
-                    <p className="text-sm text-slate-300">
-                      Send <span className="text-white font-bold">${order.totalPrice.toLocaleString()} USD</span> to the PayPal account below.
+                    <p className="text-sm text-slate-300 mb-3">
+                      Send <span className="text-white font-bold">${order.totalPrice.toLocaleString()} USD</span> to:
                     </p>
+                    <div className="space-y-2.5 mb-3">
+                      {[
+                        { label: 'PayPal Email', value: PAYPAL_EMAIL,  canCopy: true },
+                        { label: 'Amount',       value: `$${order.totalPrice.toLocaleString()} USD`, canCopy: true },
+                        { label: 'Reference',    value: `MBN-${orderId.slice(-8).toUpperCase()}`,    canCopy: true },
+                      ].map(({ label, value, canCopy }) => (
+                        <div key={label} className="flex items-center justify-between gap-2">
+                          <span className="text-slate-500 text-xs w-24 shrink-0">{label}</span>
+                          <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+                            <span className="text-white text-xs font-mono truncate">{value}</span>
+                            {canCopy && (
+                              <button onClick={() => copy(value, label)} className="text-slate-500 hover:text-primary-400 transition-colors shrink-0">
+                                {copied === label ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                     <a
-                      href={`${PAYPAL_ME}/${order.totalPrice}`}
+                      href="https://www.paypal.com/send"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-semibold text-sm transition-all"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
                       style={{ background: '#003087', color: '#fff' }}
                     >
-                      Pay with PayPal
+                      Open PayPal
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                     <p className="text-xs text-slate-500 mt-2">
-                      Include reference: <span className="font-mono text-slate-400">MBN-{orderId.slice(-8).toUpperCase()}</span> in the note.
+                      Use "Send Money" → enter the email above → add the reference in the note field.
                       After paying, click the button below.
                     </p>
                   </>
