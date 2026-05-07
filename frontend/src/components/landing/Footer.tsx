@@ -1,10 +1,22 @@
 import { Zap, MapPin, Mail, Phone, Facebook, Linkedin, Twitter, Github, Heart } from 'lucide-react';
 import Link from 'next/link';
 
-const links = {
-  'Quick Links': ['Home', 'Services', 'Portfolio', 'Pricing', 'About', 'Contact'],
-  Services: ['Custom Websites', 'E-commerce Stores', 'Web Applications', 'Landing Pages', 'Maintenance & Support'],
-};
+const quickLinks = [
+  { label: 'Home',      href: '/' },
+  { label: 'Services',  href: '/services' },
+  { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Pricing',   href: '/pricing' },
+  { label: 'About',     href: '/about' },
+  { label: 'Contact',   href: '/contact' },
+];
+
+const serviceLinks = [
+  { label: 'Custom Websites',       href: '/services/custom-websites' },
+  { label: 'E-Commerce Stores',     href: '/services/ecommerce' },
+  { label: 'Web Applications',      href: '/services/web-applications' },
+  { label: 'Landing Pages',         href: '/services/landing-pages' },
+  { label: 'Maintenance & Support', href: '/services/maintenance' },
+];
 
 const socials = [
   { icon: Facebook, href: '#' },
@@ -31,24 +43,39 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Links */}
-          {Object.entries(links).map(([section, items]) => (
-            <div key={section}>
-              <h4 className="text-white font-semibold text-sm mb-4">{section}</h4>
-              <ul className="space-y-2">
-                {items.map((item) => (
-                  <li key={item}>
-                    <a
-                      href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="text-slate-500 text-sm hover:text-slate-300 transition-colors"
-                    >
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-white font-semibold text-sm mb-4">Quick Links</h4>
+            <ul className="space-y-2">
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-slate-500 text-sm hover:text-slate-300 transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 className="text-white font-semibold text-sm mb-4">Services</h4>
+            <ul className="space-y-2">
+              {serviceLinks.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-slate-500 text-sm hover:text-slate-300 transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Contact */}
           <div>
@@ -60,7 +87,9 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 shrink-0" />
-                hello@mbndev.com
+                <Link href="/contact" className="hover:text-slate-300 transition-colors">
+                  hello@mbndev.com
+                </Link>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 shrink-0" />
@@ -82,10 +111,14 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/5 mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-slate-600 text-sm">© 2024 MBN DEV. All rights reserved.</p>
-          <p className="text-slate-600 text-sm flex items-center gap-1.5">
-            Made with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> in Morocco
-          </p>
+          <p className="text-slate-600 text-sm">© 2025 MBN DEV. All rights reserved.</p>
+          <div className="flex items-center gap-4 text-slate-600 text-sm">
+            <Link href="/pricing" className="hover:text-slate-400 transition-colors">Pricing</Link>
+            <Link href="/contact" className="hover:text-slate-400 transition-colors">Contact</Link>
+            <span className="flex items-center gap-1.5">
+              Made with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> in Morocco
+            </span>
+          </div>
         </div>
       </div>
     </footer>

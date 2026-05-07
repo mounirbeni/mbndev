@@ -1,5 +1,5 @@
 'use client';
-
+// v2
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -17,7 +17,8 @@ const services = [
     description: 'Fully custom, responsive websites designed and developed from scratch to match your brand identity and business goals.',
     features: ['Pixel-perfect responsive design', 'SEO-optimized structure', 'Performance-first development', 'CMS integration', 'Google Analytics setup', 'Custom domain & hosting support'],
     price: 'From $299',
-    slug: 'websites',
+    slug: 'custom-websites',
+    detailPage: true,
     color: 'from-primary-500/20 to-blue-500/10',
     border: 'border-primary-500/30',
   },
@@ -29,6 +30,7 @@ const services = [
     features: ['Stripe & PayPal integration', 'Product catalog & filtering', 'Cart & checkout optimization', 'Order management dashboard', 'Inventory tracking', 'Email notifications'],
     price: 'From $699',
     slug: 'ecommerce',
+    detailPage: true,
     color: 'from-blue-500/20 to-cyan-500/10',
     border: 'border-blue-500/30',
   },
@@ -40,6 +42,7 @@ const services = [
     features: ['JWT authentication system', 'Role-based access control', 'Real-time data updates', 'REST API development', 'Database design & optimization', 'CI/CD deployment pipeline'],
     price: 'From $1,299',
     slug: 'saas',
+    detailPage: false,
     color: 'from-purple-500/20 to-primary-500/10',
     border: 'border-purple-500/30',
   },
@@ -51,6 +54,7 @@ const services = [
     features: ['Conversion-optimized layout', 'A/B testing ready', 'Fast load time (<2s)', 'Lead capture forms', 'Social proof sections', 'Mobile-first design'],
     price: 'From $199',
     slug: 'landing-pages',
+    detailPage: true,
     color: 'from-green-500/20 to-emerald-500/10',
     border: 'border-green-500/30',
   },
@@ -61,7 +65,8 @@ const services = [
     description: 'Tailored web applications built for your specific business workflow — from internal tools to customer-facing platforms.',
     features: ['Custom business logic', 'Third-party API integration', 'File upload & management', 'Notifications system', 'Reporting & analytics', 'Scalable architecture'],
     price: 'From $999',
-    slug: 'web-apps',
+    slug: 'web-applications',
+    detailPage: true,
     color: 'from-orange-500/20 to-yellow-500/10',
     border: 'border-orange-500/30',
   },
@@ -73,6 +78,7 @@ const services = [
     features: ['Monthly performance reports', 'Security patches & updates', 'Bug fixes & hotfixes', 'Feature add-ons', 'Uptime monitoring', 'Priority response time'],
     price: 'From $99/mo',
     slug: 'maintenance',
+    detailPage: true,
     color: 'from-slate-500/20 to-slate-600/10',
     border: 'border-slate-500/30',
   },
@@ -120,6 +126,7 @@ export default function ServicesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((s, i) => {
               const Icon = s.icon;
+              const href = s.detailPage ? `/services/${s.slug}` : `/request?service=${s.slug}`;
               return (
                 <motion.div
                   key={s.slug}
@@ -127,31 +134,33 @@ export default function ServicesPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className={`glass rounded-2xl p-8 border ${s.border} bg-gradient-to-br ${s.color} flex flex-col group hover:scale-[1.02] transition-transform duration-300`}
                 >
-                  <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-5">
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-1">{s.title}</h3>
-                  <p className="text-primary-400 text-sm mb-3 font-medium">{s.tagline}</p>
-                  <p className="text-slate-400 text-sm mb-6 leading-relaxed flex-1">{s.description}</p>
+                  <Link href={href} className="block h-full">
+                    <div className={`glass rounded-2xl p-8 border ${s.border} bg-gradient-to-br ${s.color} flex flex-col group hover:scale-[1.02] transition-transform duration-300 h-full cursor-pointer`}>
+                      <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-5">
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-1">{s.title}</h3>
+                      <p className="text-primary-400 text-sm mb-3 font-medium">{s.tagline}</p>
+                      <p className="text-slate-400 text-sm mb-6 leading-relaxed flex-1">{s.description}</p>
 
-                  <ul className="space-y-2 mb-6">
-                    {s.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-xs text-slate-400">
-                        <Check className="w-3.5 h-3.5 text-primary-400 shrink-0" /> {f}
-                      </li>
-                    ))}
-                  </ul>
+                      <ul className="space-y-2 mb-6">
+                        {s.features.map((f) => (
+                          <li key={f} className="flex items-center gap-2 text-xs text-slate-400">
+                            <Check className="w-3.5 h-3.5 text-primary-400 shrink-0" /> {f}
+                          </li>
+                        ))}
+                      </ul>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
-                    <span className="text-white font-bold">{s.price}</span>
-                    <Link href={`/request?service=${s.slug}`}>
-                      <button className="flex items-center gap-1.5 text-primary-400 text-sm font-medium hover:text-primary-300 transition-colors group-hover:gap-2.5">
-                        Get Started <ArrowRight className="w-3.5 h-3.5 transition-all" />
-                      </button>
-                    </Link>
-                  </div>
+                      <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
+                        <span className="text-white font-bold">{s.price}</span>
+                        <span className="flex items-center gap-1.5 text-primary-400 text-sm font-medium group-hover:gap-2.5 transition-all">
+                          {s.detailPage ? 'Learn More' : 'Get Started'}
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
                 </motion.div>
               );
             })}
