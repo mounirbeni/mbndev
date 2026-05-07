@@ -6,16 +6,19 @@ async function seed() {
   console.log('🌱  Seeding Neon database...');
 
   // Wipe existing data (order matters for FK constraints)
+  await prisma.activityLog?.deleteMany().catch(() => {});
+  await prisma.notification?.deleteMany().catch(() => {});
   await prisma.messageRead.deleteMany();
   await prisma.message.deleteMany();
   await prisma.projectFile.deleteMany();
   await prisma.milestone.deleteMany();
   await prisma.payment.deleteMany();
   await prisma.project.deleteMany();
+  await prisma.order?.deleteMany().catch(() => {});
   await prisma.package.deleteMany();
   await prisma.user.deleteMany();
 
-  // Admin
+  // Admin account only — no demo data
   await prisma.user.create({
     data: {
       name: 'Mounir Banni',
@@ -23,40 +26,6 @@ async function seed() {
       password: await bcrypt.hash('admin123', 12),
       role: 'admin',
       company: 'MBN DEV',
-    },
-  });
-
-  // Demo client
-  const client = await prisma.user.create({
-    data: {
-      name: 'Youssef A.',
-      email: 'client@demo.com',
-      password: await bcrypt.hash('client123', 12),
-      role: 'client',
-      company: 'Demo Business',
-    },
-  });
-
-  // Demo project
-  await prisma.project.create({
-    data: {
-      title: 'E-Commerce Website',
-      description: 'A full-featured online store with payment integration.',
-      type: 'ecommerce',
-      status: 'in-progress',
-      progress: 60,
-      budget: 699,
-      package: 'pro',
-      features: ['Payment Integration', 'Admin Dashboard', 'SEO Optimization'],
-      designStyle: 'Modern',
-      designColors: ['#7c3aed', '#3b82f6'],
-      clientId: client.id,
-      milestones: {
-        create: [
-          { title: 'Design', amount: 200, status: 'paid' },
-          { title: 'Development', amount: 499, status: 'pending' },
-        ],
-      },
     },
   });
 
@@ -100,8 +69,8 @@ async function seed() {
   });
 
   console.log('✅  Seed complete!');
-  console.log('   Admin  → admin@mbndev.com  / admin123');
-  console.log('   Client → client@demo.com   / client123');
+  console.log('   Admin → admin@mbndev.com / admin123');
+  console.log('   ℹ️   No demo client or demo project seeded — real data only.');
 }
 
 seed()

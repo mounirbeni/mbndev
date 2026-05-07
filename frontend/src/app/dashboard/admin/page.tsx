@@ -4,41 +4,37 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { FolderOpen, Users, CreditCard, Clock, ArrowRight, TrendingUp } from 'lucide-react';
-import { projectAPI, adminAPI, paymentAPI } from '@/lib/api';
+import { adminAPI } from '@/lib/api';
 import { Project, User, Payment } from '@/types';
 import StatsCard from '@/components/dashboard/StatsCard';
 import ProjectCard from '@/components/dashboard/ProjectCard';
-import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, timeAgo } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 
+interface Analytics {
+  totalProjects: number;
+  totalClients: number;
+  activeClients: number;
+  totalRevenue: number;
+  pendingRevenue: number;
+  byStatus: { pending: number; inProgress: number; completed: number; cancelled: number; review: number; revision: number; paid: number };
+  recentProjects: Project[];
+  recentClients: User[];
+  recentPayments: Payment[];
+}
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ total: 0, inProgress: 0, completed: 0, pending: 0 });
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [clients, setClients] = useState<User[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      projectAPI.getStats(),
-      projectAPI.getAll(),
-      adminAPI.getClients(),
-      paymentAPI.getAll(),
-    ])
-      .then(([sRes, pRes, cRes, pyRes]) => {
-        setStats(sRes.data.stats);
-        setProjects(pRes.data.projects.slice(0, 5));
-        setClients(cRes.data.clients.slice(0, 5));
-        setPayments(pyRes.data.payments.slice(0, 5));
-      })
+    adminAPI.getAnalytics()
+      .then(({ data }) => setAnalytics(data.analytics))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  const totalRevenue = payments
-    .filter((p) => p.status === 'paid')
-    .reduce((s, p) => s + p.amount, 0);
+  const a = analytics;
 
   return (
     <div className="space-y-8 max-w-7xl">
@@ -49,10 +45,10 @@ export default function AdminDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Total Projects" value={stats.total} subtitle="All time" icon={FolderOpen} color="purple" index={0} />
-        <StatsCard title="In Progress" value={stats.inProgress} subtitle="Active now" icon={Clock} color="blue" index={1} />
-        <StatsCard title="Completed" value={stats.completed} subtitle="Delivered" icon={TrendingUp} color="green" index={2} />
-        <StatsCard title="Total Revenue" value={formatCurrency(totalRevenue)} subtitle="Paid invoices" icon={CreditCard} color="yellow" index={3} />
+        <StatsCard title="Total Projects"  value={loading ? '—' : (a?.totalProjects ?? 0)}              subtitle="All time"     icon={FolderOpen} color="purple" index={0} />
+        <StatsCard title="In Progress"     value={loading ? '—' : (a?.byStatus.inProgress ?? 0)}        subtitle="Active now"   icon={Clock}      color="blue"   index={1} />
+        <StatsCard title="Completed"       value={loading ? '—' : (a?.byStatus.completed ?? 0)}         subtitle="Delivered"    icon={TrendingUp}  color="green"  index={2} />
+        <StatsCard title="Total Revenue"   value={loading ? '—' : formatCurrency(a?.totalRevenue ?? 0)} subtitle="Paid invoices" icon={CreditCard}  color="yellow" index={3} />
       </div>
 
       {/* Projects + Clients */}
@@ -68,22 +64,30 @@ export default function AdminDashboard() {
             </Link>
           </div>
           <div className="space-y-3">
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="glass rounded-2xl h-20 animate-pulse" />
-                ))
-              : projects.map((p, i) => (
-                  <ProjectCard
-                    key={p._id}
-                    project={p}
-                    href={`/dashboard/admin/projects/${p._id}`}
-                    index={i}
-                  />
-                ))}
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="glass rounded-2xl h-20 animate-pulse" />
+              ))
+            ) : (a?.recentProjects ?? []).length === 0 ? (
+              <div className="glass rounded-2xl border border-white/5 p-10 text-center">
+                <FolderOpen className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                <p className="text-slate-400 text-sm font-medium">No projects yet</p>
+                <p className="text-slate-600 text-xs mt-1">Projects will appear here once clients place orders.</p>
+              </div>
+            ) : (
+              (a?.recentProjects ?? []).map((p, i) => (
+                <ProjectCard
+                  key={p._id ?? p.id}
+                  project={p}
+                  href={`/dashboard/admin/projects/${p._id ?? p.id}`}
+                  index={i}
+                />
+              ))
+            )}
           </div>
         </div>
 
-        {/* Recent Activity */}
+        {/* Recent Clients */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white">Recent Clients</h2>
@@ -100,10 +104,15 @@ export default function AdminDashboard() {
                   <div key={i} className="h-10 bg-white/5 rounded-xl animate-pulse" />
                 ))}
               </div>
+            ) : (a?.recentClients ?? []).length === 0 ? (
+              <div className="p-10 text-center">
+                <Users className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+                <p className="text-slate-500 text-sm">No clients yet</p>
+              </div>
             ) : (
               <div className="divide-y divide-white/5">
-                {clients.map((c) => (
-                  <div key={c._id} className="flex items-center gap-3 p-4">
+                {(a?.recentClients ?? []).map((c) => (
+                  <div key={c._id ?? c.id} className="flex items-center gap-3 p-4">
                     <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
                       {c.name[0]}
                     </div>

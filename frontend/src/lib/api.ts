@@ -93,8 +93,9 @@ export const packageAPI = {
 
 // Admin
 export const adminAPI = {
-  getClients:    ()          => api.get('/admin/clients'),
+  getClients:    ()           => api.get('/admin/clients'),
   toggleClient:  (id: string) => api.put(`/admin/clients/${id}/toggle`),
+  getAnalytics:  ()           => api.get('/admin/analytics'),
 };
 
 export default api;

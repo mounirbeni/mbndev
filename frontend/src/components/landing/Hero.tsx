@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowRight, Zap, Shield, Code2, Headphones,
-  MapPin, TrendingUp, CheckCircle2, Circle, BarChart2,
+  MapPin, CheckCircle2, Circle, BarChart2, Sparkles,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
@@ -107,22 +107,22 @@ export default function Hero() {
                 <div className="flex items-center justify-between mb-5">
                   <div>
                     <h3 className="text-white font-semibold text-sm">Project Overview</h3>
-                    <p className="text-slate-500 text-xs mt-0.5">All time activity</p>
+                    <p className="text-slate-500 text-xs mt-0.5">Your client dashboard</p>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-primary-500/10 border border-primary-500/20 rounded-full px-3 py-1">
-                    <TrendingUp className="w-3 h-3 text-primary-400" />
-                    <span className="text-primary-400 text-xs font-medium">+24% this month</span>
+                  <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
+                    <Sparkles className="w-3 h-3 text-green-400" />
+                    <span className="text-green-400 text-xs font-medium">Live tracking</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mb-5">
                   {[
-                    { value: '16', label: 'Total',       bg: 'bg-white/5',        text: 'text-white' },
-                    { value: '6',  label: 'In Progress', bg: 'bg-blue-500/10',    text: 'text-blue-400' },
-                    { value: '8',  label: 'Completed',   bg: 'bg-primary-500/10', text: 'text-primary-400' },
+                    { label: 'Total',       bg: 'bg-white/5',        text: 'text-white',        bar: 'w-full' },
+                    { label: 'In Progress', bg: 'bg-blue-500/10',    text: 'text-blue-400',     bar: 'w-2/3' },
+                    { label: 'Completed',   bg: 'bg-primary-500/10', text: 'text-primary-400',  bar: 'w-1/2' },
                   ].map((s) => (
                     <div key={s.label} className={`${s.bg} rounded-xl p-3 text-center`}>
-                      <div className={`${s.text} font-bold text-xl`}>{s.value}</div>
+                      <div className={`${s.text} font-bold text-xl`}>—</div>
                       <div className="text-slate-500 text-[11px] mt-0.5">{s.label}</div>
                     </div>
                   ))}
