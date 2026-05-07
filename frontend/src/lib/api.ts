@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+  // All requests go to /api which Next.js rewrites to the backend
+  // (localhost:5000 in dev, /_/backend in production on Vercel)
+  baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
