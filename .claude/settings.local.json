@@ -19,7 +19,10 @@
       "Bash(node -e \"require\\('./src/routes/orders'\\); require\\('./src/routes/notifications'\\); require\\('./src/routes/payments'\\); console.log\\('All routes OK'\\)\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\" -Directory)",
       "Bash(Select-Object Name)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "WebFetch(domain:tyymaroc.vercel.app)",
+      "WebFetch(domain:emll.vercel.app)",
+      "WebFetch(domain:www.riadconnect.com)"
     ]
   }
 }

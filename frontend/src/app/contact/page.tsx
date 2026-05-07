@@ -9,10 +9,10 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 
 const contactInfo = [
-  { icon: Mail, label: 'Email', value: 'hello@mbndev.com', href: 'mailto:hello@mbndev.com' },
-  { icon: Phone, label: 'WhatsApp', value: '+212 6 12 34 56 78', href: 'https://wa.me/212612345678' },
-  { icon: MapPin, label: 'Location', value: 'Morocco — Available Worldwide', href: null },
-  { icon: Clock, label: 'Response Time', value: 'Within 24 hours', href: null },
+  { icon: Mail,    label: 'Email',         value: 'mounirbani46@gmail.com',    href: 'mailto:mounirbani46@gmail.com'                      },
+  { icon: Phone,   label: 'WhatsApp',      value: '+212 705 914 424',          href: 'https://wa.me/212705914424'                         },
+  { icon: MapPin,  label: 'Location',      value: 'Morocco — Available Worldwide', href: null                                            },
+  { icon: Clock,   label: 'Response Time', value: 'Within a few hours',        href: null                                                },
 ];
 
 const faqs = [
@@ -24,7 +24,6 @@ const faqs = [
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
-  const [loading, setLoading] = useState(false);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -35,11 +34,12 @@ export default function ContactPage() {
       toast.error('Please fill in all required fields');
       return;
     }
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    toast.success("Message sent! I'll get back to you within 24 hours.");
-    setForm({ name: '', email: '', subject: '', message: '' });
+    // Build a WhatsApp message from the form and open it
+    const subject = form.subject ? `[${form.subject}] ` : '';
+    const text = encodeURIComponent(
+      `Hi Mounir, I'm ${form.name} (${form.email}).\n\n${subject}${form.message}`
+    );
+    window.open(`https://wa.me/212705914424?text=${text}`, '_blank');
   };
 
   return (
@@ -104,7 +104,7 @@ export default function ContactPage() {
               <h3 className="text-white font-semibold text-sm mb-4">Quick Actions</h3>
               <div className="space-y-2">
                 <a
-                  href="https://wa.me/212612345678?text=Hi%20Mounir,%20I'd%20like%20to%20discuss%20a%20project"
+                  href="https://wa.me/212705914424?text=Hi%20Mounir,%20I'd%20like%20to%20discuss%20a%20project"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-xl hover:border-green-500/40 transition-colors group"
@@ -114,7 +114,7 @@ export default function ContactPage() {
                   <ArrowRight className="w-3.5 h-3.5 text-green-400 ml-auto group-hover:translate-x-1 transition-transform" />
                 </a>
                 <a
-                  href="mailto:hello@mbndev.com"
+                  href="mailto:mounirbani46@gmail.com"
                   className="flex items-center gap-3 p-3 bg-primary-500/10 border border-primary-500/20 rounded-xl hover:border-primary-500/40 transition-colors group"
                 >
                   <Mail className="w-4 h-4 text-primary-400" />
@@ -165,9 +165,12 @@ export default function ContactPage() {
                     required
                   />
                 </div>
-                <Button type="submit" size="lg" loading={loading} className="w-full group">
-                  Send Message <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <Button type="submit" size="lg" className="w-full group">
+                  Send via WhatsApp <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
+                <p className="text-xs text-slate-600 text-center">
+                  This will open WhatsApp with your message pre-filled.
+                </p>
               </form>
             </div>
           </motion.div>

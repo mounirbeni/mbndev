@@ -27,11 +27,26 @@ export default function AdminOrdersPage() {
   const [search,  setSearch]  = useState('');
   const [filter,  setFilter]  = useState<string>('all');
 
-  useEffect(() => {
+  const fetchOrders = (silent = false) => {
+    if (!silent) setLoading(true);
     orderAPI.getAll(filter !== 'all' ? { status: filter } : {})
       .then(({ data }) => setOrders(data.orders || []))
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { if (!silent) setLoading(false); });
+  };
+
+  useEffect(() => { fetchOrders(); }, [filter]);
+
+  // Real-time polling (20 s when tab is visible)
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(() => fetchOrders(true), 20_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const filtered = orders.filter((o) =>

@@ -7,86 +7,98 @@ import { ExternalLink, ArrowRight, Zap } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 
-const categories = ['All', 'E-Commerce', 'Web App', 'Landing Page', 'SaaS', 'Corporate'];
+const categories = ['All', 'E-Commerce', 'Web App', 'SaaS', 'Hospitality'];
 
 const projects = [
   {
     id: 1,
-    title: 'Ayoub Transport',
-    category: 'Corporate',
-    type: 'Corporate Website',
-    description: 'A full corporate website for a Moroccan transport & logistics company with fleet management portal.',
-    tags: ['Next.js', 'Tailwind CSS', 'Prisma', 'PostgreSQL'],
-    gradient: 'from-blue-600/40 to-cyan-500/20',
-    accent: 'text-blue-400',
-    border: 'border-blue-500/20',
-    metrics: [{ label: 'Load Time', value: '0.9s' }, { label: 'Lighthouse', value: '98' }, { label: 'Uptime', value: '99.9%' }],
-    result: 'Increased online inquiries by 340%',
+    title: 'CarryLink',
+    url: 'https://carrylink.vercel.app/',
+    category: 'Web App',
+    type: 'P2P Logistics Platform',
+    description: 'Peer-to-peer delivery platform that connects senders with travelers for cost-effective package delivery worldwide. Features user authentication, shipment tracking, and a matching engine.',
+    tags: ['Next.js', 'Tailwind CSS', 'Node.js', 'PostgreSQL'],
+    gradient: 'from-sky-600/40 to-blue-500/20',
+    accent: 'text-sky-400',
+    border: 'border-sky-500/20',
+    stats: [
+      { label: 'Type',     value: 'P2P'        },
+      { label: 'Auth',     value: 'Full'        },
+      { label: 'Delivery', value: 'Worldwide'   },
+    ],
+    highlight: 'Connects senders & travelers for affordable worldwide delivery',
   },
   {
     id: 2,
-    title: 'Dar Marrakech',
-    category: 'Corporate',
-    type: 'Hotel & Booking',
-    description: 'Luxury riad booking platform with reservation system, room gallery, and multilingual support.',
-    tags: ['React', 'Node.js', 'Stripe', 'MongoDB'],
-    gradient: 'from-amber-600/40 to-orange-500/20',
-    accent: 'text-amber-400',
-    border: 'border-amber-500/20',
-    metrics: [{ label: 'Bookings', value: '+280%' }, { label: 'Bounce Rate', value: '-42%' }, { label: 'Revenue', value: '+$12k' }],
-    result: 'Fully replaced third-party booking platform',
+    title: 'Lueur Skin',
+    url: 'https://lueurskin.vercel.app/',
+    category: 'E-Commerce',
+    type: 'Premium Skincare Store',
+    description: 'Luxury skincare e-commerce brand selling sea moss gummies and herbal teas. Features an AI-powered skin consultation that gives personalized product recommendations.',
+    tags: ['Next.js', 'E-Commerce', 'AI Skin Analysis', 'Stripe'],
+    gradient: 'from-rose-600/30 to-pink-400/20',
+    accent: 'text-rose-400',
+    border: 'border-rose-500/20',
+    stats: [
+      { label: 'AI Feature', value: 'Skin Quiz'  },
+      { label: 'Style',      value: 'Luxury'     },
+      { label: 'Market',     value: 'Global'     },
+    ],
+    highlight: 'AI skin consultation drives personalized product discovery',
   },
   {
     id: 3,
-    title: 'Morocco Shop',
+    title: 'TyyMaroc',
+    url: 'https://tyymaroc.vercel.app/',
     category: 'E-Commerce',
-    type: 'E-Commerce Store',
-    description: 'Full-featured e-commerce platform for Moroccan artisan products with Arabic/French/English support.',
-    tags: ['Next.js', 'Stripe', 'Prisma', 'Cloudinary'],
-    gradient: 'from-emerald-600/40 to-green-500/20',
-    accent: 'text-emerald-400',
-    border: 'border-emerald-500/20',
-    metrics: [{ label: 'Products', value: '500+' }, { label: 'Orders/mo', value: '1.2k' }, { label: 'Revenue', value: '+65%' }],
-    result: 'Launched in 3 weeks, profitable in month 1',
+    type: 'Online Parapharmacie',
+    description: 'Moroccan e-commerce platform for certified beauty, health, wellness, and orthopedic products. Bilingual (FR/AR) with 24–48hr local delivery and a clean product catalog.',
+    tags: ['Next.js', 'Bilingual FR/AR', 'Product Catalog', 'Vercel'],
+    gradient: 'from-teal-600/35 to-emerald-500/20',
+    accent: 'text-teal-400',
+    border: 'border-teal-500/20',
+    stats: [
+      { label: 'Languages', value: 'FR / AR'    },
+      { label: 'Delivery',  value: '24–48h'     },
+      { label: 'Market',    value: 'Morocco'    },
+    ],
+    highlight: 'Certified wellness products with fast Moroccan delivery',
   },
   {
     id: 4,
-    title: 'Atlas Real Estate',
-    category: 'Web App',
-    type: 'Real Estate Platform',
-    description: 'Property listing and management platform with advanced search, map integration, and agent portal.',
-    tags: ['React', 'Mapbox', 'Express', 'PostgreSQL'],
-    gradient: 'from-rose-600/40 to-pink-500/20',
-    accent: 'text-rose-400',
-    border: 'border-rose-500/20',
-    metrics: [{ label: 'Listings', value: '2k+' }, { label: 'Agents', value: '45' }, { label: 'Leads/mo', value: '320' }],
-    result: 'Top real estate platform in the Atlas region',
+    title: 'Emll',
+    url: 'https://emll.vercel.app/',
+    category: 'Hospitality',
+    type: 'Travel Experience Booking',
+    description: 'Marrakech travel experience platform for booking guided tours and activities — desert trips, cooking classes, and mountain adventures with local guides.',
+    tags: ['Next.js', 'Booking System', 'Email Automation', 'Payments'],
+    gradient: 'from-amber-600/35 to-orange-400/20',
+    accent: 'text-amber-400',
+    border: 'border-amber-500/20',
+    stats: [
+      { label: 'City',       value: 'Marrakech' },
+      { label: 'Activities', value: '10+'       },
+      { label: 'Style',      value: 'Moroccan'  },
+    ],
+    highlight: 'Authentic Marrakech experiences — desert, mountains & culture',
   },
   {
     id: 5,
-    title: 'SaaS Analytics Pro',
+    title: 'RiadConnect',
+    url: 'https://www.riadconnect.com/',
     category: 'SaaS',
-    type: 'Analytics Dashboard',
-    description: 'Multi-tenant SaaS analytics platform with real-time charts, custom reports, and team management.',
-    tags: ['Next.js', 'Recharts', 'Prisma', 'Redis'],
-    gradient: 'from-violet-600/40 to-purple-500/20',
+    type: 'Hospitality SaaS Platform',
+    description: 'Commission-free booking platform for Moroccan Riads. Provides AI guest assistant, custom riad websites, SEO optimization, and WhatsApp integration — giving riads full ownership of their bookings.',
+    tags: ['Next.js', 'AI Assistant', 'WhatsApp API', 'SEO'],
+    gradient: 'from-violet-600/35 to-purple-400/20',
     accent: 'text-violet-400',
     border: 'border-violet-500/20',
-    metrics: [{ label: 'Users', value: '800+' }, { label: 'MRR', value: '$4.2k' }, { label: 'Churn', value: '1.2%' }],
-    result: 'Profitable SaaS in 60 days post-launch',
-  },
-  {
-    id: 6,
-    title: 'Resto Digital',
-    category: 'Landing Page',
-    type: 'Restaurant Landing',
-    description: 'High-converting restaurant landing page with online menu, reservation form, and Google Maps embed.',
-    tags: ['Next.js', 'Framer Motion', 'Resend', 'Vercel'],
-    gradient: 'from-orange-600/40 to-red-500/20',
-    accent: 'text-orange-400',
-    border: 'border-orange-500/20',
-    metrics: [{ label: 'Reservations', value: '+220%' }, { label: 'Load Time', value: '0.7s' }, { label: 'Score', value: '100' }],
-    result: 'Doubled reservation rate within 2 weeks',
+    stats: [
+      { label: 'AI',         value: 'Guest Bot' },
+      { label: 'Fees',       value: '0%'        },
+      { label: 'Market',     value: 'Riads'     },
+    ],
+    highlight: 'Commission-free direct bookings with AI guest assistant',
   },
 ];
 
@@ -103,13 +115,13 @@ export default function PortfolioPage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-6">
-              <Zap className="w-3 h-3 text-primary-400" /> Our Work
+              <Zap className="w-3 h-3 text-primary-400" /> Real Projects
             </span>
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight">
               Projects That<br /><span className="gradient-text">Speak for Themselves</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Real projects, real results. Every product we ship is built to perform, scale, and convert.
+              Live products built for real clients — from Moroccan e-commerce to global SaaS platforms.
             </p>
           </motion.div>
         </div>
@@ -153,38 +165,55 @@ export default function PortfolioPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.07 }}
-                  className={`glass rounded-2xl border ${p.border} overflow-hidden group hover:scale-[1.02] transition-transform duration-300 flex flex-col`}
+                  className={`glass rounded-2xl border ${p.border} overflow-hidden group hover:scale-[1.015] transition-transform duration-300 flex flex-col`}
                 >
                   {/* Preview area */}
-                  <div className={`h-48 bg-gradient-to-br ${p.gradient} relative flex items-center justify-center`}>
-                    <div className="text-center">
-                      <div className={`text-4xl font-black ${p.accent} opacity-20 select-none`}>
-                        {p.title.split(' ').map(w => w[0]).join('')}
-                      </div>
+                  <div className={`h-44 bg-gradient-to-br ${p.gradient} relative flex items-center justify-center overflow-hidden`}>
+                    {/* Big initials watermark */}
+                    <div className={`text-6xl font-black ${p.accent} opacity-10 select-none tracking-tighter`}>
+                      {p.title.replace(/\s/g, '')}
                     </div>
-                    <span className="absolute top-3 right-3 text-[10px] bg-white/10 border border-white/20 rounded-full px-2.5 py-1 text-slate-300">
+                    {/* Type badge */}
+                    <span className="absolute top-3 right-3 text-[10px] bg-black/30 backdrop-blur-sm border border-white/15 rounded-full px-2.5 py-1 text-slate-300">
                       {p.type}
+                    </span>
+                    {/* Live badge */}
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] bg-green-500/20 border border-green-500/30 rounded-full px-2.5 py-1 text-green-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                      Live
                     </span>
                   </div>
 
                   <div className="p-6 flex flex-col flex-1">
-                    <h3 className="text-white font-bold text-lg mb-2">{p.title}</h3>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="text-white font-bold text-lg">{p.title}</h3>
+                      <a
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`shrink-0 ${p.accent} opacity-60 hover:opacity-100 transition-opacity`}
+                        aria-label={`Visit ${p.title}`}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
+
                     <p className="text-slate-400 text-sm leading-relaxed mb-4 flex-1">{p.description}</p>
 
-                    {/* Metrics */}
+                    {/* Stats */}
                     <div className="grid grid-cols-3 gap-2 mb-4">
-                      {p.metrics.map((m) => (
-                        <div key={m.label} className="bg-white/5 rounded-lg p-2 text-center">
-                          <div className={`text-sm font-bold ${p.accent}`}>{m.value}</div>
-                          <div className="text-slate-600 text-[10px]">{m.label}</div>
+                      {p.stats.map((s) => (
+                        <div key={s.label} className="bg-white/5 rounded-lg p-2 text-center">
+                          <div className={`text-xs font-bold ${p.accent}`}>{s.value}</div>
+                          <div className="text-slate-600 text-[10px] mt-0.5">{s.label}</div>
                         </div>
                       ))}
                     </div>
 
-                    {/* Result */}
-                    <div className="flex items-start gap-2 p-3 bg-white/5 rounded-xl mb-4">
+                    {/* Highlight */}
+                    <div className="flex items-start gap-2 p-3 bg-white/4 rounded-xl mb-4">
                       <Zap className="w-3.5 h-3.5 text-primary-400 mt-0.5 shrink-0" />
-                      <span className="text-slate-300 text-xs">{p.result}</span>
+                      <span className="text-slate-300 text-xs leading-snug">{p.highlight}</span>
                     </div>
 
                     {/* Tags */}
@@ -207,7 +236,7 @@ export default function PortfolioPage() {
       <section className="pb-24 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-3xl font-bold text-white mb-3">Ready to be our next case study?</h2>
+            <h2 className="text-3xl font-bold text-white mb-3">Want to be our next project?</h2>
             <p className="text-slate-400 mb-8">Let's build something remarkable together.</p>
             <Link href="/request">
               <Button size="lg" className="group">
