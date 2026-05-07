@@ -135,29 +135,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo accounts */}
-          <div className="flex items-center gap-3 mt-5 mb-4">
-            <div className="flex-1 h-px bg-white/8" />
-            <span className="text-slate-600 text-[11px] font-medium tracking-wide">DEMO ACCOUNTS</span>
-            <div className="flex-1 h-px bg-white/8" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            {[
-              { role: 'Admin',  email: 'admin@mbndev.com',  pw: 'admin123',  color: 'text-primary-400', bg: 'hover:bg-primary-500/8 hover:border-primary-500/20' },
-              { role: 'Client', email: 'client@demo.com',   pw: 'client123', color: 'text-blue-400',    bg: 'hover:bg-blue-500/8 hover:border-blue-500/20' },
-            ].map((d) => (
-              <button
-                key={d.role}
-                type="button"
-                onClick={() => { setEmail(d.email); setPassword(d.pw); }}
-                className={`text-left px-3 py-2.5 bg-white/4 border border-white/8 ${d.bg} rounded-xl transition-all press-scale`}
-              >
-                <div className={`text-xs font-semibold ${d.color} mb-0.5`}>{d.role}</div>
-                <div className="text-slate-500 text-[11px] truncate">{d.email}</div>
-              </button>
-            ))}
-          </div>
         </div>
 
         <p className="text-center text-slate-500 text-sm mt-5">
