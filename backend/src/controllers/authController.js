@@ -61,10 +61,32 @@ exports.getMe = async (req, res) => {
 
 exports.updateProfile = async (req, res, next) => {
   try {
-    const { name, company, phone } = req.body;
+    const { name, company, phone, currentPassword, newPassword } = req.body;
+
+    // ── Password change flow ──────────────────────────────────────────────
+    if (currentPassword && newPassword) {
+      const full = await prisma.user.findUnique({ where: { id: req.user.id } });
+      const valid = await bcrypt.compare(currentPassword, full.password);
+      if (!valid) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+      }
+      if (newPassword.length < 6) {
+        return res.status(400).json({ success: false, message: 'New password must be at least 6 characters' });
+      }
+      const hashed = await bcrypt.hash(newPassword, 12);
+      await prisma.user.update({ where: { id: req.user.id }, data: { password: hashed } });
+      return res.json({ success: true, message: 'Password updated successfully' });
+    }
+
+    // ── Profile update flow ───────────────────────────────────────────────
+    const updateData = {};
+    if (name    !== undefined) updateData.name    = name;
+    if (company !== undefined) updateData.company = company;
+    if (phone   !== undefined) updateData.phone   = phone;
+
     const user = await prisma.user.update({
       where: { id: req.user.id },
-      data: { name, company, phone },
+      data:  updateData,
       select: {
         id: true, name: true, email: true, role: true,
         avatar: true, company: true, phone: true, isActive: true,

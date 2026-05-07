@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Sidebar, { MobileSidebar } from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/mobile/BottomNav';
 import NotificationBell from '@/components/dashboard/NotificationBell';
+import FloatingSupport from '@/components/ui/FloatingSupport';
 import { Zap } from 'lucide-react';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
 import { getInitials } from '@/lib/utils';
@@ -143,6 +144,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* BottomNav — portalled to body inside its own component */}
       <BottomNav />
+
+      {/* Floating WhatsApp / support button */}
+      <FloatingSupport />
     </div>
   );
 }

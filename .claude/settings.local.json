@@ -16,7 +16,10 @@
       "Bash(cd \"/c/Users/mouni/Desktop/mbndev/frontend\" && npx tsc --noEmit 2>&1 | head -60)",
       "Read(//c/Users/mouni/Desktop/mbndev/backend/**)",
       "Bash(node -e \"require\\('./src/controllers/orderController'\\); require\\('./src/controllers/notificationController'\\); require\\('./src/controllers/paymentController'\\); require\\('./src/lib/notifications'\\); console.log\\('All modules OK'\\)\")",
-      "Bash(node -e \"require\\('./src/routes/orders'\\); require\\('./src/routes/notifications'\\); require\\('./src/routes/payments'\\); console.log\\('All routes OK'\\)\")"
+      "Bash(node -e \"require\\('./src/routes/orders'\\); require\\('./src/routes/notifications'\\); require\\('./src/routes/payments'\\); console.log\\('All routes OK'\\)\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(npm run *)"
     ]
   }
 }

@@ -1,5 +1,6 @@
 import Navbar from './Navbar';
 import Footer from './Footer';
+import FloatingSupport from '@/components/ui/FloatingSupport';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <main>{children}</main>
         <Footer />
       </div>
+      <FloatingSupport />
     </div>
   );
 }

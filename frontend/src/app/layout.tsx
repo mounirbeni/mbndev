@@ -6,26 +6,50 @@ import InstallPrompt from '@/components/mobile/InstallPrompt';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'MBN DEV — Custom Websites Built to Elevate Your Business',
+  title: {
+    default:  'MBN DEV — Custom Websites Built to Elevate Your Business',
+    template: '%s — MBN DEV',
+  },
   description:
-    'MBN DEV is a Moroccan platform by Mounir Banni, dedicated to building modern, fast, and high-performing websites tailored to your needs.',
-  keywords: ['web development', 'Morocco', 'custom websites', 'web apps', 'MBN DEV'],
-  authors: [{ name: 'Mounir Banni' }],
+    'MBN DEV is a Moroccan platform by Mounir Banni, dedicated to building modern, fast, and high-performing websites and web applications tailored to your business needs.',
+  keywords: [
+    'web development', 'Morocco', 'custom websites', 'web apps', 'MBN DEV',
+    'Mounir Banni', 'e-commerce', 'Next.js', 'SaaS', 'web design Morocco',
+    'création site web Maroc',
+  ],
+  authors:  [{ name: 'Mounir Banni', url: 'https://mbndev.com' }],
+  creator:  'Mounir Banni',
+  metadataBase: new URL('https://mbndev.com'),
   manifest: '/manifest.json',
+  robots: {
+    index:  true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'MBN DEV',
   },
   openGraph: {
-    title: 'MBN DEV',
-    description: 'Custom Websites Built to Elevate Your Business.',
-    type: 'website',
+    title:       'MBN DEV — Custom Websites Built to Elevate Your Business',
+    description: 'A Moroccan platform by Mounir Banni building modern, fast, and high-performing websites.',
+    type:        'website',
+    url:         'https://mbndev.com',
+    siteName:    'MBN DEV',
+    locale:      'en_US',
+  },
+  twitter: {
+    card:        'summary_large_image',
+    title:       'MBN DEV — Custom Websites Built to Elevate Your Business',
+    description: 'A Moroccan platform by Mounir Banni building modern websites and web apps.',
+    creator:     '@mbndev',
   },
   other: {
-    'mobile-web-app-capable': 'yes',
+    'mobile-web-app-capable':  'yes',
     'msapplication-TileColor': '#7c3aed',
     'msapplication-tap-highlight': 'no',
+    'contact:phone_number':    '+212705914424',
   },
 };
 

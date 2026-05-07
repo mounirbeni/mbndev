@@ -40,9 +40,9 @@ export default function CTA() {
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <a href="mailto:hello@mbndev.com">
+                <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="outline">
-                    hello@mbndev.com
+                    WhatsApp Us
                   </Button>
                 </a>
               </div>
@@ -51,9 +51,9 @@ export default function CTA() {
                 <span className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" /> Morocco — Available Worldwide
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5" /> +212 6 12 34 56 78
-                </span>
+                <a href="tel:+212705914424" className="flex items-center gap-1.5 hover:text-slate-300 transition-colors">
+                  <Phone className="w-3.5 h-3.5" /> +212 705 914 424
+                </a>
                 <span className="flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5" /> Response within 24h
                 </span>

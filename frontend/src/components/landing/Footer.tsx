@@ -18,11 +18,16 @@ const serviceLinks = [
   { label: 'Maintenance & Support', href: '/services/maintenance' },
 ];
 
+const legalLinks = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Service', href: '/terms' },
+];
+
 const socials = [
-  { icon: Facebook, href: '#' },
-  { icon: Linkedin, href: '#' },
-  { icon: Twitter,  href: '#' },
-  { icon: Github,   href: '#' },
+  { icon: Facebook, href: 'https://facebook.com' },
+  { icon: Linkedin, href: 'https://linkedin.com' },
+  { icon: Twitter,  href: 'https://twitter.com' },
+  { icon: Github,   href: 'https://github.com' },
 ];
 
 export default function Footer() {
@@ -93,7 +98,9 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 shrink-0" />
-                +212 6 12 34 56 78
+                <a href="tel:+212705914424" className="hover:text-slate-300 transition-colors">
+                  +212 705 914 424
+                </a>
               </li>
             </ul>
             <div className="flex gap-3 mt-4">
@@ -111,10 +118,11 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/5 mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-slate-600 text-sm">© 2025 MBN DEV. All rights reserved.</p>
+          <p className="text-slate-600 text-sm">© {new Date().getFullYear()} MBN DEV. All rights reserved.</p>
           <div className="flex items-center gap-4 text-slate-600 text-sm">
-            <Link href="/pricing" className="hover:text-slate-400 transition-colors">Pricing</Link>
-            <Link href="/contact" className="hover:text-slate-400 transition-colors">Contact</Link>
+            {legalLinks.map((l) => (
+              <Link key={l.href} href={l.href} className="hover:text-slate-400 transition-colors">{l.label}</Link>
+            ))}
             <span className="flex items-center gap-1.5">
               Made with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> in Morocco
             </span>
