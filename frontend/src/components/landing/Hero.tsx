@@ -6,6 +6,11 @@ import {
   ArrowRight, Zap, Shield, Code2, Headphones,
   MapPin, CheckCircle2, Circle, BarChart2, Sparkles,
 } from 'lucide-react';
+import {
+  SiNextdotjs, SiReact, SiTypescript, SiNodedotjs,
+  SiPostgresql, SiTailwindcss, SiMongodb, SiDocker,
+  SiPrisma, SiStripe,
+} from 'react-icons/si';
 import Button from '@/components/ui/Button';
 
 const fadeUp = (delay = 0) => ({
@@ -21,7 +26,18 @@ const stats = [
   { icon: Headphones, label: 'Ongoing Support',       desc: 'We stay by your side after delivery.' },
 ];
 
-const clients = ['inwi', 'CIH BANK', 'Maroc Telecom', 'OCP', 'Société Générale'];
+const stack = [
+  { label: 'Next.js',     Icon: SiNextdotjs,    hex: '#ffffff' },
+  { label: 'React',       Icon: SiReact,        hex: '#61DAFB' },
+  { label: 'TypeScript',  Icon: SiTypescript,   hex: '#3178C6' },
+  { label: 'Node.js',     Icon: SiNodedotjs,    hex: '#339933' },
+  { label: 'PostgreSQL',  Icon: SiPostgresql,   hex: '#4169E1' },
+  { label: 'Tailwind',    Icon: SiTailwindcss,  hex: '#06B6D4' },
+  { label: 'MongoDB',     Icon: SiMongodb,      hex: '#47A248' },
+  { label: 'Docker',      Icon: SiDocker,       hex: '#2496ED' },
+  { label: 'Prisma',      Icon: SiPrisma,       hex: '#5A67D8' },
+  { label: 'Stripe',      Icon: SiStripe,       hex: '#635BFF' },
+];
 
 export default function Hero() {
   return (
@@ -79,17 +95,21 @@ export default function Hero() {
               </a>
             </motion.div>
 
-            {/* Trusted by */}
+            {/* Tech stack */}
             <motion.div {...fadeUp(0.55)}>
               <p className="text-xs text-slate-500 mb-3 flex items-center gap-1.5">
-                <MapPin className="w-3 h-3 text-slate-600" />
-                Trusted by businesses across Morocco
+                <Code2 className="w-3 h-3 text-slate-600" />
+                Built with modern technologies
               </p>
-              <div className="flex flex-wrap gap-4 items-center">
-                {clients.map((c) => (
-                  <span key={c} className="text-slate-600 text-xs font-semibold uppercase tracking-wider">
-                    {c}
-                  </span>
+              <div className="flex flex-wrap gap-2.5 items-center">
+                {stack.map(({ label, Icon, hex }) => (
+                  <div
+                    key={label}
+                    title={label}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/8 hover:border-white/20 hover:bg-white/10 transition-all cursor-default"
+                  >
+                    <Icon style={{ color: hex }} className="w-4 h-4 shrink-0" />
+                  </div>
                 ))}
               </div>
             </motion.div>
