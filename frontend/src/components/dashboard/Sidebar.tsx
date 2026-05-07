@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Bell,
+  BarChart2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn, getInitials } from '@/lib/utils';
@@ -35,6 +36,7 @@ const adminNav: NavItem[] = [
   { label: 'Clients', href: '/dashboard/admin/clients', icon: Users },
   { label: 'Packages', href: '/dashboard/admin/packages', icon: Package },
   { label: 'Payments', href: '/dashboard/admin/payments', icon: CreditCard },
+  { label: 'Analytics', href: '/dashboard/admin/analytics', icon: BarChart2 },
 ];
 
 const clientNav: NavItem[] = [

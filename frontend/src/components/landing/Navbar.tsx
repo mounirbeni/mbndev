@@ -3,30 +3,34 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 
 const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'Services', href: '#services' },
-  { label: 'Portfolio', href: '#portfolio' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Process', href: '#process' },
-  { label: 'About', href: '#about' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home',      href: '/' },
+  { label: 'Services',  href: '/services' },
+  { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Pricing',   href: '/pricing' },
+  { label: 'About',     href: '/about' },
+  { label: 'Contact',   href: '/contact' },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handler);
     return () => window.removeEventListener('scroll', handler);
   }, []);
+
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
     <motion.nav
@@ -53,13 +57,17 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-sm text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                  isActive(link.href)
+                    ? 'text-white bg-white/10'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -101,22 +109,34 @@ export default function Navbar() {
             >
               <div className="pt-4 flex flex-col gap-1">
                 {navLinks.map((link) => (
-                  <a
+                  <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="px-3 py-2 text-sm text-slate-400 hover:text-white transition-colors"
+                    className={`px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      isActive(link.href)
+                        ? 'text-white bg-white/10'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
                 <div className="pt-3 flex flex-col gap-2">
-                  <Link href="/login" onClick={() => setMenuOpen(false)}>
-                    <Button variant="outline" size="md" className="w-full">Sign In</Button>
-                  </Link>
-                  <Link href="/request" onClick={() => setMenuOpen(false)}>
-                    <Button size="md" className="w-full">Start Your Project</Button>
-                  </Link>
+                  {user ? (
+                    <Link href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'} onClick={() => setMenuOpen(false)}>
+                      <Button size="md" className="w-full">Go to Dashboard</Button>
+                    </Link>
+                  ) : (
+                    <>
+                      <Link href="/login" onClick={() => setMenuOpen(false)}>
+                        <Button variant="outline" size="md" className="w-full">Sign In</Button>
+                      </Link>
+                      <Link href="/request" onClick={() => setMenuOpen(false)}>
+                        <Button size="md" className="w-full">Start Your Project</Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

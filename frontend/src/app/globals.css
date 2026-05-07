@@ -86,7 +86,79 @@ body {
   outline-offset: 2px;
 }
 
-/* Noise texture overlay */
+/* ── Mobile / PWA ─────────────────────────────────────────────────────── */
+
+/* Prevent text selection flash on tap */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Safe-area helpers */
+.safe-top    { padding-top:    env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Native momentum scrolling on iOS */
+.scroll-native {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Bottom navigation bar glass */
+.bottom-nav-glass {
+  background: rgba(10, 10, 13, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Tap ripple feedback */
+.tap-highlight {
+  position: relative;
+  overflow: hidden;
+}
+.tap-highlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(124, 58, 237, 0.12);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.tap-highlight:active::after {
+  opacity: 1;
+}
+
+/* Card press scale */
+.press-scale {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.press-scale:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* Slide-up animation for mobile sheets */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.slide-up {
+  animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Skeleton shimmer */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease infinite;
+}
+
+/* ── Noise texture overlay ──────────────────────────────────────────────── */
 .noise::before {
   content: '';
   position: absolute;

@@ -62,7 +62,7 @@ export default function MessageThread({ projectId, projectTitle }: MessageThread
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-native">
         {loading && (
           <div className="flex justify-center py-8">
             <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
@@ -113,22 +113,32 @@ export default function MessageThread({ projectId, projectTitle }: MessageThread
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={sendMessage} className="p-4 border-t border-white/5">
+      {/* Input — keyboard-safe on mobile */}
+      <form
+        onSubmit={sendMessage}
+        className="shrink-0 p-3 sm:p-4 border-t border-white/5 bg-dark-100/60"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
+      >
         <div className="flex gap-2">
           <input
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Type a message..."
+            inputMode="text"
+            enterKeyHint="send"
             className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary-500 transition-colors"
             disabled={sending}
           />
           <button
             type="submit"
             disabled={!content.trim() || sending}
-            className="w-10 h-10 bg-primary-500 hover:bg-primary-600 disabled:opacity-40 rounded-xl flex items-center justify-center transition-colors shrink-0"
+            className="w-10 h-10 bg-primary-500 hover:bg-primary-600 disabled:opacity-40 rounded-xl flex items-center justify-center transition-all active:scale-95 shrink-0"
           >
-            <Send className="w-4 h-4 text-white" />
+            {sending ? (
+              <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            ) : (
+              <Send className="w-4 h-4 text-white" />
+            )}
           </button>
         </div>
       </form>

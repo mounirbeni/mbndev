@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -38,7 +38,7 @@ const featureOptions = [
 
 const designStyles = ['Minimalist', 'Corporate', 'Creative', 'Tech/Dark', 'Luxury', 'Colorful'];
 
-export default function RequestPage() {
+function RequestPageContent() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
@@ -389,5 +389,13 @@ export default function RequestPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RequestPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-dark-300 flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /></div>}>
+      <RequestPageContent />
+    </Suspense>
   );
 }

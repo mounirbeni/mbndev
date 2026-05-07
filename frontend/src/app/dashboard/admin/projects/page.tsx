@@ -145,12 +145,20 @@ export default function AdminProjectsPage() {
                       </td>
                       <td className="p-4 text-sm text-slate-400">{formatDate(p.createdAt)}</td>
                       <td className="p-4">
-                        <button
-                          onClick={() => openEdit(p)}
-                          className="text-xs text-primary-400 hover:text-primary-300 transition-colors px-2 py-1 rounded-lg hover:bg-primary-500/10"
-                        >
-                          Edit
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/dashboard/admin/projects/${p._id}`}
+                            className="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                          >
+                            View
+                          </Link>
+                          <button
+                            onClick={() => openEdit(p)}
+                            className="text-xs text-primary-400 hover:text-primary-300 transition-colors px-2 py-1 rounded-lg hover:bg-primary-500/10"
+                          >
+                            Edit
+                          </button>
+                        </div>
                       </td>
                     </motion.tr>
                   );

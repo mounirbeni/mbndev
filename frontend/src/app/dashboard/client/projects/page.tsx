@@ -7,6 +7,7 @@ import { projectAPI } from '@/lib/api';
 import { Project } from '@/types';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import Button from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 const statusTabs = ['all', 'pending', 'in-progress', 'review', 'completed'] as const;
 
@@ -61,7 +62,7 @@ export default function ClientProjectsPage() {
       {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="glass rounded-2xl h-36 animate-pulse" />
+            <Skeleton key={i} className="h-36 rounded-2xl" />
           ))}
         </div>
       ) : filtered.length === 0 ? (

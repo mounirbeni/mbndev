@@ -48,7 +48,12 @@ const config: Config = {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'glow': 'glow 2s ease-in-out infinite alternate',
         'slide-up': 'slideUp 0.5s ease-out',
+        'slide-up-fast': 'slideUp 0.28s cubic-bezier(0.32,0.72,0,1)',
         'fade-in': 'fadeIn 0.6s ease-out',
+        'fade-in-fast': 'fadeIn 0.2s ease-out',
+        'scale-in': 'scaleIn 0.2s ease-out',
+        'tab-in': 'tabIn 0.25s cubic-bezier(0.32,0.72,0,1)',
+        'skeleton': 'skeleton 1.6s ease infinite',
       },
       keyframes: {
         float: {
@@ -66,6 +71,18 @@ const config: Config = {
         fadeIn: {
           from: { opacity: '0' },
           to: { opacity: '1' },
+        },
+        scaleIn: {
+          from: { opacity: '0', transform: 'scale(0.95)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        tabIn: {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        skeleton: {
+          '0%':   { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
         },
       },
       fontFamily: {
