@@ -160,11 +160,12 @@ model Payment {
   client                User      @relation(fields: [clientId], references: [id])
   amount                Float
   currency              String    @default("usd")
-  status                String    @default("pending")  // pending | paid | failed | refunded
+  status                String    @default("pending")  // pending | pending_verification | paid | failed | refunded
   stripePaymentIntentId String?
   stripeSessionId       String?
   milestoneTitle        String?
   description           String?
+  method                String?   // stripe | cih_bank | paypal | taptapsend
   paidAt                DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt

@@ -16,11 +16,27 @@ export default function ClientProjectsPage() {
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchProjects = (silent = false) => {
+    if (!silent) setLoading(true);
     projectAPI.getMine()
       .then(({ data }) => setProjects(data.projects))
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { if (!silent) setLoading(false); });
+  };
+
+  // Initial load
+  useEffect(() => { fetchProjects(); }, []);
+
+  // Real-time polling (20 s when tab is visible)
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(() => fetchProjects(true), 20_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = filter === 'all' ? projects : projects.filter((p) => p.status === filter);

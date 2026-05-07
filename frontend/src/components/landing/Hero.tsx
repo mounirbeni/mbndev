@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowRight, Zap, Shield, Code2, Headphones,
-  MapPin, CheckCircle2, Circle, BarChart2, Sparkles,
+  CheckCircle2, Circle, BarChart2, Sparkles,
 } from 'lucide-react';
 import {
   SiNextdotjs, SiReact, SiTypescript, SiNodedotjs,
@@ -55,13 +55,6 @@ export default function Hero() {
 
           {/* ── Left content ─────────────────────────────────────────── */}
           <div className="flex flex-col justify-center">
-            <motion.div {...fadeUp(0.1)}>
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-5">
-                <MapPin className="w-3 h-3 text-primary-400" />
-                MOROCCAN PLATFORM
-              </span>
-            </motion.div>
-
             <motion.h1
               {...fadeUp(0.2)}
               className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.08] mb-5"

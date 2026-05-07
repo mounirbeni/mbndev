@@ -12,11 +12,27 @@ export default function ClientPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchPayments = (silent = false) => {
+    if (!silent) setLoading(true);
     paymentAPI.getAll()
       .then(({ data }) => setPayments(data.payments))
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { if (!silent) setLoading(false); });
+  };
+
+  // Initial load
+  useEffect(() => { fetchPayments(); }, []);
+
+  // Real-time polling (20 s when tab is visible)
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(() => fetchPayments(true), 20_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const total = payments.filter((p) => p.status === 'paid').reduce((s, p) => s + p.amount, 0);

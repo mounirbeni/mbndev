@@ -23,17 +23,30 @@ export default function AdminProjectsPage() {
   const [editForm, setEditForm] = useState({ status: '', progress: 0, notes: '' });
   const [saving, setSaving] = useState(false);
 
-  const fetchProjects = () => {
-    setLoading(true);
+  const fetchProjects = (silent = false) => {
+    if (!silent) setLoading(true);
     projectAPI
       .getAll({ search, status: statusFilter })
       .then(({ data }) => setProjects(data.projects))
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { if (!silent) setLoading(false); });
   };
 
   useEffect(() => {
     fetchProjects();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, statusFilter]);
+
+  // Real-time polling (30 s when tab is visible)
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(() => fetchProjects(true), 30_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, statusFilter]);
 
   const openEdit = (p: Project) => {

@@ -23,6 +23,7 @@ export default function MessageThread({ projectId, projectTitle }: MessageThread
   const inputRef   = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
 
+  // ── Initial load ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!projectId) return;
     setLoading(true);
@@ -32,6 +33,41 @@ export default function MessageThread({ projectId, projectTitle }: MessageThread
       .catch(() => toast.error('Failed to load messages'))
       .finally(() => setLoading(false));
   }, [projectId]);
+
+  // ── Real-time polling (5 s when tab is visible) ──────────────────────────
+  useEffect(() => {
+    if (!projectId) return;
+
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const poll = () => {
+      messageAPI
+        .get(projectId)
+        .then(({ data }) => {
+          setMessages((prev) => {
+            // Only update if something changed (avoid unnecessary re-renders)
+            if (JSON.stringify(prev.map((m) => m._id)) ===
+                JSON.stringify(data.messages.map((m: any) => m._id))) return prev;
+            return data.messages;
+          });
+        })
+        .catch(() => {}); // silent — don't spam toasts in background
+    };
+
+    const start = () => { timer = setInterval(poll, 5000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+
+    const onVisibility = () =>
+      document.visibilityState === 'visible' ? start() : stop();
+
+    start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [projectId]);
+  // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

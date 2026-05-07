@@ -272,6 +272,137 @@ exports.getPayments = async (req, res, next) => {
   }
 };
 
+// ─── Submit manual payment (CIH Bank / PayPal / TapTapSend) ──────────────────
+
+const METHOD_LABELS = {
+  cih_bank:   'CIH Bank Transfer',
+  paypal:     'PayPal',
+  taptapsend: 'TapTapSend',
+};
+
+exports.submitManualPayment = async (req, res, next) => {
+  try {
+    const { orderId, method } = req.body;
+    if (!orderId || !method) {
+      return res.status(400).json({ success: false, message: 'orderId and method are required' });
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { client: true },
+    });
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    if (order.clientId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized' });
+    }
+    if (order.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Order is not pending' });
+    }
+
+    // Prevent duplicate submission
+    const existing = await prisma.payment.findFirst({
+      where: { orderId, status: 'pending_verification' },
+    });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Payment already submitted — awaiting verification' });
+    }
+
+    const label = METHOD_LABELS[method] || method;
+
+    const payment = await prisma.payment.create({
+      data: {
+        clientId:    req.user.id,
+        orderId:     order.id,
+        amount:      order.totalPrice,
+        description: `${label} payment for: ${order.title}`,
+        status:      'pending_verification',
+        method,
+      },
+    });
+
+    // Notify admins
+    await notifyAdmins({
+      type:    'payment_received',
+      title:   'Manual Payment Submitted',
+      message: `${order.client.name} submitted a ${label} payment of $${order.totalPrice} for "${order.title}". Please verify.`,
+      link:    `/dashboard/admin/payments`,
+      metadata: { orderId: order.id, paymentId: payment.id, method },
+    });
+
+    // Notify client
+    await notify(req.user.id, {
+      type:    'payment_received',
+      title:   'Payment Submitted',
+      message: `Your ${label} payment for "${order.title}" is pending verification. We'll confirm within a few hours.`,
+      link:    `/dashboard/client/orders`,
+      metadata: { orderId: order.id },
+    });
+
+    res.json({ success: true, payment: fmt(payment) });
+  } catch (err) { next(err); }
+};
+
+// ─── Admin: approve a manual payment ─────────────────────────────────────────
+
+exports.approveManualPayment = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const payment = await prisma.payment.findUnique({
+      where: { id },
+      include: { order: true, client: true },
+    });
+    if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+    if (payment.status !== 'pending_verification') {
+      return res.status(400).json({ success: false, message: 'Payment is not pending verification' });
+    }
+
+    let project = null;
+    if (payment.orderId && payment.order && payment.order.status === 'pending') {
+      project = await createProjectFromOrder(payment.order);
+
+      await prisma.payment.update({
+        where: { id },
+        data:  { status: 'paid', paidAt: new Date(), projectId: project.id },
+      });
+
+      await logActivity(
+        project.id,
+        payment.clientId,
+        'payment_received',
+        `${METHOD_LABELS[payment.method] || 'Manual'} payment of $${payment.amount} verified. Project created.`,
+        { orderId: payment.orderId, amount: payment.amount, method: payment.method }
+      );
+
+      await notify(payment.clientId, {
+        type:    'project_created',
+        title:   'Payment Verified — Project Active!',
+        message: `Your payment for "${payment.order.title}" has been verified. Your project is now active!`,
+        link:    `/dashboard/client/projects/${project.id}`,
+        metadata: { projectId: project.id },
+      });
+    } else {
+      await prisma.payment.update({
+        where: { id },
+        data:  { status: 'paid', paidAt: new Date() },
+      });
+
+      await notify(payment.clientId, {
+        type:    'payment_received',
+        title:   'Payment Verified',
+        message: `Your payment has been verified by the admin.`,
+        link:    `/dashboard/client/orders`,
+      });
+    }
+
+    res.json({
+      success: true,
+      payment: fmt(await prisma.payment.findUnique({ where: { id } })),
+      project: project ? fmt(project) : null,
+    });
+  } catch (err) { next(err); }
+};
+
 // ─── Mock payment (dev / demo) ────────────────────────────────────────────────
 
 exports.mockPayment = async (req, res, next) => {

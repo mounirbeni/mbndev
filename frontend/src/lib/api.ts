@@ -69,10 +69,12 @@ export const messageAPI = {
 
 // Payments
 export const paymentAPI = {
-  orderCheckout: (data: any) => api.post('/payments/order-checkout', data),
-  checkout:      (data: any) => api.post('/payments/checkout', data),
-  mock:          (data: any) => api.post('/payments/mock', data),
-  getAll:        ()          => api.get('/payments'),
+  orderCheckout:  (data: any)         => api.post('/payments/order-checkout', data),
+  checkout:       (data: any)         => api.post('/payments/checkout', data),
+  mock:           (data: any)         => api.post('/payments/mock', data),
+  submitManual:   (data: any)         => api.post('/payments/manual', data),
+  approveManual:  (id: string)        => api.put(`/payments/${id}/approve`, {}),
+  getAll:         ()                  => api.get('/payments'),
 };
 
 // Notifications

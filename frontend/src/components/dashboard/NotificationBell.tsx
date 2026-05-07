@@ -44,15 +44,20 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Poll unread count every 30s
+  // Poll unread count every 15 s (paused when tab is hidden)
   useEffect(() => {
     const fetchCount = () =>
       notificationAPI.getUnread()
         .then(({ data }) => setUnread(data.count))
         .catch(() => {});
     fetchCount();
-    const id = setInterval(fetchCount, 30_000);
-    return () => clearInterval(id);
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(fetchCount, 15_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
   }, []);
 
   // Load notifications when panel opens

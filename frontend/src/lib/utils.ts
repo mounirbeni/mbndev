@@ -5,23 +5,29 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const statusColors: Record<string, string> = {
-  pending:      'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  paid:         'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  'in-progress':'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  review:       'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  revision:     'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  completed:    'bg-green-500/20 text-green-400 border-green-500/30',
-  cancelled:    'bg-red-500/20 text-red-400 border-red-500/30',
+  pending:                'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  pending_verification:   'bg-amber-500/20 text-amber-300 border-amber-500/30',
+  paid:                   'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  'in-progress':          'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  review:                 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  revision:               'bg-orange-500/20 text-orange-400 border-orange-500/30',
+  completed:              'bg-green-500/20 text-green-400 border-green-500/30',
+  cancelled:              'bg-red-500/20 text-red-400 border-red-500/30',
+  failed:                 'bg-red-500/20 text-red-400 border-red-500/30',
+  refunded:               'bg-slate-500/20 text-slate-400 border-slate-500/30',
 };
 
 export const statusLabels: Record<string, string> = {
-  pending:      'Pending',
-  paid:         'Paid',
-  'in-progress':'In Progress',
-  review:       'In Review',
-  revision:     'Revision',
-  completed:    'Completed',
-  cancelled:    'Cancelled',
+  pending:              'Pending',
+  pending_verification: 'Awaiting Verification',
+  paid:                 'Paid',
+  'in-progress':        'In Progress',
+  review:               'In Review',
+  revision:             'Revision',
+  completed:            'Completed',
+  cancelled:            'Cancelled',
+  failed:               'Failed',
+  refunded:             'Refunded',
 };
 
 export const projectTypeLabels: Record<string, string> = {

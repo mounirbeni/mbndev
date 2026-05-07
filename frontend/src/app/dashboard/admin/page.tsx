@@ -27,11 +27,27 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchAnalytics = (silent = false) => {
+    if (!silent) setLoading(true);
     adminAPI.getAnalytics()
       .then(({ data }) => setAnalytics(data.analytics))
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { if (!silent) setLoading(false); });
+  };
+
+  // Initial load
+  useEffect(() => { fetchAnalytics(); }, []);
+
+  // Real-time polling (30 s when tab is visible)
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(() => fetchAnalytics(true), 30_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const a = analytics;

@@ -107,11 +107,13 @@ export interface Payment {
   client: User | string;
   amount: number;
   currency: string;
-  status: 'pending' | 'paid' | 'failed' | 'refunded';
+  status: 'pending' | 'pending_verification' | 'paid' | 'failed' | 'refunded';
+  method?: string;
   milestoneTitle?: string;
   description?: string;
   paidAt?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface Order {

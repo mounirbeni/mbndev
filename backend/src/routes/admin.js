@@ -61,7 +61,7 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
 
       prisma.payment.count(),
       prisma.payment.aggregate({ where: { status: 'paid'    }, _sum: { amount: true }, _count: { id: true } }),
-      prisma.payment.aggregate({ where: { status: 'pending' }, _sum: { amount: true }, _count: { id: true } }),
+      prisma.payment.aggregate({ where: { status: { in: ['pending', 'pending_verification'] } }, _sum: { amount: true }, _count: { id: true } }),
 
       // 5 most recent projects
       prisma.project.findMany({

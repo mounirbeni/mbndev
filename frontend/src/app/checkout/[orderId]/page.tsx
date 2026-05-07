@@ -3,15 +3,27 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Zap, CreditCard, Shield, Clock, Check,
-  Loader2, AlertCircle,
+  Loader2, AlertCircle, Building2, Copy, ExternalLink,
+  Smartphone, CheckCircle2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { orderAPI, paymentAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
+
+// ── Payment method config ────────────────────────────────────────────────────
+
+const CIH_BANK = {
+  rib:     process.env.NEXT_PUBLIC_CIH_RIB      || 'XXX XXX XXXXXXXXXX XX',
+  account: process.env.NEXT_PUBLIC_CIH_ACCOUNT  || 'Mounir Banni',
+  bank:    'CIH Bank',
+};
+
+const PAYPAL_ME = process.env.NEXT_PUBLIC_PAYPAL_ME || 'https://www.paypal.me/mbndev';
+const TAPTAP_PHONE = process.env.NEXT_PUBLIC_TAPTAP_PHONE || '+212705914424';
 
 const SERVICE_LABELS: Record<string, string> = {
   website: 'Website', ecommerce: 'E-Commerce Store',
@@ -24,6 +36,16 @@ const FEATURE_LABELS: Record<string, string> = {
   seo: 'SEO Optimization', api: 'API Integration', hosting: 'Hosting Setup',
 };
 
+type PayMethod = 'cih_bank' | 'paypal' | 'taptapsend' | 'stripe';
+
+const METHODS: { id: PayMethod; label: string; desc: string; color: string }[] = [
+  { id: 'cih_bank',   label: 'CIH Bank Transfer', desc: 'Direct bank transfer (Morocco)', color: 'text-emerald-400' },
+  { id: 'paypal',     label: 'PayPal',             desc: 'Pay with your PayPal account',  color: 'text-blue-400'    },
+  { id: 'taptapsend', label: 'TapTapSend',         desc: 'Send via TapTapSend app',       color: 'text-purple-400'  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function CheckoutPage() {
   const { orderId }       = useParams<{ orderId: string }>();
   const router            = useRouter();
@@ -33,20 +55,27 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(true);
   const [paying,  setPaying]  = useState(false);
   const [error,   setError]   = useState('');
+  const [method,  setMethod]  = useState<PayMethod>('cih_bank');
+  const [copied,  setCopied]  = useState('');
+  const [done,    setDone]    = useState(false);   // manual payment submitted
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { router.push('/login'); return; }
-
+    if (!user) { router.push(`/login?redirect=/checkout/${orderId}`); return; }
     orderAPI.getOne(orderId)
       .then(({ data }) => setOrder(data.order))
-      .catch((err) => {
-        setError(err?.response?.data?.message || 'Order not found');
-      })
+      .catch((err) => setError(err?.response?.data?.message || 'Order not found'))
       .finally(() => setLoading(false));
   }, [orderId, user, authLoading, router]);
 
-  const handleStripeCheckout = async () => {
+  const copy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(key);
+      setTimeout(() => setCopied(''), 2000);
+    });
+  };
+
+  const handleStripe = async () => {
     setPaying(true);
     try {
       const { data } = await paymentAPI.orderCheckout({ orderId });
@@ -57,53 +86,80 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleMockPayment = async () => {
+  const handleManual = async () => {
     setPaying(true);
     try {
-      const { data } = await paymentAPI.mock({ orderId });
-      toast.success('Payment confirmed! Project created.');
-      router.push(`/checkout/success?order_id=${orderId}&project_id=${data.project?.id || ''}`);
+      await paymentAPI.submitManual({ orderId, method });
+      setDone(true);
+      // Clear request draft since order is placed
+      if (typeof window !== 'undefined') localStorage.removeItem('mbndev_request_draft');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Mock payment failed');
+      toast.error(err?.response?.data?.message || 'Failed to submit payment');
+    } finally {
       setPaying(false);
     }
   };
 
-  if (loading || authLoading) {
-    return (
-      <div className="min-h-screen bg-hero-gradient flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
-      </div>
-    );
-  }
+  // ── Loading / error states ──────────────────────────────────────────────────
+  if (loading || authLoading) return (
+    <div className="min-h-screen bg-hero-gradient flex items-center justify-center">
+      <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
+    </div>
+  );
 
-  if (error || !order) {
-    return (
-      <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <AlertCircle className="w-12 h-12 text-red-400" />
-        <h1 className="text-xl font-bold text-white">{error || 'Order not found'}</h1>
-        <Link href="/dashboard/client/orders">
-          <Button variant="outline">View My Orders</Button>
-        </Link>
-      </div>
-    );
-  }
+  if (error || !order) return (
+    <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <AlertCircle className="w-12 h-12 text-red-400" />
+      <h1 className="text-xl font-bold text-white">{error || 'Order not found'}</h1>
+      <Link href="/dashboard/client/orders"><Button variant="outline">View My Orders</Button></Link>
+    </div>
+  );
 
-  if (order.status === 'paid') {
-    return (
-      <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-          <Check className="w-8 h-8 text-green-400" />
+  if (order.status === 'paid') return (
+    <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
+        <Check className="w-8 h-8 text-green-400" />
+      </div>
+      <h1 className="text-xl font-bold text-white">This order is already paid</h1>
+      {order.project && (
+        <Link href={`/dashboard/client/projects/${order.project.id}`}><Button>View Project →</Button></Link>
+      )}
+    </div>
+  );
+
+  // ── Manual payment submitted success screen ─────────────────────────────────
+  if (done) return (
+    <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="text-center max-w-md"
+      >
+        <div className="w-20 h-20 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 className="w-10 h-10 text-green-400" />
         </div>
-        <h1 className="text-xl font-bold text-white">This order is already paid</h1>
-        {order.project && (
-          <Link href={`/dashboard/client/projects/${order.project.id}`}>
-            <Button>View Project →</Button>
+        <h1 className="text-2xl font-bold text-white mb-3">Payment Submitted!</h1>
+        <p className="text-slate-400 text-sm leading-relaxed mb-2">
+          Your payment has been submitted and is pending verification.
+        </p>
+        <p className="text-slate-500 text-sm leading-relaxed mb-8">
+          We'll verify your payment within a few hours and create your project automatically.
+          You'll receive a notification once confirmed.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/dashboard/client/orders">
+            <Button size="md">View My Orders</Button>
           </Link>
-        )}
-      </div>
-    );
-  }
+          <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
+            <Button size="md" variant="outline">
+              Contact on WhatsApp
+            </Button>
+          </a>
+        </div>
+      </motion.div>
+    </div>
+  );
 
   const isStripeEnabled = !!process.env.NEXT_PUBLIC_STRIPE_KEY;
 
@@ -127,119 +183,210 @@ export default function CheckoutPage() {
       </header>
 
       <div className="flex-1 flex items-start justify-center p-4 sm:p-6 py-6 sm:py-10">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-xl space-y-5">
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Order details card */}
-            <div className="glass rounded-2xl p-5 sm:p-7 border border-white/10 mb-5">
-              <div className="flex items-start gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center shrink-0">
-                  <CreditCard className="w-5 h-5 text-primary-400" />
-                </div>
-                <div>
-                  <h1 className="text-white font-bold text-lg leading-tight">{order.title}</h1>
-                  <p className="text-slate-500 text-sm">{SERVICE_LABELS[order.serviceType] || order.serviceType}</p>
-                </div>
+          {/* Order summary */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center shrink-0">
+                <CreditCard className="w-5 h-5 text-primary-400" />
               </div>
-
-              {/* Price breakdown */}
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Service base price</span>
-                  <span className="text-slate-200">included</span>
-                </div>
-                {order.pages > 5 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Extra pages ({order.pages - 5})</span>
-                    <span className="text-slate-200">included</span>
-                  </div>
-                )}
-                {order.features?.length > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Features ({order.features.length})</span>
-                    <span className="text-slate-200">included</span>
-                  </div>
-                )}
-                {order.addons?.includes('fastDelivery') && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">⚡ Fast Delivery</span>
-                    <span className="text-amber-400">included</span>
-                  </div>
-                )}
-                <div className="border-t border-white/10 pt-3 flex justify-between font-bold text-lg">
-                  <span className="text-white">Total Due</span>
-                  <span className="text-primary-400">${order.totalPrice.toLocaleString()}</span>
-                </div>
+              <div>
+                <h1 className="text-white font-bold text-lg leading-tight">{order.title}</h1>
+                <p className="text-slate-500 text-sm">{SERVICE_LABELS[order.serviceType] || order.serviceType}</p>
               </div>
+            </div>
 
-              {/* Delivery info */}
-              <div className="flex items-center gap-2 text-sm text-slate-500 py-3 border-t border-white/5">
-                <Clock className="w-4 h-4 text-primary-400" />
-                Estimated delivery: <span className="text-slate-300">{order.deliveryDays} business days</span>
-              </div>
-
-              {/* Features list */}
+            <div className="space-y-1.5 mb-4 text-sm">
               {order.features?.length > 0 && (
-                <div className="pt-3 border-t border-white/5">
-                  <p className="text-xs text-slate-500 mb-2 uppercase tracking-wide">Included Features</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {order.features.map((f: string) => (
-                      <span key={f} className="text-xs px-2 py-0.5 rounded-lg bg-primary-500/10 text-primary-300 border border-primary-500/20">
-                        {FEATURE_LABELS[f] || f}
-                      </span>
-                    ))}
-                  </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Features ({order.features.length})</span>
+                  <span className="text-slate-300">included</span>
                 </div>
               )}
-            </div>
-
-            {/* Payment buttons */}
-            <div className="space-y-3">
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleStripeCheckout}
-                loading={paying}
-                disabled={!isStripeEnabled}
-              >
-                <CreditCard className="w-4 h-4" />
-                {isStripeEnabled ? 'Pay with Stripe' : 'Stripe not configured'}
-              </Button>
-
-              {/* Demo mode mock payment */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/8" />
+              {order.addons?.includes('fastDelivery') && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400 flex items-center gap-1.5"><Zap className="w-3 h-3 text-amber-400" /> Fast Delivery</span>
+                  <span className="text-amber-400">included</span>
                 </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-transparent px-3 text-xs text-slate-600">DEMO</span>
-                </div>
+              )}
+              <div className="border-t border-white/10 pt-3 flex justify-between font-bold text-base">
+                <span className="text-white">Total Due</span>
+                <span className="text-primary-400 text-xl">${order.totalPrice.toLocaleString()}</span>
               </div>
-
-              <button
-                onClick={handleMockPayment}
-                disabled={paying}
-                className="w-full py-3.5 rounded-xl text-sm font-semibold border transition-all
-                           text-slate-300 hover:text-white hover:border-white/30 active:scale-[0.98]
-                           disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)' }}
-              >
-                {paying ? (
-                  <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-                ) : (
-                  'Simulate Payment (Demo)'
-                )}
-              </button>
-
-              <p className="text-xs text-slate-600 text-center">
-                By paying you agree to our{' '}
-                <Link href="/terms" className="text-primary-500 hover:text-primary-400">terms of service</Link>.
-              </p>
             </div>
+
+            <div className="flex items-center gap-2 text-xs text-slate-500 pt-3 border-t border-white/5">
+              <Clock className="w-3.5 h-3.5 text-primary-400" />
+              Estimated delivery: <span className="text-slate-300">{order.deliveryDays} business days</span>
+            </div>
+          </motion.div>
+
+          {/* Payment methods */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
+            <h2 className="text-white font-semibold text-sm mb-4">Choose Payment Method</h2>
+
+            {/* Stripe (if configured) */}
+            {isStripeEnabled && (
+              <button
+                onClick={handleStripe}
+                disabled={paying}
+                className="w-full flex items-center gap-3 p-3.5 rounded-xl border mb-3 text-left transition-all bg-primary-500/10 border-primary-500/50 hover:bg-primary-500/15"
+              >
+                <div className="w-9 h-9 rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
+                  <CreditCard className="w-4 h-4 text-primary-400" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-white text-sm font-semibold">Credit / Debit Card</div>
+                  <div className="text-slate-500 text-xs">Visa, Mastercard, Amex via Stripe</div>
+                </div>
+                <span className="text-xs text-primary-400 font-semibold">Instant</span>
+              </button>
+            )}
+
+            {/* Manual methods */}
+            <div className="space-y-2 mb-5">
+              {METHODS.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setMethod(m.id)}
+                  className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${
+                    method === m.id
+                      ? 'bg-white/8 border-white/25'
+                      : 'bg-white/4 border-white/8 hover:border-white/15'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                    method === m.id ? 'bg-white/10' : 'bg-white/5'
+                  }`}>
+                    {m.id === 'cih_bank'   && <Building2  className={`w-4 h-4 ${method === m.id ? m.color : 'text-slate-500'}`} />}
+                    {m.id === 'paypal'     && <CreditCard  className={`w-4 h-4 ${method === m.id ? m.color : 'text-slate-500'}`} />}
+                    {m.id === 'taptapsend' && <Smartphone  className={`w-4 h-4 ${method === m.id ? m.color : 'text-slate-500'}`} />}
+                  </div>
+                  <div className="flex-1">
+                    <div className={`text-sm font-semibold ${method === m.id ? 'text-white' : 'text-slate-400'}`}>{m.label}</div>
+                    <div className="text-slate-500 text-xs">{m.desc}</div>
+                  </div>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    method === m.id ? 'border-primary-500 bg-primary-500' : 'border-white/20'
+                  }`}>
+                    {method === m.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Payment instructions panel */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={method}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18 }}
+                className="rounded-xl p-4 mb-5 space-y-3"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                {method === 'cih_bank' && (
+                  <>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">CIH Bank Transfer Details</p>
+                    <div className="space-y-2">
+                      {[
+                        { label: 'Bank',      value: CIH_BANK.bank },
+                        { label: 'Account Name', value: CIH_BANK.account },
+                        { label: 'RIB',       value: CIH_BANK.rib, canCopy: true },
+                        { label: 'Amount',    value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
+                        { label: 'Reference', value: `MBN-${orderId.slice(-8).toUpperCase()}`, canCopy: true },
+                      ].map(({ label, value, canCopy }) => (
+                        <div key={label} className="flex items-center justify-between gap-2">
+                          <span className="text-slate-500 text-xs w-24 shrink-0">{label}</span>
+                          <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+                            <span className="text-white text-sm font-mono truncate">{value}</span>
+                            {canCopy && (
+                              <button
+                                onClick={() => copy(value, label)}
+                                className="text-slate-500 hover:text-primary-400 transition-colors shrink-0"
+                              >
+                                {copied === label
+                                  ? <Check className="w-3.5 h-3.5 text-green-400" />
+                                  : <Copy className="w-3.5 h-3.5" />}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-white/5">
+                      After sending the transfer, click the button below. We'll verify and activate your project within a few hours.
+                    </p>
+                  </>
+                )}
+
+                {method === 'paypal' && (
+                  <>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">PayPal Instructions</p>
+                    <p className="text-sm text-slate-300">
+                      Send <span className="text-white font-bold">${order.totalPrice.toLocaleString()} USD</span> to the PayPal account below.
+                    </p>
+                    <a
+                      href={`${PAYPAL_ME}/${order.totalPrice}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-semibold text-sm transition-all"
+                      style={{ background: '#003087', color: '#fff' }}
+                    >
+                      Pay with PayPal
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                    <p className="text-xs text-slate-500 mt-2">
+                      Include reference: <span className="font-mono text-slate-400">MBN-{orderId.slice(-8).toUpperCase()}</span> in the note.
+                      After paying, click the button below.
+                    </p>
+                  </>
+                )}
+
+                {method === 'taptapsend' && (
+                  <>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">TapTapSend Instructions</p>
+                    <div className="space-y-2">
+                      {[
+                        { label: 'Send to',   value: TAPTAP_PHONE,  canCopy: true },
+                        { label: 'Amount',    value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
+                        { label: 'Reference', value: `MBN-${orderId.slice(-8).toUpperCase()}`, canCopy: true },
+                      ].map(({ label, value, canCopy }) => (
+                        <div key={label} className="flex items-center justify-between gap-2">
+                          <span className="text-slate-500 text-xs w-20 shrink-0">{label}</span>
+                          <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+                            <span className="text-white text-sm font-mono truncate">{value}</span>
+                            {canCopy && (
+                              <button onClick={() => copy(value, label)} className="text-slate-500 hover:text-primary-400 transition-colors shrink-0">
+                                {copied === label ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-white/5">
+                      Open the TapTapSend app, send the amount to the number above, then click the button below.
+                    </p>
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Confirm button */}
+            <Button className="w-full" size="lg" onClick={handleManual} loading={paying}>
+              <Check className="w-4 h-4" />
+              {method === 'cih_bank'   && "I've Made the Bank Transfer"}
+              {method === 'paypal'     && "I've Paid via PayPal"}
+              {method === 'taptapsend' && "I've Sent via TapTapSend"}
+            </Button>
+
+            <p className="text-xs text-slate-600 text-center mt-3">
+              By proceeding you agree to our{' '}
+              <Link href="/terms" className="text-primary-500 hover:text-primary-400">terms of service</Link>.
+            </p>
           </motion.div>
         </div>
       </div>

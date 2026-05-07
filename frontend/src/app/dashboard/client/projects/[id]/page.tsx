@@ -85,7 +85,30 @@ export default function ClientProjectWorkspace() {
     }
   };
 
+  // Initial load
   useEffect(() => { fetchAll(); }, [id]);
+
+  // Real-time polling: project status + messages every 10 s (when tab visible)
+  useEffect(() => {
+    if (!id) return;
+    const silentRefresh = async () => {
+      try {
+        const [pRes, mRes] = await Promise.all([
+          projectAPI.getOne(id),
+          messageAPI.get(id),
+        ]);
+        setProject(pRes.data.project);
+        setMessages(mRes.data.messages || []);
+      } catch {}
+    };
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(silentRefresh, 10_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  }, [id]);
 
   useEffect(() => {
     if (tab === 'messages') {

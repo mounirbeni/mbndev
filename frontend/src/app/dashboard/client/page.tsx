@@ -17,14 +17,30 @@ export default function ClientDashboard() {
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchData = (silent = false) => {
+    if (!silent) setLoading(true);
     Promise.all([projectAPI.getMine(), messageAPI.getUnread()])
       .then(([pRes, mRes]) => {
         setProjects(pRes.data.projects);
         setUnread(mRes.data.count);
       })
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { if (!silent) setLoading(false); });
+  };
+
+  // Initial load
+  useEffect(() => { fetchData(); }, []);
+
+  // Real-time polling (20 s when tab is visible)
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => { timer = setInterval(() => fetchData(true), 20_000); };
+    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const inProgress = projects.filter((p) => p.status === 'in-progress').length;
