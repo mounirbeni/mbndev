@@ -22,38 +22,38 @@ import { useAuth } from '@/contexts/AuthContext';
 const STEPS = ['Service Type', 'Configuration', 'Design', 'Summary'];
 
 const serviceTypes: { value: string; label: string; desc: string; icon: LucideIcon; base: number }[] = [
-  { value: 'website',   label: 'Website',        desc: 'Landing page / brochure site',      icon: Target,       base: 499  },
-  { value: 'ecommerce', label: 'E-Commerce',      desc: 'Online store with payments',        icon: ShoppingCart, base: 999  },
-  { value: 'dashboard', label: 'SaaS Dashboard',  desc: 'Complex web application',           icon: BarChart3,    base: 1299 },
-  { value: 'mobile',    label: 'Mobile App',      desc: 'iOS & Android (React Native/PWA)',  icon: Smartphone,   base: 1799 },
-  { value: 'custom',    label: 'Custom Project',  desc: 'Something unique — let\'s talk',   icon: Lightbulb,    base: 699  },
+  { value: 'website',   label: 'Website',        desc: 'Landing page / brochure site',      icon: Target,       base: 799  },
+  { value: 'ecommerce', label: 'E-Commerce',      desc: 'Online store with payments',        icon: ShoppingCart, base: 1499 },
+  { value: 'dashboard', label: 'SaaS Dashboard',  desc: 'Complex web application',           icon: BarChart3,    base: 2499 },
+  { value: 'mobile',    label: 'Mobile App',      desc: 'iOS & Android (React Native/PWA)',  icon: Smartphone,   base: 3999 },
+  { value: 'custom',    label: 'Custom Project',  desc: 'Something unique — let\'s talk',   icon: Lightbulb,    base: 1199 },
 ];
 
 const FEATURES: { key: string; label: string; price: number; desc: string }[] = [
-  { key: 'auth',       label: 'User Authentication',  price: 150, desc: 'Login, register, profiles' },
-  { key: 'payment',    label: 'Payment Integration',  price: 200, desc: 'Stripe, PayPal checkout' },
-  { key: 'dashboard',  label: 'Admin Dashboard',      price: 300, desc: 'Backend control panel' },
-  { key: 'multilang',  label: 'Multi-language',       price: 120, desc: 'i18n / localization' },
-  { key: 'seo',        label: 'SEO Optimization',     price: 80,  desc: 'Meta, sitemap, schema' },
-  { key: 'api',        label: 'API Integration',      price: 200, desc: 'Third-party REST APIs' },
-  { key: 'hosting',    label: 'Hosting Setup',        price: 50,  desc: 'Deployment & config' },
+  { key: 'auth',       label: 'User Authentication',  price: 400, desc: 'Login, register, profiles' },
+  { key: 'payment',    label: 'Payment Integration',  price: 500, desc: 'Stripe, PayPal checkout' },
+  { key: 'dashboard',  label: 'Admin Dashboard',      price: 800, desc: 'Backend control panel' },
+  { key: 'multilang',  label: 'Multi-language',       price: 300, desc: 'i18n / localization' },
+  { key: 'seo',        label: 'SEO Optimization',     price: 250, desc: 'Meta, sitemap, schema' },
+  { key: 'api',        label: 'API Integration',      price: 400, desc: 'Third-party REST APIs' },
+  { key: 'hosting',    label: 'Hosting Setup',        price: 150, desc: 'Deployment & config' },
 ];
 
 const BASE_PRICES: Record<string, number> = {
-  website: 499, ecommerce: 999, dashboard: 1299, mobile: 1799, custom: 699,
+  website: 799, ecommerce: 1499, dashboard: 2499, mobile: 3999, custom: 1199,
 };
 const BASE_DELIVERY: Record<string, number> = {
-  website: 14, ecommerce: 21, dashboard: 28, mobile: 35, custom: 21,
+  website: 14, ecommerce: 21, dashboard: 30, mobile: 45, custom: 21,
 };
 const FEATURE_PRICES: Record<string, number> = {
-  auth: 150, payment: 200, dashboard: 300, multilang: 120, seo: 80, api: 200, hosting: 50,
+  auth: 400, payment: 500, dashboard: 800, multilang: 300, seo: 250, api: 400, hosting: 150,
 };
 
 function calcPrice(serviceType: string, pages: number, features: string[], addons: string[]) {
-  const base      = BASE_PRICES[serviceType] || 699;
-  const pageExtra = Math.max(0, pages - 5) * 30;
+  const base      = BASE_PRICES[serviceType] || 1199;
+  const pageExtra = Math.max(0, pages - 5) * 50;
   const feat      = features.reduce((s, k) => s + (FEATURE_PRICES[k] || 0), 0);
-  const addon     = addons.includes('fastDelivery') ? 200 : 0;
+  const addon     = addons.includes('fastDelivery') ? Math.round(base * 0.3) : 0;
   let   days      = BASE_DELIVERY[serviceType] || 21;
   if (addons.includes('fastDelivery')) days = Math.ceil(days * 0.6);
   return { total: base + pageExtra + feat + addon, days, base, pageExtra, feat, addon };

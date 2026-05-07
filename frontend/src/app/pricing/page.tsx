@@ -12,22 +12,22 @@ import Button from '@/components/ui/Button';
 
 const fallbackPackages = [
   {
-    _id: '1', name: 'Starter', slug: 'starter', price: 299, popular: false,
+    _id: '1', name: 'Starter', slug: 'starter', price: 799, popular: false,
     description: 'Perfect for small businesses and personal projects.',
-    features: ['Up to 5 Pages', 'Responsive Design', 'Contact Form', 'Basic SEO', '1 Revision', 'Delivery in 7 days'],
-    pages: 5, revisions: 1, deliveryDays: 7,
+    features: ['Up to 5 Pages', 'Responsive Design', 'Contact Form', 'Basic SEO', '2 Revisions', 'Delivery in 14 days'],
+    pages: 5, revisions: 2, deliveryDays: 14,
   },
   {
-    _id: '2', name: 'Pro', slug: 'pro', price: 699, popular: true,
+    _id: '2', name: 'Pro', slug: 'pro', price: 1799, popular: true,
     description: 'Best for growing businesses who need more.',
-    features: ['Up to 10 Pages', 'Responsive Design', 'CMS Integration', 'Advanced SEO', '3 Revisions', 'Priority Support', 'Analytics Setup', 'Delivery in 14 days'],
-    pages: 10, revisions: 3, deliveryDays: 14,
+    features: ['Up to 10 Pages', 'Responsive Design', 'CMS Integration', 'Advanced SEO', '3 Revisions', 'Priority Support', 'Analytics Setup', 'Delivery in 21 days'],
+    pages: 10, revisions: 3, deliveryDays: 21,
   },
   {
-    _id: '3', name: 'Premium', slug: 'premium', price: 1299, popular: false,
+    _id: '3', name: 'Premium', slug: 'premium', price: 3499, popular: false,
     description: 'For complex projects with custom requirements.',
-    features: ['Unlimited Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance', 'Delivery in 21 days'],
-    pages: 0, revisions: 6, deliveryDays: 21,
+    features: ['Unlimited Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance', 'Delivery in 30 days'],
+    pages: 0, revisions: 6, deliveryDays: 30,
   },
 ];
 

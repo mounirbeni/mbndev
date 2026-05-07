@@ -22,7 +22,9 @@
       "Bash(npm run *)",
       "WebFetch(domain:tyymaroc.vercel.app)",
       "WebFetch(domain:emll.vercel.app)",
-      "WebFetch(domain:www.riadconnect.com)"
+      "WebFetch(domain:www.riadconnect.com)",
+      "WebFetch(domain:pricinglink.com)",
+      "WebFetch(domain:zyner.io)"
     ]
   }
 }
