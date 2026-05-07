@@ -258,15 +258,13 @@ export default function CheckoutPage() {
                       : 'bg-white/4 border-white/8 hover:border-white/15'
                   }`}
                 >
-                  <div className={`w-12 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden px-1 transition-all ${
-                    method === m.id ? 'bg-white' : 'bg-white/90'
-                  }`}>
+                  <div className="w-12 h-9 rounded-lg shrink-0 overflow-hidden">
                     <Image
                       src={m.logo}
                       alt={m.label}
-                      width={40}
-                      height={28}
-                      className="object-contain w-full h-full"
+                      width={48}
+                      height={36}
+                      className="w-full h-full object-cover"
                       unoptimized
                     />
                   </div>
@@ -297,8 +295,8 @@ export default function CheckoutPage() {
                 {method === 'cih_bank' && (
                   <>
                     <div className="flex items-center gap-2.5 mb-4">
-                      <div className="w-10 h-7 rounded bg-white flex items-center justify-center px-1 shrink-0">
-                        <Image src="/images/cih.jpe" alt="CIH Bank" width={36} height={24} className="object-contain" unoptimized />
+                      <div className="w-10 h-7 rounded shrink-0 overflow-hidden">
+                        <Image src="/images/cih.jpe" alt="CIH Bank" width={36} height={24} className="w-full h-full object-cover" unoptimized />
                       </div>
                       <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">CIH Bank Transfer Details</p>
                     </div>
@@ -339,8 +337,8 @@ export default function CheckoutPage() {
                 {method === 'paypal' && (
                   <>
                     <div className="flex items-center gap-2.5 mb-4">
-                      <div className="w-10 h-7 rounded bg-white flex items-center justify-center px-1 shrink-0">
-                        <Image src="/images/paypal.jpe" alt="PayPal" width={36} height={24} className="object-contain" unoptimized />
+                      <div className="w-10 h-7 rounded shrink-0 overflow-hidden">
+                        <Image src="/images/paypal.jpe" alt="PayPal" width={36} height={24} className="w-full h-full object-cover" unoptimized />
                       </div>
                       <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">PayPal Instructions</p>
                     </div>
@@ -386,8 +384,8 @@ export default function CheckoutPage() {
                 {method === 'taptapsend' && (
                   <>
                     <div className="flex items-center gap-2.5 mb-4">
-                      <div className="w-10 h-7 rounded bg-white flex items-center justify-center px-1 shrink-0">
-                        <Image src="/images/taptap.jpeg" alt="TapTapSend" width={36} height={24} className="object-contain" unoptimized />
+                      <div className="w-10 h-7 rounded shrink-0 overflow-hidden">
+                        <Image src="/images/taptap.jpeg" alt="TapTapSend" width={36} height={24} className="w-full h-full object-cover" unoptimized />
                       </div>
                       <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">TapTapSend Instructions</p>
                     </div>
