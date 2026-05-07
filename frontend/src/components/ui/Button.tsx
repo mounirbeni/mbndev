@@ -1,11 +1,10 @@
 'use client';
 
 import { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 type Variant = 'primary' | 'outline' | 'ghost' | 'danger';
-type Size = 'sm' | 'md' | 'lg';
+type Size    = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -16,47 +15,47 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<Variant, string> = {
-  primary:
-    'bg-primary-500 hover:bg-primary-600 text-white shadow-lg hover:shadow-primary-500/30 glow-purple',
-  outline:
-    'border border-primary-500/50 text-primary-400 hover:bg-primary-500/10 hover:border-primary-400',
-  ghost: 'text-slate-300 hover:text-white hover:bg-white/5',
-  danger: 'bg-red-600 hover:bg-red-700 text-white',
+  primary: 'bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white shadow-lg shadow-primary-500/20',
+  outline: 'border border-primary-500/50 text-primary-400 hover:bg-primary-500/10 hover:border-primary-400 active:bg-primary-500/15',
+  ghost:   'text-slate-300 hover:text-white hover:bg-white/8 active:bg-white/12',
+  danger:  'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white',
 };
 
+/* Minimum 44px height on mobile for all sizes (WCAG touch target) */
 const sizes: Record<Size, string> = {
-  sm: 'px-3 py-1.5 text-sm rounded-lg',
-  md: 'px-5 py-2.5 text-sm rounded-xl',
-  lg: 'px-8 py-3.5 text-base rounded-xl',
+  sm: 'px-3 py-2 text-xs rounded-lg min-h-[36px] sm:min-h-[36px]',
+  md: 'px-4 py-2.5 text-sm rounded-xl min-h-[44px]',
+  lg: 'px-6 py-3.5 text-sm sm:text-base rounded-xl min-h-[48px]',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', loading, icon, children, className, disabled, ...props }, ref) => {
     return (
-      <motion.button
+      <button
         ref={ref}
-        whileTap={{ scale: 0.97 }}
-        whileHover={{ scale: 1.02 }}
         className={cn(
-          'inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 cursor-pointer select-none',
+          'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-150',
+          'cursor-pointer select-none',
+          // Touch feedback via CSS (works on mobile, unlike framer-motion hover)
+          'active:scale-[0.97] active:opacity-90',
           variants[variant],
           sizes[size],
           (disabled || loading) && 'opacity-50 cursor-not-allowed pointer-events-none',
           className
         )}
         disabled={disabled || loading}
-        {...(props as any)}
+        {...props}
       >
         {loading ? (
-          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+          <svg className="animate-spin h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
           </svg>
         ) : icon ? (
-          <span className="w-4 h-4">{icon}</span>
+          <span className="w-4 h-4 shrink-0">{icon}</span>
         ) : null}
         {children}
-      </motion.button>
+      </button>
     );
   }
 );

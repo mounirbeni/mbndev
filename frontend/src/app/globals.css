@@ -4,15 +4,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
-  --color-bg: #0a0a0d;
-  --color-surface: #141417;
-  --color-border: rgba(124, 58, 237, 0.15);
-  --color-primary: #7c3aed;
-  --color-primary-light: #a855f7;
+  --color-bg:           #0a0a0d;
+  --color-surface:      #141417;
+  --color-surface-2:    #1a1a1f;
+  --color-border:       rgba(124, 58, 237, 0.15);
+  --color-primary:      #7c3aed;
+  --color-primary-light:#a855f7;
+
+  /* Glass system */
+  --glass-bg:           rgba(18, 18, 22, 0.88);
+  --glass-bg-strong:    rgba(14, 14, 18, 0.96);
+  --glass-bg-card:      rgba(20, 20, 26, 0.82);
+  --glass-border:       rgba(255, 255, 255, 0.07);
+  --glass-blur:         20px;
 }
 
-* {
+/* ── Reset ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -20,6 +30,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Prevent rubber-band bounce on iOS at document level */
+  overscroll-behavior: none;
 }
 
 body {
@@ -27,32 +39,76 @@ body {
   color: #e2e8f0;
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* App-like: prevent overscroll glow on Android */
+  overscroll-behavior: none;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.4); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.7); }
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.35); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.6); }
 
-/* Glassmorphism card */
+/* ── Glass system ─────────────────────────────────────────────────────────── */
+
+/* Default glass — used on cards, panels */
 .glass {
-  background: rgba(20, 20, 23, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  border: 1px solid var(--glass-border);
 }
 
-/* Neon glow effect */
+/* Strong glass — navbar, headers, sidebars (maximum readability) */
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Subtle glass — inner cards, list rows */
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+/* Nav-specific glass — always readable over any background */
+.glass-nav {
+  background: rgba(10, 10, 13, 0.93);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Bottom navigation */
+.bottom-nav-glass {
+  background: rgba(8, 8, 11, 0.96);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Mobile drawer / sheet panel */
+.glass-panel {
+  background: rgba(12, 12, 16, 0.98);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+}
+
+/* ── Effects ──────────────────────────────────────────────────────────────── */
+
 .glow-purple {
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), 0 0 60px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.35), 0 0 60px rgba(124, 58, 237, 0.12);
 }
 
 .glow-text {
   text-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
 }
 
-/* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
   -webkit-background-clip: text;
@@ -60,7 +116,6 @@ body {
   background-clip: text;
 }
 
-/* Animated border */
 .border-glow {
   border: 1px solid transparent;
   background:
@@ -68,50 +123,53 @@ body {
     linear-gradient(135deg, #7c3aed, #3b82f6) border-box;
 }
 
-/* Progress bar */
 .progress-bar {
   background: linear-gradient(90deg, #7c3aed, #a855f7, #3b82f6);
   background-size: 200% 100%;
   animation: shimmer 2s linear infinite;
 }
 
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Focus ring */
+/* ── Focus ────────────────────────────────────────────────────────────────── */
 *:focus-visible {
   outline: 2px solid rgba(124, 58, 237, 0.7);
   outline-offset: 2px;
+  border-radius: 6px;
 }
 
-/* ── Mobile / PWA ─────────────────────────────────────────────────────── */
+/* ── Mobile / PWA base ────────────────────────────────────────────────────── */
 
-/* Prevent text selection flash on tap */
-* {
+/* Kill tap flash on all interactive elements */
+*, a, button, [role="button"], input, select, textarea {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent callout menu on long-press (links/images) */
+a, img {
   -webkit-touch-callout: none;
 }
 
-/* Safe-area helpers */
+/* No text selection on UI chrome */
+nav, header, footer, .no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ── Safe-area helpers ────────────────────────────────────────────────────── */
 .safe-top    { padding-top:    env(safe-area-inset-top); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-left   { padding-left:   env(safe-area-inset-left); }
+.safe-right  { padding-right:  env(safe-area-inset-right); }
 
-/* Native momentum scrolling on iOS */
+/* ── Native iOS/Android momentum scrolling ────────────────────────────────── */
 .scroll-native {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
-/* Bottom navigation bar glass */
-.bottom-nav-glass {
-  background: rgba(10, 10, 13, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
+/* ── Touch feedback ───────────────────────────────────────────────────────── */
 
-/* Tap ripple feedback */
+/* Ripple-style tap highlight */
 .tap-highlight {
   position: relative;
   overflow: hidden;
@@ -120,45 +178,72 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(124, 58, 237, 0.12);
+  background: rgba(124, 58, 237, 0.1);
   border-radius: inherit;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
 }
-.tap-highlight:active::after {
-  opacity: 1;
-}
+.tap-highlight:active::after { opacity: 1; }
 
-/* Card press scale */
+/* Card / button press */
 .press-scale {
-  transition: transform 0.12s ease, opacity 0.12s ease;
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.12s ease;
 }
 .press-scale:active {
-  transform: scale(0.97);
-  opacity: 0.9;
+  transform: scale(0.96);
+  opacity: 0.88;
 }
 
-/* Slide-up animation for mobile sheets */
+/* Row-style press (no scale, just dim) */
+.press-dim {
+  transition: opacity 0.1s ease;
+}
+.press-dim:active { opacity: 0.65; }
+
+/* ── Slide-up sheet animation ─────────────────────────────────────────────── */
 @keyframes slideUp {
   from { transform: translateY(100%); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
-.slide-up {
-  animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+.slide-up { animation: slideUp 0.32s cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* Slide-down (mobile nav dropdown) */
+@keyframes slideDown {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.slide-down { animation: slideDown 0.22s cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* ── Skeleton shimmer ─────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-/* Skeleton shimmer */
 @keyframes skeleton-shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
 }
+
 .skeleton-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.6s ease infinite;
 }
 
-/* ── Noise texture overlay ──────────────────────────────────────────────── */
+/* ── Mobile input enhancements ────────────────────────────────────────────── */
+input, textarea, select {
+  font-size: 16px; /* Prevents iOS zoom on focus */
+}
+
+/* ── Noise texture overlay ────────────────────────────────────────────────── */
 .noise::before {
   content: '';
   position: absolute;
@@ -166,4 +251,30 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
+}
+
+/* ── App-like card ────────────────────────────────────────────────────────── */
+.app-card {
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+}
+
+/* ── Mobile-first utility overrides ──────────────────────────────────────── */
+
+/* Ensure minimum tap targets (WCAG 2.5.5: 44×44px) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Full-bleed section on mobile, padded on larger screens */
+.section-mobile {
+  padding-left: env(safe-area-inset-left, 16px);
+  padding-right: env(safe-area-inset-right, 16px);
 }

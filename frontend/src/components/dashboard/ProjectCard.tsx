@@ -24,7 +24,7 @@ export default function ProjectCard({ project, href, index = 0 }: ProjectCardPro
       whileHover={{ y: -2 }}
     >
       <Link href={href}>
-        <div className="glass rounded-2xl p-5 border border-white/5 hover:border-primary-500/30 transition-all duration-300 group cursor-pointer press-scale active:scale-[0.97]">
+        <div className="glass rounded-2xl p-4 sm:p-5 border border-white/6 hover:border-primary-500/30 transition-all duration-200 group cursor-pointer press-scale">
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1 min-w-0 pr-3">
               <h3 className="text-white font-semibold truncate group-hover:text-primary-300 transition-colors">

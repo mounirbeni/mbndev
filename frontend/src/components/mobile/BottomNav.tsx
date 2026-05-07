@@ -10,7 +10,6 @@ import {
   CreditCard,
   Settings,
   Users,
-  Package,
   BarChart2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,7 +26,7 @@ const adminTabs: NavTab[] = [
   { label: 'Projects', href: '/dashboard/admin/projects',  icon: FolderOpen },
   { label: 'Messages', href: '/dashboard/admin/messages',  icon: MessageSquare },
   { label: 'Clients',  href: '/dashboard/admin/clients',   icon: Users },
-  { label: 'More',     href: '/dashboard/admin/analytics', icon: BarChart2 },
+  { label: 'Stats',    href: '/dashboard/admin/analytics', icon: BarChart2 },
 ];
 
 const clientTabs: NavTab[] = [
@@ -44,7 +43,6 @@ export default function BottomNav() {
   const tabs = isAdmin ? adminTabs : clientTabs;
 
   const isActive = (href: string) => {
-    // Exact match for dashboard home, startsWith for sections
     const dashHome = isAdmin ? '/dashboard/admin' : '/dashboard/client';
     if (href === dashHome) return pathname === dashHome;
     return pathname.startsWith(href);
@@ -52,13 +50,13 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bottom-nav-glass"
+      aria-label="Mobile navigation"
     >
-      {/* Blur backdrop */}
-      <div className="absolute inset-0 bg-dark-300/90 backdrop-blur-xl border-t border-white/10" />
-
-      <div className="relative flex items-center justify-around px-2 pt-2 pb-1">
+      <div
+        className="flex items-end justify-around px-1"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
+      >
         {tabs.map((tab) => {
           const active = isActive(tab.href);
           const Icon = tab.icon;
@@ -67,41 +65,45 @@ export default function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl min-w-[56px] relative"
+              className="relative flex flex-col items-center justify-end pt-2 pb-1.5 flex-1 min-h-[56px] group"
+              aria-current={active ? 'page' : undefined}
             >
-              {/* Active pill background */}
+              {/* Active pill */}
               {active && (
                 <motion.div
-                  layoutId="bottomNavActive"
-                  className="absolute inset-0 bg-primary-500/15 rounded-xl"
-                  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                  layoutId="bottomNavPill"
+                  className="absolute top-1.5 left-1 right-1 h-[34px] bg-primary-500/18 rounded-xl border border-primary-500/25"
+                  transition={{ type: 'spring', damping: 28, stiffness: 340 }}
                 />
               )}
 
-              <div className="relative">
-                <Icon
-                  className={cn(
-                    'w-5 h-5 transition-colors duration-200',
-                    active ? 'text-primary-400' : 'text-slate-500'
-                  )}
-                />
-                {/* Active dot */}
-                {active && (
-                  <motion.div
-                    layoutId="bottomNavDot"
-                    className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-primary-400 rounded-full"
+              {/* Icon container */}
+              <div className="relative z-10 flex flex-col items-center gap-1">
+                <div className="relative">
+                  <Icon
+                    className={cn(
+                      'w-[22px] h-[22px] transition-all duration-200',
+                      active
+                        ? 'text-primary-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]'
+                        : 'text-slate-500 group-active:text-slate-300'
+                    )}
+                    strokeWidth={active ? 2.2 : 1.8}
                   />
-                )}
-              </div>
+                  {/* Notification dot (can be made dynamic later) */}
+                  {tab.label === 'Messages' && (
+                    <span className="absolute -top-0.5 -right-1 w-2 h-2 bg-primary-500 rounded-full border-2 border-[#08080b]" />
+                  )}
+                </div>
 
-              <span
-                className={cn(
-                  'text-[10px] font-medium transition-colors duration-200 leading-none',
-                  active ? 'text-primary-400' : 'text-slate-600'
-                )}
-              >
-                {tab.label}
-              </span>
+                <span
+                  className={cn(
+                    'text-[10px] font-medium leading-none transition-all duration-200',
+                    active ? 'text-primary-400' : 'text-slate-600 group-active:text-slate-400'
+                  )}
+                >
+                  {tab.label}
+                </span>
+              </div>
             </Link>
           );
         })}

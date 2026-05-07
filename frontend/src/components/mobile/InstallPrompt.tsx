@@ -55,7 +55,7 @@ export default function InstallPrompt() {
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="fixed bottom-20 left-4 right-4 z-50 lg:left-auto lg:right-6 lg:bottom-6 lg:w-80"
         >
-          <div className="glass rounded-2xl p-4 border border-primary-500/30 shadow-2xl shadow-black/40">
+          <div className="glass-strong rounded-2xl p-4 border border-primary-500/30 shadow-2xl shadow-black/60">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 bg-primary-500/20 rounded-xl flex items-center justify-center shrink-0">
                 <Zap className="w-5 h-5 text-primary-400" />
