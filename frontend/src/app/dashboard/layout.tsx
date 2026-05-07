@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar, { MobileSidebar } from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/mobile/BottomNav';
-import { Bell, Zap } from 'lucide-react';
+import NotificationBell from '@/components/dashboard/NotificationBell';
+import { Zap } from 'lucide-react';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
 import { getInitials } from '@/lib/utils';
 import Link from 'next/link';
@@ -88,21 +89,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </span>
           </Link>
 
-          {/* Right: bell + avatar */}
+          {/* Right: notification bell + avatar */}
           <div className="flex items-center gap-2">
-            <button
-              aria-label="Notifications"
-              className="relative w-9 h-9 flex items-center justify-center rounded-xl
-                         text-slate-400 hover:text-white active:bg-white/10 transition-colors"
-              style={{ background: 'rgba(255,255,255,0.05)' }}
-            >
-              <Bell className="w-4 h-4" />
-              <span
-                className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-500"
-                style={{ boxShadow: '0 0 0 2px #0a0a0d' }}
-              />
-            </button>
-
+            <NotificationBell />
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center
                          text-white font-bold text-xs shrink-0"
@@ -123,17 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         >
           <div />
           <div className="flex items-center gap-3">
-            <button
-              className="relative w-9 h-9 flex items-center justify-center rounded-xl
-                         text-slate-400 hover:text-white hover:bg-white/10 transition-all"
-              style={{ background: 'rgba(255,255,255,0.05)' }}
-            >
-              <Bell className="w-4 h-4" />
-              <span
-                className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-500"
-                style={{ boxShadow: '0 0 0 2px #0a0a0d' }}
-              />
-            </button>
+            <NotificationBell />
             <div className="text-right">
               <div className="text-white text-sm font-medium">{user.name}</div>
               <div className="text-slate-500 text-xs capitalize">{user.role}</div>

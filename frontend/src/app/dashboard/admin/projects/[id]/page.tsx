@@ -14,17 +14,26 @@ import toast from 'react-hot-toast';
 import {
   ArrowLeft, LayoutDashboard, MessageSquare, Paperclip, CreditCard,
   Send, Check, Clock, AlertCircle, Download, Upload, FileText,
-  DollarSign, Edit2, Save, Users
+  DollarSign, Edit2, Save, Users, Activity,
 } from 'lucide-react';
 
 const TABS = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'messages', label: 'Messages', icon: MessageSquare },
-  { id: 'files', label: 'Files', icon: Paperclip },
-  { id: 'payments', label: 'Payments', icon: CreditCard },
+  { id: 'overview',  label: 'Overview',  icon: LayoutDashboard },
+  { id: 'messages',  label: 'Messages',  icon: MessageSquare   },
+  { id: 'files',     label: 'Files',     icon: Paperclip       },
+  { id: 'payments',  label: 'Payments',  icon: CreditCard      },
+  { id: 'activity',  label: 'Activity',  icon: Activity        },
 ];
 
-const STATUS_OPTIONS: ProjectStatus[] = ['pending', 'in-progress', 'review', 'completed', 'cancelled'];
+const STATUS_OPTIONS: ProjectStatus[] = [
+  'pending', 'paid', 'in-progress', 'review', 'revision', 'completed', 'cancelled',
+];
+
+const ACTION_ICONS: Record<string, string> = {
+  status_change:    '🔄', progress_update: '📈', file_upload: '📎',
+  message_sent:     '💬', payment_received: '💳', milestone_updated: '🏁',
+  project_delivered:'🎉', revision_requested: '✏️',
+};
 
 export default function AdminProjectWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -438,6 +447,51 @@ export default function AdminProjectWorkspace() {
               )}
             </div>
           )}
+
+          {/* ── ACTIVITY ── */}
+          {tab === 'activity' && (() => {
+            const logs = (project as any).activityLogs || [];
+            return (
+              <div className="space-y-4">
+                {logs.length === 0 ? (
+                  <div className="glass rounded-2xl p-12 text-center border border-white/5">
+                    <Activity className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                    <p className="text-slate-500 text-sm">No activity yet.</p>
+                  </div>
+                ) : (
+                  <div className="glass rounded-2xl border border-white/5 overflow-hidden">
+                    <div className="p-4 border-b border-white/5">
+                      <h3 className="text-white font-semibold text-sm">Project Timeline</h3>
+                    </div>
+                    <div className="divide-y divide-white/5">
+                      {logs.map((log: any, i: number) => (
+                        <div key={log.id} className="flex gap-4 p-4">
+                          <div className="flex flex-col items-center">
+                            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-base shrink-0">
+                              {ACTION_ICONS[log.action] || '📌'}
+                            </div>
+                            {i < logs.length - 1 && <div className="w-px flex-1 bg-white/5 mt-1" />}
+                          </div>
+                          <div className="flex-1 pb-2">
+                            <p className="text-slate-200 text-sm">{log.description}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-slate-600 text-xs">
+                                {log.user?.name || 'System'} · {formatDate(log.createdAt)}
+                              </span>
+                              <span className="text-xs px-1.5 py-0.5 rounded bg-white/5 text-slate-500 capitalize">
+                                {log.action?.replace(/_/g, ' ')}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
         </motion.div>
       </AnimatePresence>
     </div>

@@ -1,19 +1,23 @@
 const router = require('express').Router();
 const {
+  createOrderCheckout,
   createCheckoutSession,
   stripeWebhook,
   getPayments,
   mockPayment,
 } = require('../controllers/paymentController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
-// Stripe webhook (raw body needed — handled in server.js if required)
+// Stripe webhook (raw body needed)
 router.post('/webhook', stripeWebhook);
 
-// Checkout session
+// Order checkout (new flow)
+router.post('/order-checkout', protect, createOrderCheckout);
+
+// Milestone checkout (existing flow)
 router.post('/checkout', protect, createCheckoutSession);
 
-// Mock payment for dev
+// Mock payment for dev/demo
 router.post('/mock', protect, mockPayment);
 
 // Get payments

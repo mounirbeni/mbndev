@@ -22,11 +22,41 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects      Project[]     @relation("ClientProjects")
-  messages      Message[]
-  payments      Payment[]
-  uploadedFiles ProjectFile[]
-  readMessages  MessageRead[]
+  projects       Project[]      @relation("ClientProjects")
+  orders         Order[]
+  messages       Message[]
+  payments       Payment[]
+  uploadedFiles  ProjectFile[]
+  readMessages   MessageRead[]
+  notifications  Notification[]
+  activityLogs   ActivityLog[]
+}
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+
+model Order {
+  id           String   @id @default(cuid())
+  clientId     String
+  client       User     @relation(fields: [clientId], references: [id])
+  serviceType  String   // website | ecommerce | dashboard | mobile | custom
+  title        String
+  description  String?
+  pages        Int      @default(5)
+  features     String[]
+  addons       String[]
+  totalPrice   Float
+  deliveryDays Int      @default(14)
+  notes        String?
+  status       String   @default("pending") // pending | paid | cancelled
+  designStyle  String?
+  designColors String[]
+  designRefs   String[]
+  stripeSessionId String?
+  // Linked project — set after payment completes
+  project      Project?
+  payments     Payment[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
@@ -37,27 +67,31 @@ model Project {
   description  String
   clientId     String
   client       User          @relation("ClientProjects", fields: [clientId], references: [id])
-  type         String        @default("custom")    // landing-page | ecommerce | saas | portfolio | web-app | custom
-  status       String        @default("pending")   // pending | in-progress | review | completed | cancelled
+  // Link back to the order that created this project
+  orderId      String?       @unique
+  order        Order?        @relation(fields: [orderId], references: [id])
+  type         String        @default("custom")   // landing-page | ecommerce | saas | portfolio | web-app | custom
+  status       String        @default("pending")  // pending | paid | in-progress | review | revision | completed | cancelled
   progress     Int           @default(0)
   budget       Float
   deadline     DateTime?
   features     String[]
-  package      String        @default("custom")    // starter | pro | premium | custom
+  package      String        @default("custom")   // starter | pro | premium | custom
   notes        String?
   revisions    Int           @default(0)
   maxRevisions Int           @default(3)
-  // Design preferences (flattened from nested object)
+  // Design preferences (flattened)
   designStyle  String?
   designColors String[]
   designRefs   String[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  milestones Milestone[]
-  files      ProjectFile[]
-  messages   Message[]
-  payments   Payment[]
+  milestones   Milestone[]
+  files        ProjectFile[]
+  messages     Message[]
+  payments     Payment[]
+  activityLogs ActivityLog[]
 }
 
 // ─── Milestones ───────────────────────────────────────────────────────────────
@@ -116,8 +150,12 @@ model MessageRead {
 
 model Payment {
   id                    String    @id @default(cuid())
-  projectId             String
-  project               Project   @relation(fields: [projectId], references: [id])
+  // projectId is nullable — set after project is auto-created following payment
+  projectId             String?
+  project               Project?  @relation(fields: [projectId], references: [id])
+  // orderId links to the Order being paid
+  orderId               String?
+  order                 Order?    @relation(fields: [orderId], references: [id])
   clientId              String
   client                User      @relation(fields: [clientId], references: [id])
   amount                Float
@@ -148,4 +186,33 @@ model Package {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // order_placed | payment_received | project_created | status_update | new_message | revision_request | project_delivered
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+// ─── Activity Logs ────────────────────────────────────────────────────────────
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String   // status_change | file_upload | message_sent | payment_received | milestone_updated | revision_requested | project_delivered
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now())
 }

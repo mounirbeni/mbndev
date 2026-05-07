@@ -31,12 +31,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/projects', require('./routes/projects'));
-app.use('/api/messages', require('./routes/messages'));
-app.use('/api/payments', require('./routes/payments'));
-app.use('/api/packages', require('./routes/packages'));
-app.use('/api/admin', require('./routes/admin'));
+app.use('/api/auth',          require('./routes/auth'));
+app.use('/api/projects',      require('./routes/projects'));
+app.use('/api/orders',        require('./routes/orders'));
+app.use('/api/messages',      require('./routes/messages'));
+app.use('/api/payments',      require('./routes/payments'));
+app.use('/api/packages',      require('./routes/packages'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/admin',         require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {

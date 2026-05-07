@@ -1,11 +1,27 @@
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
+const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
 
 // Shared include for client details on every project query
 const withClient = {
-  client: { select: { id: true, name: true, email: true, avatar: true, company: true } },
-  files: true,
+  client:   { select: { id: true, name: true, email: true, avatar: true, company: true } },
+  files:    true,
   milestones: true,
+  activityLogs: {
+    include: { user: { select: { id: true, name: true, role: true } } },
+    orderBy: { createdAt: 'desc' },
+    take:    20,
+  },
+};
+
+const STATUS_LABELS = {
+  pending:     'Pending Review',
+  paid:        'Payment Received',
+  'in-progress': 'In Progress',
+  review:      'Under Review',
+  revision:    'Revision Requested',
+  completed:   'Completed',
+  cancelled:   'Cancelled',
 };
 
 // Client: Submit new project request
@@ -101,17 +117,52 @@ exports.updateProject = async (req, res, next) => {
   try {
     const { status, progress, notes, deadline, budget } = req.body;
 
+    // Fetch current project for comparison
+    const current = await prisma.project.findUnique({ where: { id: req.params.id } });
+    if (!current) return res.status(404).json({ success: false, message: 'Project not found' });
+
     const project = await prisma.project.update({
       where: { id: req.params.id },
       data: {
-        ...(status !== undefined ? { status } : {}),
-        ...(progress !== undefined ? { progress: Number(progress) } : {}),
-        ...(notes !== undefined ? { notes } : {}),
+        ...(status   !== undefined ? { status }                                : {}),
+        ...(progress !== undefined ? { progress: Number(progress) }           : {}),
+        ...(notes    !== undefined ? { notes }                                : {}),
         ...(deadline !== undefined ? { deadline: deadline ? new Date(deadline) : null } : {}),
-        ...(budget !== undefined ? { budget: Number(budget) } : {}),
+        ...(budget   !== undefined ? { budget: Number(budget) }              : {}),
       },
       include: withClient,
     });
+
+    // Log status change
+    if (status && status !== current.status) {
+      await logActivity(
+        project.id,
+        req.user.id,
+        'status_change',
+        `Project status changed from "${STATUS_LABELS[current.status] || current.status}" to "${STATUS_LABELS[status] || status}"`,
+        { from: current.status, to: status }
+      );
+
+      // Notify client
+      await notify(project.clientId, {
+        type:    'status_update',
+        title:   `Project Update: ${STATUS_LABELS[status] || status}`,
+        message: `Your project "${project.title}" status has been updated to "${STATUS_LABELS[status] || status}".`,
+        link:    `/dashboard/client/projects/${project.id}`,
+        metadata: { projectId: project.id, status },
+      });
+    }
+
+    // Log progress change
+    if (progress !== undefined && Number(progress) !== current.progress) {
+      await logActivity(
+        project.id,
+        req.user.id,
+        'progress_update',
+        `Project progress updated to ${progress}%`,
+        { from: current.progress, to: Number(progress) }
+      );
+    }
 
     res.json({ success: true, project: fmt(project) });
   } catch (err) {

@@ -13,6 +13,7 @@ import {
   Settings,
   Users,
   BarChart2,
+  ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -26,17 +27,17 @@ interface NavTab {
 
 const adminTabs: NavTab[] = [
   { label: 'Home',     href: '/dashboard/admin',           icon: LayoutDashboard },
+  { label: 'Orders',   href: '/dashboard/admin/orders',    icon: ShoppingBag },
   { label: 'Projects', href: '/dashboard/admin/projects',  icon: FolderOpen },
   { label: 'Messages', href: '/dashboard/admin/messages',  icon: MessageSquare, dot: true },
-  { label: 'Clients',  href: '/dashboard/admin/clients',   icon: Users },
   { label: 'Stats',    href: '/dashboard/admin/analytics', icon: BarChart2 },
 ];
 
 const clientTabs: NavTab[] = [
   { label: 'Home',     href: '/dashboard/client',           icon: LayoutDashboard },
+  { label: 'Orders',   href: '/dashboard/client/orders',    icon: ShoppingBag },
   { label: 'Projects', href: '/dashboard/client/projects',  icon: FolderOpen },
   { label: 'Messages', href: '/dashboard/client/messages',  icon: MessageSquare, dot: true },
-  { label: 'Payments', href: '/dashboard/client/payments',  icon: CreditCard },
   { label: 'Settings', href: '/dashboard/client/settings',  icon: Settings },
 ];
 

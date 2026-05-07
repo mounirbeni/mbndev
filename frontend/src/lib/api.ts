@@ -31,52 +31,70 @@ api.interceptors.response.use(
 
 // Auth
 export const authAPI = {
-  register: (data: any) => api.post('/auth/register', data),
-  login: (data: any) => api.post('/auth/login', data),
-  getMe: () => api.get('/auth/me'),
-  updateProfile: (data: any) => api.put('/auth/profile', data),
+  register:      (data: any)         => api.post('/auth/register', data),
+  login:         (data: any)         => api.post('/auth/login', data),
+  getMe:         ()                  => api.get('/auth/me'),
+  updateProfile: (data: any)         => api.put('/auth/profile', data),
 };
 
 // Projects
 export const projectAPI = {
-  create: (data: any) => api.post('/projects', data),
-  getMine: () => api.get('/projects/mine'),
-  getAll: (params?: any) => api.get('/projects', { params }),
-  getOne: (id: string) => api.get(`/projects/${id}`),
-  update: (id: string, data: any) => api.put(`/projects/${id}`, data),
+  create:     (data: any)                   => api.post('/projects', data),
+  getMine:    ()                            => api.get('/projects/mine'),
+  getAll:     (params?: any)               => api.get('/projects', { params }),
+  getOne:     (id: string)                 => api.get(`/projects/${id}`),
+  update:     (id: string, data: any)      => api.put(`/projects/${id}`, data),
   uploadFile: (id: string, formData: FormData) =>
     api.post(`/projects/${id}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  getStats: () => api.get('/projects/stats'),
+  getStats:   ()                           => api.get('/projects/stats'),
+};
+
+// Orders
+export const orderAPI = {
+  create:        (data: any)          => api.post('/orders', data),
+  getAll:        (params?: any)       => api.get('/orders', { params }),
+  getOne:        (id: string)         => api.get(`/orders/${id}`),
+  cancel:        (id: string)         => api.put(`/orders/${id}/cancel`),
+  getPrice:      (params: any)        => api.get('/orders/price', { params }),
 };
 
 // Messages
 export const messageAPI = {
-  get: (projectId: string) => api.get(`/messages/${projectId}`),
-  send: (projectId: string, data: any) => api.post(`/messages/${projectId}`, data),
-  getUnread: () => api.get('/messages/unread'),
+  get:       (projectId: string)         => api.get(`/messages/${projectId}`),
+  send:      (projectId: string, data: any) => api.post(`/messages/${projectId}`, data),
+  getUnread: ()                          => api.get('/messages/unread'),
 };
 
 // Payments
 export const paymentAPI = {
-  checkout: (data: any) => api.post('/payments/checkout', data),
-  mock: (data: any) => api.post('/payments/mock', data),
-  getAll: () => api.get('/payments'),
+  orderCheckout: (data: any) => api.post('/payments/order-checkout', data),
+  checkout:      (data: any) => api.post('/payments/checkout', data),
+  mock:          (data: any) => api.post('/payments/mock', data),
+  getAll:        ()          => api.get('/payments'),
+};
+
+// Notifications
+export const notificationAPI = {
+  getAll:       ()          => api.get('/notifications'),
+  getUnread:    ()          => api.get('/notifications/unread-count'),
+  markRead:     (id: string) => api.put(`/notifications/${id}/read`),
+  markAllRead:  ()          => api.put('/notifications/read-all'),
 };
 
 // Packages
 export const packageAPI = {
-  getAll: () => api.get('/packages'),
-  create: (data: any) => api.post('/packages', data),
-  update: (id: string, data: any) => api.put(`/packages/${id}`, data),
-  delete: (id: string) => api.delete(`/packages/${id}`),
+  getAll:  ()                       => api.get('/packages'),
+  create:  (data: any)             => api.post('/packages', data),
+  update:  (id: string, data: any) => api.put(`/packages/${id}`, data),
+  delete:  (id: string)            => api.delete(`/packages/${id}`),
 };
 
 // Admin
 export const adminAPI = {
-  getClients: () => api.get('/admin/clients'),
-  toggleClient: (id: string) => api.put(`/admin/clients/${id}/toggle`),
+  getClients:    ()          => api.get('/admin/clients'),
+  toggleClient:  (id: string) => api.put(`/admin/clients/${id}/toggle`),
 };
 
 export default api;

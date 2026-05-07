@@ -19,6 +19,7 @@ import {
   X,
   BarChart2,
   ChevronRight,
+  ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn, getInitials } from '@/lib/utils';
@@ -32,6 +33,7 @@ interface NavItem {
 
 const adminNav: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard/admin',           icon: LayoutDashboard },
+  { label: 'Orders',    href: '/dashboard/admin/orders',    icon: ShoppingBag },
   { label: 'Projects',  href: '/dashboard/admin/projects',  icon: FolderOpen },
   { label: 'Messages',  href: '/dashboard/admin/messages',  icon: MessageSquare },
   { label: 'Clients',   href: '/dashboard/admin/clients',   icon: Users },
@@ -42,6 +44,7 @@ const adminNav: NavItem[] = [
 
 const clientNav: NavItem[] = [
   { label: 'Dashboard',   href: '/dashboard/client',           icon: LayoutDashboard },
+  { label: 'My Orders',   href: '/dashboard/client/orders',    icon: ShoppingBag },
   { label: 'My Projects', href: '/dashboard/client/projects',  icon: FolderOpen },
   { label: 'Messages',    href: '/dashboard/client/messages',  icon: MessageSquare },
   { label: 'Payments',    href: '/dashboard/client/payments',  icon: CreditCard },
