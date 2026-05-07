@@ -121,7 +121,7 @@ export default function ClientMessagesPage() {
                 mobileChat ? 'block w-full' : 'hidden lg:block'
               }`}
             >
-              <MessageThread projectId={selected._id} projectTitle={selected.title} />
+              <MessageThread projectId={selected._id ?? selected.id ?? ''} projectTitle={selected.title} />
             </motion.div>
           ) : (
             !mobileChat && (

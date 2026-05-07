@@ -64,7 +64,7 @@ export default function AdminPackagesPage() {
       };
 
       if (editing) {
-        await packageAPI.update(editing._id, payload);
+        await packageAPI.update(editing._id ?? editing.id ?? '', payload);
         toast.success('Package updated');
       } else {
         await packageAPI.create(payload);
@@ -129,7 +129,7 @@ export default function AdminPackagesPage() {
                     <button onClick={() => openEdit(pkg)} className="p-1.5 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-colors">
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => handleDelete(pkg._id)} className="p-1.5 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors">
+                    <button onClick={() => handleDelete(pkg._id ?? pkg.id ?? '')} className="p-1.5 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>

@@ -45,7 +45,7 @@ export default function AdminProjectsPage() {
     if (!editingProject) return;
     setSaving(true);
     try {
-      await projectAPI.update(editingProject._id, editForm);
+      await projectAPI.update(editingProject._id ?? editingProject.id ?? '', editForm);
       toast.success('Project updated');
       setEditingProject(null);
       fetchProjects();

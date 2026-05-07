@@ -65,7 +65,7 @@ export default function AdminClientsPage() {
             <tbody>
               {clients.map((c, i) => (
                 <motion.tr
-                  key={c._id}
+                  key={c._id || c.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.04 }}
@@ -91,7 +91,7 @@ export default function AdminClientsPage() {
                   </td>
                   <td className="p-4">
                     <button
-                      onClick={() => toggleStatus(c._id)}
+                      onClick={() => toggleStatus(c._id ?? c.id ?? '')}
                       className="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
                     >
                       Toggle
