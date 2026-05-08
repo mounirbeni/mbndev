@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Check, ArrowRight, Zap, Star, HelpCircle } from 'lucide-react';
+import { Check, ArrowRight, Zap, Star, HelpCircle, Flame, Tag, Trophy } from 'lucide-react';
 import { packageAPI } from '@/lib/api';
 import { Package } from '@/types';
 import { formatCurrency } from '@/lib/utils';
@@ -13,21 +13,31 @@ import Button from '@/components/ui/Button';
 import AuthModal from '@/components/ui/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 
+const BADGE_STYLES: Record<string, { icon: any; className: string }> = {
+  'Limited Offer': { icon: Flame,  className: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
+  'Best Deal':     { icon: Tag,    className: 'bg-primary-500/20 text-primary-300 border-primary-500/30' },
+  'Best Value':    { icon: Trophy, className: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+};
+
+function discountPct(original: number, current: number) {
+  return Math.round((1 - current / original) * 100);
+}
+
 const fallbackPackages = [
   {
-    _id: '1', name: 'Starter', slug: 'starter', price: 799, popular: false,
+    _id: '1', name: 'Starter', slug: 'starter', price: 799, originalPrice: 1499, badge: 'Limited Offer', popular: false,
     description: 'Perfect for small businesses and personal projects.',
     features: ['Up to 5 Pages', 'Responsive Design', 'Contact Form', 'Basic SEO', '2 Revisions', 'Delivery in 14 days'],
     pages: 5, revisions: 2, deliveryDays: 14,
   },
   {
-    _id: '2', name: 'Pro', slug: 'pro', price: 1799, popular: true,
+    _id: '2', name: 'Pro', slug: 'pro', price: 1799, originalPrice: 2999, badge: 'Best Deal', popular: true,
     description: 'Best for growing businesses who need more.',
     features: ['Up to 10 Pages', 'Responsive Design', 'CMS Integration', 'Advanced SEO', '3 Revisions', 'Priority Support', 'Analytics Setup', 'Delivery in 21 days'],
     pages: 10, revisions: 3, deliveryDays: 21,
   },
   {
-    _id: '3', name: 'Premium', slug: 'premium', price: 3499, popular: false,
+    _id: '3', name: 'Premium', slug: 'premium', price: 3499, originalPrice: 5499, badge: 'Best Value', popular: false,
     description: 'For complex projects with custom requirements.',
     features: ['Unlimited Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance', 'Delivery in 30 days'],
     pages: 0, revisions: 6, deliveryDays: 30,
@@ -101,7 +111,7 @@ export default function PricingPage() {
               The perfect plan<br />for your <span className="gradient-text">next project</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-xl mx-auto">
-              No hidden fees. No surprises. Choose a package and let's build something great.
+              No hidden fees. No surprises. Save up to <span className="text-green-400 font-semibold">47%</span> vs average freelancer market rates.
             </p>
           </motion.div>
         </div>
@@ -111,52 +121,93 @@ export default function PricingPage() {
       <section className="pb-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-3 gap-6">
-            {displayed.map((pkg, i) => (
-              <motion.div
-                key={pkg._id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className={`glass rounded-2xl p-8 border flex flex-col relative ${
-                  pkg.popular
-                    ? 'border-primary-500/50 shadow-[0_0_40px_rgba(124,58,237,0.15)]'
-                    : 'border-white/10'
-                }`}
-              >
-                {pkg.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-primary-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full">
-                    <Star className="w-3 h-3" /> Most Popular
-                  </div>
-                )}
-                <div className="mb-6">
-                  <h3 className="text-white font-bold text-xl mb-1">{pkg.name}</h3>
-                  <p className="text-slate-400 text-sm">{pkg.description}</p>
-                </div>
-                <div className="mb-6">
-                  <span className="text-4xl font-black text-white">{formatCurrency(pkg.price)}</span>
-                  <span className="text-slate-500 text-sm ml-1">/ project</span>
-                </div>
-                <ul className="space-y-3 mb-8 flex-1">
-                  {pkg.features?.map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-slate-300">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${pkg.popular ? 'bg-primary-500' : 'bg-white/10'}`}>
-                        <Check className="w-2.5 h-2.5 text-white" />
-                      </div>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  size="md"
-                  variant={pkg.popular ? 'primary' : 'outline'}
-                  className="w-full group"
-                  onClick={() => choosePlan(pkg)}
+            {displayed.map((pkg, i) => {
+              const pct = pkg.originalPrice ? discountPct(pkg.originalPrice, pkg.price) : 0;
+              const badgeCfg = pkg.badge ? BADGE_STYLES[pkg.badge] : null;
+              const BadgeIcon = badgeCfg?.icon ?? Tag;
+              return (
+                <motion.div
+                  key={pkg._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className={`glass rounded-2xl p-8 border flex flex-col relative ${
+                    pkg.popular
+                      ? 'border-primary-500/50 shadow-[0_0_40px_rgba(124,58,237,0.15)]'
+                      : 'border-white/10'
+                  }`}
                 >
-                  Choose {pkg.name}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </motion.div>
-            ))}
+                  {/* Most Popular pill */}
+                  {pkg.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-primary-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full">
+                      <Star className="w-3 h-3" /> Most Popular
+                    </div>
+                  )}
+
+                  {/* Discount % pill — top right */}
+                  {pct > 0 && (
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-2 py-0.5 rounded-full">
+                        -{pct}%
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Promo badge */}
+                  {badgeCfg && pkg.badge && (
+                    <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-4 w-fit ${badgeCfg.className}`}>
+                      <BadgeIcon className="w-3 h-3" />
+                      {pkg.badge}
+                    </div>
+                  )}
+
+                  <div className="mb-5">
+                    <h3 className="text-white font-bold text-xl mb-1">{pkg.name}</h3>
+                    <p className="text-slate-400 text-sm">{pkg.description}</p>
+                  </div>
+
+                  {/* Price block */}
+                  <div className="mb-6">
+                    {pkg.originalPrice && (
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-slate-500 text-sm line-through">{formatCurrency(pkg.originalPrice)}</span>
+                        <span className="text-slate-500 text-xs">market avg</span>
+                      </div>
+                    )}
+                    <div className="flex items-end gap-1.5">
+                      <span className="text-4xl font-black text-white">{formatCurrency(pkg.price)}</span>
+                      <span className="text-slate-500 text-sm mb-1">/ project</span>
+                    </div>
+                    {pkg.originalPrice && (
+                      <p className="text-green-400 text-xs font-semibold mt-1.5">
+                        ✓ You save {formatCurrency(pkg.originalPrice - pkg.price)} vs market
+                      </p>
+                    )}
+                  </div>
+
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {pkg.features?.map((f) => (
+                      <li key={f} className="flex items-center gap-2.5 text-sm text-slate-300">
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${pkg.popular ? 'bg-primary-500' : 'bg-white/10'}`}>
+                          <Check className="w-2.5 h-2.5 text-white" />
+                        </div>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    size="md"
+                    variant={pkg.popular ? 'primary' : 'outline'}
+                    className="w-full group"
+                    onClick={() => choosePlan(pkg)}
+                  >
+                    Choose {pkg.name}
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>

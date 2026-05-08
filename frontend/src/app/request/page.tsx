@@ -23,12 +23,12 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const STEPS = ['Service Type', 'Configuration', 'Design', 'Summary'];
 
-const serviceTypes: { value: string; label: string; desc: string; icon: LucideIcon; base: number }[] = [
-  { value: 'website',   label: 'Website',        desc: 'Landing page / brochure site',      icon: Target,       base: 799  },
-  { value: 'ecommerce', label: 'E-Commerce',      desc: 'Online store with payments',        icon: ShoppingCart, base: 1499 },
-  { value: 'dashboard', label: 'SaaS Dashboard',  desc: 'Complex web application',           icon: BarChart3,    base: 2499 },
-  { value: 'mobile',    label: 'Mobile App',      desc: 'iOS & Android (React Native/PWA)',  icon: Smartphone,   base: 3999 },
-  { value: 'custom',    label: 'Custom Project',  desc: 'Something unique — let\'s talk',   icon: Lightbulb,    base: 1199 },
+const serviceTypes: { value: string; label: string; desc: string; icon: LucideIcon; base: number; marketValue: string }[] = [
+  { value: 'website',   label: 'Website',        desc: 'Landing page / brochure site',      icon: Target,       base: 799,  marketValue: '$1,500+' },
+  { value: 'ecommerce', label: 'E-Commerce',      desc: 'Online store with payments',        icon: ShoppingCart, base: 1499, marketValue: '$3,000+' },
+  { value: 'dashboard', label: 'SaaS Dashboard',  desc: 'Complex web application',           icon: BarChart3,    base: 2499, marketValue: '$8,000+' },
+  { value: 'mobile',    label: 'Mobile App',      desc: 'iOS & Android (React Native/PWA)',  icon: Smartphone,   base: 3999, marketValue: '$12,000+' },
+  { value: 'custom',    label: 'Custom Project',  desc: 'Something unique — let\'s talk',   icon: Lightbulb,    base: 1199, marketValue: '$2,500+' },
 ];
 
 const FEATURES: { key: string; label: string; price: number; desc: string }[] = [
@@ -281,11 +281,16 @@ function RequestPageContent() {
                                  style={{ background: active ? 'rgba(124,58,237,0.25)' : 'rgba(255,255,255,0.07)' }}>
                               <Icon className={`w-4 h-4 ${active ? 'text-primary-400' : 'text-slate-400'}`} />
                             </div>
-                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${
-                              active ? 'bg-primary-500/20 text-primary-300' : 'bg-white/5 text-slate-500'
-                            }`}>
-                              from ${t.base.toLocaleString()}
-                            </span>
+                            <div className="flex flex-col items-end gap-0.5">
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${
+                                active ? 'bg-primary-500/20 text-primary-300' : 'bg-white/5 text-slate-500'
+                              }`}>
+                                from ${t.base.toLocaleString()}
+                              </span>
+                              <span className="text-[10px] text-green-500/70 font-medium">
+                                market {t.marketValue}
+                              </span>
+                            </div>
                           </div>
                           <div className="font-semibold text-sm mt-2.5">{t.label}</div>
                           <div className="text-xs opacity-60 mt-0.5">{t.desc}</div>

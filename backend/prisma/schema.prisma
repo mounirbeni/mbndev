@@ -184,6 +184,8 @@ model Package {
   pages        Int?
   revisions    Int?
   deliveryDays Int?
+  originalPrice Float?
+  badge        String?
   popular      Boolean  @default(false)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())

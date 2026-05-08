@@ -159,6 +159,8 @@ export interface Package {
   name: string;
   slug: string;
   price: number;
+  originalPrice?: number;
+  badge?: string;
   description?: string;
   features: string[];
   pages?: number;
