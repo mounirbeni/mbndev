@@ -31,14 +31,14 @@ const serviceTypes: { value: string; label: string; desc: string; icon: LucideIc
   { value: 'custom',    label: 'Custom Project',  desc: 'Something unique — let\'s talk',   icon: Lightbulb,    base: 1199, marketValue: '$2,500+' },
 ];
 
-const FEATURES: { key: string; label: string; price: number; desc: string }[] = [
-  { key: 'auth',       label: 'User Authentication',  price: 400, desc: 'Login, register, profiles' },
-  { key: 'payment',    label: 'Payment Integration',  price: 500, desc: 'Stripe, PayPal checkout' },
-  { key: 'dashboard',  label: 'Admin Dashboard',      price: 800, desc: 'Backend control panel' },
-  { key: 'multilang',  label: 'Multi-language',       price: 300, desc: 'i18n / localization' },
-  { key: 'seo',        label: 'SEO Optimization',     price: 250, desc: 'Meta, sitemap, schema' },
-  { key: 'api',        label: 'API Integration',      price: 400, desc: 'Third-party REST APIs' },
-  { key: 'hosting',    label: 'Hosting Setup',        price: 150, desc: 'Deployment & config' },
+const FEATURES: { key: string; label: string; price: number; marketValue: number; desc: string }[] = [
+  { key: 'auth',       label: 'User Authentication',  price: 400, marketValue: 800,  desc: 'Login, register, profiles' },
+  { key: 'payment',    label: 'Payment Integration',  price: 500, marketValue: 950,  desc: 'Stripe, PayPal checkout' },
+  { key: 'dashboard',  label: 'Admin Dashboard',      price: 800, marketValue: 1500, desc: 'Backend control panel' },
+  { key: 'multilang',  label: 'Multi-language',       price: 300, marketValue: 550,  desc: 'i18n / localization' },
+  { key: 'seo',        label: 'SEO Optimization',     price: 250, marketValue: 450,  desc: 'Meta, sitemap, schema' },
+  { key: 'api',        label: 'API Integration',      price: 400, marketValue: 750,  desc: 'Third-party REST APIs' },
+  { key: 'hosting',    label: 'Hosting Setup',        price: 150, marketValue: 280,  desc: 'Deployment & config' },
 ];
 
 const BASE_PRICES: Record<string, number> = {
@@ -378,9 +378,14 @@ function RequestPageContent() {
                               <div className="font-medium text-xs leading-tight">{f.label}</div>
                               <div className="text-slate-500 text-[10px]">{f.desc}</div>
                             </div>
-                            <span className={`text-xs shrink-0 ${on ? 'text-primary-400' : 'text-slate-600'}`}>
-                              +${f.price}
-                            </span>
+                            <div className="flex flex-col items-end shrink-0 gap-0.5">
+                              <span className={`text-xs font-semibold ${on ? 'text-primary-400' : 'text-slate-500'}`}>
+                                +${f.price}
+                              </span>
+                              <span className="text-[9px] text-slate-700 line-through">
+                                ${f.marketValue}
+                              </span>
+                            </div>
                           </button>
                         );
                       })}
@@ -407,7 +412,7 @@ function RequestPageContent() {
                         <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         Fast Delivery
                       </div>
-                      <span className="text-xs text-amber-400">+$200 · 40% faster</span>
+                      <span className="text-xs text-amber-400">+30% of base · 40% faster delivery</span>
                     </button>
                   </div>
 
