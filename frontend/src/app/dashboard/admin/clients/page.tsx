@@ -6,6 +6,7 @@ import { adminAPI } from '@/lib/api';
 import { User } from '@/types';
 import { formatDate, getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
+import PlanBadge from '@/components/ui/PlanBadge';
 import toast from 'react-hot-toast';
 import { Users } from 'lucide-react';
 
@@ -56,6 +57,7 @@ export default function AdminClientsPage() {
             <thead>
               <tr className="border-b border-white/5">
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Client</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Plan</th>
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Company</th>
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Joined</th>
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Status</th>
@@ -82,6 +84,7 @@ export default function AdminClientsPage() {
                       </div>
                     </div>
                   </td>
+                  <td className="p-4"><PlanBadge plan={c.plan} /></td>
                   <td className="p-4 text-sm text-slate-400">{c.company || '—'}</td>
                   <td className="p-4 text-sm text-slate-400">{c.createdAt ? formatDate(c.createdAt) : '—'}</td>
                   <td className="p-4">

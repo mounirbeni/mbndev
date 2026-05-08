@@ -18,6 +18,7 @@ import {
   Activity, GitBranch,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/Skeleton';
+import PlanBadge from '@/components/ui/PlanBadge';
 
 const TABS = [
   { id: 'overview',  label: 'Overview',  icon: LayoutDashboard },
@@ -197,10 +198,10 @@ export default function ClientProjectWorkspace() {
             <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-xl sm:text-2xl font-bold text-white">{project.title}</h1>
               <StatusBadge status={project.status} />
+              {project.package && <PlanBadge plan={project.package} size="sm" />}
             </div>
             <p className="text-slate-400 text-sm capitalize">
               {project.type?.replace('-', ' ')}
-              {project.package ? ` — ${project.package} package` : ''}
             </p>
           </div>
           <div className="flex items-center gap-4 shrink-0">

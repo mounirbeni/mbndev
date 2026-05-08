@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import AuthModal from '@/components/ui/AuthModal';
+import PlanBadge from '@/components/ui/PlanBadge';
 import { orderAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -77,9 +79,11 @@ const designStyles: { value: string; label: string; icon: LucideIcon; desc: stri
 function RequestPageContent() {
   const [step, setStep]       = useState(0);
   const [loading, setLoading] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const { user }              = useAuth();
   const router                = useRouter();
   const params                = useSearchParams();
+  const selectedPlan          = params.get('package') || (typeof window !== 'undefined' ? localStorage.getItem('mbndev_selected_plan') : null);
 
   const [form, setForm] = useState({
     serviceType:  'website',
@@ -151,15 +155,10 @@ function RequestPageContent() {
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  const handleSubmit = async () => {
-    if (!user) {
-      toast.error('Please sign in to place an order');
-      router.push('/login?redirect=/request');
-      return;
-    }
-
+  const submitOrder = async () => {
     setLoading(true);
     try {
+      const selectedPlan = params.get('package') || localStorage.getItem('mbndev_selected_plan') || undefined;
       const { data } = await orderAPI.create({
         serviceType:  form.serviceType,
         title:        form.title,
@@ -171,23 +170,27 @@ function RequestPageContent() {
         designStyle:  form.designStyle.length > 0 ? form.designStyle.join(', ') : undefined,
         designColors: form.colors ? form.colors.split(',').map((c) => c.trim()) : [],
         designRefs:   form.references ? form.references.split('\n').filter(Boolean) : [],
+        plan:         selectedPlan,
       });
 
       toast.success('Order created! Redirecting to checkout…');
-      // Clear saved draft so a fresh form awaits next visit
       localStorage.removeItem('mbndev_request_draft');
       localStorage.removeItem('mbndev_request_step');
+      localStorage.removeItem('mbndev_selected_plan');
       router.push(`/checkout/${data.order.id}`);
     } catch (err: any) {
-      if (err?.response?.status === 401) {
-        toast.error('Please sign in first');
-        router.push('/login?redirect=/request');
-      } else {
-        toast.error(err?.response?.data?.message || 'Failed to create order');
-      }
+      toast.error(err?.response?.data?.message || 'Failed to create order');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      setAuthOpen(true);
+      return;
+    }
+    await submitOrder();
   };
 
   return (
@@ -202,6 +205,7 @@ function RequestPageContent() {
             <Zap className="w-4 h-4 text-white" />
           </div>
           <span className="text-white font-semibold text-sm sm:text-base">MBN DEV — Request Service</span>
+          {selectedPlan && <PlanBadge plan={selectedPlan} size="sm" />}
         </div>
 
         {/* Live price pill */}
@@ -549,11 +553,12 @@ function RequestPageContent() {
                   </div>
 
                   {!user && (
-                    <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                      <p className="text-yellow-400 text-sm">
-                        You need to{' '}
-                        <Link href="/login" className="underline font-medium">sign in</Link>{' '}
-                        to proceed to payment.
+                    <div className="p-3 bg-primary-500/10 border border-primary-500/30 rounded-xl flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary-500/20 flex items-center justify-center shrink-0">
+                        <ArrowRight className="w-3 h-3 text-primary-400" />
+                      </div>
+                      <p className="text-primary-300 text-sm">
+                        Click &quot;Proceed to Checkout&quot; — we&apos;ll ask you to create a free account to save your order.
                       </p>
                     </div>
                   )}
@@ -580,6 +585,13 @@ function RequestPageContent() {
           </div>
         </div>
       </div>
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onSuccess={submitOrder}
+        contextMessage="Your project details are saved. Create a free account to proceed to checkout."
+      />
     </div>
   );
 }

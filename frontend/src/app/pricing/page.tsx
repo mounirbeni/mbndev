@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Check, ArrowRight, Zap, Star, HelpCircle } from 'lucide-react';
 import { packageAPI } from '@/lib/api';
 import { Package } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
+import AuthModal from '@/components/ui/AuthModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 const fallbackPackages = [
   {
@@ -52,9 +55,13 @@ const faqs = [
 ];
 
 export default function PricingPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAnnual, setShowAnnual] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [pendingPlan, setPendingPlan] = useState<string | null>(null);
 
   useEffect(() => {
     packageAPI.getAll()
@@ -62,6 +69,21 @@ export default function PricingPage() {
       .catch(() => setPackages(fallbackPackages as any))
       .finally(() => setLoading(false));
   }, []);
+
+  const choosePlan = (pkg: { slug: string; name: string }) => {
+    localStorage.setItem('mbndev_selected_plan', pkg.slug);
+    if (user) {
+      router.push(`/request?package=${pkg.slug}`);
+    } else {
+      setPendingPlan(pkg.slug);
+      setAuthOpen(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    const plan = pendingPlan || localStorage.getItem('mbndev_selected_plan') || '';
+    router.push(`/request?package=${plan}`);
+  };
 
   const displayed = loading ? fallbackPackages : packages;
 
@@ -124,16 +146,15 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href={`/request?package=${pkg.slug}`}>
-                  <Button
-                    size="md"
-                    variant={pkg.popular ? 'primary' : 'outline'}
-                    className="w-full group"
-                  >
-                    Choose {pkg.name}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
+                <Button
+                  size="md"
+                  variant={pkg.popular ? 'primary' : 'outline'}
+                  className="w-full group"
+                  onClick={() => choosePlan(pkg)}
+                >
+                  Choose {pkg.name}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </motion.div>
             ))}
           </div>
@@ -232,6 +253,13 @@ export default function PricingPage() {
           </motion.div>
         </div>
       </section>
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onSuccess={handleAuthSuccess}
+        plan={pendingPlan ?? undefined}
+        contextMessage="Create your account to start your project and access your client dashboard."
+      />
     </PublicLayout>
   );
 }

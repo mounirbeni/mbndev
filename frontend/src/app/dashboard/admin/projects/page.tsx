@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import { Search, Filter } from 'lucide-react';
 import Link from 'next/link';
+import PlanBadge from '@/components/ui/PlanBadge';
 
 const statusOptions: ProjectStatus[] = ['pending', 'in-progress', 'review', 'completed', 'cancelled'];
 
@@ -120,6 +121,7 @@ export default function AdminProjectsPage() {
                 <tr className="border-b border-white/5">
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Project</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Client</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Plan</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Budget</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Status</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Progress</th>
@@ -143,6 +145,7 @@ export default function AdminProjectsPage() {
                         <div className="text-slate-500 text-xs">{projectTypeLabels[p.type] || p.type}</div>
                       </td>
                       <td className="p-4 text-sm text-slate-400">{client?.name || '—'}</td>
+                      <td className="p-4"><PlanBadge plan={p.package} /></td>
                       <td className="p-4 text-sm font-medium text-white">{formatCurrency(p.budget)}</td>
                       <td className="p-4"><StatusBadge status={p.status} /></td>
                       <td className="p-4">

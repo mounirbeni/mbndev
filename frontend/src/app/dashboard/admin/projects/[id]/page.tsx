@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { projectAPI, messageAPI, paymentAPI } from '@/lib/api';
 import { Project, Message, Payment, ProjectStatus } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
+import PlanBadge from '@/components/ui/PlanBadge';
 import Button from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -186,6 +187,7 @@ export default function AdminProjectWorkspace() {
             <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-2xl font-bold text-white">{project.title}</h1>
               <StatusBadge status={project.status} />
+              {project.package && <PlanBadge plan={project.package} size="sm" />}
             </div>
             <div className="flex items-center gap-3 flex-wrap">
               <span className="text-slate-400 text-sm capitalize">{project.type?.replace('-', ' ')}</span>

@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
+import AuthModal from '@/components/ui/AuthModal';
 import { packageAPI } from '@/lib/api';
 import { Package } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const defaultPackages: Package[] = [
   {
@@ -40,13 +41,33 @@ const defaultPackages: Package[] = [
 ];
 
 export default function Pricing() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [packages, setPackages] = useState<Package[]>(defaultPackages);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [pendingPlan, setPendingPlan] = useState<string | null>(null);
 
   useEffect(() => {
     packageAPI.getAll()
       .then(({ data }) => { if (data.packages?.length) setPackages(data.packages); })
       .catch(() => {}); // silently fall back to defaults
   }, []);
+
+  const choosePlan = (pkg: Package) => {
+    // Save selected plan so it survives auth
+    localStorage.setItem('mbndev_selected_plan', pkg.slug);
+    if (user) {
+      router.push(`/request?package=${pkg.slug}`);
+    } else {
+      setPendingPlan(pkg.slug);
+      setAuthOpen(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    const plan = pendingPlan || localStorage.getItem('mbndev_selected_plan') || '';
+    router.push(`/request?package=${plan}`);
+  };
 
   return (
     <section id="pricing" className="py-24 relative">
@@ -111,15 +132,14 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <Link href={`/request?package=${pkg.slug}`}>
-                <Button
-                  variant={pkg.popular ? 'primary' : 'outline'}
-                  size="md"
-                  className="w-full"
-                >
-                  Choose Plan
-                </Button>
-              </Link>
+              <Button
+                variant={pkg.popular ? 'primary' : 'outline'}
+                size="md"
+                className="w-full"
+                onClick={() => choosePlan(pkg)}
+              >
+                Choose Plan
+              </Button>
             </motion.div>
           ))}
         </div>
@@ -137,6 +157,14 @@ export default function Pricing() {
           about your project.
         </motion.p>
       </div>
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onSuccess={handleAuthSuccess}
+        plan={pendingPlan ?? undefined}
+        contextMessage="Sign up to start your project request and track everything in your dashboard."
+      />
     </section>
   );
 }

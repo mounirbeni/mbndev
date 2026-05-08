@@ -15,6 +15,7 @@ model User {
   email     String   @unique
   password  String
   role      String   @default("client")   // "admin" | "client"
+  plan      String   @default("custom")   // "starter" | "pro" | "premium" | "custom"
   avatar    String   @default("")
   company   String   @default("")
   phone     String   @default("")

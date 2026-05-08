@@ -57,7 +57,7 @@ exports.createOrder = async (req, res, next) => {
   try {
     const {
       serviceType, title, description, pages, features, addons, notes,
-      designStyle, designColors, designRefs,
+      designStyle, designColors, designRefs, plan,
     } = req.body;
 
     if (!serviceType || !title) {
@@ -88,6 +88,14 @@ exports.createOrder = async (req, res, next) => {
         designRefs:  designRefs || [],
       },
     });
+
+    // Update user's plan if one was selected
+    if (plan && ['starter', 'pro', 'premium', 'custom'].includes(plan)) {
+      await prisma.user.update({
+        where: { id: req.user.id },
+        data: { plan },
+      });
+    }
 
     // Notify admins of new order
     await notifyAdmins({

@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   role: 'admin' | 'client';
+  plan?: 'starter' | 'pro' | 'premium' | 'custom';
   avatar?: string;
   company?: string;
   phone?: string;

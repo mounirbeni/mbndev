@@ -9,7 +9,7 @@ router.get('/clients', protect, authorize('admin'), async (req, res, next) => {
   try {
     const clients = await prisma.user.findMany({
       where:   { role: 'client' },
-      select:  { id: true, name: true, email: true, company: true, phone: true, isActive: true, createdAt: true, role: true },
+      select:  { id: true, name: true, email: true, company: true, phone: true, isActive: true, createdAt: true, role: true, plan: true },
       orderBy: { createdAt: 'desc' },
     });
     res.json({ success: true, clients: fmt(clients) });

@@ -10,6 +10,7 @@ import { Project } from '@/types';
 import StatsCard from '@/components/dashboard/StatsCard';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import Button from '@/components/ui/Button';
+import PlanBadge from '@/components/ui/PlanBadge';
 
 export default function ClientDashboard() {
   const { user } = useAuth();
@@ -55,10 +56,13 @@ export default function ClientDashboard() {
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            Welcome back, {user?.name?.split(' ')[0]}
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <div className="flex items-center gap-2.5 mb-1">
+            <h1 className="text-2xl font-bold text-white">
+              Welcome back, {user?.name?.split(' ')[0]}
+            </h1>
+            {user?.plan && <PlanBadge plan={user.plan} size="md" />}
+          </div>
+          <p className="text-slate-400 text-sm">
             Here&apos;s what&apos;s happening with your projects.
           </p>
         </div>

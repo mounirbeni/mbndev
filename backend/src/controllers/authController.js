@@ -88,7 +88,7 @@ exports.updateProfile = async (req, res, next) => {
       where: { id: req.user.id },
       data:  updateData,
       select: {
-        id: true, name: true, email: true, role: true,
+        id: true, name: true, email: true, role: true, plan: true,
         avatar: true, company: true, phone: true, isActive: true,
       },
     });
