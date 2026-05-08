@@ -24,7 +24,9 @@
       "WebFetch(domain:emll.vercel.app)",
       "WebFetch(domain:www.riadconnect.com)",
       "WebFetch(domain:pricinglink.com)",
-      "WebFetch(domain:zyner.io)"
+      "WebFetch(domain:zyner.io)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "PowerShell(cd C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\backend; $env:DATABASE_URL=\"postgresql://neondb_owner:npg_I5dYjpHgGh3L@ep-blue-surf-anw6wmcl-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&connect_timeout=30\"; npx prisma db push 2>&1)"
     ]
   }
 }
