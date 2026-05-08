@@ -9,7 +9,7 @@ import {
   ArrowLeft, ArrowRight, Check, Zap, Target, ShoppingCart,
   BarChart3, Palette, Settings, Lightbulb, Smartphone,
   Minus, Briefcase, Wand2, Terminal, Crown, Layers,
-  Feather, Smile, Type, BookOpen, Calendar,
+  Feather, Smile, Type, BookOpen, Calendar, Lock,
   type LucideIcon,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -51,39 +51,89 @@ const FEATURE_PRICES: Record<string, number> = {
   auth: 400, payment: 500, dashboard: 800, multilang: 300, seo: 250, api: 400, hosting: 150,
 };
 
-function calcPrice(serviceType: string, pages: number, features: string[], addons: string[]) {
-  const base      = BASE_PRICES[serviceType] || 1199;
-  const pageExtra = Math.max(0, pages - 5) * 50;
-  const feat      = features.reduce((s, k) => s + (FEATURE_PRICES[k] || 0), 0);
-  const addon     = addons.includes('fastDelivery') ? Math.round(base * 0.3) : 0;
-  let   days      = BASE_DELIVERY[serviceType] || 21;
+// ─── Package Inclusions ───────────────────────────────────────────────────────
+// Defines what each pricing package includes for FREE
+
+const PACKAGE_INCLUSIONS: Record<string, {
+  label: string;
+  price: number;
+  includedPages: number; // 99 = unlimited
+  includedFeatures: string[];
+  summary: string;
+}> = {
+  starter: {
+    label:            'Starter',
+    price:            799,
+    includedPages:    5,
+    includedFeatures: ['seo', 'hosting'],
+    summary:          '5 pages · SEO optimization · Hosting setup',
+  },
+  pro: {
+    label:            'Pro',
+    price:            1799,
+    includedPages:    10,
+    includedFeatures: ['seo', 'hosting', 'auth', 'api'],
+    summary:          '10 pages · SEO · Hosting · Authentication · API integration',
+  },
+  premium: {
+    label:            'Premium',
+    price:            3499,
+    includedPages:    99, // effectively unlimited
+    includedFeatures: ['seo', 'hosting', 'auth', 'api', 'payment', 'dashboard', 'multilang'],
+    summary:          'Unlimited pages · All features included',
+  },
+};
+
+// ─── Pricing Calculator ───────────────────────────────────────────────────────
+
+function calcPrice(
+  serviceType: string,
+  pages: number,
+  features: string[],
+  addons: string[],
+  plan?: string | null,
+) {
+  const pkg          = plan ? PACKAGE_INCLUSIONS[plan] : null;
+  const base         = pkg ? pkg.price : (BASE_PRICES[serviceType] || 1199);
+  const includedPages = pkg ? pkg.includedPages : 5;
+  const includedFeats = pkg ? pkg.includedFeatures : [];
+
+  const pageExtra   = Math.max(0, pages - includedPages) * 50;
+  const paidFeats   = features.filter((k) => !includedFeats.includes(k));
+  const feat        = paidFeats.reduce((s, k) => s + (FEATURE_PRICES[k] || 0), 0);
+  const addon       = addons.includes('fastDelivery') ? Math.round(base * 0.3) : 0;
+  let   days        = BASE_DELIVERY[serviceType] || 21;
   if (addons.includes('fastDelivery')) days = Math.ceil(days * 0.6);
-  return { total: base + pageExtra + feat + addon, days, base, pageExtra, feat, addon };
+
+  return { total: base + pageExtra + feat + addon, days, base, pageExtra, feat, addon, pkg, includedFeats, includedPages };
 }
 
+// ─── Design Styles ────────────────────────────────────────────────────────────
+
 const designStyles: { value: string; label: string; icon: LucideIcon; desc: string }[] = [
-  { value: 'Minimalist', label: 'Minimalist', icon: Minus,     desc: 'Clean & spacious'       },
-  { value: 'Corporate',  label: 'Corporate',  icon: Briefcase, desc: 'Professional & formal'  },
-  { value: 'Creative',   label: 'Creative',   icon: Wand2,     desc: 'Unique & artistic'      },
-  { value: 'Tech / Dark',label: 'Tech / Dark',icon: Terminal,  desc: 'Dark UI, futuristic'    },
-  { value: 'Luxury',     label: 'Luxury',     icon: Crown,     desc: 'Premium & high-end'     },
-  { value: 'Colorful',   label: 'Colorful',   icon: Palette,   desc: 'Vibrant & energetic'    },
-  { value: 'Modern',     label: 'Modern',     icon: Layers,    desc: 'Sleek & contemporary'   },
-  { value: 'Elegant',    label: 'Elegant',    icon: Feather,   desc: 'Refined & sophisticated'},
-  { value: 'Playful',    label: 'Playful',    icon: Smile,     desc: 'Fun & friendly'         },
-  { value: 'Classic',    label: 'Classic',    icon: BookOpen,  desc: 'Timeless & trustworthy' },
+  { value: 'Minimalist', label: 'Minimalist', icon: Minus,     desc: 'Clean & spacious'        },
+  { value: 'Corporate',  label: 'Corporate',  icon: Briefcase, desc: 'Professional & formal'   },
+  { value: 'Creative',   label: 'Creative',   icon: Wand2,     desc: 'Unique & artistic'       },
+  { value: 'Tech / Dark',label: 'Tech / Dark',icon: Terminal,  desc: 'Dark UI, futuristic'     },
+  { value: 'Luxury',     label: 'Luxury',     icon: Crown,     desc: 'Premium & high-end'      },
+  { value: 'Colorful',   label: 'Colorful',   icon: Palette,   desc: 'Vibrant & energetic'     },
+  { value: 'Modern',     label: 'Modern',     icon: Layers,    desc: 'Sleek & contemporary'    },
+  { value: 'Elegant',    label: 'Elegant',    icon: Feather,   desc: 'Refined & sophisticated' },
+  { value: 'Playful',    label: 'Playful',    icon: Smile,     desc: 'Fun & friendly'          },
+  { value: 'Classic',    label: 'Classic',    icon: BookOpen,  desc: 'Timeless & trustworthy'  },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function RequestPageContent() {
-  const [step, setStep]       = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [step, setStep]         = useState(0);
+  const [loading, setLoading]   = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const { user }              = useAuth();
-  const router                = useRouter();
-  const params                = useSearchParams();
-  const selectedPlan          = params.get('package') || (typeof window !== 'undefined' ? localStorage.getItem('mbndev_selected_plan') : null);
+  const { user }                = useAuth();
+  const router                  = useRouter();
+  const params                  = useSearchParams();
+  const selectedPlan            = params.get('package') || (typeof window !== 'undefined' ? localStorage.getItem('mbndev_selected_plan') : null);
+  const planData                = selectedPlan ? PACKAGE_INCLUSIONS[selectedPlan] : null;
 
   const [form, setForm] = useState({
     serviceType:  'website',
@@ -99,7 +149,6 @@ function RequestPageContent() {
   });
 
   // ── Draft persistence ─────────────────────────────────────────────────────
-  // Restore saved draft on mount (survives login redirects, refreshes, etc.)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const raw = localStorage.getItem('mbndev_request_draft');
@@ -107,14 +156,27 @@ function RequestPageContent() {
     try {
       const parsed = JSON.parse(raw);
       setForm((prev) => ({ ...prev, ...parsed }));
-      // Restore the step they were on
       const savedStep = localStorage.getItem('mbndev_request_step');
       if (savedStep) setStep(Math.min(parseInt(savedStep, 10), STEPS.length - 1));
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Persist on every change
+  // ── Pre-populate plan-included features & set plan pages ──────────────────
+  useEffect(() => {
+    if (!selectedPlan || !planData) return;
+    setForm((f) => ({
+      ...f,
+      // Merge included features without removing user-selected extras
+      features: Array.from(new Set([...f.features, ...planData.includedFeatures])),
+      // Set pages to plan limit if currently below it (but don't shrink if user set more)
+      pages: planData.includedPages < 99
+        ? Math.max(f.pages, planData.includedPages)
+        : f.pages,
+    }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPlan]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     localStorage.setItem('mbndev_request_draft', JSON.stringify(form));
@@ -127,11 +189,15 @@ function RequestPageContent() {
   // ──────────────────────────────────────────────────────────────────────────
 
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
-  const toggleArr = (k: 'features' | 'addons', val: string) =>
+
+  // Prevent deselecting plan-included features
+  const toggleArr = (k: 'features' | 'addons', val: string) => {
+    if (k === 'features' && selectedPlan && planData?.includedFeatures.includes(val)) return;
     setForm((f) => ({
       ...f,
       [k]: f[k].includes(val) ? f[k].filter((x) => x !== val) : [...f[k], val],
     }));
+  };
 
   const toggleStyle = (val: string) =>
     setForm((f) => {
@@ -144,7 +210,7 @@ function RequestPageContent() {
       return { ...f, designStyle: [...f.designStyle, val] };
     });
 
-  const pricing = calcPrice(form.serviceType, form.pages, form.features, form.addons);
+  const pricing = calcPrice(form.serviceType, form.pages, form.features, form.addons, selectedPlan);
 
   const canNext = () => {
     if (step === 0) return !!form.serviceType;
@@ -158,7 +224,7 @@ function RequestPageContent() {
   const submitOrder = async () => {
     setLoading(true);
     try {
-      const selectedPlan = params.get('package') || localStorage.getItem('mbndev_selected_plan') || undefined;
+      const plan = params.get('package') || localStorage.getItem('mbndev_selected_plan') || undefined;
       const { data } = await orderAPI.create({
         serviceType:  form.serviceType,
         title:        form.title,
@@ -170,7 +236,7 @@ function RequestPageContent() {
         designStyle:  form.designStyle.length > 0 ? form.designStyle.join(', ') : undefined,
         designColors: form.colors ? form.colors.split(',').map((c) => c.trim()) : [],
         designRefs:   form.references ? form.references.split('\n').filter(Boolean) : [],
-        plan:         selectedPlan,
+        plan,
       });
 
       toast.success('Order created! Redirecting to checkout…');
@@ -186,12 +252,12 @@ function RequestPageContent() {
   };
 
   const handleSubmit = async () => {
-    if (!user) {
-      setAuthOpen(true);
-      return;
-    }
+    if (!user) { setAuthOpen(true); return; }
     await submitOrder();
   };
+
+  // Extra features = selected features NOT in plan
+  const extraFeatures = form.features.filter((k) => !pricing.includedFeats.includes(k));
 
   return (
     <div className="min-h-screen bg-hero-gradient flex flex-col">
@@ -257,11 +323,29 @@ function RequestPageContent() {
               className="glass rounded-2xl p-5 sm:p-8 border border-white/10"
             >
 
-              {/* Step 0: Service Type */}
+              {/* ── Step 0: Service Type ─────────────────────────────────── */}
               {step === 0 && (
                 <div>
                   <h2 className="text-xl font-bold text-white mb-1">What do you need?</h2>
-                  <p className="text-slate-400 text-sm mb-5">Select the service type for your project.</p>
+                  <p className="text-slate-400 text-sm mb-4">Select the service type for your project.</p>
+
+                  {/* Plan inclusion banner */}
+                  {planData && (
+                    <div className="mb-5 p-3.5 rounded-xl border border-green-500/25 bg-green-500/8">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <PlanBadge plan={selectedPlan!} size="sm" />
+                        <span className="text-white text-sm font-semibold">Package Active</span>
+                        <span className="ml-auto text-green-400 text-xs font-bold">
+                          ${planData.price.toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-green-400/80 text-xs leading-relaxed">{planData.summary}</p>
+                      <p className="text-slate-400 text-[10px] mt-1.5">
+                        ✓ Included items are free — only extras beyond your plan are charged
+                      </p>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {serviceTypes.map((t) => {
                       const Icon   = t.icon;
@@ -285,7 +369,7 @@ function RequestPageContent() {
                               <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${
                                 active ? 'bg-primary-500/20 text-primary-300' : 'bg-white/5 text-slate-500'
                               }`}>
-                                from ${t.base.toLocaleString()}
+                                {planData ? 'included' : `from $${t.base.toLocaleString()}`}
                               </span>
                               <span className="text-[10px] text-green-500/70 font-medium">
                                 market {t.marketValue}
@@ -301,13 +385,24 @@ function RequestPageContent() {
                 </div>
               )}
 
-              {/* Step 1: Configuration */}
+              {/* ── Step 1: Configuration ────────────────────────────────── */}
               {step === 1 && (
                 <div className="space-y-5">
                   <div>
                     <h2 className="text-xl font-bold text-white mb-1">Configure Your Project</h2>
                     <p className="text-slate-400 text-sm">Set up details and select features.</p>
                   </div>
+
+                  {/* Plan inclusions reminder */}
+                  {planData && (
+                    <div className="flex items-start gap-2 p-3 rounded-xl border border-green-500/20 bg-green-500/6">
+                      <Check className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />
+                      <p className="text-green-400/80 text-xs leading-relaxed">
+                        <span className="text-green-400 font-semibold">{planData.label} Plan:</span>{' '}
+                        {planData.summary} — all marked <span className="font-semibold">FREE</span> below.
+                      </p>
+                    </div>
+                  )}
 
                   <Input
                     label="Project Title *"
@@ -330,10 +425,30 @@ function RequestPageContent() {
 
                   {/* Pages slider */}
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-2">
-                      Number of Pages <span className="text-primary-400 font-bold ml-1">{form.pages}</span>
-                      {form.pages > 5 && (
-                        <span className="text-slate-500 ml-1.5">(+${(form.pages - 5) * 30} for extra pages)</span>
+                    <label className="block text-xs font-medium text-slate-400 mb-2 flex flex-wrap items-center gap-1.5">
+                      Number of Pages
+                      <span className="text-primary-400 font-bold">{form.pages}</span>
+                      {planData ? (
+                        pricing.includedPages >= 99 ? (
+                          <span className="text-green-400 text-[10px] font-semibold bg-green-500/10 px-1.5 py-0.5 rounded-md border border-green-500/20">
+                            unlimited included in your plan
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-green-400 text-[10px] font-semibold bg-green-500/10 px-1.5 py-0.5 rounded-md border border-green-500/20">
+                              {pricing.includedPages} included in your plan
+                            </span>
+                            {form.pages > pricing.includedPages && (
+                              <span className="text-slate-500 text-[10px]">
+                                (+${(form.pages - pricing.includedPages) * 50} extra)
+                              </span>
+                            )}
+                          </>
+                        )
+                      ) : (
+                        form.pages > 5 && (
+                          <span className="text-slate-500">(+${(form.pages - 5) * 50} for extra pages)</span>
+                        )
                       )}
                     </label>
                     <input
@@ -346,7 +461,13 @@ function RequestPageContent() {
                     />
                     <div className="flex justify-between text-xs text-slate-600 mt-1">
                       <span>1 page</span>
-                      <span>5 pages (base)</span>
+                      {planData ? (
+                        <span className="text-green-500/60">
+                          {pricing.includedPages >= 99 ? 'all pages free' : `${pricing.includedPages} free`}
+                        </span>
+                      ) : (
+                        <span>5 pages (base)</span>
+                      )}
                       <span>20 pages</span>
                     </div>
                   </div>
@@ -354,37 +475,67 @@ function RequestPageContent() {
                   {/* Features */}
                   <div>
                     <label className="block text-xs font-medium text-slate-400 mb-2">
-                      Features <span className="text-slate-600">({form.features.length} selected)</span>
+                      Features
+                      <span className="text-slate-600 ml-1">
+                        ({pricing.includedFeats.length > 0 && `${pricing.includedFeats.length} included · `}
+                        {extraFeatures.length} extra)
+                      </span>
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {FEATURES.map((f) => {
-                        const on = form.features.includes(f.key);
+                        const isIncluded = pricing.includedFeats.includes(f.key);
+                        const isSelected = form.features.includes(f.key);
                         return (
                           <button
                             key={f.key}
                             onClick={() => toggleArr('features', f.key)}
+                            disabled={isIncluded}
                             className={`flex items-center gap-2.5 p-3 rounded-xl text-left border transition-all text-sm ${
-                              on
+                              isIncluded
+                                ? 'bg-green-500/8 border-green-500/25 text-white cursor-default'
+                                : isSelected
                                 ? 'bg-primary-500/15 border-primary-500/60 text-white'
                                 : 'bg-white/5 border-white/10 hover:border-white/20 text-slate-300'
                             }`}
                           >
+                            {/* Checkbox */}
                             <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                              on ? 'bg-primary-500 border-primary-500' : 'border-white/30'
+                              isIncluded
+                                ? 'bg-green-500 border-green-500'
+                                : isSelected
+                                ? 'bg-primary-500 border-primary-500'
+                                : 'border-white/30'
                             }`}>
-                              {on && <Check className="w-2.5 h-2.5 text-white" />}
+                              {(isSelected || isIncluded) && <Check className="w-2.5 h-2.5 text-white" />}
                             </div>
+
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-xs leading-tight">{f.label}</div>
+                              <div className="font-medium text-xs leading-tight flex items-center gap-1.5">
+                                {f.label}
+                                {isIncluded && (
+                                  <Lock className="w-2.5 h-2.5 text-green-500/60 shrink-0" />
+                                )}
+                              </div>
                               <div className="text-slate-500 text-[10px]">{f.desc}</div>
                             </div>
+
+                            {/* Price / FREE badge */}
                             <div className="flex flex-col items-end shrink-0 gap-0.5">
-                              <span className={`text-xs font-semibold ${on ? 'text-primary-400' : 'text-slate-500'}`}>
-                                +${f.price}
-                              </span>
-                              <span className="text-[9px] text-slate-700 line-through">
-                                ${f.marketValue}
-                              </span>
+                              {isIncluded ? (
+                                <>
+                                  <span className="text-xs font-bold text-green-400">FREE</span>
+                                  <span className="text-[9px] text-green-500/50 font-medium">in your plan</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className={`text-xs font-semibold ${isSelected ? 'text-primary-400' : 'text-slate-500'}`}>
+                                    +${f.price}
+                                  </span>
+                                  <span className="text-[9px] text-slate-700 line-through">
+                                    ${f.marketValue}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </button>
                         );
@@ -429,7 +580,7 @@ function RequestPageContent() {
                 </div>
               )}
 
-              {/* Step 2: Design */}
+              {/* ── Step 2: Design ───────────────────────────────────────── */}
               {step === 2 && (
                 <div className="space-y-5">
                   <div>
@@ -449,8 +600,8 @@ function RequestPageContent() {
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {designStyles.map(({ value, label, icon: Icon, desc }) => {
-                        const active   = form.designStyle.includes(value);
-                        const maxed    = !active && form.designStyle.length >= 3;
+                        const active = form.designStyle.includes(value);
+                        const maxed  = !active && form.designStyle.length >= 3;
                         return (
                           <button
                             key={value}
@@ -504,7 +655,7 @@ function RequestPageContent() {
                 </div>
               )}
 
-              {/* Step 3: Summary */}
+              {/* ── Step 3: Summary ──────────────────────────────────────── */}
               {step === 3 && (
                 <div>
                   <h2 className="text-xl font-bold text-white mb-1">Order Summary</h2>
@@ -513,48 +664,125 @@ function RequestPageContent() {
                   {/* Price breakdown */}
                   <div className="rounded-xl p-4 mb-4 space-y-2"
                        style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Base price ({serviceTypes.find(s => s.value === form.serviceType)?.label})</span>
-                      <span className="text-white">${pricing.base}</span>
-                    </div>
+
+                    {/* Base / Package line */}
+                    {pricing.pkg ? (
+                      <>
+                        {/* Package header row */}
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-400">{pricing.pkg.label} Package</span>
+                            <PlanBadge plan={selectedPlan!} size="sm" />
+                          </div>
+                          <span className="text-white font-semibold">${pricing.base.toLocaleString()}</span>
+                        </div>
+
+                        {/* Included items sub-list */}
+                        <div className="ml-3 space-y-1 pb-1">
+                          {pricing.includedPages >= 99 ? (
+                            <div className="flex justify-between text-xs">
+                              <span className="text-green-500/70 flex items-center gap-1">
+                                <Check className="w-2.5 h-2.5" /> Unlimited pages
+                              </span>
+                              <span className="text-green-500/70 font-medium">Included ✓</span>
+                            </div>
+                          ) : (
+                            <div className="flex justify-between text-xs">
+                              <span className="text-green-500/70 flex items-center gap-1">
+                                <Check className="w-2.5 h-2.5" /> Up to {pricing.includedPages} pages
+                              </span>
+                              <span className="text-green-500/70 font-medium">Included ✓</span>
+                            </div>
+                          )}
+                          {pricing.includedFeats.map((fKey) => {
+                            const feat = FEATURES.find((f) => f.key === fKey);
+                            return feat ? (
+                              <div key={fKey} className="flex justify-between text-xs">
+                                <span className="text-green-500/70 flex items-center gap-1">
+                                  <Check className="w-2.5 h-2.5" /> {feat.label}
+                                </span>
+                                <span className="text-green-500/70 font-medium">Included ✓</span>
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-400">
+                          Base price ({serviceTypes.find((s) => s.value === form.serviceType)?.label})
+                        </span>
+                        <span className="text-white">${pricing.base.toLocaleString()}</span>
+                      </div>
+                    )}
+
+                    {/* Extra pages */}
                     {pricing.pageExtra > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">Extra pages ({form.pages - 5} × $30)</span>
+                        <span className="text-slate-400">
+                          Extra pages ({form.pages - pricing.includedPages} × $50)
+                        </span>
                         <span className="text-white">+${pricing.pageExtra}</span>
                       </div>
                     )}
+
+                    {/* Extra features (paid) */}
                     {pricing.feat > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">Features ({form.features.length})</span>
+                        <span className="text-slate-400">
+                          {pricing.pkg ? 'Extra features' : 'Features'} ({extraFeatures.length})
+                        </span>
                         <span className="text-white">+${pricing.feat}</span>
                       </div>
                     )}
+
+                    {/* Fast delivery */}
                     {pricing.addon > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-400">Fast Delivery add-on</span>
                         <span className="text-amber-400">+${pricing.addon}</span>
                       </div>
                     )}
+
+                    {/* Total */}
                     <div className="border-t border-white/10 pt-2 flex justify-between font-bold">
                       <span className="text-white">Total</span>
                       <span className="text-primary-400 text-lg">${pricing.total.toLocaleString()}</span>
                     </div>
+
+                    {/* Delivery estimate */}
                     <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 pt-1">
                       <Calendar className="w-3.5 h-3.5 shrink-0" />
-                      Estimated delivery: <span className="text-slate-300">{pricing.days} business days</span>
+                      Estimated delivery:{' '}
+                      <span className="text-slate-300">{pricing.days} business days</span>
                     </div>
                   </div>
 
                   {/* Summary rows */}
                   <div className="space-y-2 mb-4">
                     {[
-                      { label: 'Service',   value: serviceTypes.find(s => s.value === form.serviceType)?.label || form.serviceType },
+                      selectedPlan && { label: 'Package',  value: planData?.label ?? selectedPlan },
+                      { label: 'Service',   value: serviceTypes.find((s) => s.value === form.serviceType)?.label || form.serviceType },
                       { label: 'Title',     value: form.title },
                       { label: 'Pages',     value: `${form.pages}` },
-                      { label: 'Features',  value: form.features.length > 0 ? form.features.join(', ') : 'None' },
+                      {
+                        label: 'Features',
+                        value: form.features.length > 0
+                          ? [
+                              ...pricing.includedFeats.filter((k) => form.features.includes(k)).map((k) => {
+                                const f = FEATURES.find((feat) => feat.key === k);
+                                return f ? `${f.label} (free)` : k;
+                              }),
+                              ...extraFeatures.map((k) => {
+                                const f = FEATURES.find((feat) => feat.key === k);
+                                return f ? f.label : k;
+                              }),
+                            ].join(', ')
+                          : 'None',
+                      },
                       { label: 'Add-ons',   value: form.addons.length > 0 ? form.addons.join(', ') : 'None' },
                       { label: 'Style',     value: form.designStyle.length > 0 ? form.designStyle.join(', ') : 'Not specified' },
-                    ].map(({ label, value }) => (
+                    ].filter(Boolean).map(({ label, value }: any) => (
                       <div key={label} className="flex gap-3 py-1.5 border-b border-white/5 last:border-0">
                         <span className="text-slate-500 text-sm w-20 sm:w-24 shrink-0">{label}</span>
                         <span className="text-slate-200 text-sm capitalize break-all">{value}</span>
