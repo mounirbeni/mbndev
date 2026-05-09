@@ -1,50 +1,86 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { projectAPI } from '@/lib/api';
-import { Project } from '@/types';
+import { MessageSquare, ArrowLeft, Loader2 } from 'lucide-react';
+import { messageAPI } from '@/lib/api';
+import { MessageThread as ThreadType } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRealtime } from '@/hooks/useRealtime';
 import MessageThread from '@/components/dashboard/MessageThread';
-import { MessageSquare, ArrowLeft } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/Badge';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { timeAgo } from '@/lib/utils';
 
 export default function ClientMessagesPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [selected, setSelected] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
-  // On mobile: show chat panel when a project is selected
+  const [threads,    setThreads]    = useState<ThreadType[]>([]);
+  const [selected,   setSelected]   = useState<ThreadType | null>(null);
+  const [loading,    setLoading]    = useState(true);
   const [mobileChat, setMobileChat] = useState(false);
+  const { user } = useAuth();
+  const userId = user?._id || user?.id;
 
+  // ── Load threads ───────────────────────────────────────────────────────────
   useEffect(() => {
-    projectAPI.getMine()
+    messageAPI.getThreads()
       .then(({ data }) => {
-        setProjects(data.projects);
-        // Auto-select on desktop (don't on mobile to avoid hiding list)
-        if (data.projects.length > 0 && window.innerWidth >= 1024) {
-          setSelected(data.projects[0]);
+        setThreads(data.threads || []);
+        if (data.threads?.length > 0 && window.innerWidth >= 1024) {
+          setSelected(data.threads[0]);
         }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSelectProject = (p: Project) => {
-    setSelected(p);
-    setMobileChat(true);
-  };
+  // ── Real-time: update sidebar unread counts for non-active threads ─────────
+  const realtimeHandlers = useMemo(() => ({
+    'message:new': (msg: any) => {
+      const pid        = msg.projectId || msg.project;
+      const isFromSelf = (msg.sender?._id || msg.sender?.id || msg.senderId) === userId;
+      const isActive   = selected?.projectId === pid;
 
-  const handleBack = () => {
-    setMobileChat(false);
+      setThreads((prev) => prev.map((t) => {
+        if (t.projectId !== pid) return t;
+        // Update last message preview always
+        let text = '';
+        if (msg.type === 'system') {
+          try { text = JSON.parse(msg.content).title; } catch { text = msg.content; }
+        } else {
+          text = (msg.content || '').slice(0, 60);
+        }
+        const updatedThread = {
+          ...t,
+          lastMessage: { text, type: msg.type || 'user', senderName: msg.sender?.name, createdAt: msg.createdAt },
+          updatedAt: msg.createdAt,
+        };
+        // Only bump unread count if thread isn't currently open and message isn't from self
+        if (!isActive && !isFromSelf) {
+          updatedThread.unreadCount = t.unreadCount + 1;
+        }
+        return updatedThread;
+      }));
+    },
+  }), [selected?.projectId, userId]);
+
+  useRealtime({ on: realtimeHandlers });
+
+  const handleSelect = (thread: ThreadType) => {
+    setSelected(thread);
+    setMobileChat(true);
+    // Clear unread count locally — getMessages will mark them as read on the backend
+    setThreads((prev) =>
+      prev.map((t) => t.projectId === thread.projectId ? { ...t, unreadCount: 0 } : t)
+    );
   };
 
   return (
     <div className="max-w-7xl h-[calc(100svh-8rem)] min-h-[400px] flex flex-col">
-      {/* Header — hidden on mobile when chat is open */}
-      <div className={`mb-4 lg:mb-6 flex items-center gap-3 ${mobileChat ? 'lg:block hidden' : 'flex'}`}>
+
+      {/* Header */}
+      <div className={`mb-4 lg:mb-6 flex items-center gap-3 ${mobileChat ? 'lg:flex hidden' : 'flex'}`}>
         {mobileChat && (
           <button
-            onClick={handleBack}
+            onClick={() => setMobileChat(false)}
             className="lg:hidden p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -52,17 +88,20 @@ export default function ClientMessagesPage() {
         )}
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-white">
-            {mobileChat && selected ? selected.title : 'Messages'}
+            {mobileChat && selected ? selected.projectTitle : 'Messages'}
           </h1>
           {!mobileChat && (
-            <p className="text-slate-500 text-sm hidden sm:block">Chat with your developer about your projects</p>
+            <p className="text-slate-500 text-sm hidden sm:block">
+              Direct communication with your development team
+            </p>
           )}
         </div>
       </div>
 
       {/* Layout */}
       <div className="flex gap-4 flex-1 overflow-hidden min-h-0">
-        {/* Project list sidebar — hidden on mobile when chat is open */}
+
+        {/* ── Sidebar ─────────────────────────────────────────────────── */}
         <AnimatePresence initial={false}>
           {!mobileChat && (
             <motion.div
@@ -70,65 +109,107 @@ export default function ClientMessagesPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="w-full lg:w-64 glass rounded-2xl border border-white/5 overflow-y-auto shrink-0 lg:block"
+              className="w-full lg:w-72 glass rounded-2xl border border-white/5 flex flex-col shrink-0"
             >
-              <div className="p-3 space-y-1.5">
+              <div className="px-4 pt-4 pb-3 border-b border-white/5 shrink-0">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+                  Projects
+                </p>
+              </div>
+
+              <div className="flex-1 overflow-y-auto scroll-native p-2 space-y-1">
                 {loading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-16 rounded-xl" />
-                  ))
-                ) : projects.length === 0 ? (
-                  <div className="p-6 text-center">
+                  <div className="flex justify-center py-10">
+                    <Loader2 className="w-5 h-5 text-slate-600 animate-spin" />
+                  </div>
+                ) : threads.length === 0 ? (
+                  <div className="py-10 text-center">
                     <MessageSquare className="w-8 h-8 text-slate-700 mx-auto mb-2" />
                     <p className="text-slate-500 text-sm">No projects yet</p>
+                    <p className="text-slate-600 text-xs mt-1">Request a project to get started</p>
                   </div>
                 ) : (
-                  projects.map((p) => (
-                    <button
-                      key={p._id}
-                      onClick={() => handleSelectProject(p)}
-                      className={`w-full text-left p-3.5 rounded-xl transition-all press-scale ${
-                        selected?._id === p._id && !mobileChat
-                          ? 'bg-primary-500/20 border border-primary-500/30'
-                          : 'hover:bg-white/5 border border-transparent'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-white truncate">{p.title}</div>
-                          <div className="text-xs text-slate-500 capitalize mt-0.5">
-                            {p.type?.replace('-', ' ')}
+                  threads.map((t) => {
+                    const isActive = selected?.projectId === t.projectId && !mobileChat;
+                    return (
+                      <button
+                        key={t.projectId}
+                        onClick={() => handleSelect(t)}
+                        className={`w-full text-left p-3 rounded-xl transition-all group ${
+                          isActive
+                            ? 'bg-primary-500/15 border border-primary-500/25'
+                            : 'hover:bg-white/5 border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-white truncate leading-tight">
+                                {t.projectTitle}
+                              </span>
+                              {t.unreadCount > 0 && (
+                                <span className="shrink-0 min-w-[18px] h-[18px] px-1 bg-primary-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                  {t.unreadCount > 9 ? '9+' : t.unreadCount}
+                                </span>
+                              )}
+                            </div>
                           </div>
+                          <StatusBadge status={t.projectStatus} />
                         </div>
-                        <StatusBadge status={p.status} />
-                      </div>
-                    </button>
-                  ))
+
+                        {t.lastMessage ? (
+                          <div className="flex items-end justify-between gap-2">
+                            <p className={`text-xs leading-snug truncate flex-1 ${
+                              t.unreadCount > 0 ? 'text-slate-300 font-medium' : 'text-slate-600'
+                            }`}>
+                              {t.lastMessage.type === 'system'
+                                ? `⚡ ${t.lastMessage.text}`
+                                : t.lastMessage.text}
+                            </p>
+                            <span className="text-[10px] text-slate-700 shrink-0">
+                              {timeAgo(t.lastMessage.createdAt)}
+                            </span>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-700">No messages yet</p>
+                        )}
+                      </button>
+                    );
+                  })
                 )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Message thread — hidden on mobile when no project selected */}
+        {/* ── Thread panel ────────────────────────────────────────────── */}
         <AnimatePresence initial={false}>
-          {(selected && mobileChat) || (selected && !mobileChat) ? (
+          {selected ? (
             <motion.div
-              key={selected._id}
+              key={selected.projectId}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className={`flex-1 glass rounded-2xl border border-white/5 overflow-hidden min-w-0 ${
                 mobileChat ? 'block w-full' : 'hidden lg:block'
               }`}
             >
-              <MessageThread projectId={selected._id ?? selected.id ?? ''} projectTitle={selected.title} />
+              <MessageThread
+                projectId={selected.projectId}
+                projectTitle={selected.projectTitle}
+                onUnreadChange={(pid, count) =>
+                  setThreads((prev) => prev.map((t) => t.projectId === pid ? { ...t, unreadCount: count } : t))
+                }
+              />
             </motion.div>
           ) : (
             !mobileChat && (
               <div className="flex-1 glass rounded-2xl border border-white/5 hidden lg:flex items-center justify-center">
                 <div className="text-center">
-                  <MessageSquare className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-400 text-sm">Select a project to view messages</p>
+                  <div className="w-16 h-16 bg-primary-500/8 border border-primary-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-7 h-7 text-primary-400/60" />
+                  </div>
+                  <p className="text-slate-400 text-sm font-medium">Select a project</p>
+                  <p className="text-slate-600 text-xs mt-1">to view messages</p>
                 </div>
               </div>
             )

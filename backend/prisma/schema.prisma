@@ -143,13 +143,17 @@ model Message {
   id        String        @id @default(cuid())
   projectId String
   project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  senderId  String
-  sender    User          @relation(fields: [senderId], references: [id])
+  senderId  String?                                      // null = system message
+  sender    User?         @relation(fields: [senderId], references: [id])
   content   String
+  type      String        @default("user")              // "user" | "system"
   isRead    Boolean       @default(false)
   readBy    MessageRead[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+
+  @@index([projectId, createdAt])
+  @@index([isRead, senderId])
 }
 
 model MessageRead {

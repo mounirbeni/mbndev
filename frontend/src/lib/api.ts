@@ -82,9 +82,10 @@ export const orderAPI = {
 };
 
 export const messageAPI = {
-  get:       (projectId: string)             => api.get(`/messages/${projectId}`),
-  send:      (projectId: string, data: any)  => api.post(`/messages/${projectId}`, data),
-  getUnread: ()                              => api.get('/messages/unread'),
+  getThreads: ()                              => api.get('/messages/threads'),
+  get:        (projectId: string)             => api.get(`/messages/${projectId}`),
+  send:       (projectId: string, data: any)  => api.post(`/messages/${projectId}`, data),
+  getUnread:  ()                              => api.get('/messages/unread'),
 };
 
 export const paymentAPI = {

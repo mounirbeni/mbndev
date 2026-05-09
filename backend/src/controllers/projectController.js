@@ -1,6 +1,7 @@
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
+const { SM } = require('../lib/systemMessages');
 const realtime = require('../lib/realtime');
 const { sendEmail, templates } = require('../lib/email');
 
@@ -155,6 +156,9 @@ exports.updateProject = async (req, res, next) => {
 
     // Log status change
     if (status && status !== current.status) {
+      // System message in project chat (fire-and-forget)
+      SM.statusChanged(project.id, { toStatus: status }).catch(() => {});
+
       await logActivity(
         project.id,
         req.user.id,
@@ -252,6 +256,12 @@ exports.uploadFile = async (req, res, next) => {
         uploadedById: req.user.id,
       },
     });
+
+    // System message in project chat (fire-and-forget)
+    SM.fileUploaded(req.params.id, {
+      fileName:     req.file.originalname.slice(0, 100),
+      uploaderName: req.user.name,
+    }).catch(() => {});
 
     res.json({ success: true, file: fmt(file) });
   } catch (err) {

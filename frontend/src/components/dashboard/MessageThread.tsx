@@ -1,90 +1,188 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { Message } from '@/types';
 import { messageAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRealtime } from '@/hooks/useRealtime';
 import { timeAgo, getInitials, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
-interface MessageThreadProps {
-  projectId: string;
-  projectTitle?: string;
+interface Props {
+  projectId:       string;
+  projectTitle?:   string;
+  /** Called with (projectId, count) when unread state changes */
+  onUnreadChange?: (projectId: string, count: number) => void;
 }
 
-export default function MessageThread({ projectId, projectTitle }: MessageThreadProps) {
+// ─── System message card ─────────────────────────────────────────────────────
+
+function SystemMessage({ msg }: { msg: Message }) {
+  let icon  = '🔔';
+  let title = '';
+  let body  = '';
+  try {
+    const p = JSON.parse(msg.content);
+    icon  = p.icon  || icon;
+    title = p.title || '';
+    body  = p.body  || '';
+  } catch {
+    body = msg.content;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="flex justify-center py-1"
+    >
+      <div className="max-w-[340px] w-full mx-2 rounded-2xl border border-primary-500/20 bg-primary-500/6 px-4 py-3.5 text-center">
+        <div className="text-xl mb-1.5 leading-none">{icon}</div>
+        {title && (
+          <div className="text-xs font-semibold text-primary-300 mb-1 tracking-wide uppercase">
+            {title}
+          </div>
+        )}
+        {body && (
+          <div className="text-xs text-slate-400 leading-relaxed">{body}</div>
+        )}
+        <div className="text-[10px] text-slate-600 mt-2">{timeAgo(msg.createdAt)}</div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── User message bubble ─────────────────────────────────────────────────────
+
+function UserMessage({ msg, isOwn }: { msg: Message; isOwn: boolean }) {
+  const name = msg.sender?.name || (isOwn ? 'You' : 'Admin');
+  const role = msg.sender?.role;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.18 }}
+      className={cn('flex gap-2.5 sm:gap-3', isOwn && 'flex-row-reverse')}
+    >
+      {/* Avatar */}
+      <div
+        className={cn(
+          'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 mt-auto',
+          isOwn
+            ? 'bg-gradient-to-br from-primary-500 to-primary-700'
+            : role === 'admin'
+              ? 'bg-gradient-to-br from-violet-600 to-purple-700'
+              : 'bg-gradient-to-br from-blue-500 to-cyan-600'
+        )}
+      >
+        {getInitials(name)}
+      </div>
+
+      <div className={cn('max-w-[76%] sm:max-w-[68%] flex flex-col gap-1', isOwn && 'items-end')}>
+        {/* Sender label (only for non-own messages) */}
+        {!isOwn && (
+          <span className="text-[10px] text-slate-500 px-1 font-medium">
+            {role === 'admin' ? 'MBN DEV' : name}
+          </span>
+        )}
+        <div
+          className={cn(
+            'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed break-words',
+            isOwn
+              ? 'bg-primary-500 text-white rounded-tr-sm shadow-lg shadow-primary-500/20'
+              : 'bg-white/8 text-slate-200 rounded-tl-sm border border-white/5'
+          )}
+        >
+          {msg.content}
+        </div>
+        <span className="text-[10px] text-slate-600 px-1">{timeAgo(msg.createdAt)}</span>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Main component ──────────────────────────────────────────────────────────
+
+export default function MessageThread({ projectId, projectTitle, onUnreadChange }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [content, setContent]   = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [sending, setSending]   = useState(false);
-  const bottomRef  = useRef<HTMLDivElement>(null);
-  const inputRef   = useRef<HTMLInputElement>(null);
+  const [content,  setContent]  = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const [sending,  setSending]  = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const bottomRef    = useRef<HTMLDivElement>(null);
+  const inputRef     = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
 
-  // ── Initial load ────────────────────────────────────────────────────────
+  const msgId = (m: any) => m?._id || m?.id || '';
+
+  const isNearBottom = () => {
+    const el = containerRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  };
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    bottomRef.current?.scrollIntoView({ behavior });
+  }, []);
+
+  // ── Load messages ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!projectId) return;
     setLoading(true);
+    setMessages([]);
     messageAPI
       .get(projectId)
-      .then(({ data }) => setMessages(data.messages))
+      .then(({ data }) => {
+        setMessages(data.messages || []);
+        onUnreadChange?.(projectId, 0);
+      })
       .catch(() => toast.error('Failed to load messages'))
       .finally(() => setLoading(false));
-  }, [projectId]);
+  }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Real-time polling (5 s when tab is visible) ──────────────────────────
+  // Scroll to bottom on initial load
   useEffect(() => {
-    if (!projectId) return;
+    if (!loading && messages.length > 0) {
+      scrollToBottom('instant');
+    }
+  }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    let timer: ReturnType<typeof setInterval> | null = null;
+  // ── Real-time: append incoming messages for this thread ────────────────────
+  const realtimeHandlers = useMemo(() => ({
+    'message:new': (msg: any) => {
+      if ((msg.projectId || msg.project) !== projectId) return;
+      const near = isNearBottom();
+      setMessages((prev) => {
+        if (prev.some((m) => msgId(m) === msgId(msg))) return prev;
+        return [...prev, msg];
+      });
+      if (near) setTimeout(() => scrollToBottom('smooth'), 50);
+    },
+  }), [projectId, scrollToBottom]);
 
-    const poll = () => {
-      messageAPI
-        .get(projectId)
-        .then(({ data }) => {
-          setMessages((prev) => {
-            // Only update if something changed (avoid unnecessary re-renders)
-            if (JSON.stringify(prev.map((m) => m._id)) ===
-                JSON.stringify(data.messages.map((m: any) => m._id))) return prev;
-            return data.messages;
-          });
-        })
-        .catch(() => {}); // silent — don't spam toasts in background
-    };
+  useRealtime({ on: realtimeHandlers });
 
-    const start = () => { timer = setInterval(poll, 5000); };
-    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
-
-    const onVisibility = () =>
-      document.visibilityState === 'visible' ? start() : stop();
-
-    start();
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => {
-      stop();
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
-  }, [projectId]);
-  // ─────────────────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
+  // ── Send message ───────────────────────────────────────────────────────────
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !projectId) return;
     const text = content.trim();
+    if (!text || !projectId || sending) return;
     setContent('');
     setSending(true);
     try {
       const { data } = await messageAPI.send(projectId, { content: text });
-      setMessages((prev) => [...prev, data.message]);
+      setMessages((prev) => {
+        if (prev.some((m) => msgId(m) === msgId(data.message))) return prev;
+        return [...prev, data.message];
+      });
+      setTimeout(() => scrollToBottom('smooth'), 50);
     } catch {
       toast.error('Failed to send message');
-      setContent(text); // restore on failure
+      setContent(text);
     } finally {
       setSending(false);
       inputRef.current?.focus();
@@ -98,76 +196,65 @@ export default function MessageThread({ projectId, projectTitle }: MessageThread
     }
   };
 
+  const userId = user?._id || user?.id;
+
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+
+      {/* ── Header ─────────────────────────────────────────────────────── */}
       {projectTitle && (
-        <div className="px-4 py-3.5 border-b border-white/6 glass-strong shrink-0">
-          <h3 className="text-white font-semibold text-sm">{projectTitle}</h3>
-          <p className="text-slate-500 text-xs mt-0.5">{messages.length} messages</p>
+        <div className="px-4 py-3.5 border-b border-white/6 shrink-0 flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.6)] shrink-0" />
+          <div className="min-w-0">
+            <h3 className="text-white font-semibold text-sm leading-tight truncate">{projectTitle}</h3>
+            <p className="text-slate-500 text-[11px] mt-0.5">
+              {loading ? 'Loading…' : `${messages.length} message${messages.length !== 1 ? 's' : ''}`}
+            </p>
+          </div>
         </div>
       )}
 
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto scroll-native px-3 sm:px-4 py-4 space-y-3">
+      {/* ── Messages area ──────────────────────────────────────────────── */}
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-y-auto scroll-native px-3 sm:px-4 py-5 space-y-4"
+      >
         {loading && (
-          <div className="flex justify-center py-8">
-            <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-5 h-5 text-primary-400 animate-spin" />
           </div>
         )}
 
         {!loading && messages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-3">
-              <Send className="w-5 h-5 text-slate-500" />
+            <div className="w-14 h-14 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-4">
+              <Send className="w-5 h-5 text-primary-400" />
             </div>
-            <p className="text-slate-400 text-sm font-medium">No messages yet</p>
-            <p className="text-slate-600 text-xs mt-1">Start the conversation below</p>
+            <p className="text-slate-300 text-sm font-semibold">No messages yet</p>
+            <p className="text-slate-600 text-xs mt-1.5 max-w-[200px]">
+              Start the conversation — we usually respond within a few hours.
+            </p>
           </div>
         )}
 
         <AnimatePresence initial={false}>
           {messages.map((msg) => {
-            const isOwn = msg.sender?._id === user?._id;
-            return (
-              <motion.div
-                key={msg._id}
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.18 }}
-                className={cn('flex gap-2.5 sm:gap-3', isOwn && 'flex-row-reverse')}
-              >
-                {/* Avatar */}
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-auto">
-                  {msg.sender ? getInitials(msg.sender.name) : '?'}
-                </div>
-
-                <div className={cn('max-w-[78%] sm:max-w-[70%] flex flex-col', isOwn && 'items-end')}>
-                  <div
-                    className={cn(
-                      'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
-                      isOwn
-                        ? 'bg-primary-500 text-white rounded-tr-sm shadow-lg shadow-primary-500/20'
-                        : 'bg-white/8 text-slate-200 rounded-tl-sm'
-                    )}
-                  >
-                    {msg.content}
-                  </div>
-                  <span className="text-[11px] text-slate-600 mt-1 px-1">
-                    {timeAgo(msg.createdAt)}
-                  </span>
-                </div>
-              </motion.div>
-            );
+            const id = msgId(msg);
+            if (msg.type === 'system') {
+              return <SystemMessage key={id} msg={msg} />;
+            }
+            const isOwn = (msg.sender?._id || msg.sender?.id || msg.senderId) === userId;
+            return <UserMessage key={id} msg={msg} isOwn={isOwn} />;
           })}
         </AnimatePresence>
+
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Input bar ─────────────────────────────────────────────────── */}
+      {/* ── Input bar ──────────────────────────────────────────────────── */}
       <form
         onSubmit={sendMessage}
-        className="shrink-0 px-3 sm:px-4 pt-3 border-t border-white/6 glass-strong"
+        className="shrink-0 px-3 sm:px-4 pt-3 border-t border-white/6"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
       >
         <div className="flex items-center gap-2">
@@ -176,28 +263,28 @@ export default function MessageThread({ projectId, projectTitle }: MessageThread
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
+            placeholder="Type a message…"
             inputMode="text"
             enterKeyHint="send"
             autoComplete="off"
-            disabled={sending}
-            className="flex-1 bg-white/6 border border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary-500/60 focus:bg-white/8 transition-all min-h-[44px]"
+            disabled={sending || loading}
+            className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-primary-500/50 focus:bg-white/7 transition-all min-h-[44px] disabled:opacity-50"
           />
           <button
             type="submit"
-            disabled={!content.trim() || sending}
+            disabled={!content.trim() || sending || loading}
             className={cn(
               'w-11 h-11 rounded-2xl flex items-center justify-center transition-all shrink-0',
               content.trim() && !sending
-                ? 'bg-primary-500 hover:bg-primary-600 active:bg-primary-700 active:scale-95 shadow-lg shadow-primary-500/25'
-                : 'bg-white/8 opacity-40 cursor-not-allowed'
+                ? 'bg-primary-500 hover:bg-primary-600 active:scale-95 shadow-lg shadow-primary-500/25'
+                : 'bg-white/6 opacity-40 cursor-not-allowed'
             )}
             aria-label="Send message"
           >
             {sending ? (
-              <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              <Loader2 className="w-4 h-4 text-white animate-spin" />
             ) : (
-              <Send className={cn('w-4 h-4', content.trim() ? 'text-white' : 'text-slate-400')} />
+              <Send className={cn('w-4 h-4', content.trim() ? 'text-white' : 'text-slate-500')} />
             )}
           </button>
         </div>

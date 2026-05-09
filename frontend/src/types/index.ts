@@ -92,12 +92,30 @@ export interface Project {
 export interface Message {
   id?: string;
   _id?: string;
-  project: string | Project;
-  sender: User;
+  projectId?: string;
+  project?: string | Project;
+  sender?: User | null;
+  senderId?: string | null;
   content: string;
+  type?: 'user' | 'system';
   attachments?: { name: string; url: string }[];
   isRead: boolean;
   createdAt: string;
+}
+
+export interface MessageThread {
+  projectId:     string;
+  projectTitle:  string;
+  projectStatus: string;
+  client?:       Pick<User, 'id' | 'name' | 'avatar'>;
+  lastMessage:   {
+    text:        string;
+    type:        'user' | 'system';
+    senderName?: string;
+    createdAt:   string;
+  } | null;
+  unreadCount: number;
+  updatedAt:   string;
 }
 
 export interface Payment {

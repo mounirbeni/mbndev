@@ -1,6 +1,7 @@
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
+const { SM } = require('../lib/systemMessages');
 const { sendEmail, templates } = require('../lib/email');
 
 const SERVICE_TYPE_LABELS = {
@@ -177,6 +178,9 @@ exports.approveManualPayment = async (req, res, next) => {
         link:    `/dashboard/client/projects/${project.id}`,
         metadata: { projectId: project.id },
       }).catch(() => {});
+
+      // System message in project chat
+      SM.paymentVerified(project.id).catch(() => {});
 
       // Email client
       sendEmail({

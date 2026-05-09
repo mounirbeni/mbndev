@@ -1,9 +1,11 @@
 const router = require('express').Router();
-const { getMessages, sendMessage, getUnreadCount } = require('../controllers/messageController');
-const { protect } = require('../middleware/auth');
+const { getThreads, getMessages, sendMessage, getUnreadCount } = require('../controllers/messageController');
+const { protect }          = require('../middleware/auth');
 const { sendMessageRules } = require('../middleware/validate');
 
-router.get ('/unread',     protect, getUnreadCount);
+// Static routes must precede /:projectId to avoid param capture
+router.get('/threads', protect, getThreads);
+router.get('/unread',  protect, getUnreadCount);
 router.get ('/:projectId', protect, getMessages);
 router.post('/:projectId', protect, sendMessageRules, sendMessage);
 
