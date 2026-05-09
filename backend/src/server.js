@@ -23,9 +23,11 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   'http://localhost:3000',
   'http://localhost:3001',
+  'https://mbndev.vercel.app',
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
 ].filter(Boolean);
 
-const allowedVercelDomains = (process.env.ALLOWED_VERCEL_DOMAINS || '')
+const allowedVercelDomains = (process.env.ALLOWED_VERCEL_DOMAINS || '.vercel.app')
   .split(',').map((d) => d.trim()).filter(Boolean);
 
 app.use(cors({
