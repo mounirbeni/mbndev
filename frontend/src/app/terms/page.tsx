@@ -88,9 +88,9 @@ export default function TermsPage() {
             </p>
             <h3 className="text-white font-medium mt-4 mb-2">4.3 Payment</h3>
             <p>
-              Payments are processed securely via Stripe. By providing payment information, you authorize us to charge
-              the specified amount. All payments are non-refundable unless otherwise agreed in writing, except where
-              required by applicable law.
+              Payments are accepted via direct bank transfer (CIH Bank), PayPal, or TapTapSend. Each payment is
+              manually verified before the project is activated. All payments are non-refundable unless otherwise
+              agreed in writing, except where required by applicable law.
             </p>
             <h3 className="text-white font-medium mt-4 mb-2">4.4 Refunds</h3>
             <p>

@@ -1,38 +1,55 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+import Link from 'next/link';
+import {
+  ShieldCheck, Repeat, Clock, MessageSquare, Code2, Sparkles,
+  ArrowRight,
+} from 'lucide-react';
 
-const testimonials = [
+// Replaced fabricated testimonials with concrete commitments we can stand
+// behind — every line below is something the platform actually delivers
+// (visible to clients in their dashboard) or that we contractually honour.
+//
+// When real reviewable client work exists, this section can be swapped
+// for a CMS-backed list. Until then, "honest specifics" beat "fake quotes."
+
+const commitments = [
   {
-    name: 'Youssef A.',
-    role: 'E-commerce Business',
-    content: 'Great experience working with MBN DEV. Professional, fast, and very creative!',
-    rating: 5,
-    initials: 'YA',
-    color: 'from-purple-500 to-violet-600',
+    icon: ShieldCheck,
+    title: 'No surprise pricing',
+    desc:  'Quote in writing before any work starts. The number you see on /pricing is the number you pay.',
   },
   {
-    name: 'Salma R.',
-    role: 'Startup Founder',
-    content: 'MBN DEV built exactly what we needed. Communication was smooth and amazing.',
-    rating: 5,
-    initials: 'SR',
-    color: 'from-blue-500 to-cyan-600',
+    icon: Repeat,
+    title: 'Revisions included',
+    desc:  'Every package comes with structured revision rounds. Tracked transparently in your dashboard.',
   },
   {
-    name: 'Karim Z.',
-    role: 'CEO, Tech Company',
-    content: 'Highly recommended! The quality of work is top-notch and the support is great.',
-    rating: 5,
-    initials: 'KZ',
-    color: 'from-pink-500 to-rose-600',
+    icon: Clock,
+    title: 'Real delivery dates',
+    desc:  'Each project has a stated delivery window. If we slip, the next package up is on us.',
+  },
+  {
+    icon: MessageSquare,
+    title: 'Direct communication',
+    desc:  'Project messages, not ticket queues. You talk to the person building your project.',
+  },
+  {
+    icon: Code2,
+    title: 'You own the code',
+    desc:  'Source delivered on completion. No vendor lock-in, no recurring license fees.',
+  },
+  {
+    icon: Sparkles,
+    title: 'Built on modern tooling',
+    desc:  'Next.js, TypeScript, Tailwind, PostgreSQL. The same stack we use for this platform.',
   },
 ];
 
 export default function Testimonials() {
   return (
-    <section id="about" className="py-24 relative">
+    <section id="commitments" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -41,48 +58,52 @@ export default function Testimonials() {
           className="text-center mb-16"
         >
           <span className="text-primary-400 text-sm font-medium uppercase tracking-widest mb-3 block">
-            Testimonials
+            Why MBN DEV
           </span>
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-            What <span className="gradient-text">Clients</span> Say
+            What we <span className="gradient-text">commit to</span>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-            Real feedback from real clients. Their success is our mission.
+            Concrete promises, not testimonials. Everything below is honoured for every project — no exceptions.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className="glass rounded-2xl p-6 border border-white/5 hover:border-primary-500/30 transition-all"
-            >
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="text-slate-300 text-sm leading-relaxed mb-6 italic">
-                &ldquo;{t.content}&rdquo;
-              </p>
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm`}
-                >
-                  {t.initials}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {commitments.map((c, i) => {
+            const Icon = c.icon;
+            return (
+              <motion.div
+                key={c.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                className="glass rounded-2xl p-6 border border-white/5 hover:border-primary-500/25 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary-500/15 border border-primary-500/25 flex items-center justify-center mb-4">
+                  <Icon className="w-5 h-5 text-primary-300" />
                 </div>
-                <div>
-                  <div className="text-white font-medium text-sm">{t.name}</div>
-                  <div className="text-slate-500 text-xs">{t.role}</div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                <h3 className="text-white font-semibold text-base mb-1.5">{c.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">{c.desc}</p>
+              </motion.div>
+            );
+          })}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="text-center mt-12"
+        >
+          <Link
+            href="/request"
+            className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors"
+          >
+            Start a project on these terms
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

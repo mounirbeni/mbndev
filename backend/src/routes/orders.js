@@ -6,15 +6,16 @@ const {
   cancelOrder,
   calculateOrderPrice,
 } = require('../controllers/orderController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
+const { createOrderRules, calculatePriceRules } = require('../middleware/validate');
 
 // Price calculator (public-ish, but auth helps logging)
-router.get('/price', calculateOrderPrice);
+router.get('/price', calculatePriceRules, calculateOrderPrice);
 
 // Order CRUD
-router.post('/',         protect, createOrder);
-router.get('/',          protect, getOrders);
-router.get('/:id',       protect, getOrder);
-router.put('/:id/cancel', protect, cancelOrder);
+router.post('/',          protect, createOrderRules, createOrder);
+router.get ('/',          protect, getOrders);
+router.get ('/:id',       protect, getOrder);
+router.put ('/:id/cancel', protect, cancelOrder);
 
 module.exports = router;

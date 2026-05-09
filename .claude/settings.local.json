@@ -30,7 +30,9 @@
       "WebSearch",
       "WebFetch(domain:clutch.co)",
       "WebFetch(domain:www.webfx.com)",
-      "PowerShell($proc = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -First 1; if \\($proc\\) { Stop-Process -Id $proc -Force; Write-Host \"Killed $proc\" }; Start-Sleep 1; Start-Process -FilePath \"node\" -ArgumentList \"src/server.js\" -WorkingDirectory \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\backend\" -WindowStyle Minimized; Start-Sleep 3; $p = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue; if \\($p\\) { \"✅ Backend running \\(PID $\\($p.OwningProcess\\)\\)\" } else { \"⚠️ Starting...\" })"
+      "PowerShell($proc = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -First 1; if \\($proc\\) { Stop-Process -Id $proc -Force; Write-Host \"Killed $proc\" }; Start-Sleep 1; Start-Process -FilePath \"node\" -ArgumentList \"src/server.js\" -WorkingDirectory \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\backend\" -WindowStyle Minimized; Start-Sleep 3; $p = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue; if \\($p\\) { \"✅ Backend running \\(PID $\\($p.OwningProcess\\)\\)\" } else { \"⚠️ Starting...\" })",
+      "Bash(git check-ignore *)",
+      "Bash(mkdir -p \"C:/Users/mouni/Desktop/mbndev/.claude\" 2>&1; echo \"OK\")"
     ]
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { authAPI } from '@/lib/api';
 import { User } from '@/types';
 
@@ -11,6 +11,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
+  refresh: () => Promise<void>;
   isAdmin: boolean;
   isClient: boolean;
 }
@@ -24,28 +25,73 @@ interface RegisterData {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const TOKEN_KEY = 'mbndev_token';
+const USER_KEY  = 'mbndev_user';
+// Cookie consumed by Next.js middleware for SSR-level route guarding.
+// Stores ONLY the role ('client' | 'admin'), not the JWT. JWT stays in
+// localStorage; this cookie just signals "is logged in" to the edge.
+const AUTH_COOKIE = 'mbndev_auth';
+
+function setAuthCookie(role: string) {
+  if (typeof document === 'undefined') return;
+  // 7 days, samesite=lax, path=/
+  // No httpOnly flag because middleware reads it; not a security boundary.
+  const maxAge = 60 * 60 * 24 * 7;
+  document.cookie = `${AUTH_COOKIE}=${role}; path=/; max-age=${maxAge}; samesite=lax`;
+}
+
+function clearAuthCookie() {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; samesite=lax`;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser]       = useState<User | null>(null);
+  const [token, setToken]     = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Restore session from localStorage on mount
+  // Restore session + verify token freshness on mount.
+  // Calling /auth/me catches: revoked tokens, deactivated accounts,
+  // server-side profile changes (e.g. plan upgrade) made by admin.
   useEffect(() => {
-    const storedToken = localStorage.getItem('mbndev_token');
-    const storedUser = localStorage.getItem('mbndev_user');
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    const storedToken = localStorage.getItem(TOKEN_KEY);
+    const storedUser  = localStorage.getItem(USER_KEY);
+    if (!storedToken || !storedUser) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    // Optimistic: show cached user immediately
+    try {
+      const cached = JSON.parse(storedUser) as User;
+      setToken(storedToken);
+      setUser(cached);
+      setAuthCookie(cached.role);
+    } catch {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    }
+
+    // Then verify against backend in the background
+    authAPI.getMe()
+      .then(({ data }) => {
+        setUser(data.user);
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        setAuthCookie(data.user.role);
+      })
+      .catch(() => {
+        // 401 interceptor in api.ts handles the redirect
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const persistSession = (token: string, user: User) => {
-    localStorage.setItem('mbndev_token', token);
-    localStorage.setItem('mbndev_user', JSON.stringify(user));
+  const persistSession = useCallback((token: string, user: User) => {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    setAuthCookie(user.role);
     setToken(token);
     setUser(user);
-  };
+  }, []);
 
   const login = async (email: string, password: string) => {
     const { data } = await authAPI.login({ email, password });
@@ -57,12 +103,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     persistSession(data.token, data.user);
   };
 
-  const logout = () => {
-    localStorage.removeItem('mbndev_token');
-    localStorage.removeItem('mbndev_user');
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    clearAuthCookie();
     setToken(null);
     setUser(null);
-  };
+  }, []);
+
+  const refresh = useCallback(async () => {
+    try {
+      const { data } = await authAPI.getMe();
+      setUser(data.user);
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      setAuthCookie(data.user.role);
+    } catch {
+      // Interceptor will handle 401
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -73,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        refresh,
         isAdmin: user?.role === 'admin',
         isClient: user?.role === 'client',
       }}

@@ -1,6 +1,8 @@
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
+const realtime = require('../lib/realtime');
+const { sendEmail, templates } = require('../lib/email');
 
 // Shared include for client details on every project query
 const withClient = {
@@ -95,18 +97,36 @@ exports.getProject = async (req, res, next) => {
 // Admin: Get all projects
 exports.getAllProjects = async (req, res, next) => {
   try {
-    const { status, search } = req.query;
+    const { status, page = 1, limit = 50 } = req.query;
+    // Cap search length to defend against ReDoS / huge payloads
+    const search = req.query.search ? String(req.query.search).slice(0, 100) : null;
+    const take = Math.min(Math.max(parseInt(limit, 10) || 50, 1), 100);
+    const skip = Math.max((parseInt(page, 10) || 1) - 1, 0) * take;
 
-    const projects = await prisma.project.findMany({
-      where: {
-        ...(status ? { status } : {}),
-        ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
-      },
-      include: withClient,
-      orderBy: { createdAt: 'desc' },
+    const where = {
+      ...(status ? { status } : {}),
+      ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
+    };
+
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        include: withClient,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+      }),
+      prisma.project.count({ where }),
+    ]);
+
+    res.json({
+      success:  true,
+      count:    projects.length,
+      total,
+      page:     parseInt(page, 10) || 1,
+      limit:    take,
+      projects: fmt(projects),
     });
-
-    res.json({ success: true, count: projects.length, projects: fmt(projects) });
   } catch (err) {
     next(err);
   }
@@ -143,7 +163,7 @@ exports.updateProject = async (req, res, next) => {
         { from: current.status, to: status }
       );
 
-      // Notify client
+      // Notify client (in-app + realtime)
       await notify(project.clientId, {
         type:    'status_update',
         title:   `Project Update: ${STATUS_LABELS[status] || status}`,
@@ -151,7 +171,34 @@ exports.updateProject = async (req, res, next) => {
         link:    `/dashboard/client/projects/${project.id}`,
         metadata: { projectId: project.id, status },
       });
+
+      // Email the client
+      const fullClient = await prisma.user.findUnique({
+        where:  { id: project.clientId },
+        select: { email: true, name: true },
+      });
+      if (fullClient?.email) {
+        sendEmail({
+          to: fullClient.email,
+          ...templates.projectStatusUpdate({
+            client:     fullClient,
+            project,
+            fromStatus: STATUS_LABELS[current.status] || current.status,
+            toStatus:   STATUS_LABELS[status] || status,
+          }),
+        }).catch(() => {});
+      }
     }
+
+    // Realtime push to client + admins on ANY project update
+    realtime.publishToUser(project.clientId, 'project:updated', {
+      id: project.id, status: project.status, progress: project.progress,
+      updatedAt: project.updatedAt,
+    });
+    realtime.publishToAdmins('project:updated', {
+      id: project.id, status: project.status, progress: project.progress,
+      updatedAt: project.updatedAt,
+    });
 
     // Log progress change
     if (progress !== undefined && Number(progress) !== current.progress) {
@@ -177,13 +224,31 @@ exports.uploadFile = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
+    // Ownership check — must run BEFORE accepting the upload to disk
+    // (multer has already saved the file at this point — clean up if denied)
+    const project = await prisma.project.findUnique({
+      where:  { id: req.params.id },
+      select: { id: true, clientId: true },
+    });
+
+    const denyAndCleanup = (status, message) => {
+      // Best-effort cleanup of uploaded file
+      try { require('fs').unlinkSync(req.file.path); } catch {}
+      return res.status(status).json({ success: false, message });
+    };
+
+    if (!project) return denyAndCleanup(404, 'Project not found');
+    if (req.user.role !== 'admin' && project.clientId !== req.user.id) {
+      return denyAndCleanup(403, 'Not authorized to upload to this project');
+    }
+
     const fileUrl = `/uploads/${req.file.filename}`;
 
     const file = await prisma.projectFile.create({
       data: {
-        name: req.file.originalname,
-        url: fileUrl,
-        projectId: req.params.id,
+        name:         req.file.originalname.slice(0, 200),
+        url:          fileUrl,
+        projectId:    req.params.id,
         uploadedById: req.user.id,
       },
     });

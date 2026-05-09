@@ -1,5 +1,6 @@
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
+const realtime = require('../lib/realtime');
 
 // Get all messages for a project
 exports.getMessages = async (req, res, next) => {
@@ -87,36 +88,33 @@ exports.sendMessage = async (req, res, next) => {
       },
     });
 
-    res.status(201).json({ success: true, message: fmt(message) });
+    // Push to the *other* side of the conversation in real time.
+    // - If client sent → admins see it instantly.
+    // - If admin sent  → the project's client sees it instantly.
+    const messagePayload = fmt(message);
+    if (req.user.role === 'admin') {
+      realtime.publishToUser(project.clientId, 'message:new', messagePayload);
+    } else {
+      realtime.publishToAdmins('message:new', messagePayload);
+    }
+
+    res.status(201).json({ success: true, message: messagePayload });
   } catch (err) {
     next(err);
   }
 };
 
 // Get unread message count for current user
+// Single query with relation filter — replaces the previous N+1 pattern.
 exports.getUnreadCount = async (req, res, next) => {
   try {
-    let projectIds;
-
-    if (req.user.role === 'admin') {
-      const projects = await prisma.project.findMany({ select: { id: true } });
-      projectIds = projects.map((p) => p.id);
-    } else {
-      const projects = await prisma.project.findMany({
-        where: { clientId: req.user.id },
-        select: { id: true },
-      });
-      projectIds = projects.map((p) => p.id);
-    }
-
     const count = await prisma.message.count({
       where: {
-        projectId: { in: projectIds },
         senderId: { not: req.user.id },
-        isRead: false,
+        isRead:   false,
+        project:  req.user.role === 'admin' ? {} : { clientId: req.user.id },
       },
     });
-
     res.json({ success: true, count });
   } catch (err) {
     next(err);

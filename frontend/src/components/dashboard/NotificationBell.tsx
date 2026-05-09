@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Bell, Check, CheckCheck, X, Loader2 } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { useRealtime } from '@/hooks/useRealtime';
 
 interface Notif {
   id: string;
@@ -44,21 +45,27 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Poll unread count every 15 s (paused when tab is hidden)
+  // Initial fetch + occasional refresh as a safety net (real-time is primary)
   useEffect(() => {
     const fetchCount = () =>
       notificationAPI.getUnread()
         .then(({ data }) => setUnread(data.count))
         .catch(() => {});
     fetchCount();
-    let timer: ReturnType<typeof setInterval> | null = null;
-    const start = () => { timer = setInterval(fetchCount, 15_000); };
-    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
-    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
-    start();
+    // Background refresh every 60s in case SSE missed an event
+    const onVis = () => { if (document.visibilityState === 'visible') fetchCount(); };
     document.addEventListener('visibilitychange', onVis);
-    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+    return () => document.removeEventListener('visibilitychange', onVis);
   }, []);
+
+  // Real-time: instant unread bump + prepend the notification if panel is open
+  const realtimeHandlers = useMemo(() => ({
+    'notification:new': (n: any) => {
+      setUnread((c) => c + 1);
+      setNotifs((prev) => [{ ...n, read: false }, ...prev].slice(0, 50));
+    },
+  }), []);
+  useRealtime({ on: realtimeHandlers });
 
   // Load notifications when panel opens
   useEffect(() => {

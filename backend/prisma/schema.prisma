@@ -31,6 +31,22 @@ model User {
   readMessages   MessageRead[]
   notifications  Notification[]
   activityLogs   ActivityLog[]
+  resetTokens    PasswordResetToken[]
+}
+
+// ─── Password Reset ───────────────────────────────────────────────────────────
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // SHA-256 hash of the random token sent via email — never stores the plaintext
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // ─── Orders ───────────────────────────────────────────────────────────────────
@@ -52,7 +68,6 @@ model Order {
   designStyle  String?
   designColors String[]
   designRefs   String[]
-  stripeSessionId String?
   // Linked project — set after payment completes
   project      Project?
   payments     Payment[]
@@ -153,20 +168,20 @@ model Payment {
   id                    String    @id @default(cuid())
   // projectId is nullable — set after project is auto-created following payment
   projectId             String?
-  project               Project?  @relation(fields: [projectId], references: [id])
+  project               Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   // orderId links to the Order being paid
   orderId               String?
-  order                 Order?    @relation(fields: [orderId], references: [id])
+  order                 Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
   clientId              String
   client                User      @relation(fields: [clientId], references: [id])
   amount                Float
   currency              String    @default("usd")
   status                String    @default("pending")  // pending | pending_verification | paid | failed | refunded
-  stripePaymentIntentId String?
-  stripeSessionId       String?
   milestoneTitle        String?
   description           String?
-  method                String?   // stripe | cih_bank | paypal | taptapsend
+  method                String?   // cih_bank | paypal | taptapsend | mock
+  // External transaction reference (PayPal txn ID, bank ref, etc) — proof of payment
+  externalRef           String?
   paidAt                DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt

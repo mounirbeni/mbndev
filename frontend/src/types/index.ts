@@ -134,7 +134,6 @@ export interface Order {
   designStyle?: string;
   designColors?: string[];
   designRefs?: string[];
-  stripeSessionId?: string;
   project?: Pick<Project, 'id' | 'title' | 'status' | 'progress'> | null;
   payments?: Payment[];
   createdAt: string;

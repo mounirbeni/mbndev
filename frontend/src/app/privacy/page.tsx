@@ -52,7 +52,7 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside mt-2 space-y-1 text-slate-400">
               <li>Create an account (name, email address, company, phone)</li>
               <li>Submit a project request (project details, requirements, budget)</li>
-              <li>Make a payment (processed securely via Stripe — we never store card data)</li>
+              <li>Make a payment (we never store card data — payments are made via direct bank transfer, PayPal, or TapTapSend)</li>
               <li>Send messages through the platform</li>
               <li>Upload project files</li>
             </ul>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
             <p>
               Your data is stored on Neon PostgreSQL — a secure, encrypted cloud database hosted on AWS infrastructure.
               All data transmission uses TLS/HTTPS encryption. Passwords are hashed using bcrypt.
-              Payment processing is handled by Stripe, a PCI-DSS compliant payment processor.
+              Payments are processed via PayPal, CIH Bank, or TapTapSend — we do not handle card data ourselves.
             </p>
             <p className="mt-2">
               We implement reasonable technical and organizational measures to protect your data, but no system is 100% secure.
@@ -131,7 +131,8 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-white mb-3">8. Third-Party Services</h2>
             <p>We use the following third-party services:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 text-slate-400">
-              <li><strong className="text-slate-300">Stripe</strong> — Payment processing (see Stripe&apos;s Privacy Policy)</li>
+              <li><strong className="text-slate-300">PayPal</strong> — Payment processing (when used; see PayPal&apos;s Privacy Policy)</li>
+              <li><strong className="text-slate-300">Resend</strong> — Transactional email delivery</li>
               <li><strong className="text-slate-300">Neon</strong> — Database hosting</li>
               <li><strong className="text-slate-300">Vercel</strong> — Frontend hosting and CDN</li>
             </ul>

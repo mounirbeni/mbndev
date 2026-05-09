@@ -11,10 +11,10 @@ import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 
 const METHOD_LABELS: Record<string, string> = {
-  stripe:     'Stripe',
   cih_bank:   'CIH Bank',
   paypal:     'PayPal',
   taptapsend: 'TapTapSend',
+  mock:       'Mock',
 };
 
 export default function AdminPaymentsPage() {
@@ -141,7 +141,7 @@ export default function AdminPaymentsPage() {
                       </td>
                       <td className="p-4 text-sm font-semibold text-white">{formatCurrency(pay.amount)}</td>
                       <td className="p-4 text-sm text-slate-400">
-                        {pay.method ? METHOD_LABELS[pay.method] || pay.method : 'Stripe'}
+                        {pay.method ? METHOD_LABELS[pay.method] || pay.method : 'Manual'}
                       </td>
                       <td className="p-4"><StatusBadge status={pay.status} /></td>
                       <td className="p-4 text-sm text-slate-400">

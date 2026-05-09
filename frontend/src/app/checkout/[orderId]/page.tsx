@@ -32,18 +32,12 @@ const SERVICE_LABELS: Record<string, string> = {
   dashboard: 'SaaS Dashboard', mobile: 'Mobile App', custom: 'Custom Project',
 };
 
-const FEATURE_LABELS: Record<string, string> = {
-  auth: 'User Authentication', payment: 'Payment Integration',
-  dashboard: 'Admin Dashboard', multilang: 'Multi-language',
-  seo: 'SEO Optimization', api: 'API Integration', hosting: 'Hosting Setup',
-};
+type PayMethod = 'cih_bank' | 'paypal' | 'taptapsend';
 
-type PayMethod = 'cih_bank' | 'paypal' | 'taptapsend' | 'stripe';
-
-const METHODS: { id: PayMethod; label: string; desc: string; logo: string; bg: string }[] = [
-  { id: 'cih_bank',   label: 'CIH Bank Transfer', desc: 'Direct bank transfer (Morocco)', logo: '/images/cih.jpe',    bg: 'bg-white' },
-  { id: 'paypal',     label: 'PayPal',             desc: 'Pay with your PayPal account',  logo: '/images/paypal.jpe', bg: 'bg-white' },
-  { id: 'taptapsend', label: 'TapTapSend',         desc: 'Send via TapTapSend app',       logo: '/images/taptap.jpeg',bg: 'bg-white' },
+const METHODS: { id: PayMethod; label: string; desc: string; logo: string }[] = [
+  { id: 'cih_bank',   label: 'CIH Bank Transfer', desc: 'Direct bank transfer (Morocco)', logo: '/images/cih.jpe'    },
+  { id: 'paypal',     label: 'PayPal',             desc: 'Pay with your PayPal account',  logo: '/images/paypal.jpe' },
+  { id: 'taptapsend', label: 'TapTapSend',         desc: 'Send via TapTapSend app',       logo: '/images/taptap.jpeg'},
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -58,12 +52,13 @@ export default function CheckoutPage() {
   const [paying,  setPaying]  = useState(false);
   const [error,   setError]   = useState('');
   const [method,  setMethod]  = useState<PayMethod>('cih_bank');
+  const [externalRef, setExternalRef] = useState('');
   const [copied,  setCopied]  = useState('');
-  const [done,    setDone]    = useState(false);   // manual payment submitted
+  const [done,    setDone]    = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { router.push(`/login?redirect=/checkout/${orderId}`); return; }
+    if (!user) { router.push(`/login?next=/checkout/${orderId}`); return; }
     orderAPI.getOne(orderId)
       .then(({ data }) => setOrder(data.order))
       .catch((err) => setError(err?.response?.data?.message || 'Order not found'))
@@ -77,23 +72,15 @@ export default function CheckoutPage() {
     });
   };
 
-  const handleStripe = async () => {
+  const handleSubmit = async () => {
     setPaying(true);
     try {
-      const { data } = await paymentAPI.orderCheckout({ orderId });
-      window.location.href = data.url;
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to start checkout');
-      setPaying(false);
-    }
-  };
-
-  const handleManual = async () => {
-    setPaying(true);
-    try {
-      await paymentAPI.submitManual({ orderId, method });
+      await paymentAPI.submitManual({
+        orderId,
+        method,
+        externalRef: externalRef.trim() || undefined,
+      });
       setDone(true);
-      // Clear request draft since order is placed
       if (typeof window !== 'undefined') localStorage.removeItem('mbndev_request_draft');
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Failed to submit payment');
@@ -129,7 +116,6 @@ export default function CheckoutPage() {
     </div>
   );
 
-  // ── Manual payment submitted success screen ─────────────────────────────────
   if (done) return (
     <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center p-6">
       <motion.div
@@ -141,33 +127,29 @@ export default function CheckoutPage() {
         <div className="w-20 h-20 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-green-400" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-3">Payment Submitted!</h1>
+        <h1 className="text-2xl font-bold text-white mb-3">Payment submitted</h1>
         <p className="text-slate-400 text-sm leading-relaxed mb-2">
-          Your payment has been submitted and is pending verification.
+          We received your payment notification. We&apos;ll verify it and activate your project within a few hours — usually faster.
         </p>
         <p className="text-slate-500 text-sm leading-relaxed mb-8">
-          We'll verify your payment within a few hours and create your project automatically.
-          You'll receive a notification once confirmed.
+          You&apos;ll get a notification (and an email if configured) the moment it&apos;s confirmed.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/dashboard/client/orders">
-            <Button size="md">View My Orders</Button>
+            <Button size="md">View my orders</Button>
           </Link>
           <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
-            <Button size="md" variant="outline">
-              Contact on WhatsApp
-            </Button>
+            <Button size="md" variant="outline">Contact on WhatsApp</Button>
           </a>
         </div>
       </motion.div>
     </div>
   );
 
-  const isStripeEnabled = !!process.env.NEXT_PUBLIC_STRIPE_KEY;
+  const reference = `MBN-${orderId.slice(-8).toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-hero-gradient flex flex-col">
-      {/* Header */}
       <header className="glass border-b border-white/5 px-4 sm:px-6 py-4 flex items-center gap-4 shrink-0">
         <Link href="/request" className="text-slate-400 hover:text-white transition-colors">
           <ArrowLeft className="w-5 h-5" />
@@ -180,7 +162,7 @@ export default function CheckoutPage() {
         </div>
         <div className="ml-auto flex items-center gap-1.5 text-xs text-slate-500">
           <Shield className="w-3.5 h-3.5 text-green-400" />
-          Secure checkout
+          Manually verified
         </div>
       </header>
 
@@ -226,27 +208,8 @@ export default function CheckoutPage() {
 
           {/* Payment methods */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
-            <h2 className="text-white font-semibold text-sm mb-4">Choose Payment Method</h2>
+            <h2 className="text-white font-semibold text-sm mb-4">Choose payment method</h2>
 
-            {/* Stripe (if configured) */}
-            {isStripeEnabled && (
-              <button
-                onClick={handleStripe}
-                disabled={paying}
-                className="w-full flex items-center gap-3 p-3.5 rounded-xl border mb-3 text-left transition-all bg-primary-500/10 border-primary-500/50 hover:bg-primary-500/15"
-              >
-                <div className="w-9 h-9 rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
-                  <CreditCard className="w-4 h-4 text-primary-400" />
-                </div>
-                <div className="flex-1">
-                  <div className="text-white text-sm font-semibold">Credit / Debit Card</div>
-                  <div className="text-slate-500 text-xs">Visa, Mastercard, Amex via Stripe</div>
-                </div>
-                <span className="text-xs text-primary-400 font-semibold">Instant</span>
-              </button>
-            )}
-
-            {/* Manual methods */}
             <div className="space-y-2 mb-5">
               {METHODS.map((m) => (
                 <button
@@ -259,14 +222,7 @@ export default function CheckoutPage() {
                   }`}
                 >
                   <div className="w-12 h-9 rounded-lg shrink-0 overflow-hidden">
-                    <Image
-                      src={m.logo}
-                      alt={m.label}
-                      width={48}
-                      height={36}
-                      className="w-full h-full object-cover"
-                      unoptimized
-                    />
+                    <Image src={m.logo} alt={m.label} width={48} height={36} className="w-full h-full object-cover" unoptimized />
                   </div>
                   <div className="flex-1">
                     <div className={`text-sm font-semibold ${method === m.id ? 'text-white' : 'text-slate-400'}`}>{m.label}</div>
@@ -294,12 +250,7 @@ export default function CheckoutPage() {
               >
                 {method === 'cih_bank' && (
                   <>
-                    <div className="flex items-center gap-2.5 mb-4">
-                      <div className="w-10 h-7 rounded shrink-0 overflow-hidden">
-                        <Image src="/images/cih.jpe" alt="CIH Bank" width={36} height={24} className="w-full h-full object-cover" unoptimized />
-                      </div>
-                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">CIH Bank Transfer Details</p>
-                    </div>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">CIH Bank Transfer Details</p>
                     <div className="space-y-2.5">
                       {[
                         { label: 'Bank',       value: CIH_BANK.bank,   canCopy: false },
@@ -308,7 +259,7 @@ export default function CheckoutPage() {
                         { label: 'IBAN',       value: CIH_BANK.iban,   canCopy: true  },
                         { label: 'SWIFT',      value: CIH_BANK.swift,  canCopy: true  },
                         { label: 'Amount',     value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
-                        { label: 'Reference',  value: `MBN-${orderId.slice(-8).toUpperCase()}`, canCopy: true },
+                        { label: 'Reference',  value: reference, canCopy: true },
                       ].map(({ label, value, canCopy }) => (
                         <div key={label} className="flex items-center justify-between gap-2">
                           <span className="text-slate-500 text-xs w-20 shrink-0">{label}</span>
@@ -318,6 +269,7 @@ export default function CheckoutPage() {
                               <button
                                 onClick={() => copy(value, label)}
                                 className="text-slate-500 hover:text-primary-400 transition-colors shrink-0"
+                                aria-label={`Copy ${label}`}
                               >
                                 {copied === label
                                   ? <Check className="w-3.5 h-3.5 text-green-400" />
@@ -328,20 +280,12 @@ export default function CheckoutPage() {
                         </div>
                       ))}
                     </div>
-                    <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-white/5">
-                      After sending the transfer, click the button below. We'll verify and activate your project within a few hours.
-                    </p>
                   </>
                 )}
 
                 {method === 'paypal' && (
                   <>
-                    <div className="flex items-center gap-2.5 mb-4">
-                      <div className="w-10 h-7 rounded shrink-0 overflow-hidden">
-                        <Image src="/images/paypal.jpe" alt="PayPal" width={36} height={24} className="w-full h-full object-cover" unoptimized />
-                      </div>
-                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">PayPal Instructions</p>
-                    </div>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">PayPal Instructions</p>
                     <p className="text-sm text-slate-300 mb-3">
                       Send <span className="text-white font-bold">${order.totalPrice.toLocaleString()} USD</span> to:
                     </p>
@@ -349,14 +293,14 @@ export default function CheckoutPage() {
                       {[
                         { label: 'PayPal Email', value: PAYPAL_EMAIL,  canCopy: true },
                         { label: 'Amount',       value: `$${order.totalPrice.toLocaleString()} USD`, canCopy: true },
-                        { label: 'Reference',    value: `MBN-${orderId.slice(-8).toUpperCase()}`,    canCopy: true },
+                        { label: 'Reference',    value: reference,    canCopy: true },
                       ].map(({ label, value, canCopy }) => (
                         <div key={label} className="flex items-center justify-between gap-2">
                           <span className="text-slate-500 text-xs w-24 shrink-0">{label}</span>
                           <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
                             <span className="text-white text-xs font-mono truncate">{value}</span>
                             {canCopy && (
-                              <button onClick={() => copy(value, label)} className="text-slate-500 hover:text-primary-400 transition-colors shrink-0">
+                              <button onClick={() => copy(value, label)} className="text-slate-500 hover:text-primary-400 transition-colors shrink-0" aria-label={`Copy ${label}`}>
                                 {copied === label ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                               </button>
                             )}
@@ -374,33 +318,24 @@ export default function CheckoutPage() {
                       Open PayPal
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
-                    <p className="text-xs text-slate-500 mt-2">
-                      Use "Send Money" → enter the email above → add the reference in the note field.
-                      After paying, click the button below.
-                    </p>
                   </>
                 )}
 
                 {method === 'taptapsend' && (
                   <>
-                    <div className="flex items-center gap-2.5 mb-4">
-                      <div className="w-10 h-7 rounded shrink-0 overflow-hidden">
-                        <Image src="/images/taptap.jpeg" alt="TapTapSend" width={36} height={24} className="w-full h-full object-cover" unoptimized />
-                      </div>
-                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">TapTapSend Instructions</p>
-                    </div>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">TapTapSend Instructions</p>
                     <div className="space-y-2">
                       {[
-                        { label: 'Send to',   value: TAPTAP_PHONE,  canCopy: true },
+                        { label: 'Send to',   value: TAPTAP_PHONE, canCopy: true },
                         { label: 'Amount',    value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
-                        { label: 'Reference', value: `MBN-${orderId.slice(-8).toUpperCase()}`, canCopy: true },
+                        { label: 'Reference', value: reference,    canCopy: true },
                       ].map(({ label, value, canCopy }) => (
                         <div key={label} className="flex items-center justify-between gap-2">
                           <span className="text-slate-500 text-xs w-20 shrink-0">{label}</span>
                           <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
                             <span className="text-white text-sm font-mono truncate">{value}</span>
                             {canCopy && (
-                              <button onClick={() => copy(value, label)} className="text-slate-500 hover:text-primary-400 transition-colors shrink-0">
+                              <button onClick={() => copy(value, label)} className="text-slate-500 hover:text-primary-400 transition-colors shrink-0" aria-label={`Copy ${label}`}>
                                 {copied === label ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                               </button>
                             )}
@@ -408,20 +343,31 @@ export default function CheckoutPage() {
                         </div>
                       ))}
                     </div>
-                    <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-white/5">
-                      Open the TapTapSend app, send the amount to the number above, then click the button below.
-                    </p>
                   </>
                 )}
               </motion.div>
             </AnimatePresence>
 
-            {/* Confirm button */}
-            <Button className="w-full" size="lg" onClick={handleManual} loading={paying}>
+            {/* Optional reference / proof field */}
+            <div className="mb-5">
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                Transaction reference <span className="text-slate-600">(optional but speeds up verification)</span>
+              </label>
+              <input
+                type="text"
+                value={externalRef}
+                onChange={(e) => setExternalRef(e.target.value)}
+                placeholder={method === 'paypal' ? 'PayPal transaction ID' : method === 'cih_bank' ? 'Bank reference / receipt #' : 'Transfer reference'}
+                maxLength={200}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-primary-500/60"
+              />
+            </div>
+
+            <Button className="w-full" size="lg" onClick={handleSubmit} loading={paying}>
               <Check className="w-4 h-4" />
-              {method === 'cih_bank'   && "I've Made the Bank Transfer"}
-              {method === 'paypal'     && "I've Paid via PayPal"}
-              {method === 'taptapsend' && "I've Sent via TapTapSend"}
+              {method === 'cih_bank'   && "I've made the bank transfer"}
+              {method === 'paypal'     && "I've paid via PayPal"}
+              {method === 'taptapsend' && "I've sent via TapTapSend"}
             </Button>
 
             <p className="text-xs text-slate-600 text-center mt-3">

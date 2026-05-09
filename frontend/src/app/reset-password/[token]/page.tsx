@@ -1,28 +1,42 @@
 'use client';
 
 import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Zap, Mail, Lock, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Zap, Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { authAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
-export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+export default function ResetPasswordPage() {
+  const { token } = useParams<{ token: string }>();
+  const router = useRouter();
+
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm]   = useState('');
+  const [show, setShow]         = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [done, setDone]         = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
+
+    if (password.length < 8) return toast.error('Password must be at least 8 characters');
+    if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+      return toast.error('Password must contain both letters and numbers');
+    }
+    if (password !== confirm) return toast.error('Passwords do not match');
+
     setLoading(true);
     try {
-      await authAPI.forgotPassword(email.trim());
-      setSent(true);
+      await authAPI.resetPassword(token, password);
+      setDone(true);
+      setTimeout(() => router.push('/login'), 2200);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Could not send reset email');
+      toast.error(err?.response?.data?.message || 'Could not reset password');
     } finally {
       setLoading(false);
     }
@@ -47,32 +61,49 @@ export default function ForgotPasswordPage() {
         </div>
 
         <div className="glass rounded-2xl p-8 border border-white/10">
-          {!sent ? (
+          {!done ? (
             <>
               <div className="w-14 h-14 bg-primary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
                 <Lock className="w-7 h-7 text-primary-400" />
               </div>
 
-              <h1 className="text-2xl font-bold text-white mb-2 text-center">Forgot your password?</h1>
+              <h1 className="text-2xl font-bold text-white mb-2 text-center">Choose a new password</h1>
               <p className="text-slate-400 text-sm mb-6 leading-relaxed text-center">
-                Enter the email associated with your account and we&apos;ll send you a secure reset link.
+                Pick something at least 8 characters with letters and numbers.
               </p>
 
               <form onSubmit={submit} className="space-y-4">
+                <div className="relative">
+                  <Input
+                    type={show ? 'text' : 'password'}
+                    label="New password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="new-password"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow((s) => !s)}
+                    aria-label={show ? 'Hide password' : 'Show password'}
+                    className="absolute right-3 top-9 text-slate-500 hover:text-slate-300"
+                  >
+                    {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+
                 <Input
-                  type="email"
-                  label="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
+                  type={show ? 'text' : 'password'}
+                  label="Confirm password"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
                   required
-                  autoComplete="email"
-                  autoFocus
+                  autoComplete="new-password"
                 />
 
                 <Button type="submit" className="w-full" size="lg" loading={loading}>
-                  <Mail className="w-4 h-4" />
-                  Send reset link
+                  Update password
                 </Button>
               </form>
             </>
@@ -86,13 +117,8 @@ export default function ForgotPasswordPage() {
               >
                 <CheckCircle2 className="w-7 h-7 text-green-400" />
               </motion.div>
-              <h1 className="text-2xl font-bold text-white mb-2">Check your inbox</h1>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                If an account exists for <span className="text-white font-medium">{email}</span>, a reset link is on its way. The link expires in 60 minutes.
-              </p>
-              <p className="text-slate-600 text-xs mb-6">
-                Didn&apos;t get it? Check spam, or try again in a few minutes.
-              </p>
+              <h1 className="text-2xl font-bold text-white mb-2">Password updated</h1>
+              <p className="text-slate-400 text-sm mb-2">Sending you back to the login page…</p>
             </div>
           )}
 

@@ -1,56 +1,8 @@
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
-const { notify, notifyAdmins } = require('../lib/notifications');
-
-// ─── Pricing engine ───────────────────────────────────────────────────────────
-
-const BASE_PRICES = {
-  website:   499,
-  ecommerce: 999,
-  dashboard: 1299,
-  mobile:    1799,
-  custom:    699,
-};
-
-const FEATURE_PRICES = {
-  auth:        150,
-  payment:     200,
-  dashboard:   300,
-  multilang:   120,
-  seo:          80,
-  api:         200,
-  hosting:      50,
-};
-
-const ADDON_PRICES = {
-  fastDelivery: 200,
-};
-
-const DELIVERY_DAYS = {
-  website:   14,
-  ecommerce: 21,
-  dashboard: 28,
-  mobile:    35,
-  custom:    21,
-};
-
-function calculatePrice({ serviceType, pages = 5, features = [], addons = [] }) {
-  const base      = BASE_PRICES[serviceType] || BASE_PRICES.custom;
-  const pageExtra = Math.max(0, pages - 5) * 30;
-  const featureTotal = features.reduce((sum, f) => sum + (FEATURE_PRICES[f] || 0), 0);
-  const addonTotal   = addons.reduce((sum, a) => sum + (ADDON_PRICES[a] || 0), 0);
-
-  let deliveryDays = DELIVERY_DAYS[serviceType] || 21;
-  if (addons.includes('fastDelivery')) deliveryDays = Math.ceil(deliveryDays * 0.6);
-
-  return {
-    totalPrice: base + pageExtra + featureTotal + addonTotal,
-    deliveryDays,
-    breakdown: { base, pageExtra, featureTotal, addonTotal },
-  };
-}
-
-// ─── Controllers ─────────────────────────────────────────────────────────────
+const { notifyAdmins } = require('../lib/notifications');
+const { calculatePrice, VALID_PLANS } = require('../lib/pricing');
+const { sendEmail, templates } = require('../lib/email');
 
 // POST /api/orders — Create a new order (client)
 exports.createOrder = async (req, res, next) => {
@@ -64,47 +16,60 @@ exports.createOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'serviceType and title are required' });
     }
 
+    // Backend is authoritative — never trust client-supplied price
+    const safePlan = plan && VALID_PLANS.includes(plan) ? plan : null;
     const { totalPrice, deliveryDays } = calculatePrice({
       serviceType,
-      pages: Number(pages) || 5,
+      pages:    Number(pages) || 5,
       features: features || [],
-      addons: addons || [],
+      addons:   addons   || [],
+      plan:     safePlan,
     });
 
-    const order = await prisma.order.create({
-      data: {
-        clientId:    req.user.id,
-        serviceType,
-        title,
-        description: description || null,
-        pages:       Number(pages) || 5,
-        features:    features || [],
-        addons:      addons || [],
-        totalPrice,
-        deliveryDays,
-        notes:       notes || null,
-        designStyle: designStyle || null,
-        designColors: designColors || [],
-        designRefs:  designRefs || [],
-      },
-    });
-
-    // Update user's plan if one was selected
-    if (plan && ['starter', 'pro', 'premium', 'custom'].includes(plan)) {
-      await prisma.user.update({
-        where: { id: req.user.id },
-        data: { plan },
+    // Atomic: create order + update user.plan in one transaction
+    const order = await prisma.$transaction(async (tx) => {
+      const created = await tx.order.create({
+        data: {
+          clientId:     req.user.id,
+          serviceType,
+          title,
+          description:  description || null,
+          pages:        Number(pages) || 5,
+          features:     features || [],
+          addons:       addons || [],
+          totalPrice,
+          deliveryDays,
+          notes:        notes || null,
+          designStyle:  designStyle || null,
+          designColors: designColors || [],
+          designRefs:   designRefs || [],
+        },
       });
-    }
 
-    // Notify admins of new order
-    await notifyAdmins({
+      if (safePlan) {
+        await tx.user.update({
+          where: { id: req.user.id },
+          data:  { plan: safePlan },
+        });
+      }
+
+      return created;
+    });
+
+    // Notify admins (fire-and-forget — outside transaction)
+    notifyAdmins({
       type:    'order_placed',
       title:   'New Order Received',
       message: `${req.user.name} placed a new order: "${title}" ($${totalPrice})`,
       link:    `/dashboard/admin/orders/${order.id}`,
       metadata: { orderId: order.id, clientId: req.user.id },
-    });
+    }).catch((err) => console.error('[notifyAdmins] failed:', err));
+
+    // Email confirmation to client
+    sendEmail({
+      to: req.user.email,
+      ...templates.orderPlaced({ user: req.user, order }),
+    }).catch(() => {});
 
     res.status(201).json({ success: true, order: fmt(order) });
   } catch (err) {
@@ -115,23 +80,38 @@ exports.createOrder = async (req, res, next) => {
 // GET /api/orders — List orders (admin: all, client: own)
 exports.getOrders = async (req, res, next) => {
   try {
-    const { status } = req.query;
+    const { status, page = 1, limit = 50 } = req.query;
+    const take = Math.min(Math.max(parseInt(limit, 10) || 50, 1), 100);
+    const skip = Math.max((parseInt(page, 10) || 1) - 1, 0) * take;
+
     const where = {
       ...(req.user.role !== 'admin' ? { clientId: req.user.id } : {}),
       ...(status ? { status } : {}),
     };
 
-    const orders = await prisma.order.findMany({
-      where,
-      include: {
-        client:  { select: { id: true, name: true, email: true, company: true } },
-        project: { select: { id: true, title: true, status: true, progress: true } },
-        payments: { select: { id: true, status: true, amount: true, paidAt: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: {
+          client:   { select: { id: true, name: true, email: true, company: true } },
+          project:  { select: { id: true, title: true, status: true, progress: true } },
+          payments: { select: { id: true, status: true, amount: true, paidAt: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+      }),
+      prisma.order.count({ where }),
+    ]);
 
-    res.json({ success: true, count: orders.length, orders: fmt(orders) });
+    res.json({
+      success: true,
+      count:   orders.length,
+      total,
+      page:    parseInt(page, 10) || 1,
+      limit:   take,
+      orders:  fmt(orders),
+    });
   } catch (err) {
     next(err);
   }
@@ -143,8 +123,8 @@ exports.getOrder = async (req, res, next) => {
     const order = await prisma.order.findUnique({
       where: { id: req.params.id },
       include: {
-        client:  { select: { id: true, name: true, email: true, company: true, avatar: true } },
-        project: { select: { id: true, title: true, status: true, progress: true, createdAt: true } },
+        client:   { select: { id: true, name: true, email: true, company: true, avatar: true } },
+        project:  { select: { id: true, title: true, status: true, progress: true, createdAt: true } },
         payments: true,
       },
     });
@@ -190,12 +170,13 @@ exports.cancelOrder = async (req, res, next) => {
 // GET /api/orders/price — Calculate price without creating order
 exports.calculateOrderPrice = async (req, res, next) => {
   try {
-    const { serviceType, pages, features, addons } = req.query;
+    const { serviceType, pages, features, addons, plan } = req.query;
     const result = calculatePrice({
       serviceType: serviceType || 'website',
       pages:    Number(pages) || 5,
       features: features ? (Array.isArray(features) ? features : features.split(',')) : [],
       addons:   addons   ? (Array.isArray(addons)   ? addons   : addons.split(','))   : [],
+      plan:     plan && VALID_PLANS.includes(plan) ? plan : null,
     });
     res.json({ success: true, ...result });
   } catch (err) {
