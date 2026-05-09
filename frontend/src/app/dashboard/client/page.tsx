@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FolderOpen, MessageSquare, CreditCard, Clock, ArrowRight, Plus } from 'lucide-react';
+import { FolderOpen, MessageSquare, CreditCard, Clock, ArrowRight, Plus, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { projectAPI, messageAPI } from '@/lib/api';
 import { Project } from '@/types';
@@ -11,12 +11,15 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import Button from '@/components/ui/Button';
 import PlanBadge from '@/components/ui/PlanBadge';
+import OnboardingModal, { useOnboarding } from '@/components/onboarding/OnboardingModal';
+import ProjectLifecycle from '@/components/dashboard/ProjectLifecycle';
 
 export default function ClientDashboard() {
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { show: showOnboarding, dismiss: dismissOnboarding } = useOnboarding();
 
   const fetchData = (silent = false) => {
     if (!silent) setLoading(true);
@@ -49,6 +52,11 @@ export default function ClientDashboard() {
 
   return (
     <div className="space-y-8 max-w-7xl">
+
+      {/* Onboarding modal — shown once on first visit */}
+      {showOnboarding && (
+        <OnboardingModal userName={user?.name || 'there'} onClose={dismissOnboarding} />
+      )}
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -100,14 +108,89 @@ export default function ClientDashboard() {
             ))}
           </div>
         ) : projects.length === 0 ? (
-          <div className="glass rounded-2xl p-12 text-center border border-white/5">
-            <FolderOpen className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-white font-medium mb-1">No projects yet</h3>
-            <p className="text-slate-500 text-sm mb-4">Start by requesting your first project.</p>
-            <Link href="/request">
-              <Button size="md">Start Your Project</Button>
-            </Link>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="glass rounded-3xl border border-white/5 overflow-hidden"
+          >
+            {/* Top gradient accent */}
+            <div className="h-[2px] w-full bg-gradient-to-r from-primary-700 via-primary-500 to-violet-500" />
+
+            <div className="p-8 sm:p-10">
+              {/* Hero copy */}
+              <div className="flex flex-col sm:flex-row sm:items-start gap-6 mb-10">
+                <div className="w-14 h-14 rounded-2xl bg-primary-500/15 border border-primary-500/25 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-6 h-6 text-primary-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-white mb-2 leading-tight">
+                    Your first project is one step away.
+                  </h3>
+                  <p className="text-slate-400 text-sm leading-relaxed max-w-lg">
+                    Submit a brief and we&apos;ll confirm your scope, timeline, and price
+                    within 24 hours — before a single line of code is written.
+                    No surprises, ever.
+                  </p>
+                </div>
+              </div>
+
+              {/* Project lifecycle visualizer */}
+              <div className="mb-8">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
+                  How every project works
+                </p>
+                <ProjectLifecycle animated />
+              </div>
+
+              {/* Feature pills */}
+              <div className="flex flex-wrap gap-2 mb-8">
+                {[
+                  '✅ Price confirmed upfront',
+                  '💬 Direct developer access',
+                  '📦 Full source code handover',
+                  '🔄 Revision rounds included',
+                  '⚡ Real-time status updates',
+                ].map((feat) => (
+                  <span
+                    key={feat}
+                    className="text-xs text-slate-400 bg-white/5 border border-white/8 px-3 py-1.5 rounded-full"
+                  >
+                    {feat}
+                  </span>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <Link href="/request">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold px-6 py-3 rounded-xl shadow-lg shadow-primary-500/25 transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Start my first project
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                </Link>
+                <span className="text-sm text-slate-600">
+                  or{' '}
+                  <button
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        localStorage.removeItem('mbndev_onboarding_done');
+                        window.location.reload();
+                      }
+                    }}
+                    className="text-primary-400 hover:text-primary-300 underline underline-offset-2 transition-colors"
+                  >
+                    replay the guided tour
+                  </button>
+                </span>
+              </div>
+            </div>
+          </motion.div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {projects.slice(0, 6).map((p, i) => (
