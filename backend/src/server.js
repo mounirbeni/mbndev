@@ -127,21 +127,25 @@ app.use((err, req, res, _next) => {
 });
 
 // ─── Server startup + graceful shutdown ──────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`MBN DEV API listening on :${PORT} [${process.env.NODE_ENV || 'development'}]`);
-});
-
-const shutdown = (signal) => {
-  console.log(`\n${signal} received — closing server gracefully...`);
-  server.close(async () => {
-    await prisma.$disconnect().catch(() => {});
-    console.log('Server closed.');
-    process.exit(0);
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  const server = app.listen(PORT, () => {
+    console.log(`MBN DEV API listening on :${PORT} [${process.env.NODE_ENV || 'development'}]`);
   });
-  // Force-quit if cleanup hangs
-  setTimeout(() => process.exit(1), 10_000).unref();
-};
 
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT',  () => shutdown('SIGINT'));
+  const shutdown = (signal) => {
+    console.log(`\n${signal} received — closing server gracefully...`);
+    server.close(async () => {
+      await prisma.$disconnect().catch(() => {});
+      console.log('Server closed.');
+      process.exit(0);
+    });
+    // Force-quit if cleanup hangs
+    setTimeout(() => process.exit(1), 10_000).unref();
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT',  () => shutdown('SIGINT'));
+}
+
+module.exports = app;
