@@ -4,17 +4,14 @@ const nextConfig = {
     domains: ['localhost', 'avatars.githubusercontent.com'],
   },
   async rewrites() {
-    const isProd = process.env.NODE_ENV === 'production';
-    return [
-      {
-        source: '/api/:path*',
-        // In production (Vercel): route to the backend service via its routePrefix
-        // In development: proxy to local Express server
-        destination: isProd
-          ? '/_/backend/api/:path*'
-          : 'http://localhost:5000/api/:path*',
-      },
-    ];
+    return process.env.NODE_ENV === 'production'
+      ? [] // handled by vercel.json rewrites in prod
+      : [
+          {
+            source: '/api/:path*',
+            destination: 'http://localhost:5000/api/:path*',
+          },
+        ];
   },
 };
 
