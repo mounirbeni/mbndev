@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageCircle, Phone, Mail } from 'lucide-react';
 
-const WA_URL   = 'https://wa.me/212705914424';
-const TEL      = 'tel:+212705914424';
-const MAILTO   = 'mailto:hello@mbndev.com';
+const WA_URL  = 'https://wa.me/212705914424';
+const TEL     = 'tel:+212705914424';
+const MAILTO  = 'mailto:hello@mbndev.com';
 
 export default function FloatingSupport() {
   const [open, setOpen] = useState(false);
@@ -45,7 +45,7 @@ export default function FloatingSupport() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-xl glass border border-white/10 text-white text-sm font-semibold shadow-lg shadow-black/30 hover:bg-white/10 transition-all"
             >
               <Phone className="w-4 h-4 shrink-0 text-primary-400" />
-              +212 705 914 424
+              Call Us
             </a>
 
             {/* Email */}

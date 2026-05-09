@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Search, ArrowLeft, Loader2 } from 'lucide-react';
+import { MessageSquare, Search, ArrowLeft, Loader2, Zap } from 'lucide-react';
 import { messageAPI } from '@/lib/api';
 import { MessageThread as ThreadType } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -201,14 +201,17 @@ export default function AdminMessagesPage() {
 
                             {t.lastMessage ? (
                               <div className="flex items-end justify-between gap-2">
-                                <p className={`text-xs leading-snug truncate flex-1 ${
+                                <p className={`text-xs leading-snug truncate flex-1 flex items-center gap-1 ${
                                   t.unreadCount > 0 ? 'text-slate-300 font-medium' : 'text-slate-600'
                                 }`}>
-                                  {t.lastMessage.type === 'system'
-                                    ? `⚡ ${t.lastMessage.text}`
-                                    : t.lastMessage.senderName
-                                      ? `${t.lastMessage.senderName}: ${t.lastMessage.text}`
-                                      : t.lastMessage.text}
+                                  {t.lastMessage.type === 'system' ? (
+                                    <>
+                                      <Zap className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                                      {t.lastMessage.text}
+                                    </>
+                                  ) : t.lastMessage.senderName
+                                    ? `${t.lastMessage.senderName}: ${t.lastMessage.text}`
+                                    : t.lastMessage.text}
                                 </p>
                                 <span className="text-[10px] text-slate-700 shrink-0">
                                   {timeAgo(t.lastMessage.createdAt)}

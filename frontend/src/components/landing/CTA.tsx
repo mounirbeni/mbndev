@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
-import { ArrowRight, MapPin, Phone, Zap } from 'lucide-react';
+import { ArrowRight, MapPin, Zap, Clock } from 'lucide-react';
 
 export default function CTA() {
   return (
@@ -51,11 +51,11 @@ export default function CTA() {
                 <span className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" /> Morocco — Available Worldwide
                 </span>
-                <a href="tel:+212705914424" className="flex items-center gap-1.5 hover:text-slate-300 transition-colors">
-                  <Phone className="w-3.5 h-3.5" /> +212 705 914 424
-                </a>
                 <span className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5" /> Response within 24h
+                  <Clock className="w-3.5 h-3.5" /> Response within 24h
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5" /> No commitment required
                 </span>
               </div>
             </div>

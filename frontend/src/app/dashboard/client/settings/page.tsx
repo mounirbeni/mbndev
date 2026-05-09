@@ -179,7 +179,7 @@ export default function SettingsPage() {
             href="tel:+212705914424"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm font-semibold hover:bg-white/10 transition-all"
           >
-            +212 705 914 424
+            Call Support
           </a>
         </div>
       </motion.div>

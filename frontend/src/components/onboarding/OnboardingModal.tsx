@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   X, ArrowRight, ArrowLeft, MessageSquare, CreditCard,
   CheckCircle2, Zap, FolderOpen, FileCheck, RotateCcw,
-  Package, Trophy, ChevronRight,
+  Package, Trophy, ChevronRight, FileText, Upload, ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -159,10 +159,10 @@ function MessagesVisual() {
 
 function PaymentsVisual() {
   const steps = [
-    { icon: '📋', label: 'Order submitted',    color: 'text-slate-400' },
-    { icon: '💳', label: 'Payment uploaded',   color: 'text-amber-400' },
-    { icon: '✅', label: 'Admin verifies',      color: 'text-blue-400'  },
-    { icon: '🚀', label: 'Project activates',  color: 'text-green-400' },
+    { icon: FileText,    label: 'Order submitted',   color: 'text-slate-400', bg: 'bg-slate-700/40'    },
+    { icon: Upload,      label: 'Payment uploaded',  color: 'text-amber-400', bg: 'bg-amber-500/15'   },
+    { icon: ShieldCheck, label: 'Admin verifies',    color: 'text-blue-400',  bg: 'bg-blue-500/15'    },
+    { icon: Zap,         label: 'Project activates', color: 'text-green-400', bg: 'bg-green-500/15'   },
   ];
   return (
     <motion.div
@@ -170,26 +170,29 @@ function PaymentsVisual() {
       animate={{ opacity: 1 }}
       className="flex items-center justify-between gap-1 py-8 px-2"
     >
-      {steps.map((s, i) => (
-        <div key={s.label} className="flex items-center gap-1 flex-1 min-w-0">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: i * 0.12, type: 'spring', stiffness: 260, damping: 20 }}
-            className="flex flex-col items-center gap-1.5 flex-1 min-w-0"
-          >
-            <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-lg">
-              {s.icon}
-            </div>
-            <span className={cn('text-[10px] font-medium text-center leading-tight', s.color)}>
-              {s.label}
-            </span>
-          </motion.div>
-          {i < steps.length - 1 && (
-            <ChevronRight className="w-3 h-3 text-slate-700 shrink-0 mb-4" />
-          )}
-        </div>
-      ))}
+      {steps.map((s, i) => {
+        const Icon = s.icon;
+        return (
+          <div key={s.label} className="flex items-center gap-1 flex-1 min-w-0">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: i * 0.12, type: 'spring', stiffness: 260, damping: 20 }}
+              className="flex flex-col items-center gap-1.5 flex-1 min-w-0"
+            >
+              <div className={cn('w-10 h-10 border border-white/10 rounded-2xl flex items-center justify-center', s.bg)}>
+                <Icon className={cn('w-4 h-4', s.color)} />
+              </div>
+              <span className={cn('text-[10px] font-medium text-center leading-tight', s.color)}>
+                {s.label}
+              </span>
+            </motion.div>
+            {i < steps.length - 1 && (
+              <ChevronRight className="w-3 h-3 text-slate-700 shrink-0 mb-4" />
+            )}
+          </div>
+        );
+      })}
     </motion.div>
   );
 }
@@ -240,37 +243,37 @@ interface Step {
 const buildSteps = (firstName: string): Step[] => [
   {
     id:          'welcome',
-    badge:       '👋  Welcome',
+    badge:       'Welcome',
     title:       `You're in, ${firstName}.`,
     description: 'MBN DEV is your dedicated workspace for commissioning, tracking, and receiving professional software projects — fully transparent, end-to-end.',
     visual:      <WelcomeVisual />,
   },
   {
     id:          'workflow',
-    badge:       '🗺️  How it works',
+    badge:       'How it works',
     title:       'Every project has a clear journey.',
-    description: 'Projects move through defined stages — from your initial request all the way to final delivery. You\'ll always know exactly where things stand.',
+    description: "Projects move through defined stages — from your initial request all the way to final delivery. You'll always know exactly where things stand.",
     visual:      <WorkflowVisual />,
   },
   {
     id:          'messages',
-    badge:       '💬  Communication',
+    badge:       'Communication',
     title:       'Talk directly to the person building your product.',
     description: 'No ticket queues, no support bots. Every project has a dedicated message thread where you can ask questions, give feedback, or request changes — in real time.',
     visual:      <MessagesVisual />,
   },
   {
     id:          'payments',
-    badge:       '💳  Billing',
+    badge:       'Billing',
     title:       'Simple, transparent payments.',
-    description: 'Your price is confirmed in writing before work starts. Submit your payment proof directly on the platform — we verify it and your project activates the same day.',
+    description: "Your price is confirmed in writing before work starts. Submit your payment proof directly on the platform — we verify it and your project activates the same day.",
     visual:      <PaymentsVisual />,
   },
   {
     id:          'ready',
-    badge:       '✅  All set',
+    badge:       "You're all set",
     title:       'Ready to build something great?',
-    description: 'Submit your first project brief and we\'ll review it within 24 hours — confirming scope, timeline, and price upfront before any work begins.',
+    description: "Submit your first project brief and we'll review it within 24 hours — confirming scope, timeline, and price upfront before any work begins.",
     visual:      <ReadyVisual />,
   },
 ];

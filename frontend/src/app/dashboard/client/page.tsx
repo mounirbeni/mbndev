@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FolderOpen, MessageSquare, CreditCard, Clock, ArrowRight, Plus, Sparkles } from 'lucide-react';
+import {
+  FolderOpen, MessageSquare, CreditCard, Clock, ArrowRight, Plus,
+  Sparkles, CheckCircle2, Package, RotateCcw, Zap,
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { projectAPI, messageAPI } from '@/lib/api';
 import { Project } from '@/types';
@@ -146,17 +149,18 @@ export default function ClientDashboard() {
               {/* Feature pills */}
               <div className="flex flex-wrap gap-2 mb-8">
                 {[
-                  '✅ Price confirmed upfront',
-                  '💬 Direct developer access',
-                  '📦 Full source code handover',
-                  '🔄 Revision rounds included',
-                  '⚡ Real-time status updates',
-                ].map((feat) => (
+                  { icon: CheckCircle2,   label: 'Price confirmed upfront'  },
+                  { icon: MessageSquare,  label: 'Direct developer access'  },
+                  { icon: Package,        label: 'Full source code handover' },
+                  { icon: RotateCcw,      label: 'Revision rounds included'  },
+                  { icon: Zap,            label: 'Real-time status updates'  },
+                ].map(({ icon: Icon, label }) => (
                   <span
-                    key={feat}
-                    className="text-xs text-slate-400 bg-white/5 border border-white/8 px-3 py-1.5 rounded-full"
+                    key={label}
+                    className="inline-flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 border border-white/8 px-3 py-1.5 rounded-full"
                   >
-                    {feat}
+                    <Icon className="w-3 h-3 text-primary-400 shrink-0" />
+                    {label}
                   </span>
                 ))}
               </div>

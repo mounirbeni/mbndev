@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import {
   ArrowLeft, LayoutDashboard, MessageSquare, Paperclip, CreditCard,
   Send, Check, Clock, AlertCircle, Download, Upload, FileText,
   DollarSign, Edit2, Save, Users, Activity,
+  RefreshCw, TrendingUp, Target, Package, Star, Edit3,
 } from 'lucide-react';
 
 const TABS = [
@@ -30,10 +31,15 @@ const STATUS_OPTIONS: ProjectStatus[] = [
   'pending', 'paid', 'in-progress', 'review', 'revision', 'completed', 'cancelled',
 ];
 
-const ACTION_ICONS: Record<string, string> = {
-  status_change:    '🔄', progress_update: '📈', file_upload: '📎',
-  message_sent:     '💬', payment_received: '💳', milestone_updated: '🏁',
-  project_delivered:'🎉', revision_requested: '✏️',
+const ACTION_ICONS: Record<string, React.ElementType> = {
+  status_change:     RefreshCw,
+  progress_update:   TrendingUp,
+  file_upload:       Paperclip,
+  message_sent:      MessageSquare,
+  payment_received:  CreditCard,
+  milestone_updated: Target,
+  project_delivered: Package,
+  revision_requested:Edit3,
 };
 
 export default function AdminProjectWorkspace() {
@@ -507,8 +513,8 @@ export default function AdminProjectWorkspace() {
                       {logs.map((log: any, i: number) => (
                         <div key={log.id} className="flex gap-4 p-4">
                           <div className="flex flex-col items-center">
-                            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-base shrink-0">
-                              {ACTION_ICONS[log.action] || '📌'}
+                            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+                              {(() => { const Icon = ACTION_ICONS[log.action] || Activity; return <Icon className="w-3.5 h-3.5 text-slate-400" />; })()}
                             </div>
                             {i < logs.length - 1 && <div className="w-px flex-1 bg-white/5 mt-1" />}
                           </div>

@@ -9,10 +9,10 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 
 const contactInfo = [
-  { icon: Mail,    label: 'Email',         value: 'mounirbani46@gmail.com',    href: 'mailto:mounirbani46@gmail.com'                      },
-  { icon: Phone,   label: 'WhatsApp',      value: '+212 705 914 424',          href: 'https://wa.me/212705914424'                         },
-  { icon: MapPin,  label: 'Location',      value: 'Morocco — Available Worldwide', href: null                                            },
-  { icon: Clock,   label: 'Response Time', value: 'Within a few hours',        href: null                                                },
+  { icon: Mail,    label: 'Email',         value: 'hello@mbndev.com',              href: 'mailto:hello@mbndev.com'   },
+  { icon: Phone,   label: 'WhatsApp',      value: 'Chat with us on WhatsApp',      href: 'https://wa.me/212705914424' },
+  { icon: MapPin,  label: 'Location',      value: 'Morocco — Available Worldwide', href: null                        },
+  { icon: Clock,   label: 'Response Time', value: 'Within a few hours',            href: null                        },
 ];
 
 const faqs = [
@@ -109,16 +109,16 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-xl hover:border-green-500/40 transition-colors group"
                 >
-                  <MessageCircle className="w-4 h-4 text-green-400" />
+                  <MessageCircle className="w-4 h-4 text-green-400 shrink-0" />
                   <span className="text-green-400 text-sm font-medium">Chat on WhatsApp</span>
                   <ArrowRight className="w-3.5 h-3.5 text-green-400 ml-auto group-hover:translate-x-1 transition-transform" />
                 </a>
                 <a
-                  href="mailto:mounirbani46@gmail.com"
+                  href="mailto:hello@mbndev.com"
                   className="flex items-center gap-3 p-3 bg-primary-500/10 border border-primary-500/20 rounded-xl hover:border-primary-500/40 transition-colors group"
                 >
-                  <Mail className="w-4 h-4 text-primary-400" />
-                  <span className="text-primary-400 text-sm font-medium">Send Email Directly</span>
+                  <Mail className="w-4 h-4 text-primary-400 shrink-0" />
+                  <span className="text-primary-400 text-sm font-medium">Send an Email</span>
                   <ArrowRight className="w-3.5 h-3.5 text-primary-400 ml-auto group-hover:translate-x-1 transition-transform" />
                 </a>
               </div>
