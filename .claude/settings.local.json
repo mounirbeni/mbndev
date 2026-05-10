@@ -39,7 +39,13 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(powershell -command \"\\(Get-Content 'C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\\\\app\\\\dashboard\\\\admin\\\\projects\\\\[id]\\\\page.tsx'\\).Count\")",
-      "Bash(for f *)"
+      "Bash(for f *)",
+      "Bash(cd /c/Users/mouni/Desktop/mbndev && find . -maxdepth 2 -type f -name \"package.json\" -o -name \"tsconfig.json\" -o -name \"next.config.js\" | head -20)",
+      "Bash(node_modules\\\\.bin\\\\tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(\"C:/Users/mouni/Desktop/mbndev/frontend/node_modules/.bin/tsc\" --noEmit --project tsconfig.json)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "PowerShell(git -C \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\.claude\\\\worktrees\\\\jovial-napier-8b6e45\" diff --stat HEAD)"
     ]
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -12,14 +12,18 @@ import Button from '@/components/ui/Button';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHaptic } from '@/hooks/useHaptic';
 
 export default function Navbar() {
-  const [scrolled, setScrolled]   = useState(false);
-  const [menuOpen, setMenuOpen]   = useState(false);
-  const [mounted, setMounted]     = useState(false);
-  const { user } = useAuth();
-  const { t } = useLanguage();
-  const pathname = usePathname();
+  const [scrolled,  setScrolled]  = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [mounted,   setMounted]   = useState(false);
+  const { user }   = useAuth();
+  const { t }      = useLanguage();
+  const pathname   = usePathname();
+  const haptic     = useHaptic();
+  const sheetRef   = useRef<HTMLDivElement>(null);
+  const dragStartY = useRef<number | null>(null);
 
   const navLinks = [
     { label: t('nav.home'),      href: '/',          icon: Home },
@@ -30,8 +34,6 @@ export default function Navbar() {
     { label: t('nav.contact'),   href: '/contact',   icon: Mail },
   ];
 
-  // Delay auth-dependent UI until after hydration to prevent text content mismatch.
-  // Server always renders logged-out state; client switches after mount.
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
@@ -40,31 +42,39 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  // Close menu on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
+  const openMenu = () => { haptic('light'); setMenuOpen(true); };
+  const closeMenu = () => { haptic('light'); setMenuOpen(false); };
+
+  /* Drag-down to dismiss the mobile sheet */
+  const onSheetTouchStart = (e: React.TouchEvent) => {
+    dragStartY.current = e.touches[0].clientY;
+  };
+  const onSheetTouchEnd = (e: React.TouchEvent) => {
+    if (dragStartY.current === null) return;
+    const delta = e.changedTouches[0].clientY - dragStartY.current;
+    if (delta > 70) closeMenu();
+    dragStartY.current = null;
+  };
+
   return (
     <>
+      {/* ── Main navbar ────────────────────────────────────────────────── */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled || menuOpen ? 'glass-nav shadow-xl shadow-black/30' : 'glass-nav'
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 glass-nav transition-shadow duration-300"
+        style={{ boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.35)' : 'none' }}
       >
         <div
           className="max-w-7xl mx-auto px-4 sm:px-6"
@@ -82,7 +92,7 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop Nav links */}
+            {/* Desktop nav links */}
             <div className="hidden lg:flex items-center gap-0.5">
               {navLinks.map((link) => (
                 <Link
@@ -99,7 +109,7 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Desktop CTAs — gated on mounted to prevent hydration mismatch */}
+            {/* Desktop CTAs */}
             <div className="hidden lg:flex items-center gap-3">
               <LanguageSwitcher />
               {mounted && user ? (
@@ -118,13 +128,14 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile hamburger — CSS-only swap avoids framer-motion SSR/hydration mismatch */}
+            {/* Mobile hamburger — CSS-based swap avoids SSR hydration mismatch */}
             <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden touch-target rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors relative"
+              onClick={menuOpen ? closeMenu : openMenu}
+              className="lg:hidden touch-target rounded-xl text-slate-400 hover:text-white
+                         active:bg-white/8 transition-colors relative"
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
             >
-              {/* Both icons always in DOM; CSS shows/hides — no text content difference between server & client */}
               <span className="w-6 h-6 relative block">
                 <Menu
                   className={`w-6 h-6 absolute inset-0 transition-all duration-200 ${
@@ -142,65 +153,79 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Mobile full-screen menu overlay */}
+      {/* ── Mobile bottom-sheet menu ────────────────────────────────────── */}
       <AnimatePresence>
         {menuOpen && (
           <>
             {/* Backdrop */}
             <motion.div
-              key="backdrop"
+              key="nav-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-              onClick={() => setMenuOpen(false)}
+              transition={{ duration: 0.22 }}
+              className="fixed inset-0 z-40 bg-black/65 lg:hidden"
+              style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+              onClick={closeMenu}
             />
 
-            {/* Drawer panel */}
+            {/* Bottom sheet panel */}
             <motion.div
-              key="drawer"
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-              className="fixed left-3 right-3 z-50 lg:hidden glass-panel rounded-2xl border border-white/8 overflow-hidden shadow-2xl shadow-black/60"
-              style={{ top: 'calc(64px + max(env(safe-area-inset-top), 0px) + 8px)' }}
+              key="nav-sheet"
+              ref={sheetRef}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 340, mass: 0.85 }}
+              onTouchStart={onSheetTouchStart}
+              onTouchEnd={onSheetTouchEnd}
+              className="fixed left-0 right-0 bottom-0 z-50 lg:hidden"
+              style={{
+                background:           'rgba(12, 12, 16, 0.98)',
+                backdropFilter:       'blur(32px) saturate(1.8)',
+                WebkitBackdropFilter: 'blur(32px) saturate(1.8)',
+                borderTop:            '1px solid rgba(255, 255, 255, 0.09)',
+                borderRadius:         '24px 24px 0 0',
+                paddingBottom:        'max(env(safe-area-inset-bottom), 16px)',
+              }}
             >
+              {/* Drag handle */}
+              <div className="w-9 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-1" />
+
               {/* Nav links */}
-              <div className="px-2 pt-3 pb-2">
-                <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 mb-2">Navigation</p>
+              <div className="px-3 pt-3 pb-2">
+                <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 mb-2">
+                  Navigation
+                </p>
                 {navLinks.map((link, i) => {
-                  const Icon = link.icon;
+                  const Icon   = link.icon;
                   const active = isActive(link.href);
                   return (
                     <motion.div
                       key={link.href}
-                      initial={{ opacity: 0, x: -12 }}
+                      initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.04, duration: 0.2 }}
+                      transition={{ delay: i * 0.035, duration: 0.18 }}
                     >
                       <Link
                         href={link.href}
-                        onClick={() => setMenuOpen(false)}
-                        className={`flex items-center gap-3.5 px-3 py-3 rounded-xl transition-all press-dim ${
+                        onClick={closeMenu}
+                        className={`flex items-center gap-3.5 px-3 py-3.5 rounded-2xl mb-0.5 transition-all press-dim ${
                           active
-                            ? 'bg-primary-500/15 text-white border border-primary-500/25'
-                            : 'text-slate-300 hover:bg-white/5 border border-transparent'
+                            ? 'bg-primary-500/15 border border-primary-500/25 text-white'
+                            : 'text-slate-300 border border-transparent active:bg-white/6'
                         }`}
                       >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                          active ? 'bg-primary-500/20' : 'bg-white/5'
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          active ? 'bg-primary-500/20' : 'bg-white/6'
                         }`}>
-                          <Icon className={`w-4 h-4 ${active ? 'text-primary-400' : 'text-slate-400'}`} />
+                          <Icon className={`w-4.5 h-4.5 ${active ? 'text-primary-400' : 'text-slate-400'}`} />
                         </div>
-                        <span className="font-medium text-sm">{link.label}</span>
-                        {active && (
-                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-400" />
-                        )}
-                        {!active && (
-                          <ChevronRight className="ml-auto w-4 h-4 text-slate-600" />
-                        )}
+                        <span className="font-medium text-[15px] flex-1">{link.label}</span>
+                        {active
+                          ? <div className="w-2 h-2 rounded-full bg-primary-400 shrink-0" />
+                          : <ChevronRight className="w-4 h-4 text-slate-600 shrink-0" />
+                        }
                       </Link>
                     </motion.div>
                   );
@@ -208,46 +233,49 @@ export default function Navbar() {
               </div>
 
               {/* Divider */}
-              <div className="h-px bg-white/6 mx-3" />
+              <div className="h-px bg-white/6 mx-4 my-1" />
 
-              {/* CTA section — gated on mounted */}
-              <div className="px-3 py-3 flex flex-col gap-2">
+              {/* CTA section */}
+              <div className="px-3 pt-2 pb-1 flex flex-col gap-2">
+                {/* Language switcher on mobile */}
+                <div className="flex items-center justify-between px-3 py-2">
+                  <span className="text-slate-500 text-sm">{t('nav.language') ?? 'Language'}</span>
+                  <LanguageSwitcher />
+                </div>
+
                 {mounted && user ? (
                   <Link
                     href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'}
-                    onClick={() => setMenuOpen(false)}
+                    onClick={closeMenu}
                   >
-                    <div className="flex items-center gap-3 px-3 py-3 bg-primary-500/15 border border-primary-500/25 rounded-xl press-dim">
-                      <div className="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
+                    <div className="flex items-center gap-3 px-4 py-3.5 bg-primary-500/15 border border-primary-500/25 rounded-2xl press-dim">
+                      <div className="w-9 h-9 rounded-xl bg-primary-500/20 flex items-center justify-center shrink-0">
                         <LayoutDashboard className="w-4 h-4 text-primary-400" />
                       </div>
-                      <span className="text-white font-semibold text-sm">Go to Dashboard</span>
+                      <span className="text-white font-semibold text-[15px]">Go to Dashboard</span>
                       <ChevronRight className="ml-auto w-4 h-4 text-primary-400" />
                     </div>
                   </Link>
                 ) : (
                   <>
-                    <Link href="/login" onClick={() => setMenuOpen(false)}>
-                      <div className="flex items-center gap-3 px-3 py-3 bg-white/5 border border-white/8 rounded-xl press-dim">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                    <Link href="/login" onClick={closeMenu}>
+                      <div className="flex items-center gap-3 px-4 py-3.5 bg-white/5 border border-white/8 rounded-2xl press-dim">
+                        <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
                           <LogIn className="w-4 h-4 text-slate-400" />
                         </div>
-                        <span className="text-white font-medium text-sm">{t('nav.login')}</span>
+                        <span className="text-white font-medium text-[15px]">{t('nav.login')}</span>
                         <ChevronRight className="ml-auto w-4 h-4 text-slate-600" />
                       </div>
                     </Link>
-                    <Link href="/request" onClick={() => setMenuOpen(false)}>
-                      <div className="flex items-center justify-center gap-2 px-4 py-3.5 bg-primary-500 rounded-xl press-scale shadow-lg shadow-primary-500/30">
+                    <Link href="/request" onClick={closeMenu}>
+                      <div className="flex items-center justify-center gap-2 px-4 py-4 bg-primary-500 rounded-2xl press-scale shadow-lg shadow-primary-500/30 mt-1">
                         <Zap className="w-4 h-4 text-white" />
-                          <span className="text-white font-semibold text-sm">{t('nav.request')}</span>
+                        <span className="text-white font-bold text-[15px]">{t('nav.request')} →</span>
                       </div>
                     </Link>
                   </>
                 )}
               </div>
-
-              {/* Safe area bottom padding */}
-              <div style={{ height: 'env(safe-area-inset-bottom)' }} />
             </motion.div>
           </>
         )}
