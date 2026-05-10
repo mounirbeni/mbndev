@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Zap, ArrowLeft } from 'lucide-react';
+import { LegalPageNav } from '@/components/legal/LegalPageNav';
+import { LegalPageFooter } from '@/components/legal/LegalPageFooter';
 
 export const metadata: Metadata = {
   title: 'Terms of Service — MBN DEV',
@@ -12,18 +12,7 @@ const LAST_UPDATED = 'May 7, 2026';
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0d]">
-      {/* Nav */}
-      <nav className="border-b border-white/5 px-4 sm:px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-white font-bold">MBN DEV</span>
-        </Link>
-        <Link href="/" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </Link>
-      </nav>
+      <LegalPageNav />
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
@@ -200,14 +189,7 @@ export default function TermsPage() {
           </section>
         </div>
 
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-slate-600 text-sm">© {new Date().getFullYear()} MBN DEV. All rights reserved.</p>
-          <div className="flex gap-4 text-sm text-slate-500">
-            <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
-            <Link href="/contact" className="hover:text-slate-300 transition-colors">Contact</Link>
-          </div>
-        </div>
+        <LegalPageFooter />
       </div>
     </div>
   );

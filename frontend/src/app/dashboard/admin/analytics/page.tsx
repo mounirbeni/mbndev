@@ -10,21 +10,9 @@ import {
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { formatCurrency, formatDate, statusLabels } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
-// ─── Type labels ──────────────────────────────────────────────────────────────
-
-const TYPE_LABELS: Record<string, string> = {
-  website:      'Website',
-  ecommerce:    'E-Commerce',
-  dashboard:    'SaaS Dashboard',
-  mobile:       'Mobile App',
-  custom:       'Custom',
-  'landing-page': 'Landing Page',
-  saas:         'SaaS',
-  portfolio:    'Portfolio',
-  'web-app':    'Web App',
-};
+// TYPE_LABELS moved inside component (uses t() for locale-aware labels)
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
 
@@ -118,15 +106,16 @@ function EmptyChart({ label }: { label: string }) {
 
 function BarChart({
   data, valueKey = 'value', labelKey = 'month', color = 'bg-primary-500',
-  formatVal,
+  formatVal, noDataLabel,
 }: {
-  data: any[]; valueKey?: string; labelKey?: string; color?: string; formatVal?: (v: number) => string;
+  data: any[]; valueKey?: string; labelKey?: string; color?: string;
+  formatVal?: (v: number) => string; noDataLabel?: string;
 }) {
   const values = data.map((d) => Number(d[valueKey]));
   const max    = Math.max(...values, 1);
   const hasData = values.some((v) => v > 0);
 
-  if (!hasData) return <EmptyChart label="No data recorded yet" />;
+  if (!hasData) return <EmptyChart label={noDataLabel || 'No data recorded yet'} />;
 
   return (
     <div className="flex items-end gap-1.5 h-40">
@@ -177,7 +166,7 @@ export default function AdminAnalyticsPage() {
   useEffect(() => {
     adminAPI.getAnalytics()
       .then(({ data: res }) => setData(res.analytics))
-      .catch((err) => setError(err?.response?.data?.message || 'Failed to load analytics'))
+      .catch((err) => setError(err?.response?.data?.message || t('admin.analytics.loadError')))
       .finally(() => setLoading(false));
   }, []);
 
@@ -239,14 +228,27 @@ export default function AdminAnalyticsPage() {
     + (byStatus.inProgress || 0) + (byStatus.review || 0) + (byStatus.revision || 0);
 
   const statusRows = [
-    { label: 'Pending',     count: byStatus.pending,    color: 'bg-amber-500',   text: 'text-amber-400'   },
-    { label: 'Paid',        count: byStatus.paid,        color: 'bg-emerald-500', text: 'text-emerald-400' },
-    { label: 'In Progress', count: byStatus.inProgress,  color: 'bg-blue-500',    text: 'text-blue-400'    },
-    { label: 'Review',      count: byStatus.review,      color: 'bg-purple-500',  text: 'text-purple-400'  },
-    { label: 'Revision',    count: byStatus.revision,    color: 'bg-orange-500',  text: 'text-orange-400'  },
-    { label: 'Completed',   count: byStatus.completed,   color: 'bg-green-500',   text: 'text-green-400'   },
-    { label: 'Cancelled',   count: byStatus.cancelled,   color: 'bg-red-500',     text: 'text-red-400'     },
+    { label: t('status.pending'),    count: byStatus.pending,    color: 'bg-amber-500',   text: 'text-amber-400'   },
+    { label: t('status.paid'),       count: byStatus.paid,        color: 'bg-emerald-500', text: 'text-emerald-400' },
+    { label: t('status.inProgress'), count: byStatus.inProgress,  color: 'bg-blue-500',    text: 'text-blue-400'    },
+    { label: t('status.review'),     count: byStatus.review,      color: 'bg-purple-500',  text: 'text-purple-400'  },
+    { label: t('status.revision'),   count: byStatus.revision,    color: 'bg-orange-500',  text: 'text-orange-400'  },
+    { label: t('status.completed'),  count: byStatus.completed,   color: 'bg-green-500',   text: 'text-green-400'   },
+    { label: t('status.cancelled'),  count: byStatus.cancelled,   color: 'bg-red-500',     text: 'text-red-400'     },
   ].filter((s) => s.count > 0);
+
+  // TYPE_LABELS: locale-aware service type labels
+  const TYPE_LABELS: Record<string, string> = {
+    website:        t('request.svc.website'),
+    ecommerce:      t('request.svc.ecommerce'),
+    dashboard:      t('request.svc.dashboard'),
+    mobile:         t('request.svc.mobile'),
+    custom:         t('request.svc.custom'),
+    'landing-page': t('services.landing.title'),
+    saas:           t('services.saas.title'),
+    portfolio:      'Portfolio',
+    'web-app':      t('services.webapp.title'),
+  };
 
   const typeRows = Object.entries(byType as Record<string, number>)
     .sort(([, a], [, b]) => b - a);
@@ -300,36 +302,36 @@ export default function AdminAnalyticsPage() {
         {[
           {
             icon: DollarSign,
-            label: 'Avg. Project Value',
+            label: t('admin.analytics.avgValue'),
             value: formatCurrency(avgProjectValue),
-            sub: 'Per paid invoice',
+            sub: t('admin.analytics.perInvoice'),
             color: 'text-green-400',
             bg: 'bg-green-500/15',
             delta: null,
           },
           {
             icon: TrendingUp,
-            label: 'MoM Revenue',
+            label: t('admin.analytics.momRevenue'),
             value: revenueChange === 0 ? '—' : `${revenueChange > 0 ? '+' : ''}${revenueChange}%`,
-            sub: 'vs previous month',
+            sub: t('admin.analytics.vsPrevMonth'),
             color: revenueChange >= 0 ? 'text-green-400' : 'text-red-400',
             bg: revenueChange >= 0 ? 'bg-green-500/15' : 'bg-red-500/15',
             delta: null,
           },
           {
             icon: Zap,
-            label: 'ARR Estimate',
+            label: t('admin.analytics.arrEstimate'),
             value: formatCurrency(arrEstimate),
-            sub: 'Based on avg 3-month MRR',
+            sub: t('admin.analytics.mrrBasis'),
             color: 'text-primary-400',
             bg: 'bg-primary-500/15',
             delta: null,
           },
           {
             icon: Target,
-            label: 'Active Pipeline',
+            label: t('admin.analytics.activePipeline'),
             value: activeInPipeline,
-            sub: 'Projects not yet completed',
+            sub: t('admin.analytics.pipelineSub'),
             color: 'text-blue-400',
             bg: 'bg-blue-500/15',
             delta: null,
@@ -363,7 +365,7 @@ export default function AdminAnalyticsPage() {
             <div>
               <h3 className="text-white font-semibold">{t('admin.monthlyRevenue')}</h3>
               <p className="text-slate-500 text-xs mt-0.5">
-                Real payments data — {year}
+                {t('admin.analytics.realPayments')} {year}
               </p>
             </div>
             <div className="flex items-center gap-2 text-green-400 text-sm font-medium">
@@ -376,6 +378,7 @@ export default function AdminAnalyticsPage() {
             valueKey="revenue"
             color="bg-primary-500"
             formatVal={(v) => formatCurrency(v)}
+            noDataLabel={t('admin.analytics.noData')}
           />
         </div>
 
@@ -383,7 +386,7 @@ export default function AdminAnalyticsPage() {
         <div className="glass rounded-2xl p-6 border border-white/5">
           <h3 className="text-white font-semibold mb-5">{t('admin.projectStatus')}</h3>
           {statusRows.length === 0 ? (
-            <EmptyChart label="No projects yet" />
+            <EmptyChart label={t('admin.analytics.noProjects')} />
           ) : (
             <div className="space-y-3">
               {statusRows.map((s) => (
@@ -418,13 +421,13 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-white font-semibold">{t('admin.clientGrowth')}</h3>
-              <p className="text-slate-500 text-xs mt-0.5">New clients per month — {year}</p>
+              <p className="text-slate-500 text-xs mt-0.5">{t('admin.analytics.clientsPerMo')} {year}</p>
             </div>
             <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center">
               <Users className="w-4 h-4 text-blue-400" />
             </div>
           </div>
-          <BarChart data={monthlyClients} valueKey="count" color="bg-blue-500" />
+          <BarChart data={monthlyClients} valueKey="count" color="bg-blue-500" noDataLabel={t('admin.analytics.noData')} />
         </div>
 
         {/* Project creation */}
@@ -432,13 +435,13 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-white font-semibold">{t('admin.projectsCreated')}</h3>
-              <p className="text-slate-500 text-xs mt-0.5">New projects per month — {year}</p>
+              <p className="text-slate-500 text-xs mt-0.5">{t('admin.analytics.projectsPerMo')} {year}</p>
             </div>
             <div className="w-8 h-8 rounded-xl bg-primary-500/15 flex items-center justify-center">
               <FolderOpen className="w-4 h-4 text-primary-400" />
             </div>
           </div>
-          <BarChart data={monthlyProjects} valueKey="count" color="bg-primary-500" />
+          <BarChart data={monthlyProjects} valueKey="count" color="bg-primary-500" noDataLabel={t('admin.analytics.noData')} />
         </div>
       </div>
 
@@ -447,21 +450,21 @@ export default function AdminAnalyticsPage() {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-white font-semibold">{t('admin.projectFunnel')}</h3>
-            <p className="text-slate-500 text-xs mt-0.5">Distribution of all projects by stage</p>
+            <p className="text-slate-500 text-xs mt-0.5">{t('admin.analytics.pipelineDesc')}</p>
           </div>
           <div className="flex items-center gap-2 text-blue-400 text-sm font-semibold">
             <Activity className="w-4 h-4" />
-            {activeInPipeline} active
+            {activeInPipeline} {t('admin.analytics.activeSuffix')}
           </div>
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
           {[
-            { label: 'Pending Review',  count: byStatus.pending   || 0, color: 'bg-amber-500'   },
-            { label: 'Paid — Queued',   count: byStatus.paid      || 0, color: 'bg-emerald-500'  },
-            { label: 'In Development',  count: byStatus.inProgress || 0, color: 'bg-blue-500'   },
-            { label: 'Under Review',    count: byStatus.review    || 0, color: 'bg-purple-500'   },
-            { label: 'Revision',        count: byStatus.revision  || 0, color: 'bg-orange-500'   },
-            { label: 'Completed',       count: byStatus.completed || 0, color: 'bg-green-500'    },
+            { label: t('admin.funnel.pendingReview'),  count: byStatus.pending    || 0, color: 'bg-amber-500'   },
+            { label: t('admin.funnel.paidQueued'),     count: byStatus.paid       || 0, color: 'bg-emerald-500' },
+            { label: t('admin.funnel.inDevelopment'),  count: byStatus.inProgress || 0, color: 'bg-blue-500'   },
+            { label: t('admin.funnel.underReview'),    count: byStatus.review     || 0, color: 'bg-purple-500'  },
+            { label: t('status.revision'),             count: byStatus.revision   || 0, color: 'bg-orange-500'  },
+            { label: t('status.completed'),            count: byStatus.completed  || 0, color: 'bg-green-500'   },
           ].map((step, i) => (
             <FunnelStep
               key={step.label}
@@ -499,7 +502,7 @@ export default function AdminAnalyticsPage() {
         <div className="glass rounded-2xl p-6 border border-white/5">
           <h3 className="text-white font-semibold mb-5">{t('admin.projectsByType')}</h3>
           {typeRows.length === 0 ? (
-            <EmptyChart label="No projects yet" />
+            <EmptyChart label={t('admin.analytics.noProjects')} />
           ) : (
             <div className="space-y-3">
               {typeRows.map(([type, count]) => (
@@ -532,7 +535,7 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-white font-semibold">{t('admin.recentPayments')}</h3>
             <Link href="/dashboard/admin/payments" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
-              View all <ArrowRight className="w-3 h-3" />
+              {t('admin.analytics.viewAll')} <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
           {recentPayments.length === 0 ? (
@@ -541,13 +544,13 @@ export default function AdminAnalyticsPage() {
                    style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)' }}>
                 <CreditCard className="w-5 h-5 text-slate-600" />
               </div>
-              <p className="text-slate-500 text-sm">No payments yet</p>
-              <p className="text-slate-600 text-xs">Payments will appear here once clients pay</p>
+              <p className="text-slate-500 text-sm">{t('admin.analytics.noPayments')}</p>
+              <p className="text-slate-600 text-xs">{t('admin.analytics.paymentsSub')}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {recentPayments.map((p: any) => {
-                const label = p.project?.title || p.order?.title || 'Payment';
+                const label = p.project?.title || p.order?.title || t('admin.analytics.payment');
                 return (
                   <div key={p.id} className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
@@ -580,7 +583,7 @@ export default function AdminAnalyticsPage() {
         <div className="flex items-center justify-between p-5 border-b border-white/5">
           <h3 className="text-white font-semibold">{t('admin.recentProjects')}</h3>
           <Link href="/dashboard/admin/projects" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
-            View all <ArrowRight className="w-3 h-3" />
+            {t('admin.analytics.viewAll')} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
         {recentProjects.length === 0 ? (
@@ -589,8 +592,8 @@ export default function AdminAnalyticsPage() {
                  style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.12)' }}>
               <FolderOpen className="w-6 h-6 text-slate-600" />
             </div>
-            <p className="text-slate-400 font-medium">No projects yet</p>
-            <p className="text-slate-600 text-sm">Projects will appear here once clients place orders</p>
+            <p className="text-slate-400 font-medium">{t('admin.analytics.noProjects')}</p>
+            <p className="text-slate-600 text-sm">{t('admin.analytics.projectsSub')}</p>
           </div>
         ) : (
           <div className="divide-y divide-white/5">
@@ -626,7 +629,7 @@ export default function AdminAnalyticsPage() {
         <div className="flex items-center justify-between p-5 border-b border-white/5">
           <h3 className="text-white font-semibold">{t('admin.recentClients')}</h3>
           <Link href="/dashboard/admin/clients" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
-            View all <ArrowRight className="w-3 h-3" />
+            {t('admin.analytics.viewAll')} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
         {recentClients.length === 0 ? (
@@ -635,8 +638,8 @@ export default function AdminAnalyticsPage() {
                  style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.12)' }}>
               <Users className="w-6 h-6 text-slate-600" />
             </div>
-            <p className="text-slate-400 font-medium">No clients yet</p>
-            <p className="text-slate-600 text-sm">Clients will appear here after they sign up</p>
+            <p className="text-slate-400 font-medium">{t('admin.analytics.noClients')}</p>
+            <p className="text-slate-600 text-sm">{t('admin.analytics.clientsSub')}</p>
           </div>
         ) : (
           <div className="divide-y divide-white/5">
@@ -652,7 +655,7 @@ export default function AdminAnalyticsPage() {
                 <div className="text-right shrink-0">
                   <div className="text-slate-500 text-xs">{formatDate(c.createdAt)}</div>
                   <div className={`text-xs mt-0.5 ${c.isActive ? 'text-green-400' : 'text-red-400'}`}>
-                    {c.isActive ? 'Active' : 'Inactive'}
+                    {c.isActive ? t('status.active') : t('status.inactive')}
                   </div>
                 </div>
               </div>

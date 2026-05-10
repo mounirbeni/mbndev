@@ -111,13 +111,13 @@ export default function AdminPaymentsPage() {
               <thead>
                 <tr className="border-b border-white/5">
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Order / Project</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Amount</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Method</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.orderProject')}</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.amount')}</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.method')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Date</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Invoice</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Action</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.date')}</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('invoice.title')}</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.action')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,7 +143,7 @@ export default function AdminPaymentsPage() {
                       </td>
                       <td className="p-4 text-sm font-semibold text-white">{formatCurrency(pay.amount)}</td>
                       <td className="p-4 text-sm text-slate-400">
-                        {pay.method ? METHOD_LABELS[pay.method] || pay.method : 'Manual'}
+                        {pay.method ? METHOD_LABELS[pay.method] || pay.method : t('admin.col.manual')}
                       </td>
                       <td className="p-4"><StatusBadge status={pay.status} /></td>
                       <td className="p-4 text-sm text-slate-400">

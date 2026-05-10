@@ -146,7 +146,7 @@ export default function AdminOrdersPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/5">
-                    {[t('admin.clients'), 'Service', 'Title', 'Amount', 'Delivery', t('admin.status'), 'Date', ''].map((h) => (
+                    {[t('admin.clients'), t('admin.col.service'), t('admin.col.title'), t('admin.col.amount'), t('admin.col.delivery'), t('admin.status'), t('admin.col.date'), ''].map((h) => (
                       <th key={h} className="text-left p-4 text-xs text-slate-500 font-medium uppercase whitespace-nowrap">
                         {h}
                       </th>

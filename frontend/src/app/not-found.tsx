@@ -2,10 +2,13 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Zap, ArrowLeft, Home } from 'lucide-react';
+import { Zap, Home } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function NotFound() {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0d] px-4">
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-500/8 rounded-full blur-[120px] pointer-events-none" />
@@ -28,21 +31,21 @@ export default function NotFound() {
         <div className="text-[120px] font-black text-white/5 leading-none select-none mb-2">
           404
         </div>
-        <h1 className="text-2xl font-bold text-white mb-3 -mt-4">Page not found</h1>
+        <h1 className="text-2xl font-bold text-white mb-3 -mt-4">{t('notfound.title')}</h1>
         <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved.
+          {t('notfound.sub')}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/">
             <Button size="md">
               <Home className="w-4 h-4" />
-              Back to Home
+              {t('notfound.backHome')}
             </Button>
           </Link>
           <Link href="/contact">
             <Button size="md" variant="outline">
-              Contact Support
+              {t('notfound.contact')}
             </Button>
           </Link>
         </div>

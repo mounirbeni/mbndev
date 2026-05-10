@@ -159,7 +159,7 @@ export default function AuthModal({
                         {plan === 'pro' && <Star className="w-4 h-4 inline mr-1.5 -mt-0.5" />}
                         {plan === 'premium' && <Crown className="w-4 h-4 inline mr-1.5 -mt-0.5" />}
                         {plan === 'starter' && <Zap className="w-4 h-4 inline mr-1.5 -mt-0.5" />}
-                        {plan.charAt(0).toUpperCase() + plan.slice(1)} Plan
+                        {plan.charAt(0).toUpperCase() + plan.slice(1)} {t('auth.modal.planSuffix')}
                       </p>
                     </div>
                   )}

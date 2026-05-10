@@ -8,7 +8,7 @@ import { messageAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtime } from '@/hooks/useRealtime';
-import { timeAgo, getInitials, cn } from '@/lib/utils';
+import { makeTimeAgo, getInitials, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 interface Props {
@@ -20,7 +20,9 @@ interface Props {
 
 // ─── System message card ─────────────────────────────────────────────────────
 
-function SystemMessage({ msg }: { msg: Message }) {
+type TimeAgoFn = (date: string) => string;
+
+function SystemMessage({ msg, timeAgo }: { msg: Message; timeAgo: TimeAgoFn }) {
   let icon  = '🔔';
   let title = '';
   let body  = '';
@@ -58,7 +60,7 @@ function SystemMessage({ msg }: { msg: Message }) {
 
 // ─── User message bubble ─────────────────────────────────────────────────────
 
-function UserMessage({ msg, isOwn, youLabel, adminLabel }: { msg: Message; isOwn: boolean; youLabel: string; adminLabel: string }) {
+function UserMessage({ msg, isOwn, youLabel, adminLabel, timeAgo }: { msg: Message; isOwn: boolean; youLabel: string; adminLabel: string; timeAgo: TimeAgoFn }) {
   const name = msg.sender?.name || (isOwn ? youLabel : adminLabel);
   const role = msg.sender?.role;
 
@@ -198,7 +200,8 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
     }
   };
 
-  const userId = user?._id || user?.id;
+  const userId  = user?._id || user?.id;
+  const timeAgo = makeTimeAgo(t);
 
   return (
     <div className="flex flex-col h-full">
@@ -243,10 +246,10 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
           {messages.map((msg) => {
             const id = msgId(msg);
             if (msg.type === 'system') {
-              return <SystemMessage key={id} msg={msg} />;
+              return <SystemMessage key={id} msg={msg} timeAgo={timeAgo} />;
             }
             const isOwn = (msg.sender?._id || msg.sender?.id || msg.senderId) === userId;
-            return <UserMessage key={id} msg={msg} isOwn={isOwn} youLabel={t('common.you')} adminLabel={t('common.admin')} />;
+            return <UserMessage key={id} msg={msg} isOwn={isOwn} youLabel={t('common.you')} adminLabel={t('common.admin')} timeAgo={timeAgo} />;
           })}
         </AnimatePresence>
 
@@ -281,7 +284,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
                 ? 'bg-primary-500 hover:bg-primary-600 active:scale-95 shadow-lg shadow-primary-500/25'
                 : 'bg-white/6 opacity-40 cursor-not-allowed'
             )}
-            aria-label="Send message"
+            aria-label={t('client.sendMessage')}
           >
             {sending ? (
               <Loader2 className="w-4 h-4 text-white animate-spin" />

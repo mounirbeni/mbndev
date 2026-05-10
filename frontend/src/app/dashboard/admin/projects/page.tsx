@@ -6,7 +6,7 @@ import { projectAPI } from '@/lib/api';
 import { Project, ProjectStatus } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StatusBadge } from '@/components/ui/Badge';
-import { formatCurrency, formatDate, projectTypeLabels } from '@/lib/utils';
+import { formatCurrency, formatDate, getProjectTypeLabel } from '@/lib/utils';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -120,13 +120,13 @@ export default function AdminProjectsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5">
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Project</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.project')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Plan</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Budget</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.plan')}</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('client.budget')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.progress')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Created</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('client.created')}</th>
                   <th className="p-4" />
                 </tr>
               </thead>
@@ -143,7 +143,7 @@ export default function AdminProjectsPage() {
                     >
                       <td className="p-4">
                         <div className="text-white text-sm font-medium">{p.title}</div>
-                        <div className="text-slate-500 text-xs">{projectTypeLabels[p.type] || p.type}</div>
+                        <div className="text-slate-500 text-xs">{getProjectTypeLabel(p.type, t)}</div>
                       </td>
                       <td className="p-4 text-sm text-slate-400">{client?.name || '—'}</td>
                       <td className="p-4"><PlanBadge plan={p.package} /></td>

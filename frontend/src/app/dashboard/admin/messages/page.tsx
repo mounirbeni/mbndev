@@ -159,7 +159,7 @@ export default function AdminMessagesPage() {
                 ) : (
                   filtered.map((thread) => {
                     const isActive   = selected?.projectId === thread.projectId;
-                    const clientName = thread.client?.name || 'Unknown';
+                    const clientName = thread.client?.name || t('common.unknown');
 
                     return (
                       <button

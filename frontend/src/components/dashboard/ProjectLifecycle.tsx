@@ -5,13 +5,14 @@ import {
   FileText, Zap, Code2, RotateCcw, Package, Trophy, CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export type ProjectStatus =
   | 'pending' | 'paid' | 'in-progress' | 'review'
   | 'revision' | 'delivered' | 'completed' | 'cancelled';
 
 interface Stage {
-  key:         string[];   // status values that map to this stage
+  key:         string[];
   icon:        React.ElementType;
   label:       string;
   shortLabel:  string;
@@ -21,72 +22,69 @@ interface Stage {
   ring:        string;
 }
 
-const STAGES: Stage[] = [
-  {
-    key:         ['pending'],
-    icon:        FileText,
-    label:       'Request',
-    shortLabel:  'Request',
-    description: 'Your project brief has been submitted. We\'ll review scope and confirm pricing within 24 hours.',
-    color:       'text-slate-300',
-    bg:          'bg-slate-800/80',
-    ring:        'ring-slate-500/40',
-  },
-  {
-    key:         ['paid'],
-    icon:        Zap,
-    label:       'Approved',
-    shortLabel:  'Approved',
-    description: 'Scope and price confirmed. Payment received — your project is queued for development.',
-    color:       'text-amber-400',
-    bg:          'bg-amber-500/15',
-    ring:        'ring-amber-500/40',
-  },
-  {
-    key:         ['in-progress'],
-    icon:        Code2,
-    label:       'Development',
-    shortLabel:  'Dev',
-    description: 'Active development is underway. You\'ll receive real-time updates as milestones are completed.',
-    color:       'text-blue-400',
-    bg:          'bg-blue-500/15',
-    ring:        'ring-blue-500/40',
-  },
-  {
-    key:         ['review', 'revision'],
-    icon:        RotateCcw,
-    label:       'Review & Revisions',
-    shortLabel:  'Review',
-    description: 'Deliverables are ready for your review. Share feedback and request revisions directly in your project.',
-    color:       'text-orange-400',
-    bg:          'bg-orange-500/15',
-    ring:        'ring-orange-500/40',
-  },
-  {
-    key:         ['delivered'],
-    icon:        Package,
-    label:       'Delivered',
-    shortLabel:  'Delivered',
-    description: 'All files and assets have been packaged and are available for download in your dashboard.',
-    color:       'text-violet-400',
-    bg:          'bg-violet-500/15',
-    ring:        'ring-violet-500/40',
-  },
-  {
-    key:         ['completed'],
-    icon:        Trophy,
-    label:       'Complete',
-    shortLabel:  'Complete',
-    description: 'Project is complete and the full source code has been handed over. It\'s yours, no strings attached.',
-    color:       'text-green-400',
-    bg:          'bg-green-500/15',
-    ring:        'ring-green-500/40',
-  },
-];
-
-function getActiveIndex(status?: ProjectStatus): number {
-  if (!status) return -1;
-  return STAGES.findIndex((s) => s.key.includes(status));
+function buildStages(t: (k: string) => string): Stage[] {
+  return [
+    {
+      key:         ['pending'],
+      icon:        FileText,
+      label:       t('lifecycle.stage.request'),
+      shortLabel:  t('lifecycle.stage.request'),
+      description: t('lifecycle.desc.request'),
+      color:       'text-slate-300',
+      bg:          'bg-slate-800/80',
+      ring:        'ring-slate-500/40',
+    },
+    {
+      key:         ['paid'],
+      icon:        Zap,
+      label:       t('lifecycle.stage.approved'),
+      shortLabel:  t('lifecycle.stage.approved'),
+      description: t('lifecycle.desc.approved'),
+      color:       'text-amber-400',
+      bg:          'bg-amber-500/15',
+      ring:        'ring-amber-500/40',
+    },
+    {
+      key:         ['in-progress'],
+      icon:        Code2,
+      label:       t('lifecycle.stage.dev'),
+      shortLabel:  t('lifecycle.stage.devShort'),
+      description: t('lifecycle.desc.dev'),
+      color:       'text-blue-400',
+      bg:          'bg-blue-500/15',
+      ring:        'ring-blue-500/40',
+    },
+    {
+      key:         ['review', 'revision'],
+      icon:        RotateCcw,
+      label:       t('lifecycle.stage.review'),
+      shortLabel:  t('lifecycle.stage.reviewShort'),
+      description: t('lifecycle.desc.review'),
+      color:       'text-orange-400',
+      bg:          'bg-orange-500/15',
+      ring:        'ring-orange-500/40',
+    },
+    {
+      key:         ['delivered'],
+      icon:        Package,
+      label:       t('lifecycle.stage.delivered'),
+      shortLabel:  t('lifecycle.stage.delivered'),
+      description: t('lifecycle.desc.delivered'),
+      color:       'text-violet-400',
+      bg:          'bg-violet-500/15',
+      ring:        'ring-violet-500/40',
+    },
+    {
+      key:         ['completed'],
+      icon:        Trophy,
+      label:       t('lifecycle.stage.complete'),
+      shortLabel:  t('lifecycle.stage.complete'),
+      description: t('lifecycle.desc.complete'),
+      color:       'text-green-400',
+      bg:          'bg-green-500/15',
+      ring:        'ring-green-500/40',
+    },
+  ];
 }
 
 interface Props {
@@ -98,7 +96,9 @@ interface Props {
 }
 
 export default function ProjectLifecycle({ status, compact = false, animated = true, className }: Props) {
-  const activeIndex = getActiveIndex(status);
+  const { t } = useLanguage();
+  const STAGES = buildStages(t);
+  const activeIndex = STAGES.findIndex((s) => s.key.includes(status ?? ''));
 
   if (compact) {
     // ── Compact horizontal strip (for cards / sidebars) ──────────────────────
@@ -244,7 +244,7 @@ export default function ProjectLifecycle({ status, compact = false, animated = t
       {activeIndex < 0 && (
         <div className="rounded-2xl px-4 py-3 border border-white/6 bg-white/3 text-center">
           <p className="text-xs text-slate-500">
-            Once your project is created, you&apos;ll see its current stage highlighted here.
+            {t('lifecycle.noStage')}
           </p>
         </div>
       )}

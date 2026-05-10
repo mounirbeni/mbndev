@@ -67,7 +67,7 @@ export default function ClientProjectsPage() {
                 : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
             }`}
           >
-            {tab === 'all' ? t('common.view') : tab === 'in-progress' ? t('status.inProgress') : tab === 'completed' ? t('status.completed') : tab === 'review' ? t('status.review') : t('status.pending')}
+            {tab === 'all' ? t('portfolio.cat.all') : tab === 'in-progress' ? t('status.inProgress') : tab === 'completed' ? t('status.completed') : tab === 'review' ? t('status.review') : t('status.pending')}
             <span className="ml-1.5 text-xs opacity-60">
               {tab === 'all'
                 ? projects.length

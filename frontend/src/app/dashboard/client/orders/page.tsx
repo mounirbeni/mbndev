@@ -122,7 +122,7 @@ export default function ClientOrdersPage() {
                           <h3 className="text-white font-semibold text-sm truncate">{order.title}</h3>
                           <p className="text-slate-500 text-xs mt-0.5">
                             {SERVICE_LABELS[order.serviceType] || order.serviceType} ·{' '}
-                            {order.deliveryDays}d delivery · {order.features?.length || 0} features
+                            {order.deliveryDays}{t('common.days')} · {order.features?.length || 0} {t('common.features')}
                           </p>
                         </div>
                         <div className="text-right shrink-0">

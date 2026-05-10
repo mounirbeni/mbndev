@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Bell, Check, CheckCheck, X, Loader2 } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
+import { cn, makeTimeAgo } from '@/lib/utils';
 import { useRealtime } from '@/hooks/useRealtime';
 
 interface Notif {
@@ -29,18 +29,10 @@ const TYPE_COLORS: Record<string, string> = {
   project_delivered: 'bg-emerald-500/20 text-emerald-400',
 };
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1)  return 'just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
 
 export default function NotificationBell() {
   const { t } = useLanguage();
+  const timeAgo = makeTimeAgo(t);
   const [open,    setOpen]    = useState(false);
   const [notifs,  setNotifs]  = useState<Notif[]>([]);
   const [unread,  setUnread]  = useState(0);

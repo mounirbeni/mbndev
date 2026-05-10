@@ -68,7 +68,8 @@ function LifecycleStrip({ activeIndex = -1 }: { activeIndex?: number }) {
 
 // ─── Step visuals ─────────────────────────────────────────────────────────────
 
-function WelcomeVisual() {
+function WelcomeVisual({ t }: { t: (k: string) => string }) {
+  const words = t('onboarding.welcome.tagline').split(' ');
   return (
     <motion.div
       initial={{ scale: 0.9, opacity: 0 }}
@@ -90,9 +91,9 @@ function WelcomeVisual() {
           <span className="text-white text-4xl font-black tracking-tight">M</span>
         </motion.div>
         <div className="flex items-center gap-1.5">
-          {['Your', 'workspace', 'is', 'ready.'].map((word, i) => (
+          {words.map((word, i) => (
             <motion.span
-              key={word}
+              key={i}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.08 }}
@@ -107,7 +108,7 @@ function WelcomeVisual() {
   );
 }
 
-function WorkflowVisual() {
+function WorkflowVisual({ t }: { t: (k: string) => string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -117,7 +118,7 @@ function WorkflowVisual() {
     >
       <LifecycleStrip activeIndex={1} />
       <p className="text-center text-xs text-slate-600 mt-4">
-        You&apos;ll always see exactly where your project stands.
+        {t('onboarding.step2.visual')}
       </p>
     </motion.div>
   );
@@ -161,12 +162,12 @@ function MessagesVisual() {
   );
 }
 
-function PaymentsVisual() {
+function PaymentsVisual({ t }: { t: (k: string) => string }) {
   const steps = [
-    { icon: FileText,    label: 'Order submitted',   color: 'text-slate-400', bg: 'bg-slate-700/40'    },
-    { icon: Upload,      label: 'Payment uploaded',  color: 'text-amber-400', bg: 'bg-amber-500/15'   },
-    { icon: ShieldCheck, label: 'Admin verifies',    color: 'text-blue-400',  bg: 'bg-blue-500/15'    },
-    { icon: Zap,         label: 'Project activates', color: 'text-green-400', bg: 'bg-green-500/15'   },
+    { icon: FileText,    label: t('onboarding.step4.submitted'), color: 'text-slate-400', bg: 'bg-slate-700/40'  },
+    { icon: Upload,      label: t('onboarding.step4.uploaded'),  color: 'text-amber-400', bg: 'bg-amber-500/15'  },
+    { icon: ShieldCheck, label: t('onboarding.step4.verified'),  color: 'text-blue-400',  bg: 'bg-blue-500/15'   },
+    { icon: Zap,         label: t('onboarding.step4.activates'), color: 'text-green-400', bg: 'bg-green-500/15'  },
   ];
   return (
     <motion.div
@@ -201,7 +202,7 @@ function PaymentsVisual() {
   );
 }
 
-function ReadyVisual() {
+function ReadyVisual({ t }: { t: (k: string) => string }) {
   return (
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
@@ -227,8 +228,8 @@ function ReadyVisual() {
         </motion.div>
       </div>
       <div className="text-center">
-        <p className="text-sm text-slate-300">Everything is set up for you.</p>
-        <p className="text-xs text-slate-600 mt-1">Start by submitting your first project brief.</p>
+        <p className="text-sm text-slate-300">{t('onboarding.ready.line1')}</p>
+        <p className="text-xs text-slate-600 mt-1">{t('onboarding.ready.line2')}</p>
       </div>
     </motion.div>
   );
@@ -261,36 +262,36 @@ export default function OnboardingModal({ userName, onClose }: Props) {
       id:          'welcome',
       badge:       t('onboarding.step1.badge'),
       title:       `${t('onboarding.step1.badge')}, ${firstName}.`,
-      description: 'MBN DEV is your dedicated workspace for commissioning, tracking, and receiving professional software projects — fully transparent, end-to-end.',
-      visual:      <WelcomeVisual />,
+      description: t('onboarding.step1.desc'),
+      visual:      <WelcomeVisual t={t} />,
     },
     {
       id:          'workflow',
       badge:       t('onboarding.step2.badge'),
-      title:       'Every project has a clear journey.',
-      description: "Projects move through defined stages — from your initial request all the way to final delivery. You'll always know exactly where things stand.",
-      visual:      <WorkflowVisual />,
+      title:       t('onboarding.step2.title'),
+      description: t('onboarding.step2.desc'),
+      visual:      <WorkflowVisual t={t} />,
     },
     {
       id:          'messages',
       badge:       t('onboarding.step3.badge'),
-      title:       'Talk directly to the person building your product.',
-      description: 'No ticket queues, no support bots. Every project has a dedicated message thread where you can ask questions, give feedback, or request changes — in real time.',
+      title:       t('onboarding.step3.title'),
+      description: t('onboarding.step3.desc'),
       visual:      <MessagesVisual />,
     },
     {
       id:          'payments',
       badge:       t('onboarding.step4.badge'),
-      title:       'Simple, transparent payments.',
-      description: "Your price is confirmed in writing before work starts. Submit your payment proof directly on the platform — we verify it and your project activates the same day.",
-      visual:      <PaymentsVisual />,
+      title:       t('onboarding.step4.title'),
+      description: t('onboarding.step4.desc'),
+      visual:      <PaymentsVisual t={t} />,
     },
     {
       id:          'ready',
       badge:       t('onboarding.step5.badge'),
-      title:       'Ready to build something great?',
-      description: "Submit your first project brief and we'll review it within 24 hours — confirming scope, timeline, and price upfront before any work begins.",
-      visual:      <ReadyVisual />,
+      title:       t('onboarding.step5.title'),
+      description: t('onboarding.step5.desc'),
+      visual:      <ReadyVisual t={t} />,
     },
   ];
 

@@ -1,4 +1,7 @@
-import { cn, statusColors, statusLabels } from '@/lib/utils';
+'use client';
+
+import { cn, statusColors, getStatusLabel } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BadgeProps {
   status: string;
@@ -6,6 +9,7 @@ interface BadgeProps {
 }
 
 export function StatusBadge({ status, className }: BadgeProps) {
+  const { t } = useLanguage();
   return (
     <span
       className={cn(
@@ -15,7 +19,7 @@ export function StatusBadge({ status, className }: BadgeProps) {
       )}
     >
       <span className="w-1.5 h-1.5 rounded-full bg-current mr-1.5" />
-      {statusLabels[status] || status}
+      {getStatusLabel(status, t)}
     </span>
   );
 }

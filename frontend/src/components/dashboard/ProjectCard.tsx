@@ -6,7 +6,7 @@ import { Calendar, MessageSquare, ArrowRight } from 'lucide-react';
 import { Project } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { formatDate, projectTypeLabels } from '@/lib/utils';
+import { formatDate, getProjectTypeLabel } from '@/lib/utils';
 
 interface ProjectCardProps {
   project: Project;
@@ -33,7 +33,7 @@ export default function ProjectCard({ project, href, index = 0 }: ProjectCardPro
                 {project.title}
               </h3>
               <p className="text-slate-500 text-xs mt-0.5">
-                {projectTypeLabels[project.type] || project.type}
+                {getProjectTypeLabel(project.type, t)}
               </p>
             </div>
             <StatusBadge status={project.status} />

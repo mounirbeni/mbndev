@@ -59,18 +59,18 @@ export default function ClientPaymentsPage() {
         ) : payments.length === 0 ? (
           <div className="p-12 text-center">
             <CreditCard className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">No payments yet.</p>
+            <p className="text-slate-400 text-sm">{t('client.noPayments')}</p>
           </div>
         ) : (
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/5">
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Project</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Milestone</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Amount</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Status</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Date</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Invoice</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.project')}</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.milestone')}</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.amount')}</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.date')}</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('invoice.title')}</th>
               </tr>
             </thead>
             <tbody>
@@ -99,7 +99,7 @@ export default function ClientPaymentsPage() {
                         className="inline-flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors"
                       >
                         <FileText className="w-3.5 h-3.5" />
-                        Invoice
+                        {t('invoice.title')}
                       </Link>
                     </td>
                   </motion.tr>

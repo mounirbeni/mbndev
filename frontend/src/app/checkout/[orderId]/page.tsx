@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { orderAPI, paymentAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getProjectTypeLabel } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 
 // ── Payment method config ────────────────────────────────────────────────────
@@ -28,24 +29,19 @@ const CIH_BANK = {
 const PAYPAL_EMAIL = process.env.NEXT_PUBLIC_PAYPAL_ME || 'mounirbani46@gmail.com';
 const TAPTAP_PHONE = process.env.NEXT_PUBLIC_TAPTAP_PHONE || '+212705914424';
 
-const SERVICE_LABELS: Record<string, string> = {
-  website: 'Website', ecommerce: 'E-Commerce Store',
-  dashboard: 'SaaS Dashboard', mobile: 'Mobile App', custom: 'Custom Project',
-};
-
 type PayMethod = 'cih_bank' | 'paypal' | 'taptapsend';
-
-const METHODS: { id: PayMethod; label: string; desc: string; logo: string }[] = [
-  { id: 'cih_bank',   label: 'CIH Bank Transfer', desc: 'Direct bank transfer (Morocco)', logo: '/images/cih.jpe'    },
-  { id: 'paypal',     label: 'PayPal',             desc: 'Pay with your PayPal account',  logo: '/images/paypal.jpe' },
-  { id: 'taptapsend', label: 'TapTapSend',         desc: 'Send via TapTapSend app',       logo: '/images/taptap.jpeg'},
-];
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function CheckoutPage() {
   const { t }             = useLanguage();
   const { orderId }       = useParams<{ orderId: string }>();
+
+  const METHODS: { id: PayMethod; label: string; desc: string; logo: string }[] = [
+    { id: 'cih_bank',   label: t('checkout.method.cih'),    desc: t('checkout.method.cihDesc'),    logo: '/images/cih.jpe'    },
+    { id: 'paypal',     label: t('checkout.method.paypal'), desc: t('checkout.method.paypalDesc'), logo: '/images/paypal.jpe' },
+    { id: 'taptapsend', label: t('checkout.method.taptap'), desc: t('checkout.method.taptapDesc'), logo: '/images/taptap.jpeg'},
+  ];
   const router            = useRouter();
   const { user, loading: authLoading } = useAuth();
 
@@ -179,7 +175,7 @@ export default function CheckoutPage() {
               </div>
               <div>
                 <h1 className="text-white font-bold text-lg leading-tight">{order.title}</h1>
-                <p className="text-slate-500 text-sm">{SERVICE_LABELS[order.serviceType] || order.serviceType}</p>
+                <p className="text-slate-500 text-sm">{getProjectTypeLabel(order.serviceType, t)}</p>
               </div>
             </div>
 
@@ -252,16 +248,16 @@ export default function CheckoutPage() {
               >
                 {method === 'cih_bank' && (
                   <>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">CIH Bank Transfer Details</p>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">{t('checkout.cih.heading')}</p>
                     <div className="space-y-2.5">
                       {[
-                        { label: 'Bank',       value: CIH_BANK.bank,   canCopy: false },
-                        { label: 'Titulaire',  value: CIH_BANK.holder, canCopy: true  },
-                        { label: 'RIB',        value: CIH_BANK.rib,    canCopy: true  },
-                        { label: 'IBAN',       value: CIH_BANK.iban,   canCopy: true  },
-                        { label: 'SWIFT',      value: CIH_BANK.swift,  canCopy: true  },
-                        { label: 'Amount',     value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
-                        { label: 'Reference',  value: reference, canCopy: true },
+                        { label: t('checkout.cih.bank'),      value: CIH_BANK.bank,   canCopy: false },
+                        { label: t('checkout.cih.holder'),    value: CIH_BANK.holder, canCopy: true  },
+                        { label: t('checkout.cih.rib'),       value: CIH_BANK.rib,    canCopy: true  },
+                        { label: t('checkout.cih.iban'),      value: CIH_BANK.iban,   canCopy: true  },
+                        { label: t('checkout.cih.swift'),     value: CIH_BANK.swift,  canCopy: true  },
+                        { label: t('checkout.cih.amount'),    value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
+                        { label: t('checkout.cih.reference'), value: reference, canCopy: true },
                       ].map(({ label, value, canCopy }) => (
                         <div key={label} className="flex items-center justify-between gap-2">
                           <span className="text-slate-500 text-xs w-20 shrink-0">{label}</span>
@@ -287,15 +283,15 @@ export default function CheckoutPage() {
 
                 {method === 'paypal' && (
                   <>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">PayPal Instructions</p>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">{t('checkout.paypal.heading')}</p>
                     <p className="text-sm text-slate-300 mb-3">
-                      Send <span className="text-white font-bold">${order.totalPrice.toLocaleString()} USD</span> to:
+                      {t('checkout.paypal.sendTo')} <span className="text-white font-bold">${order.totalPrice.toLocaleString()} USD</span> {t('checkout.paypal.to')}
                     </p>
                     <div className="space-y-2.5 mb-3">
                       {[
-                        { label: 'PayPal Email', value: PAYPAL_EMAIL,  canCopy: true },
-                        { label: 'Amount',       value: `$${order.totalPrice.toLocaleString()} USD`, canCopy: true },
-                        { label: 'Reference',    value: reference,    canCopy: true },
+                        { label: t('checkout.paypal.email'),    value: PAYPAL_EMAIL,  canCopy: true },
+                        { label: t('checkout.cih.amount'),      value: `$${order.totalPrice.toLocaleString()} USD`, canCopy: true },
+                        { label: t('checkout.cih.reference'),   value: reference,    canCopy: true },
                       ].map(({ label, value, canCopy }) => (
                         <div key={label} className="flex items-center justify-between gap-2">
                           <span className="text-slate-500 text-xs w-24 shrink-0">{label}</span>
@@ -317,7 +313,7 @@ export default function CheckoutPage() {
                       className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
                       style={{ background: '#003087', color: '#fff' }}
                     >
-                      Open PayPal
+                      {t('checkout.paypal.openBtn')}
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </>
@@ -325,12 +321,12 @@ export default function CheckoutPage() {
 
                 {method === 'taptapsend' && (
                   <>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">TapTapSend Instructions</p>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-3">{t('checkout.taptap.heading')}</p>
                     <div className="space-y-2">
                       {[
-                        { label: 'Send to',   value: TAPTAP_PHONE, canCopy: true },
-                        { label: 'Amount',    value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
-                        { label: 'Reference', value: reference,    canCopy: true },
+                        { label: t('checkout.taptap.sendTo'),  value: TAPTAP_PHONE, canCopy: true },
+                        { label: t('checkout.cih.amount'),     value: `$${order.totalPrice.toLocaleString()}`, canCopy: true },
+                        { label: t('checkout.cih.reference'),  value: reference,    canCopy: true },
                       ].map(({ label, value, canCopy }) => (
                         <div key={label} className="flex items-center justify-between gap-2">
                           <span className="text-slate-500 text-xs w-20 shrink-0">{label}</span>
@@ -359,7 +355,7 @@ export default function CheckoutPage() {
                 type="text"
                 value={externalRef}
                 onChange={(e) => setExternalRef(e.target.value)}
-                placeholder={method === 'paypal' ? 'PayPal transaction ID' : method === 'cih_bank' ? 'Bank reference / receipt #' : 'Transfer reference'}
+                placeholder={method === 'paypal' ? t('checkout.ph.paypal') : method === 'cih_bank' ? t('checkout.ph.bank') : t('checkout.ph.taptap')}
                 maxLength={200}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-primary-500/60"
               />

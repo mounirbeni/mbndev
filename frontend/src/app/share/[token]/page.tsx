@@ -10,20 +10,8 @@ import {
 } from 'lucide-react';
 import { projectAPI } from '@/lib/api';
 import ProjectLifecycle, { ProjectStatus } from '@/components/dashboard/ProjectLifecycle';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getProjectTypeLabel } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-const TYPE_LABELS: Record<string, string> = {
-  website:        'Custom Website',
-  ecommerce:      'E-Commerce Store',
-  dashboard:      'SaaS Dashboard',
-  mobile:         'Mobile App',
-  'landing-page': 'Landing Page',
-  'web-app':      'Web Application',
-  saas:           'SaaS Platform',
-  portfolio:      'Portfolio',
-  custom:         'Custom Project',
-};
 
 function MilestoneItem({ title, status, dueDate }: { title: string; status: string; dueDate?: string | null }) {
   const done = status === 'paid' || status === 'completed';
@@ -59,7 +47,7 @@ export default function SharePage() {
   useEffect(() => {
     projectAPI.getByShareToken(token)
       .then(({ data }) => setProject(data.project))
-      .catch((err) => setError(err?.response?.data?.message || 'Could not load project'))
+      .catch((err) => setError(err?.response?.data?.message || t('share.linkInvalidSub')))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -129,7 +117,7 @@ export default function SharePage() {
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div>
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-                      {TYPE_LABELS[project.type] || project.type}
+                      {getProjectTypeLabel(project.type, t)}
                     </span>
                     <h1 className="text-2xl font-bold text-white mt-1">{project.title}</h1>
                     {project.client?.company && (

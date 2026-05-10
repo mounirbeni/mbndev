@@ -30,6 +30,26 @@ export const statusLabels: Record<string, string> = {
   refunded:             'Refunded',
 };
 
+/** Locale-aware status label. Pass the `t` function from useLanguage(). */
+export function getStatusLabel(status: string, t: (k: string) => string): string {
+  const map: Record<string, string> = {
+    pending:              t('status.pending'),
+    pending_verification: t('status.pendingVerif'),
+    paid:                 t('status.paid'),
+    'in-progress':        t('status.inProgress'),
+    review:               t('status.review'),
+    revision:             t('status.revision'),
+    completed:            t('status.completed'),
+    cancelled:            t('status.cancelled'),
+    failed:               t('status.failed'),
+    refunded:             t('status.refunded'),
+    delivered:            t('status.completed'),
+    unpaid:               t('status.unpaid'),
+  };
+  return map[status] || status;
+}
+
+/** @deprecated Use `getProjectTypeLabel(type, t)` for locale-aware labels */
 export const projectTypeLabels: Record<string, string> = {
   'landing-page': 'Landing Page',
   ecommerce: 'E-Commerce Store',
@@ -38,6 +58,25 @@ export const projectTypeLabels: Record<string, string> = {
   'web-app': 'Web Application',
   custom: 'Custom Project',
 };
+
+/**
+ * Returns the locale-aware project type label.
+ * Pass the `t` function from `useLanguage()`.
+ */
+export function getProjectTypeLabel(type: string, t: (key: string) => string): string {
+  const map: Record<string, string> = {
+    website:        t('request.svc.website'),
+    ecommerce:      t('request.svc.ecommerce'),
+    dashboard:      t('request.svc.dashboard'),
+    mobile:         t('request.svc.mobile'),
+    custom:         t('request.svc.custom'),
+    'landing-page': t('services.landing.title'),
+    saas:           t('services.saas.title'),
+    portfolio:      'Portfolio',
+    'web-app':      t('services.webapp.title'),
+  };
+  return map[type] || type;
+}
 
 export function formatCurrency(amount: number, currency = 'USD') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
@@ -60,6 +99,20 @@ export function timeAgo(date: string) {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
+}
+
+/** Locale-aware time-ago: pass the `t` translation function from useLanguage(). */
+export function makeTimeAgo(t: (k: string) => string) {
+  return (date: string) => {
+    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+    if (seconds < 60) return t('notif.justNow');
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}${t('notif.minsAgo')}`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}${t('notif.hoursAgo')}`;
+    const days = Math.floor(hours / 24);
+    return `${days}${t('notif.daysAgo')}`;
+  };
 }
 
 export function getInitials(name: string) {

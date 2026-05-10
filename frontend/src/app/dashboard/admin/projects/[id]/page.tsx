@@ -354,8 +354,8 @@ export default function AdminProjectWorkspace() {
                   <div className="glass rounded-2xl p-6 border border-white/5">
                     <h3 className="text-white font-semibold mb-4">{t('admin.design')}</h3>
                     <div className="space-y-2 text-sm">
-                      {project.designPreferences.style && <div className="flex gap-3"><span className="text-slate-500 w-24">Style</span><span className="text-white">{project.designPreferences.style}</span></div>}
-                      {project.designPreferences.colors?.length ? <div className="flex gap-3"><span className="text-slate-500 w-24">Colors</span><span className="text-white">{project.designPreferences.colors.join(', ')}</span></div> : null}
+                      {project.designPreferences.style && <div className="flex gap-3"><span className="text-slate-500 w-24">{t('field.style')}</span><span className="text-white">{project.designPreferences.style}</span></div>}
+                      {project.designPreferences.colors?.length ? <div className="flex gap-3"><span className="text-slate-500 w-24">{t('field.colors')}</span><span className="text-white">{project.designPreferences.colors.join(', ')}</span></div> : null}
                     </div>
                   </div>
                 )}
@@ -374,8 +374,8 @@ export default function AdminProjectWorkspace() {
                         <div className="text-slate-500 text-xs">{client.email}</div>
                       </div>
                     </div>
-                    {client.company && <div className="text-slate-400 text-xs">Company: {client.company}</div>}
-                    {client.phone && <div className="text-slate-400 text-xs mt-1">Phone: {client.phone}</div>}
+                    {client.company && <div className="text-slate-400 text-xs">{t('field.company')}: {client.company}</div>}
+                    {client.phone && <div className="text-slate-400 text-xs mt-1">{t('field.phone')}: {client.phone}</div>}
                   </div>
                 )}
                 <div className="glass rounded-2xl p-5 border border-white/5 space-y-3">

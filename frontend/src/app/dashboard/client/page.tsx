@@ -60,7 +60,7 @@ export default function ClientDashboard() {
 
       {/* Onboarding modal — shown once on first visit */}
       {showOnboarding && (
-        <OnboardingModal userName={user?.name || 'there'} onClose={dismissOnboarding} />
+        <OnboardingModal userName={user?.name || t('common.there')} onClose={dismissOnboarding} />
       )}
       {/* Header */}
       <motion.div
@@ -130,12 +130,10 @@ export default function ClientDashboard() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-white mb-2 leading-tight">
-                    Your first project is one step away.
+                    {t('dash.empty.title')}
                   </h3>
                   <p className="text-slate-400 text-sm leading-relaxed max-w-lg">
-                    Submit a brief and we&apos;ll confirm your scope, timeline, and price
-                    within 24 hours — before a single line of code is written.
-                    No surprises, ever.
+                    {t('dash.empty.sub')}
                   </p>
                 </div>
               </div>
@@ -151,11 +149,11 @@ export default function ClientDashboard() {
               {/* Feature pills */}
               <div className="flex flex-wrap gap-2 mb-8">
                 {[
-                  { icon: CheckCircle2,   label: 'Price confirmed upfront'  },
-                  { icon: MessageSquare,  label: 'Direct developer access'  },
-                  { icon: Package,        label: 'Full source code handover' },
-                  { icon: RotateCcw,      label: 'Revision rounds included'  },
-                  { icon: Zap,            label: 'Real-time status updates'  },
+                  { icon: CheckCircle2,   label: t('dash.empty.feat1') },
+                  { icon: MessageSquare,  label: t('dash.empty.feat2') },
+                  { icon: Package,        label: t('dash.empty.feat3') },
+                  { icon: RotateCcw,      label: t('dash.empty.feat4') },
+                  { icon: Zap,            label: t('dash.empty.feat5') },
                 ].map(({ icon: Icon, label }) => (
                   <span
                     key={label}
@@ -181,7 +179,7 @@ export default function ClientDashboard() {
                   </motion.button>
                 </Link>
                 <span className="text-sm text-slate-600">
-                  or{' '}
+                  {t('dash.empty.or')}{' '}
                   <button
                     onClick={() => {
                       if (typeof window !== 'undefined') {
@@ -191,7 +189,7 @@ export default function ClientDashboard() {
                     }}
                     className="text-primary-400 hover:text-primary-300 underline underline-offset-2 transition-colors"
                   >
-                    replay the guided tour
+                    {t('dash.empty.replayTour')}
                   </button>
                 </span>
               </div>
