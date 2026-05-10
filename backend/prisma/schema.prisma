@@ -18,6 +18,7 @@ model User {
   avatar    String   @default("")
   company   String   @default("")
   phone     String   @default("")
+  locale    String   @default("en")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
