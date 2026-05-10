@@ -11,22 +11,24 @@ import {
 import Button from '@/components/ui/Button';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { useAuth } from '@/contexts/AuthContext';
-
-const navLinks = [
-  { label: 'Home',      href: '/',          icon: Home },
-  { label: 'Services',  href: '/services',  icon: Briefcase },
-  { label: 'Portfolio', href: '/portfolio', icon: FolderOpen },
-  { label: 'Pricing',   href: '/pricing',   icon: DollarSign },
-  { label: 'About',     href: '/about',     icon: Info },
-  { label: 'Contact',   href: '/contact',   icon: Mail },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Navbar() {
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
   const [mounted, setMounted]     = useState(false);
   const { user } = useAuth();
+  const { t } = useLanguage();
   const pathname = usePathname();
+
+  const navLinks = [
+    { label: t('nav.home'),      href: '/',          icon: Home },
+    { label: t('nav.services'),  href: '/services',  icon: Briefcase },
+    { label: t('nav.portfolio'), href: '/portfolio', icon: FolderOpen },
+    { label: t('nav.pricing'),   href: '/pricing',   icon: DollarSign },
+    { label: t('nav.about'),     href: '/about',     icon: Info },
+    { label: t('nav.contact'),   href: '/contact',   icon: Mail },
+  ];
 
   // Delay auth-dependent UI until after hydration to prevent text content mismatch.
   // Server always renders logged-out state; client switches after mount.
@@ -107,10 +109,10 @@ export default function Navbar() {
               ) : (
                 <>
                   <Link href="/login">
-                    <Button variant="ghost" size="md">Sign In</Button>
+                    <Button variant="ghost" size="md">{t('nav.login')}</Button>
                   </Link>
                   <Link href="/request">
-                    <Button size="md">Start Project →</Button>
+                    <Button size="md">{t('nav.request')} →</Button>
                   </Link>
                 </>
               )}
@@ -230,14 +232,14 @@ export default function Navbar() {
                         <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
                           <LogIn className="w-4 h-4 text-slate-400" />
                         </div>
-                        <span className="text-white font-medium text-sm">Sign In</span>
+                        <span className="text-white font-medium text-sm">{t('nav.login')}</span>
                         <ChevronRight className="ml-auto w-4 h-4 text-slate-600" />
                       </div>
                     </Link>
                     <Link href="/request" onClick={() => setMenuOpen(false)}>
                       <div className="flex items-center justify-center gap-2 px-4 py-3.5 bg-primary-500 rounded-xl press-scale shadow-lg shadow-primary-500/30">
                         <Zap className="w-4 h-4 text-white" />
-                        <span className="text-white font-semibold text-sm">Start Your Project</span>
+                          <span className="text-white font-semibold text-sm">{t('nav.request')}</span>
                       </div>
                     </Link>
                   </>

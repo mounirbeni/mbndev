@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { ArrowRight, MapPin, Zap, Clock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function CTA() {
+  const { t } = useLanguage();
   return (
     <section id="contact" className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-radial from-primary-500/10 via-transparent to-transparent" />
@@ -21,41 +23,41 @@ export default function CTA() {
 
             <div className="relative z-10">
               <span className="text-primary-400 text-sm font-medium uppercase tracking-widest mb-4 block">
-                Ready to start?
+                {t('cta.badge')}
               </span>
               <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-                Have a project in mind?
+                {t('cta.title')}
               </h2>
               <p className="text-xl text-primary-300 mb-3">
-                Let&apos;s build something amazing together.
+                {t('cta.sub')}
               </p>
               <p className="text-slate-400 mb-8 max-w-lg mx-auto">
-                Fill out our smart project request form and get a custom proposal within 24 hours.
+                {t('cta.body')}
               </p>
 
               <div className="flex flex-wrap justify-center gap-4">
                 <Link href="/request">
                   <Button size="lg" className="group">
-                    Start Your Project
+                    {t('cta.start')}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="outline">
-                    WhatsApp Us
+                    {t('cta.whatsapp')}
                   </Button>
                 </a>
               </div>
 
               <div className="mt-8 flex flex-wrap justify-center gap-8 text-sm text-slate-500">
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5" /> Morocco — Available Worldwide
+                  <MapPin className="w-3.5 h-3.5" /> {t('cta.location')}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" /> Response within 24h
+                  <Clock className="w-3.5 h-3.5" /> {t('cta.response')}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5" /> No commitment required
+                  <Zap className="w-3.5 h-3.5" /> {t('cta.nocommit')}
                 </span>
               </div>
             </div>

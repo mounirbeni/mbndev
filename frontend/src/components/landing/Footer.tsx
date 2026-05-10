@@ -1,36 +1,17 @@
+'use client';
+
 import {
   Zap, MapPin, Mail, Facebook, Linkedin, Twitter, Github,
   ShieldCheck, MessageCircle, ArrowUpRight,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const quickLinks = [
-  { label: 'Home',      href: '/' },
-  { label: 'Services',  href: '/services' },
-  { label: 'Portfolio', href: '/portfolio' },
-  { label: 'Pricing',   href: '/pricing' },
-  { label: 'About',     href: '/about' },
-  { label: 'Contact',   href: '/contact' },
-];
-
-const serviceLinks = [
-  { label: 'Custom Websites',       href: '/services/custom-websites' },
-  { label: 'E-Commerce Stores',     href: '/services/ecommerce' },
-  { label: 'Web Applications',      href: '/services/web-applications' },
-  { label: 'Landing Pages',         href: '/services/landing-pages' },
-  { label: 'Maintenance & Support', href: '/services/maintenance' },
-];
-
-const legalLinks = [
-  { label: 'Privacy Policy',  href: '/privacy' },
-  { label: 'Terms of Service', href: '/terms' },
-];
-
-const socials = [
-  { icon: Facebook, href: 'https://facebook.com',  label: 'Facebook'  },
-  { icon: Linkedin, href: 'https://linkedin.com',  label: 'LinkedIn'  },
-  { icon: Twitter,  href: 'https://twitter.com',   label: 'Twitter'   },
-  { icon: Github,   href: 'https://github.com',    label: 'GitHub'    },
+const SOCIALS = [
+  { icon: Facebook, href: 'https://facebook.com',  label: 'Facebook' },
+  { icon: Linkedin, href: 'https://linkedin.com',  label: 'LinkedIn' },
+  { icon: Twitter,  href: 'https://twitter.com',   label: 'Twitter'  },
+  { icon: Github,   href: 'https://github.com',    label: 'GitHub'   },
 ];
 
 /** Inline SVG brand-accurate payment method marks */
@@ -60,13 +41,37 @@ function TapTapMark() {
   );
 }
 
-const trustBadges = [
-  { icon: ShieldCheck, label: 'Secure Platform',    sub: 'End-to-end encrypted' },
-  { icon: Zap,         label: 'Response within 24h', sub: 'Guaranteed' },
-  { icon: MapPin,      label: 'Morocco & Worldwide', sub: 'Remote-first'  },
-];
-
 export default function Footer() {
+  const { t } = useLanguage();
+
+  const quickLinks = [
+    { label: t('nav.home'),      href: '/' },
+    { label: t('nav.services'),  href: '/services' },
+    { label: t('nav.portfolio'), href: '/portfolio' },
+    { label: t('nav.pricing'),   href: '/pricing' },
+    { label: t('nav.about'),     href: '/about' },
+    { label: t('nav.contact'),   href: '/contact' },
+  ];
+
+  const serviceLinks = [
+    { label: 'Custom Websites',       href: '/services/custom-websites' },
+    { label: 'E-Commerce Stores',     href: '/services/ecommerce' },
+    { label: 'Web Applications',      href: '/services/web-applications' },
+    { label: 'Landing Pages',         href: '/services/landing-pages' },
+    { label: 'Maintenance & Support', href: '/services/maintenance' },
+  ];
+
+  const legalLinks = [
+    { label: t('footer.privacy'), href: '/privacy' },
+    { label: t('footer.terms'),   href: '/terms' },
+  ];
+
+  const trustBadges = [
+    { icon: ShieldCheck, label: t('footer.secure'),   sub: 'End-to-end encrypted' },
+    { icon: Zap,         label: t('footer.response'), sub: 'Guaranteed'           },
+    { icon: MapPin,      label: 'Morocco & Worldwide', sub: t('footer.remote')    },
+  ];
+
   return (
     <footer className="border-t border-white/5 bg-dark-200">
 
@@ -78,7 +83,7 @@ export default function Footer() {
             {/* Payment methods */}
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <span className="text-xs font-semibold text-slate-600 uppercase tracking-widest shrink-0">
-                Accepted payments
+                {t('footer.payments')}
               </span>
               <div className="flex items-center gap-3 flex-wrap justify-center">
                 <PayPalMark />
@@ -124,7 +129,7 @@ export default function Footer() {
             </p>
             {/* Socials */}
             <div className="flex gap-2">
-              {socials.map(({ icon: Icon, href, label }) => (
+              {SOCIALS.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
@@ -139,7 +144,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">Navigation</h4>
+            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.nav')}</h4>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
@@ -156,7 +161,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">Services</h4>
+            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.services')}</h4>
             <ul className="space-y-2">
               {serviceLinks.map((link) => (
                 <li key={link.label}>
@@ -173,11 +178,11 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">Get in Touch</h4>
+            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.contact')}</h4>
             <ul className="space-y-3 text-sm text-slate-500 mb-5">
               <li className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 shrink-0" />
-                Morocco — Remote worldwide
+                {t('footer.location')}
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 shrink-0" />
@@ -194,7 +199,7 @@ export default function Footer() {
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] text-xs font-semibold hover:bg-[#25D366]/20 transition-all group"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
-                Chat on WhatsApp
+                {t('footer.chat')}
                 <ArrowUpRight className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
               </a>
               <Link
@@ -202,7 +207,7 @@ export default function Footer() {
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-primary-500/8 border border-primary-500/15 text-primary-400 text-xs font-semibold hover:bg-primary-500/15 transition-all"
               >
                 <Mail className="w-3.5 h-3.5" />
-                Send a message
+                {t('footer.email')}
               </Link>
             </div>
           </div>
@@ -213,7 +218,7 @@ export default function Footer() {
       <div className="border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="text-slate-600 text-xs">
-            © {new Date().getFullYear()} MBN DEV. All rights reserved.
+            © {new Date().getFullYear()} MBN DEV. {t('footer.rights')}
           </p>
           <div className="flex items-center gap-4 text-slate-600 text-xs">
             {legalLinks.map((l) => (
@@ -221,7 +226,7 @@ export default function Footer() {
                 {l.label}
               </Link>
             ))}
-            <span className="text-slate-700">Built in Morocco</span>
+            <span className="text-slate-700">{t('footer.built')}</span>
           </div>
         </div>
       </div>
