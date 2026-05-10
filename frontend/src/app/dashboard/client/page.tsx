@@ -8,6 +8,7 @@ import {
   Sparkles, CheckCircle2, Package, RotateCcw, Zap,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { projectAPI, messageAPI } from '@/lib/api';
 import { Project } from '@/types';
 import StatsCard from '@/components/dashboard/StatsCard';
@@ -19,6 +20,7 @@ import ProjectLifecycle from '@/components/dashboard/ProjectLifecycle';
 
 export default function ClientDashboard() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -69,37 +71,37 @@ export default function ClientDashboard() {
         <div>
           <div className="flex items-center gap-2.5 mb-1">
             <h1 className="text-2xl font-bold text-white">
-              Welcome back, {user?.name?.split(' ')[0]}
+              {t('dash.welcome')}, {user?.name?.split(' ')[0]}
             </h1>
             {user?.plan && <PlanBadge plan={user.plan} size="md" />}
           </div>
           <p className="text-slate-400 text-sm">
-            Here&apos;s what&apos;s happening with your projects.
+            {t('dash.overview')}
           </p>
         </div>
         <Link href="/request">
           <Button size="md">
             <Plus className="w-4 h-4" />
-            New Project
+            {t('common.create')}
           </Button>
         </Link>
       </motion.div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Total Projects" value={projects.length} subtitle="All time" icon={FolderOpen} color="purple" index={0} />
-        <StatsCard title="In Progress" value={inProgress} subtitle="Currently" icon={Clock} color="blue" index={1} />
-        <StatsCard title="Completed" value={completed} subtitle="All time" icon={CreditCard} color="green" index={2} />
-        <StatsCard title="Unread Messages" value={unread} subtitle="New messages" icon={MessageSquare} color="yellow" index={3} />
+        <StatsCard title={t('dash.nav.myProjects')} value={projects.length} subtitle={t('dash.recent')} icon={FolderOpen} color="purple" index={0} />
+        <StatsCard title={t('status.inProgress')} value={inProgress} subtitle={t('dash.overview')} icon={Clock} color="blue" index={1} />
+        <StatsCard title={t('status.completed')} value={completed} subtitle={t('dash.recent')} icon={CreditCard} color="green" index={2} />
+        <StatsCard title={t('dash.nav.messages')} value={unread} subtitle={t('empty.notifications.sub')} icon={MessageSquare} color="yellow" index={3} />
       </div>
 
       {/* Recent Projects */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">My Projects</h2>
+          <h2 className="text-lg font-semibold text-white">{t('dash.nav.myProjects')}</h2>
           <Link href="/dashboard/client/projects">
             <Button variant="ghost" size="sm" className="text-primary-400">
-              View All <ArrowRight className="w-3 h-3" />
+              {t('dash.viewAll')} <ArrowRight className="w-3 h-3" />
             </Button>
           </Link>
         </div>
@@ -141,7 +143,7 @@ export default function ClientDashboard() {
               {/* Project lifecycle visualizer */}
               <div className="mb-8">
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
-                  How every project works
+                  {t('process.eyebrow')}
                 </p>
                 <ProjectLifecycle animated />
               </div>
@@ -174,7 +176,7 @@ export default function ClientDashboard() {
                     className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold px-6 py-3 rounded-xl shadow-lg shadow-primary-500/25 transition-all"
                   >
                     <Plus className="w-4 h-4" />
-                    Start my first project
+                    {t('hero.cta.primary')}
                     <ArrowRight className="w-4 h-4" />
                   </motion.button>
                 </Link>

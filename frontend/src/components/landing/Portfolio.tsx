@@ -4,56 +4,27 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ExternalLink, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const projects = [
-  {
-    title: 'CarryLink',
-    url: 'https://carrylink.vercel.app/',
-    type: 'P2P Logistics Platform',
-    desc: 'Connects senders with travelers for cost-effective worldwide package delivery.',
-    tag: 'blue',
-    gradient: 'from-sky-500/25 to-blue-600/15',
-    initial: 'CL',
-  },
-  {
-    title: 'Lueur Skin',
-    url: 'https://lueurskin.vercel.app/',
-    type: 'Premium Skincare Store',
-    desc: 'Luxury skincare brand with AI-powered skin consultation and personalized product recommendations.',
-    tag: 'red',
-    gradient: 'from-rose-500/25 to-pink-600/15',
-    initial: 'LS',
-  },
-  {
-    title: 'TyyMaroc',
-    url: 'https://tyymaroc.vercel.app/',
-    type: 'Online Parapharmacie',
-    desc: 'Moroccan wellness e-commerce in French & Arabic with certified products and 24–48h delivery.',
-    tag: 'green',
-    gradient: 'from-teal-500/25 to-emerald-600/15',
-    initial: 'TM',
-  },
-  {
-    title: 'Emll',
-    url: 'https://emll.vercel.app/',
-    type: 'Travel Experience Booking',
-    desc: 'Book guided tours in Marrakech — desert trips, cooking classes, and mountain adventures.',
-    tag: 'yellow',
-    gradient: 'from-amber-500/25 to-orange-500/15',
-    initial: 'EM',
-  },
-  {
-    title: 'RiadConnect',
-    url: 'https://www.riadconnect.com/',
-    type: 'Hospitality SaaS',
-    desc: 'Commission-free booking platform for Moroccan Riads with AI guest assistant and WhatsApp integration.',
-    tag: 'purple',
-    gradient: 'from-violet-500/25 to-purple-600/15',
-    initial: 'RC',
-  },
+type ProjectKey = 'carrylink' | 'lueur' | 'tyy' | 'emll' | 'riad';
+
+const projectsMeta: { key: ProjectKey; title: string; url: string; tag: string; gradient: string; initial: string }[] = [
+  { key: 'carrylink', title: 'CarryLink',    url: 'https://carrylink.vercel.app/',   tag: 'blue',   gradient: 'from-sky-500/25 to-blue-600/15',     initial: 'CL' },
+  { key: 'lueur',     title: 'Lueur Skin',   url: 'https://lueurskin.vercel.app/',   tag: 'red',    gradient: 'from-rose-500/25 to-pink-600/15',     initial: 'LS' },
+  { key: 'tyy',       title: 'TyyMaroc',     url: 'https://tyymaroc.vercel.app/',    tag: 'green',  gradient: 'from-teal-500/25 to-emerald-600/15',  initial: 'TM' },
+  { key: 'emll',      title: 'Emll',         url: 'https://emll.vercel.app/',        tag: 'yellow', gradient: 'from-amber-500/25 to-orange-500/15',  initial: 'EM' },
+  { key: 'riad',      title: 'RiadConnect',  url: 'https://www.riadconnect.com/',    tag: 'purple', gradient: 'from-violet-500/25 to-purple-600/15', initial: 'RC' },
 ];
 
 export default function Portfolio() {
+  const { t } = useLanguage();
+
+  const projects = projectsMeta.map((p) => ({
+    ...p,
+    type: t(`portfolio.type.${p.key}`),
+    desc: t(`portfolio.desc.${p.key}`),
+  }));
+
   return (
     <section id="portfolio" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -65,13 +36,13 @@ export default function Portfolio() {
           className="text-center mb-16"
         >
           <span className="text-primary-400 text-sm font-medium uppercase tracking-widest mb-3 block">
-            Our Work
+            {t('portfolio.eyebrow')}
           </span>
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-            Recent <span className="gradient-text">Projects</span>
+            {t('portfolio.title')} <span className="gradient-text">{t('portfolio.title.bold')}</span>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-            Live products built for real clients — from Moroccan e-commerce to global platforms.
+            {t('portfolio.subtitle')}
           </p>
         </motion.div>
 
@@ -96,7 +67,7 @@ export default function Portfolio() {
                 {/* Live badge */}
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 text-[10px] bg-green-500/20 border border-green-500/25 rounded-full px-2.5 py-1 text-green-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  Live
+                  {t('portfolio.live')}
                 </div>
 
                 {/* External link — visible on hover */}
@@ -134,8 +105,8 @@ export default function Portfolio() {
                   <ArrowRight className="w-5 h-5 text-primary-400 group-hover:translate-x-0.5 transition-transform" />
                 </div>
                 <div>
-                  <p className="text-white font-semibold mb-1">View Full Portfolio</p>
-                  <p className="text-slate-500 text-sm">See all projects with details</p>
+                  <p className="text-white font-semibold mb-1">{t('portfolio.viewAll')}</p>
+                  <p className="text-slate-500 text-sm">{t('portfolio.viewAll.sub')}</p>
                 </div>
               </div>
             </Link>

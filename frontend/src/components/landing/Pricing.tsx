@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Tag, Flame, Trophy, Zap } from 'lucide-react';
+import { Check, Tag, Flame, Trophy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import AuthModal from '@/components/ui/AuthModal';
 import { packageAPI } from '@/lib/api';
 import { Package } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const defaultPackages: Package[] = [
   {
@@ -31,18 +32,13 @@ const defaultPackages: Package[] = [
   },
 ];
 
-const BADGE_STYLES: Record<string, { icon: any; className: string }> = {
-  'Limited Offer': { icon: Flame,  className: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
-  'Best Deal':     { icon: Tag,    className: 'bg-primary-500/20 text-primary-300 border-primary-500/30' },
-  'Best Value':    { icon: Trophy, className: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
-};
-
 function discountPct(original: number, current: number) {
   return Math.round((1 - current / original) * 100);
 }
 
 export default function Pricing() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const [packages, setPackages] = useState<Package[]>(defaultPackages);
   const [authOpen, setAuthOpen] = useState(false);
@@ -68,6 +64,26 @@ export default function Pricing() {
     router.push(`/request?package=${pendingPlan || localStorage.getItem('mbndev_selected_plan') || ''}`);
   };
 
+  // Badge key → translation key mapping
+  const BADGE_KEY_MAP: Record<string, string> = {
+    'Limited Offer': 'pricing.badge.limited',
+    'Best Deal':     'pricing.badge.bestDeal',
+    'Best Value':    'pricing.badge.bestValue',
+  };
+
+  const BADGE_STYLES: Record<string, { icon: any; className: string }> = {
+    'Limited Offer': { icon: Flame,  className: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
+    'Best Deal':     { icon: Tag,    className: 'bg-primary-500/20 text-primary-300 border-primary-500/30' },
+    'Best Value':    { icon: Trophy, className: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+  };
+
+  // Description key mapping by slug
+  const DESC_KEY_MAP: Record<string, string> = {
+    starter: 'pricing.starter.desc',
+    pro:     'pricing.pro.desc',
+    premium: 'pricing.premium.desc',
+  };
+
   return (
     <section id="pricing" className="py-24 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/5 to-transparent pointer-events-none" />
@@ -80,13 +96,13 @@ export default function Pricing() {
           className="text-center mb-16"
         >
           <span className="text-primary-400 text-sm font-medium uppercase tracking-widest mb-3 block">
-            Transparent Pricing
+            {t('pricing.eyebrow')}
           </span>
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-            Simple, <span className="gradient-text">Transparent</span> Pricing
+            {t('pricing.title.simple')} <span className="gradient-text">{t('pricing.title.bold')}</span> {t('pricing.title.end')}
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-            Compare to market rates — you save up to <span className="text-green-400 font-semibold">47%</span> vs average freelancer pricing.
+            {t('pricing.subtitle').replace('{pct}', '47%')}
           </p>
         </motion.div>
 
@@ -95,6 +111,10 @@ export default function Pricing() {
             const pct = pkg.originalPrice ? discountPct(pkg.originalPrice, pkg.price) : 0;
             const badgeConfig = pkg.badge ? BADGE_STYLES[pkg.badge] : null;
             const BadgeIcon = badgeConfig?.icon ?? Tag;
+            const badgeLabel = pkg.badge ? t(BADGE_KEY_MAP[pkg.badge] ?? pkg.badge) : '';
+            const descKey = DESC_KEY_MAP[pkg.slug];
+            const description = descKey ? t(descKey) : pkg.description;
+            const savings = pkg.originalPrice ? `$${(pkg.originalPrice - pkg.price).toLocaleString()}` : '';
 
             return (
               <motion.div
@@ -113,12 +133,12 @@ export default function Pricing() {
                 {pkg.popular && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <span className="bg-primary-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                      Most Popular
+                      {t('pricing.popular')}
                     </span>
                   </div>
                 )}
 
-                {/* Discount % pill — top right */}
+                {/* Discount % pill */}
                 {pct > 0 && (
                   <div className="absolute top-4 right-4">
                     <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-2 py-0.5 rounded-full">
@@ -128,16 +148,16 @@ export default function Pricing() {
                 )}
 
                 {/* Promo badge */}
-                {badgeConfig && pkg.badge && (
+                {badgeConfig && badgeLabel && (
                   <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-4 ${badgeConfig.className}`}>
                     <BadgeIcon className="w-3 h-3" />
-                    {pkg.badge}
+                    {badgeLabel}
                   </div>
                 )}
 
                 <div className="mb-6">
                   <h3 className="text-white font-bold text-xl mb-1">{pkg.name}</h3>
-                  <p className="text-slate-400 text-sm">{pkg.description}</p>
+                  <p className="text-slate-400 text-sm">{description}</p>
                 </div>
 
                 {/* Price block */}
@@ -145,16 +165,16 @@ export default function Pricing() {
                   {pkg.originalPrice && (
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-slate-500 text-sm line-through">${pkg.originalPrice.toLocaleString()}</span>
-                      <span className="text-green-400 text-xs font-medium">Market avg</span>
+                      <span className="text-green-400 text-xs font-medium">{t('pricing.marketAvg')}</span>
                     </div>
                   )}
                   <div className="flex items-end gap-1.5">
                     <span className="text-5xl font-bold text-white">${pkg.price.toLocaleString()}</span>
-                    <span className="text-slate-400 text-sm mb-1.5">/ project</span>
+                    <span className="text-slate-400 text-sm mb-1.5">{t('pricing.perProject')}</span>
                   </div>
                   {pkg.originalPrice && (
                     <p className="text-green-400 text-xs font-semibold mt-1">
-                      You save ${(pkg.originalPrice - pkg.price).toLocaleString()} vs market
+                      {t('pricing.youSave').replace('{amount}', savings)}
                     </p>
                   )}
                 </div>
@@ -174,7 +194,7 @@ export default function Pricing() {
                   className="w-full"
                   onClick={() => choosePlan(pkg)}
                 >
-                  Choose Plan
+                  {t('pricing.choose')}
                 </Button>
               </motion.div>
             );
@@ -188,11 +208,11 @@ export default function Pricing() {
           viewport={{ once: true }}
           className="text-center text-slate-500 mt-8 text-sm"
         >
-          Need something custom?{' '}
+          {t('pricing.custom')}{' '}
           <a href="#contact" className="text-primary-400 hover:text-primary-300 transition-colors">
-            Let&apos;s talk
+            {t('pricing.letstalk')}
           </a>{' '}
-          about your project.
+          {t('pricing.aboutProject')}
         </motion.p>
       </div>
 
@@ -201,7 +221,7 @@ export default function Pricing() {
         onClose={() => setAuthOpen(false)}
         onSuccess={handleAuthSuccess}
         plan={pendingPlan ?? undefined}
-        contextMessage="Sign up to start your project request and track everything in your dashboard."
+        contextMessage={t('pricing.authPrompt')}
       />
     </section>
   );

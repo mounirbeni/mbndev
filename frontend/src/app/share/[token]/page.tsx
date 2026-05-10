@@ -11,6 +11,7 @@ import {
 import { projectAPI } from '@/lib/api';
 import ProjectLifecycle, { ProjectStatus } from '@/components/dashboard/ProjectLifecycle';
 import { formatDate } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const TYPE_LABELS: Record<string, string> = {
   website:        'Custom Website',
@@ -49,6 +50,7 @@ function MilestoneItem({ title, status, dueDate }: { title: string; status: stri
 }
 
 export default function SharePage() {
+  const { t }      = useLanguage();
   const { token }  = useParams<{ token: string }>();
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -74,7 +76,7 @@ export default function SharePage() {
             <span className="text-white font-bold text-sm">MBN DEV</span>
           </Link>
           <span className="text-xs text-slate-500 border border-white/10 px-3 py-1 rounded-full">
-            Project Status — Shared View
+            {t('share.sharedView')}
           </span>
         </div>
       </nav>
@@ -85,7 +87,7 @@ export default function SharePage() {
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-slate-500 text-sm">Loading project status…</p>
+            <p className="text-slate-500 text-sm">{t('share.loading')}</p>
           </div>
         )}
 
@@ -99,15 +101,15 @@ export default function SharePage() {
             <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
               <AlertCircle className="w-6 h-6 text-red-400" />
             </div>
-            <h2 className="text-lg font-bold text-white">Link expired or invalid</h2>
+            <h2 className="text-lg font-bold text-white">{t('share.linkInvalid')}</h2>
             <p className="text-slate-500 text-sm max-w-xs">
-              {error || 'This share link is no longer valid. Please request a new one from the project owner.'}
+              {error || t('share.linkInvalidSub')}
             </p>
             <Link
               href="/"
               className="mt-2 text-primary-400 text-sm hover:text-primary-300 flex items-center gap-1.5"
             >
-              Visit MBN DEV <ExternalLink className="w-3.5 h-3.5" />
+              {t('share.visitMbn')} <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           </motion.div>
         )}
@@ -153,7 +155,7 @@ export default function SharePage() {
                     {project.deadline && (
                       <div className="flex items-center gap-1.5 text-xs text-slate-500">
                         <Calendar className="w-3.5 h-3.5" />
-                        Deadline: {formatDate(project.deadline)}
+                        {t('share.deadline')}: {formatDate(project.deadline)}
                       </div>
                     )}
                   </div>
@@ -163,7 +165,7 @@ export default function SharePage() {
 
             {/* Lifecycle */}
             <div className="glass rounded-2xl border border-white/5 p-6">
-              <h2 className="text-sm font-semibold text-white mb-5">Project Stage</h2>
+              <h2 className="text-sm font-semibold text-white mb-5">{t('share.projectStage')}</h2>
               <ProjectLifecycle status={project.status as ProjectStatus} animated />
             </div>
 
@@ -172,9 +174,9 @@ export default function SharePage() {
               <div className="glass rounded-2xl border border-white/5 p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Target className="w-4 h-4 text-primary-400" />
-                  <h2 className="text-sm font-semibold text-white">Milestones</h2>
+                  <h2 className="text-sm font-semibold text-white">{t('share.milestones')}</h2>
                   <span className="ml-auto text-xs text-slate-500">
-                    {project.milestones.filter((m: any) => m.status === 'paid').length} / {project.milestones.length} done
+                    {project.milestones.filter((m: any) => m.status === 'paid').length} / {project.milestones.length} {t('share.done')}
                   </span>
                 </div>
                 <div>
@@ -187,12 +189,12 @@ export default function SharePage() {
 
             {/* Last updated */}
             <div className="flex items-center justify-between text-xs text-slate-600">
-              <span>Last updated {formatDate(project.updatedAt)}</span>
+              <span>{t('share.lastUpdated')} {formatDate(project.updatedAt)}</span>
               <Link
                 href="/"
                 className="flex items-center gap-1.5 text-primary-500/60 hover:text-primary-400 transition-colors"
               >
-                Powered by MBN DEV <ExternalLink className="w-3 h-3" />
+                {t('share.poweredBy')} <ExternalLink className="w-3 h-3" />
               </Link>
             </div>
           </motion.div>

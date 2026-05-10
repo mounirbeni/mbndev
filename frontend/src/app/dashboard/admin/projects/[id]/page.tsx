@@ -11,6 +11,7 @@ import PlanBadge from '@/components/ui/PlanBadge';
 import Button from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft, LayoutDashboard, MessageSquare, Paperclip, CreditCard,
@@ -20,12 +21,12 @@ import {
   Share2, Copy, CheckCheck,
 } from 'lucide-react';
 
-const TABS = [
-  { id: 'overview',  label: 'Overview',  icon: LayoutDashboard },
-  { id: 'messages',  label: 'Messages',  icon: MessageSquare   },
-  { id: 'files',     label: 'Files',     icon: Paperclip       },
-  { id: 'payments',  label: 'Payments',  icon: CreditCard      },
-  { id: 'activity',  label: 'Activity',  icon: Activity        },
+const TAB_DEFS = [
+  { id: 'overview',  labelKey: 'dash.tab.overview',  icon: LayoutDashboard },
+  { id: 'messages',  labelKey: 'dash.nav.messages',  icon: MessageSquare   },
+  { id: 'files',     labelKey: 'dash.tab.files',     icon: Paperclip       },
+  { id: 'payments',  labelKey: 'dash.nav.payments',  icon: CreditCard      },
+  { id: 'activity',  labelKey: 'dash.tab.activity',  icon: Activity        },
 ];
 
 const STATUS_OPTIONS: ProjectStatus[] = [
@@ -46,7 +47,11 @@ const ACTION_ICONS: Record<string, React.ElementType> = {
 export default function AdminProjectWorkspace() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
+
+  // Tabs built inside component so labels re-evaluate on locale change
+  const TABS = TAB_DEFS.map((tab) => ({ ...tab, label: t(tab.labelKey) }));
 
   const [project, setProject] = useState<Project | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -81,7 +86,7 @@ export default function AdminProjectWorkspace() {
         return pid === id;
       }));
     } catch {
-      toast.error('Failed to load project');
+      toast.error(t('toast.error'));
       router.push('/dashboard/admin/projects');
     } finally {
       setLoading(false);
@@ -121,10 +126,10 @@ export default function AdminProjectWorkspace() {
     setSaving(true);
     try {
       await projectAPI.update(id, editForm);
-      toast.success('Project updated');
+      toast.success(t('toast.saved'));
       setEditing(false);
       fetchAll();
-    } catch { toast.error('Failed to save'); }
+    } catch { toast.error(t('toast.error')); }
     finally { setSaving(false); }
   };
 
@@ -136,7 +141,7 @@ export default function AdminProjectWorkspace() {
       setMsgText('');
       const mRes = await messageAPI.get(id);
       setMessages(mRes.data.messages || []);
-    } catch { toast.error('Failed to send'); }
+    } catch { toast.error(t('toast.error')); }
     finally { setSending(false); }
   };
 
@@ -146,10 +151,10 @@ export default function AdminProjectWorkspace() {
       const { data } = await projectAPI.generateShare(id);
       await navigator.clipboard.writeText(data.shareUrl);
       setCopied(true);
-      toast.success('Share link copied to clipboard!');
+      toast.success(t('toast.copied'));
       setTimeout(() => setCopied(false), 3000);
     } catch {
-      toast.error('Failed to generate share link');
+      toast.error(t('toast.error'));
     } finally {
       setSharing(false);
     }
@@ -163,9 +168,9 @@ export default function AdminProjectWorkspace() {
     setUploading(true);
     try {
       await projectAPI.uploadFile(id, fd);
-      toast.success('File uploaded');
+      toast.success(t('toast.saved'));
       fetchAll();
-    } catch { toast.error('Upload failed'); }
+    } catch { toast.error(t('toast.error')); }
     finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
   };
 
@@ -187,7 +192,7 @@ export default function AdminProjectWorkspace() {
     <div className="space-y-5 max-w-5xl">
       <div className="flex items-center justify-between">
         <Link href="/dashboard/admin/projects" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
-          <ArrowLeft className="w-4 h-4" /> All Projects
+          <ArrowLeft className="w-4 h-4" /> {t('admin.allProjects')}
         </Link>
         {!editing ? (
           <div className="flex items-center gap-2">
@@ -197,21 +202,21 @@ export default function AdminProjectWorkspace() {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all disabled:opacity-50"
             >
               {copied
-                ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied!</>
+                ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> {t('common.copied')}</>
                 : sharing
-                  ? <><span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" /> Generating…</>
-                  : <><Share2 className="w-3.5 h-3.5" /> Share</>
+                  ? <><span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" /> {t('common.loading')}</>
+                  : <><Share2 className="w-3.5 h-3.5" /> {t('common.share')}</>
               }
             </button>
             <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-              <Edit2 className="w-3.5 h-3.5" /> Edit Project
+              <Edit2 className="w-3.5 h-3.5" /> {t('common.edit')}
             </Button>
           </div>
         ) : (
           <div className="flex gap-2">
-            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>{t('common.cancel')}</Button>
             <Button size="sm" onClick={saveEdits} loading={saving}>
-              <Save className="w-3.5 h-3.5" /> Save
+              <Save className="w-3.5 h-3.5" /> {t('common.save')}
             </Button>
           </div>
         )}
@@ -238,11 +243,11 @@ export default function AdminProjectWorkspace() {
           </div>
           <div className="flex items-center gap-4 shrink-0">
             <div className="text-right">
-              <div className="text-slate-400 text-xs mb-0.5">Budget</div>
+              <div className="text-slate-400 text-xs mb-0.5">{t('request.field.budget')}</div>
               <div className="text-white font-bold">{formatCurrency(project.budget)}</div>
             </div>
             <div className="text-right">
-              <div className="text-slate-400 text-xs mb-0.5">Paid</div>
+              <div className="text-slate-400 text-xs mb-0.5">{t('status.paid')}</div>
               <div className="text-green-400 font-bold">{formatCurrency(paidTotal)}</div>
             </div>
           </div>
@@ -252,7 +257,7 @@ export default function AdminProjectWorkspace() {
         {editing ? (
           <div className="mt-5 pt-5 border-t border-white/5 grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5">Status</label>
+              <label className="block text-xs text-slate-400 mb-1.5">{t('admin.status')}</label>
               <select
                 value={editForm.status}
                 onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value }))}
@@ -262,7 +267,7 @@ export default function AdminProjectWorkspace() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5">Progress: {editForm.progress}%</label>
+              <label className="block text-xs text-slate-400 mb-1.5">{t('admin.progress')}: {editForm.progress}%</label>
               <input type="range" min={0} max={100} value={editForm.progress}
                 onChange={(e) => setEditForm((f) => ({ ...f, progress: +e.target.value }))}
                 className="w-full accent-primary-500 mt-2" />
@@ -280,7 +285,7 @@ export default function AdminProjectWorkspace() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs text-slate-400 mb-1.5">Internal Notes</label>
+              <label className="block text-xs text-slate-400 mb-1.5">{t('admin.notes')}</label>
               <textarea value={editForm.notes}
                 onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
                 rows={2}
@@ -291,7 +296,7 @@ export default function AdminProjectWorkspace() {
         ) : (
           <div className="mt-5">
             <div className="flex justify-between text-xs text-slate-400 mb-2">
-              <span>Progress</span><span>{project.progress}%</span>
+              <span>{t('admin.progress')}</span><span>{project.progress}%</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div initial={{ width: 0 }} animate={{ width: `${project.progress}%` }} transition={{ duration: 1 }}
@@ -308,14 +313,14 @@ export default function AdminProjectWorkspace() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-white/5 rounded-xl p-1">
-        {TABS.map((t) => {
-          const Icon = t.icon;
+        {TABS.map((tabItem) => {
+          const Icon = tabItem.icon;
           return (
-            <button key={t.id} onClick={() => setTab(t.id)}
+            <button key={tabItem.id} onClick={() => setTab(tabItem.id)}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                tab === t.id ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' : 'text-slate-400 hover:text-white'
+                tab === tabItem.id ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' : 'text-slate-400 hover:text-white'
               }`}>
-              <Icon className="w-4 h-4" /><span className="hidden sm:inline">{t.label}</span>
+              <Icon className="w-4 h-4" /><span className="hidden sm:inline">{tabItem.label}</span>
             </button>
           );
         })}
@@ -330,12 +335,12 @@ export default function AdminProjectWorkspace() {
             <div className="grid lg:grid-cols-3 gap-5">
               <div className="lg:col-span-2 space-y-5">
                 <div className="glass rounded-2xl p-6 border border-white/5">
-                  <h3 className="text-white font-semibold mb-3">Description</h3>
+                  <h3 className="text-white font-semibold mb-3">{t('request.field.description')}</h3>
                   <p className="text-slate-400 text-sm leading-relaxed">{project.description}</p>
                 </div>
                 {project.features && project.features.length > 0 && (
                   <div className="glass rounded-2xl p-6 border border-white/5">
-                    <h3 className="text-white font-semibold mb-4">Requested Features</h3>
+                    <h3 className="text-white font-semibold mb-4">{t('admin.features')}</h3>
                     <div className="grid sm:grid-cols-2 gap-2">
                       {project.features.map((f) => (
                         <div key={f} className="flex items-center gap-2 text-sm text-slate-300">
@@ -347,7 +352,7 @@ export default function AdminProjectWorkspace() {
                 )}
                 {project.designPreferences && (
                   <div className="glass rounded-2xl p-6 border border-white/5">
-                    <h3 className="text-white font-semibold mb-4">Design Preferences</h3>
+                    <h3 className="text-white font-semibold mb-4">{t('admin.design')}</h3>
                     <div className="space-y-2 text-sm">
                       {project.designPreferences.style && <div className="flex gap-3"><span className="text-slate-500 w-24">Style</span><span className="text-white">{project.designPreferences.style}</span></div>}
                       {project.designPreferences.colors?.length ? <div className="flex gap-3"><span className="text-slate-500 w-24">Colors</span><span className="text-white">{project.designPreferences.colors.join(', ')}</span></div> : null}
@@ -359,7 +364,7 @@ export default function AdminProjectWorkspace() {
                 {/* Client info */}
                 {client && (
                   <div className="glass rounded-2xl p-5 border border-white/5">
-                    <h3 className="text-white font-semibold text-sm mb-4">Client</h3>
+                    <h3 className="text-white font-semibold text-sm mb-4">{t('admin.clients')}</h3>
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0">
                         {client.name?.[0]?.toUpperCase()}
@@ -374,14 +379,14 @@ export default function AdminProjectWorkspace() {
                   </div>
                 )}
                 <div className="glass rounded-2xl p-5 border border-white/5 space-y-3">
-                  <h3 className="text-white font-semibold text-sm">Project Info</h3>
+                  <h3 className="text-white font-semibold text-sm">{t('admin.projectInfo')}</h3>
                   {[
-                    { label: 'Budget', value: formatCurrency(project.budget) },
-                    { label: 'Paid', value: formatCurrency(paidTotal) },
-                    { label: 'Deadline', value: project.deadline ? formatDate(project.deadline) : 'Flexible' },
-                    { label: 'Revisions', value: `${project.revisions} / ${project.maxRevisions}` },
-                    { label: 'Created', value: formatDate(project.createdAt) },
-                    { label: 'Last update', value: formatDate(project.updatedAt) },
+                    { label: t('request.field.budget'), value: formatCurrency(project.budget) },
+                    { label: t('status.paid'),          value: formatCurrency(paidTotal) },
+                    { label: t('admin.deadline'),       value: project.deadline ? formatDate(project.deadline) : t('admin.flexible') },
+                    { label: t('admin.revisions'),      value: `${project.revisions} / ${project.maxRevisions}` },
+                    { label: t('dash.recent'),          value: formatDate(project.createdAt) },
+                    { label: t('admin.lastUpdate'),     value: formatDate(project.updatedAt) },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between text-xs">
                       <span className="text-slate-500">{label}</span>
@@ -400,7 +405,7 @@ export default function AdminProjectWorkspace() {
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <MessageSquare className="w-10 h-10 text-slate-700 mb-3" />
-                    <p className="text-slate-500 text-sm">No messages yet.</p>
+                    <p className="text-slate-500 text-sm">{t('empty.messages')}</p>
                   </div>
                 ) : messages.map((m) => {
                   const isSystem = m.type === 'system';
@@ -440,7 +445,7 @@ export default function AdminProjectWorkspace() {
                 <div className="flex gap-3">
                   <input value={msgText} onChange={(e) => setMsgText(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                    placeholder="Reply to client..."
+                    placeholder={t('admin.replyClient')}
                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary-500" />
                   <Button onClick={sendMessage} loading={sending} size="md"><Send className="w-4 h-4" /></Button>
                 </div>
@@ -454,14 +459,14 @@ export default function AdminProjectWorkspace() {
               <div onClick={() => fileInputRef.current?.click()}
                 className="glass rounded-2xl border-2 border-dashed border-white/10 hover:border-primary-500/40 p-10 text-center cursor-pointer transition-colors group">
                 <Upload className="w-8 h-8 text-slate-600 group-hover:text-primary-400 mx-auto mb-3 transition-colors" />
-                <p className="text-slate-400 text-sm">Upload deliverable file</p>
+                <p className="text-slate-400 text-sm">{t('admin.uploadFile')}</p>
                 <input ref={fileInputRef} type="file" className="hidden" onChange={handleUpload} />
               </div>
               {uploading && <div className="glass rounded-xl p-3 border border-primary-500/20 text-primary-400 text-sm text-center animate-pulse">Uploading...</div>}
               {!project.files || project.files.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border border-white/5">
                   <FileText className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-500 text-sm">No files uploaded yet.</p>
+                  <p className="text-slate-500 text-sm">{t('admin.noFiles')}</p>
                 </div>
               ) : (
                 <div className="glass rounded-2xl border border-white/5 overflow-hidden divide-y divide-white/5">
@@ -489,9 +494,9 @@ export default function AdminProjectWorkspace() {
             <div className="space-y-4">
               <div className="grid sm:grid-cols-3 gap-4">
                 {[
-                  { label: 'Total Budget', value: formatCurrency(project.budget), color: 'text-white' },
-                  { label: 'Collected', value: formatCurrency(paidTotal), color: 'text-green-400' },
-                  { label: 'Outstanding', value: formatCurrency(project.budget - paidTotal), color: 'text-yellow-400' },
+                  { label: t('request.field.budget'), value: formatCurrency(project.budget), color: 'text-white' },
+                  { label: t('admin.collected'),      value: formatCurrency(paidTotal), color: 'text-green-400' },
+                  { label: t('admin.outstanding'),    value: formatCurrency(project.budget - paidTotal), color: 'text-yellow-400' },
                 ].map((s) => (
                   <div key={s.label} className="glass rounded-xl p-4 border border-white/5 text-center">
                     <div className={`text-2xl font-black ${s.color} mb-1`}>{s.value}</div>
@@ -502,7 +507,7 @@ export default function AdminProjectWorkspace() {
               {payments.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border border-white/5">
                   <CreditCard className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-500 text-sm">No payments recorded yet.</p>
+                  <p className="text-slate-500 text-sm">{t('empty.payments')}</p>
                 </div>
               ) : (
                 <div className="glass rounded-2xl border border-white/5 overflow-hidden divide-y divide-white/5">
@@ -534,12 +539,12 @@ export default function AdminProjectWorkspace() {
                 {logs.length === 0 ? (
                   <div className="glass rounded-2xl p-12 text-center border border-white/5">
                     <Activity className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                    <p className="text-slate-500 text-sm">No activity yet.</p>
+                    <p className="text-slate-500 text-sm">{t('admin.noActivity')}</p>
                   </div>
                 ) : (
                   <div className="glass rounded-2xl border border-white/5 overflow-hidden">
                     <div className="p-4 border-b border-white/5">
-                      <h3 className="text-white font-semibold text-sm">Project Timeline</h3>
+                      <h3 className="text-white font-semibold text-sm">{t('admin.timeline')}</h3>
                     </div>
                     <div className="divide-y divide-white/5">
                       {logs.map((log: any, i: number) => (

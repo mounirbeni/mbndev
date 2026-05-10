@@ -6,12 +6,14 @@ import { MessageSquare, ArrowLeft, Loader2, Zap } from 'lucide-react';
 import { messageAPI } from '@/lib/api';
 import { MessageThread as ThreadType } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtime } from '@/hooks/useRealtime';
 import MessageThread from '@/components/dashboard/MessageThread';
 import { StatusBadge } from '@/components/ui/Badge';
 import { timeAgo } from '@/lib/utils';
 
 export default function ClientMessagesPage() {
+  const { t } = useLanguage();
   const [threads,    setThreads]    = useState<ThreadType[]>([]);
   const [selected,   setSelected]   = useState<ThreadType | null>(null);
   const [loading,    setLoading]    = useState(true);
@@ -41,7 +43,6 @@ export default function ClientMessagesPage() {
 
       setThreads((prev) => prev.map((t) => {
         if (t.projectId !== pid) return t;
-        // Update last message preview always
         let text = '';
         if (msg.type === 'system') {
           try { text = JSON.parse(msg.content).title; } catch { text = msg.content; }
@@ -53,7 +54,6 @@ export default function ClientMessagesPage() {
           lastMessage: { text, type: msg.type || 'user', senderName: msg.sender?.name, createdAt: msg.createdAt },
           updatedAt: msg.createdAt,
         };
-        // Only bump unread count if thread isn't currently open and message isn't from self
         if (!isActive && !isFromSelf) {
           updatedThread.unreadCount = t.unreadCount + 1;
         }
@@ -67,7 +67,6 @@ export default function ClientMessagesPage() {
   const handleSelect = (thread: ThreadType) => {
     setSelected(thread);
     setMobileChat(true);
-    // Clear unread count locally — getMessages will mark them as read on the backend
     setThreads((prev) =>
       prev.map((t) => t.projectId === thread.projectId ? { ...t, unreadCount: 0 } : t)
     );
@@ -82,17 +81,18 @@ export default function ClientMessagesPage() {
           <button
             onClick={() => setMobileChat(false)}
             className="lg:hidden p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-colors"
+            aria-label={t('common.back')}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
         )}
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-white">
-            {mobileChat && selected ? selected.projectTitle : 'Messages'}
+            {mobileChat && selected ? selected.projectTitle : t('messages.title')}
           </h1>
           {!mobileChat && (
             <p className="text-slate-500 text-sm hidden sm:block">
-              Direct communication with your development team
+              {t('messages.subtitle')}
             </p>
           )}
         </div>
@@ -113,7 +113,7 @@ export default function ClientMessagesPage() {
             >
               <div className="px-4 pt-4 pb-3 border-b border-white/5 shrink-0">
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-                  Projects
+                  {t('messages.projects')}
                 </p>
               </div>
 
@@ -125,16 +125,16 @@ export default function ClientMessagesPage() {
                 ) : threads.length === 0 ? (
                   <div className="py-10 text-center">
                     <MessageSquare className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                    <p className="text-slate-500 text-sm">No projects yet</p>
-                    <p className="text-slate-600 text-xs mt-1">Request a project to get started</p>
+                    <p className="text-slate-500 text-sm">{t('messages.noProjects')}</p>
+                    <p className="text-slate-600 text-xs mt-1">{t('messages.noProjects.sub')}</p>
                   </div>
                 ) : (
-                  threads.map((t) => {
-                    const isActive = selected?.projectId === t.projectId && !mobileChat;
+                  threads.map((thread) => {
+                    const isActive = selected?.projectId === thread.projectId && !mobileChat;
                     return (
                       <button
-                        key={t.projectId}
-                        onClick={() => handleSelect(t)}
+                        key={thread.projectId}
+                        onClick={() => handleSelect(thread)}
                         className={`w-full text-left p-3 rounded-xl transition-all group ${
                           isActive
                             ? 'bg-primary-500/15 border border-primary-500/25'
@@ -145,34 +145,34 @@ export default function ClientMessagesPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium text-white truncate leading-tight">
-                                {t.projectTitle}
+                                {thread.projectTitle}
                               </span>
-                              {t.unreadCount > 0 && (
+                              {thread.unreadCount > 0 && (
                                 <span className="shrink-0 min-w-[18px] h-[18px] px-1 bg-primary-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                                  {t.unreadCount > 9 ? '9+' : t.unreadCount}
+                                  {thread.unreadCount > 9 ? '9+' : thread.unreadCount}
                                 </span>
                               )}
                             </div>
                           </div>
-                          <StatusBadge status={t.projectStatus} />
+                          <StatusBadge status={thread.projectStatus} />
                         </div>
 
-                        {t.lastMessage ? (
+                        {thread.lastMessage ? (
                           <div className="flex items-end justify-between gap-2">
                             <p className={`text-xs leading-snug truncate flex-1 flex items-center gap-1 ${
-                              t.unreadCount > 0 ? 'text-slate-300 font-medium' : 'text-slate-600'
+                              thread.unreadCount > 0 ? 'text-slate-300 font-medium' : 'text-slate-600'
                             }`}>
-                              {t.lastMessage.type === 'system' && (
+                              {thread.lastMessage.type === 'system' && (
                                 <Zap className="w-2.5 h-2.5 text-amber-400 shrink-0" />
                               )}
-                              {t.lastMessage.text}
+                              {thread.lastMessage.text}
                             </p>
                             <span className="text-[10px] text-slate-700 shrink-0">
-                              {timeAgo(t.lastMessage.createdAt)}
+                              {timeAgo(thread.lastMessage.createdAt)}
                             </span>
                           </div>
                         ) : (
-                          <p className="text-xs text-slate-700">No messages yet</p>
+                          <p className="text-xs text-slate-700">{t('messages.noMessages')}</p>
                         )}
                       </button>
                     );
@@ -209,8 +209,8 @@ export default function ClientMessagesPage() {
                   <div className="w-16 h-16 bg-primary-500/8 border border-primary-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <MessageSquare className="w-7 h-7 text-primary-400/60" />
                   </div>
-                  <p className="text-slate-400 text-sm font-medium">Select a project</p>
-                  <p className="text-slate-600 text-xs mt-1">to view messages</p>
+                  <p className="text-slate-400 text-sm font-medium">{t('messages.selectProject')}</p>
+                  <p className="text-slate-600 text-xs mt-1">{t('messages.selectProject.sub')}</p>
                 </div>
               </div>
             )

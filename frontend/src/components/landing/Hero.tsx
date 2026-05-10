@@ -12,19 +12,13 @@ import {
   SiPrisma, SiStripe,
 } from 'react-icons/si';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 30 },
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.6, delay, ease: 'easeOut' },
 });
-
-const stats = [
-  { icon: Zap,        label: 'Fast Delivery',        desc: 'We respect deadlines and deliver on time.' },
-  { icon: Shield,     label: 'Modern & Secure',       desc: 'Latest tech, best practices always.' },
-  { icon: Code2,      label: 'Clean Code',            desc: 'Scalable, maintainable, future-ready.' },
-  { icon: Headphones, label: 'Ongoing Support',       desc: 'We stay by your side after delivery.' },
-];
 
 const stack = [
   { label: 'Next.js',     Icon: SiNextdotjs,    hex: '#ffffff' },
@@ -40,6 +34,15 @@ const stack = [
 ];
 
 export default function Hero() {
+  const { t } = useLanguage();
+
+  const stats = [
+    { icon: Zap,        label: t('hero.stat.fast'),    desc: t('hero.stat.fast.desc') },
+    { icon: Shield,     label: t('hero.stat.secure'),  desc: t('hero.stat.secure.desc') },
+    { icon: Code2,      label: t('hero.stat.clean'),   desc: t('hero.stat.clean.desc') },
+    { icon: Headphones, label: t('hero.stat.support'), desc: t('hero.stat.support.desc') },
+  ];
+
   return (
     <section
       id="home"
@@ -59,31 +62,29 @@ export default function Hero() {
               {...fadeUp(0.2)}
               className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.08] mb-5"
             >
-              Custom Websites<br />
-              Built to{' '}
-              <span className="gradient-text">Elevate</span>
+              {t('hero.title.line1')}<br />
+              {t('hero.title.line2a')}{' '}
+              <span className="gradient-text">{t('hero.title.elevate')}</span>
               <br className="hidden sm:block" />
-              {' '}Your{' '}
-              <span className="gradient-text">Business.</span>
+              {' '}{t('hero.title.line2b')}{' '}
+              <span className="gradient-text">{t('hero.title.business')}</span>
             </motion.h1>
 
             <motion.p {...fadeUp(0.35)} className="text-base sm:text-lg text-slate-400 mb-8 max-w-lg leading-relaxed">
-              MBN DEV is a Moroccan platform by{' '}
-              <span className="text-white font-medium">Mounir Banni</span>, dedicated to building
-              modern, fast, and high-performing websites tailored to your needs.
+              {t('hero.subtitle')}
             </motion.p>
 
             {/* CTAs — full width on mobile */}
             <motion.div {...fadeUp(0.45)} className="flex flex-col sm:flex-row gap-3 mb-10">
               <Link href="/request" className="w-full sm:w-auto">
                 <Button size="lg" className="group w-full sm:w-auto justify-center">
-                  Start Your Project
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {t('hero.cta.primary')}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
                 </Button>
               </Link>
               <a href="#portfolio" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto justify-center">
-                  View Our Work
+                  {t('hero.cta.secondary')}
                 </Button>
               </a>
             </motion.div>
@@ -92,7 +93,7 @@ export default function Hero() {
             <motion.div {...fadeUp(0.55)}>
               <p className="text-xs text-slate-500 mb-3 flex items-center gap-1.5">
                 <Code2 className="w-3 h-3 text-slate-600" />
-                Built with modern technologies
+                {t('hero.stack.label')}
               </p>
               <div className="flex flex-wrap gap-2.5 items-center">
                 {stack.map(({ label, Icon, hex }) => (
@@ -119,20 +120,20 @@ export default function Hero() {
               <div className="glass rounded-2xl p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h3 className="text-white font-semibold text-sm">Project Overview</h3>
-                    <p className="text-slate-500 text-xs mt-0.5">Your client dashboard</p>
+                    <h3 className="text-white font-semibold text-sm">{t('hero.mock.title')}</h3>
+                    <p className="text-slate-500 text-xs mt-0.5">{t('hero.mock.subtitle')}</p>
                   </div>
                   <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
                     <Sparkles className="w-3 h-3 text-green-400" />
-                    <span className="text-green-400 text-xs font-medium">Live tracking</span>
+                    <span className="text-green-400 text-xs font-medium">{t('hero.mock.live')}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mb-5">
                   {[
-                    { label: 'Total',       bg: 'bg-white/5',        text: 'text-white',        bar: 'w-full' },
-                    { label: 'In Progress', bg: 'bg-blue-500/10',    text: 'text-blue-400',     bar: 'w-2/3' },
-                    { label: 'Completed',   bg: 'bg-primary-500/10', text: 'text-primary-400',  bar: 'w-1/2' },
+                    { label: t('hero.mock.total'),      bg: 'bg-white/5',        text: 'text-white',        bar: 'w-full' },
+                    { label: t('hero.mock.inProgress'), bg: 'bg-blue-500/10',    text: 'text-blue-400',     bar: 'w-2/3' },
+                    { label: t('hero.mock.completed'),  bg: 'bg-primary-500/10', text: 'text-primary-400',  bar: 'w-1/2' },
                   ].map((s) => (
                     <div key={s.label} className={`${s.bg} rounded-xl p-3 text-center`}>
                       <div className={`${s.text} font-bold text-xl`}>—</div>
@@ -143,21 +144,21 @@ export default function Hero() {
 
                 <div className="space-y-3">
                   {[
-                    { name: 'E-Commerce Store',  type: 'E-Commerce', progress: 100, status: 'Live',        statusColor: 'text-green-400',   bar: 'bg-green-500' },
-                    { name: 'Corporate Website', type: 'Web Design',  progress: 75,  status: 'In Progress', statusColor: 'text-blue-400',    bar: 'bg-blue-500' },
-                    { name: 'SaaS Dashboard',    type: 'Web App',     progress: 40,  status: 'In Progress', statusColor: 'text-blue-400',    bar: 'bg-primary-500' },
-                    { name: 'Portfolio Site',    type: 'Portfolio',   progress: 100, status: 'Live',        statusColor: 'text-green-400',   bar: 'bg-green-500' },
+                    { name: 'E-Commerce Store',  progress: 100, isLive: true,  statusColor: 'text-green-400',   bar: 'bg-green-500' },
+                    { name: 'Corporate Website', progress: 75,  isLive: false, statusColor: 'text-blue-400',    bar: 'bg-blue-500' },
+                    { name: 'SaaS Dashboard',    progress: 40,  isLive: false, statusColor: 'text-blue-400',    bar: 'bg-primary-500' },
+                    { name: 'Portfolio Site',    progress: 100, isLive: true,  statusColor: 'text-green-400',   bar: 'bg-green-500' },
                   ].map((p) => (
                     <div key={p.name} className="flex items-center gap-3">
                       <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-                        {p.status === 'Live'
+                        {p.isLive
                           ? <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
                           : <Circle className="w-3.5 h-3.5 text-blue-400" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-white text-xs font-medium truncate">{p.name}</span>
-                          <span className={`text-[10px] font-semibold shrink-0 ml-2 ${p.statusColor}`}>{p.status}</span>
+                          <span className={`text-[10px] font-semibold shrink-0 ml-2 ${p.statusColor}`}>{p.isLive ? t('status.live') : t('status.inProgress')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
@@ -179,13 +180,13 @@ export default function Hero() {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <BarChart2 className="w-3.5 h-3.5 text-primary-400" />
-                  <span className="text-white text-xs font-medium">Recent Activity</span>
+                  <span className="text-white text-xs font-medium">{t('hero.mock.activity')}</span>
                 </div>
                 <div className="space-y-1.5">
                   {[
-                    { dot: 'bg-green-500',    text: 'New project received' },
-                    { dot: 'bg-blue-500',     text: 'Design approved' },
-                    { dot: 'bg-primary-500',  text: 'Payment received' },
+                    { dot: 'bg-green-500',    text: t('hero.mock.act1') },
+                    { dot: 'bg-blue-500',     text: t('hero.mock.act2') },
+                    { dot: 'bg-primary-500',  text: t('hero.mock.act3') },
                   ].map((a) => (
                     <div key={a.text} className="flex items-center gap-1.5">
                       <div className={`w-1.5 h-1.5 rounded-full ${a.dot} shrink-0`} />

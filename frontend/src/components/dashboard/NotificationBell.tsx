@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Bell, Check, CheckCheck, X, Loader2 } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useRealtime } from '@/hooks/useRealtime';
 
@@ -39,6 +40,7 @@ function timeAgo(dateStr: string) {
 }
 
 export default function NotificationBell() {
+  const { t } = useLanguage();
   const [open,    setOpen]    = useState(false);
   const [notifs,  setNotifs]  = useState<Notif[]>([]);
   const [unread,  setUnread]  = useState(0);
@@ -103,7 +105,7 @@ export default function NotificationBell() {
       {/* Bell button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Notifications"
+        aria-label={t('notif.title')}
         className="relative w-9 h-9 flex items-center justify-center rounded-xl text-slate-400
                    hover:text-white transition-colors"
         style={{ background: 'rgba(255,255,255,0.05)' }}
@@ -139,14 +141,14 @@ export default function NotificationBell() {
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/6">
-              <span className="text-white font-semibold text-sm">Notifications</span>
+              <span className="text-white font-semibold text-sm">{t('notif.title')}</span>
               <div className="flex items-center gap-2">
                 {unread > 0 && (
                   <button
                     onClick={markAll}
                     className="text-xs text-slate-400 hover:text-primary-400 flex items-center gap-1 transition-colors"
                   >
-                    <CheckCheck className="w-3.5 h-3.5" /> Mark all read
+                    <CheckCheck className="w-3.5 h-3.5" /> {t('notif.markAllRead')}
                   </button>
                 )}
                 <button onClick={() => setOpen(false)} className="text-slate-500 hover:text-white transition-colors">
@@ -164,7 +166,7 @@ export default function NotificationBell() {
               ) : notifs.length === 0 ? (
                 <div className="py-10 text-center">
                   <Bell className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                  <p className="text-slate-500 text-sm">No notifications yet</p>
+                  <p className="text-slate-500 text-sm">{t('empty.notifications')}</p>
                 </div>
               ) : (
                 notifs.map((n) => {

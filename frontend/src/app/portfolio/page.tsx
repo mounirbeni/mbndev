@@ -6,10 +6,25 @@ import Link from 'next/link';
 import { ExternalLink, ArrowRight, Zap } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const categories = ['All', 'E-Commerce', 'Web App', 'SaaS', 'Hospitality'];
+// Project category IDs (language-agnostic, used for filtering)
+type Category = 'All' | 'E-Commerce' | 'Web App' | 'SaaS' | 'Hospitality';
 
-const projects = [
+const projects: {
+  id: number;
+  title: string;
+  url: string;
+  category: Category;
+  type: string;
+  description: string;
+  tags: string[];
+  gradient: string;
+  accent: string;
+  border: string;
+  stats: { label: string; value: string }[];
+  highlight: string;
+}[] = [
   {
     id: 1,
     title: 'CarryLink',
@@ -102,8 +117,20 @@ const projects = [
   },
 ];
 
+// Map category IDs to translation keys
+const CATEGORY_KEYS: Record<string, string> = {
+  'All':         'portfolio.cat.all',
+  'E-Commerce':  'portfolio.cat.ecommerce',
+  'Web App':     'portfolio.cat.webapp',
+  'SaaS':        'portfolio.cat.saas',
+  'Hospitality': 'portfolio.cat.hospitality',
+};
+
+const CATEGORY_IDS: Category[] = ['All', 'E-Commerce', 'Web App', 'SaaS', 'Hospitality'];
+
 export default function PortfolioPage() {
-  const [active, setActive] = useState('All');
+  const { t } = useLanguage();
+  const [active, setActive] = useState<Category>('All');
 
   const filtered = active === 'All' ? projects : projects.filter((p) => p.category === active);
 
@@ -115,13 +142,13 @@ export default function PortfolioPage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-6">
-              <Zap className="w-3 h-3 text-primary-400" /> Real Projects
+              <Zap className="w-3 h-3 text-primary-400" /> {t('portfolio.badge')}
             </span>
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight">
-              Projects That<br /><span className="gradient-text">Speak for Themselves</span>
+              {t('portfolio.pageTitle')}
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Live products built for real clients — from Moroccan e-commerce to global SaaS platforms.
+              {t('portfolio.pageSub')}
             </p>
           </motion.div>
         </div>
@@ -131,17 +158,17 @@ export default function PortfolioPage() {
       <section className="pb-10 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((c) => (
+            {CATEGORY_IDS.map((catId) => (
               <button
-                key={c}
-                onClick={() => setActive(c)}
+                key={catId}
+                onClick={() => setActive(catId)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                  active === c
+                  active === catId
                     ? 'bg-primary-500/20 border border-primary-500/40 text-primary-400'
                     : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:border-white/20'
                 }`}
               >
-                {c}
+                {t(CATEGORY_KEYS[catId])}
               </button>
             ))}
           </div>
@@ -169,7 +196,6 @@ export default function PortfolioPage() {
                 >
                   {/* Preview area */}
                   <div className={`h-44 bg-gradient-to-br ${p.gradient} relative flex items-center justify-center overflow-hidden`}>
-                    {/* Big initials watermark */}
                     <div className={`text-6xl font-black ${p.accent} opacity-10 select-none tracking-tighter`}>
                       {p.title.replace(/\s/g, '')}
                     </div>
@@ -180,7 +206,7 @@ export default function PortfolioPage() {
                     {/* Live badge */}
                     <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] bg-green-500/20 border border-green-500/30 rounded-full px-2.5 py-1 text-green-400">
                       <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                      Live
+                      {t('portfolio.live')}
                     </span>
                   </div>
 
@@ -218,9 +244,9 @@ export default function PortfolioPage() {
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1.5">
-                      {p.tags.map((t) => (
-                        <span key={t} className="text-[10px] bg-white/5 border border-white/10 rounded-full px-2 py-0.5 text-slate-400">
-                          {t}
+                      {p.tags.map((tag) => (
+                        <span key={tag} className="text-[10px] bg-white/5 border border-white/10 rounded-full px-2 py-0.5 text-slate-400">
+                          {tag}
                         </span>
                       ))}
                     </div>
@@ -236,11 +262,11 @@ export default function PortfolioPage() {
       <section className="pb-24 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-3xl font-bold text-white mb-3">Want to be our next project?</h2>
-            <p className="text-slate-400 mb-8">Let's build something remarkable together.</p>
+            <h2 className="text-3xl font-bold text-white mb-3">{t('portfolio.cta.title')}</h2>
+            <p className="text-slate-400 mb-8">{t('portfolio.cta.sub')}</p>
             <Link href="/request">
               <Button size="lg" className="group">
-                Start Your Project <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                {t('hero.cta.primary')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </motion.div>

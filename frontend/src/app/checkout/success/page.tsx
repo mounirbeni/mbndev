@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CheckCircle2, ArrowRight, FolderOpen, LayoutDashboard } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 function SuccessContent() {
-  const params  = useSearchParams();
-  const orderId = params.get('order_id');
+  const { t }    = useLanguage();
+  const params   = useSearchParams();
+  const orderId  = params.get('order_id');
 
   return (
     <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center p-6">
@@ -32,19 +34,19 @@ function SuccessContent() {
           <CheckCircle2 className="w-12 h-12 text-green-400" />
         </motion.div>
 
-        <h1 className="text-3xl font-bold text-white mb-3">Payment received</h1>
+        <h1 className="text-3xl font-bold text-white mb-3">{t('checkout.success.received')}</h1>
         <p className="text-slate-400 mb-2">
-          Your payment has been recorded and is awaiting verification.
+          {t('checkout.success.awaiting')}
         </p>
         <p className="text-slate-500 text-sm mb-8">
-          We typically verify payments within a few hours. The moment it&apos;s confirmed, your project becomes active and you&apos;ll get a notification.
+          {t('checkout.success.timeline')}
         </p>
 
         <div className="space-y-3">
           <Link href="/dashboard/client/orders">
             <Button className="w-full" size="lg">
               <FolderOpen className="w-4 h-4" />
-              View my orders
+              {t('checkout.success.viewOrders')}
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -52,13 +54,13 @@ function SuccessContent() {
           <Link href="/dashboard/client">
             <Button variant="outline" className="w-full" size="lg">
               <LayoutDashboard className="w-4 h-4" />
-              Go to dashboard
+              {t('checkout.success.goDash')}
             </Button>
           </Link>
         </div>
 
         {orderId && (
-          <p className="text-slate-600 text-xs mt-6">Order: {orderId}</p>
+          <p className="text-slate-600 text-xs mt-6">{t('checkout.success.order')}: {orderId}</p>
         )}
       </motion.div>
     </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { adminAPI } from '@/lib/api';
 import { User } from '@/types';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { formatDate, getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import PlanBadge from '@/components/ui/PlanBadge';
@@ -11,6 +12,7 @@ import toast from 'react-hot-toast';
 import { Users } from 'lucide-react';
 
 export default function AdminClientsPage() {
+  const { t } = useLanguage();
   const [clients, setClients] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,17 +29,17 @@ export default function AdminClientsPage() {
       setClients((prev) =>
         prev.map((c) => (c._id === id ? { ...c, isActive: data.user.isActive } : c))
       );
-      toast.success('Client status updated');
+      toast.success(t('toast.saved'));
     } catch {
-      toast.error('Failed to update client');
+      toast.error(t('toast.error'));
     }
   };
 
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold text-white">Clients</h1>
-        <p className="text-slate-400 text-sm mt-1">{clients.length} registered clients</p>
+        <h1 className="text-2xl font-bold text-white">{t('admin.clients')}</h1>
+        <p className="text-slate-400 text-sm mt-1">{clients.length} {t('admin.clients.count')}</p>
       </div>
 
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
@@ -50,17 +52,17 @@ export default function AdminClientsPage() {
         ) : clients.length === 0 ? (
           <div className="p-12 text-center">
             <Users className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-500 text-sm">No clients yet.</p>
+            <p className="text-slate-500 text-sm">{t('empty.clients')}</p>
           </div>
         ) : (
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/5">
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Client</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Plan</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Company</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Joined</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Status</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('auth.signup.company')}</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('auth.field.phone')}</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
                 <th className="p-4" />
               </tr>
             </thead>
@@ -89,7 +91,7 @@ export default function AdminClientsPage() {
                   <td className="p-4 text-sm text-slate-400">{c.createdAt ? formatDate(c.createdAt) : '—'}</td>
                   <td className="p-4">
                     <Badge color={c.isActive ? 'green' : 'red'}>
-                      {c.isActive ? 'Active' : 'Inactive'}
+                      {c.isActive ? t('status.active') : t('status.inactive')}
                     </Badge>
                   </td>
                   <td className="p-4">
@@ -97,7 +99,7 @@ export default function AdminClientsPage() {
                       onClick={() => toggleStatus(c._id ?? c.id ?? '')}
                       className="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
                     >
-                      Toggle
+                      {t('admin.toggle')}
                     </button>
                   </td>
                 </motion.tr>

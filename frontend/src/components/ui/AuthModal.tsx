@@ -6,15 +6,8 @@ import { X, Eye, EyeOff, Check, Zap, Star, Crown, ArrowRight, Lock } from 'lucid
 import Button from './Button';
 import Input from './Input';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
-
-const BENEFITS = [
-  { icon: Check, text: 'Save your project draft instantly' },
-  { icon: Check, text: 'Track progress & revisions in real time' },
-  { icon: Check, text: 'Manage payments & invoices' },
-  { icon: Check, text: 'Direct message with the developer' },
-  { icon: Check, text: 'Full dashboard access' },
-];
 
 interface AuthModalProps {
   open: boolean;
@@ -38,6 +31,7 @@ export default function AuthModal({
   plan,
 }: AuthModalProps) {
   const { login, register } = useAuth();
+  const { t } = useLanguage();
   const [tab, setTab] = useState<'login' | 'register'>(defaultTab);
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -51,6 +45,15 @@ export default function AuthModal({
   const [regEmail, setRegEmail] = useState('');
   const [regPass, setRegPass] = useState('');
   const [regCompany, setRegCompany] = useState('');
+
+  // Benefits list — built inside component so labels re-evaluate on locale change
+  const BENEFITS = [
+    { icon: Check, text: t('auth.modal.benefit1') },
+    { icon: Check, text: t('auth.modal.benefit2') },
+    { icon: Check, text: t('auth.modal.benefit3') },
+    { icon: Check, text: t('auth.modal.benefit4') },
+    { icon: Check, text: t('auth.modal.benefit5') },
+  ];
 
   // Reset tab when modal opens
   useEffect(() => {
@@ -72,11 +75,11 @@ export default function AuthModal({
     setLoading(true);
     try {
       await login(loginEmail, loginPass);
-      toast.success('Welcome back!');
+      toast.success(t('toast.loggedIn'));
       onSuccess?.();
       onClose();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Invalid credentials');
+      toast.error(err?.response?.data?.message || t('toast.invalidCreds'));
     } finally {
       setLoading(false);
     }
@@ -84,15 +87,15 @@ export default function AuthModal({
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (regPass.length < 6) { toast.error('Password must be at least 6 characters'); return; }
+    if (regPass.length < 6) { toast.error(t('auth.modal.passError')); return; }
     setLoading(true);
     try {
       await register({ name: regName, email: regEmail, password: regPass, company: regCompany || undefined });
-      toast.success('Account created! Welcome aboard 🎉');
+      toast.success(t('toast.signedUp'));
       onSuccess?.();
       onClose();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Registration failed');
+      toast.error(err?.response?.data?.message || t('auth.modal.regFailed'));
     } finally {
       setLoading(false);
     }
@@ -105,6 +108,12 @@ export default function AuthModal({
     custom: 'text-slate-300',
   };
   const planColor = plan ? (planColors[plan.toLowerCase()] ?? 'text-primary-300') : 'text-primary-300';
+
+  // Tab definitions — avoids shadowing the `t` translation function
+  const TABS: { id: 'register' | 'login'; label: string }[] = [
+    { id: 'register', label: t('auth.modal.tabCreate') },
+    { id: 'login',    label: t('auth.modal.tabSignin') },
+  ];
 
   return (
     <AnimatePresence>
@@ -145,7 +154,7 @@ export default function AuthModal({
 
                   {plan && (
                     <div className="mb-6 px-4 py-3 rounded-xl bg-white/5 border border-white/10">
-                      <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider">Selected plan</p>
+                      <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider">{t('auth.modal.selectedPlan')}</p>
                       <p className={`font-bold text-lg capitalize ${planColor}`}>
                         {plan === 'pro' && <Star className="w-4 h-4 inline mr-1.5 -mt-0.5" />}
                         {plan === 'premium' && <Crown className="w-4 h-4 inline mr-1.5 -mt-0.5" />}
@@ -160,12 +169,10 @@ export default function AuthModal({
                   )}
 
                   <h2 className="text-2xl font-bold text-white mb-2">
-                    {tab === 'register' ? 'Create your account' : 'Welcome back'}
+                    {tab === 'register' ? t('auth.modal.createTitle') : t('auth.modal.welcomeBack')}
                   </h2>
                   <p className="text-slate-400 text-sm mb-8">
-                    {tab === 'register'
-                      ? 'Sign up to save your project and get full access to your client workspace.'
-                      : 'Sign in to continue your project request and access your dashboard.'}
+                    {tab === 'register' ? t('auth.modal.registerSub') : t('auth.modal.loginSub')}
                   </p>
 
                   <ul className="space-y-3">
@@ -189,7 +196,7 @@ export default function AuthModal({
                         </div>
                       ))}
                     </div>
-                    <p className="text-slate-400 text-xs">Join our growing clients</p>
+                    <p className="text-slate-400 text-xs">{t('auth.modal.joinClients')}</p>
                   </div>
                 </div>
               </div>
@@ -219,17 +226,17 @@ export default function AuthModal({
 
                 {/* Tabs */}
                 <div className="flex bg-white/5 rounded-xl p-1 mb-6">
-                  {(['register', 'login'] as const).map((t) => (
+                  {TABS.map((tabItem) => (
                     <button
-                      key={t}
-                      onClick={() => setTab(t)}
+                      key={tabItem.id}
+                      onClick={() => setTab(tabItem.id)}
                       className={`flex-1 text-sm font-medium py-2 rounded-lg transition-all ${
-                        tab === t
+                        tab === tabItem.id
                           ? 'bg-primary-600 text-white shadow'
                           : 'text-slate-400 hover:text-white'
                       }`}
                     >
-                      {t === 'register' ? 'Create Account' : 'Sign In'}
+                      {tabItem.label}
                     </button>
                   ))}
                 </div>
@@ -247,41 +254,41 @@ export default function AuthModal({
                     >
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs text-slate-400 mb-1.5">Full Name *</label>
+                          <label className="block text-xs text-slate-400 mb-1.5">{t('auth.modal.fullName')} *</label>
                           <Input
                             value={regName}
                             onChange={(e) => setRegName(e.target.value)}
-                            placeholder="Your name"
+                            placeholder={t('auth.signup.namePlaceholder')}
                             required
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-slate-400 mb-1.5">Company</label>
+                          <label className="block text-xs text-slate-400 mb-1.5">{t('auth.signup.company')}</label>
                           <Input
                             value={regCompany}
                             onChange={(e) => setRegCompany(e.target.value)}
-                            placeholder="Optional"
+                            placeholder={t('auth.signup.companyPlaceholder')}
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1.5">Email *</label>
+                        <label className="block text-xs text-slate-400 mb-1.5">{t('auth.field.email')} *</label>
                         <Input
                           type="email"
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
-                          placeholder="you@example.com"
+                          placeholder={t('auth.placeholder.email')}
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1.5">Password *</label>
+                        <label className="block text-xs text-slate-400 mb-1.5">{t('auth.field.password')} *</label>
                         <div className="relative">
                           <Input
                             type={showPass ? 'text' : 'password'}
                             value={regPass}
                             onChange={(e) => setRegPass(e.target.value)}
-                            placeholder="Min. 6 characters"
+                            placeholder={t('auth.placeholder.passwordMin')}
                             required
                             className="pr-10"
                           />
@@ -295,8 +302,8 @@ export default function AuthModal({
                         </div>
                       </div>
                       <Button type="submit" size="md" className="w-full mt-2 group" disabled={loading}>
-                        {loading ? 'Creating account…' : (
-                          <>Create Account <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                        {loading ? t('auth.modal.creating') : (
+                          <>{t('auth.signup.submit')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
                         )}
                       </Button>
                     </motion.form>
@@ -311,23 +318,23 @@ export default function AuthModal({
                       className="space-y-4 flex-1 flex flex-col"
                     >
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1.5">Email</label>
+                        <label className="block text-xs text-slate-400 mb-1.5">{t('auth.field.email')}</label>
                         <Input
                           type="email"
                           value={loginEmail}
                           onChange={(e) => setLoginEmail(e.target.value)}
-                          placeholder="you@example.com"
+                          placeholder={t('auth.placeholder.email')}
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1.5">Password</label>
+                        <label className="block text-xs text-slate-400 mb-1.5">{t('auth.field.password')}</label>
                         <div className="relative">
                           <Input
                             type={showPass ? 'text' : 'password'}
                             value={loginPass}
                             onChange={(e) => setLoginPass(e.target.value)}
-                            placeholder="Your password"
+                            placeholder={t('auth.placeholder.passwordDots')}
                             required
                             className="pr-10"
                           />
@@ -341,8 +348,8 @@ export default function AuthModal({
                         </div>
                       </div>
                       <Button type="submit" size="md" className="w-full mt-2 group" disabled={loading}>
-                        {loading ? 'Signing in…' : (
-                          <>Sign In <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                        {loading ? t('auth.modal.signingIn') : (
+                          <>{t('auth.login.submit')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
                         )}
                       </Button>
                     </motion.form>
@@ -350,15 +357,13 @@ export default function AuthModal({
                 </AnimatePresence>
 
                 <p className="text-xs text-center text-slate-500 mt-6">
-                  {tab === 'register'
-                    ? 'Already have an account? '
-                    : "Don't have an account? "}
+                  {tab === 'register' ? t('auth.modal.hasAccount') : t('auth.modal.noAccount')}{' '}
                   <button
                     type="button"
                     onClick={() => setTab(tab === 'register' ? 'login' : 'register')}
                     className="text-primary-400 hover:text-primary-300 transition-colors"
                   >
-                    {tab === 'register' ? 'Sign in' : 'Create one'}
+                    {tab === 'register' ? t('auth.modal.signInLink') : t('auth.modal.createLink')}
                   </button>
                 </p>
               </div>

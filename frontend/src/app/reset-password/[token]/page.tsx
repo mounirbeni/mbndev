@@ -8,11 +8,13 @@ import { ArrowLeft, Zap, Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { authAPI } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
 
 export default function ResetPasswordPage() {
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [password, setPassword] = useState('');
   const [confirm, setConfirm]   = useState('');
@@ -24,11 +26,11 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     if (loading) return;
 
-    if (password.length < 8) return toast.error('Password must be at least 8 characters');
+    if (password.length < 8) return toast.error(t('validation.password'));
     if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-      return toast.error('Password must contain both letters and numbers');
+      return toast.error(t('validation.password'));
     }
-    if (password !== confirm) return toast.error('Passwords do not match');
+    if (password !== confirm) return toast.error(t('validation.passwordMatch'));
 
     setLoading(true);
     try {
@@ -36,7 +38,7 @@ export default function ResetPasswordPage() {
       setDone(true);
       setTimeout(() => router.push('/login'), 2200);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Could not reset password');
+      toast.error(err?.response?.data?.message || t('toast.error'));
     } finally {
       setLoading(false);
     }
@@ -67,16 +69,16 @@ export default function ResetPasswordPage() {
                 <Lock className="w-7 h-7 text-primary-400" />
               </div>
 
-              <h1 className="text-2xl font-bold text-white mb-2 text-center">Choose a new password</h1>
+              <h1 className="text-2xl font-bold text-white mb-2 text-center">{t('auth.reset.title')}</h1>
               <p className="text-slate-400 text-sm mb-6 leading-relaxed text-center">
-                Pick something at least 8 characters with letters and numbers.
+                {t('auth.reset.subtitle')}
               </p>
 
               <form onSubmit={submit} className="space-y-4">
                 <div className="relative">
                   <Input
                     type={show ? 'text' : 'password'}
-                    label="New password"
+                    label={t('auth.reset.newPassword')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -95,7 +97,7 @@ export default function ResetPasswordPage() {
 
                 <Input
                   type={show ? 'text' : 'password'}
-                  label="Confirm password"
+                  label={t('auth.reset.confirmPassword')}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required
@@ -103,7 +105,7 @@ export default function ResetPasswordPage() {
                 />
 
                 <Button type="submit" className="w-full" size="lg" loading={loading}>
-                  Update password
+                  {t('auth.reset.submit')}
                 </Button>
               </form>
             </>
@@ -117,8 +119,8 @@ export default function ResetPasswordPage() {
               >
                 <CheckCircle2 className="w-7 h-7 text-green-400" />
               </motion.div>
-              <h1 className="text-2xl font-bold text-white mb-2">Password updated</h1>
-              <p className="text-slate-400 text-sm mb-2">Sending you back to the login page…</p>
+              <h1 className="text-2xl font-bold text-white mb-2">{t('auth.reset.done.title')}</h1>
+              <p className="text-slate-400 text-sm mb-2">{t('auth.reset.done.sub')}</p>
             </div>
           )}
 
@@ -127,7 +129,7 @@ export default function ResetPasswordPage() {
               href="/login"
               className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" /> Back to login
+              <ArrowLeft className="w-4 h-4" /> {t('auth.forgot.back')}
             </Link>
           </div>
         </div>

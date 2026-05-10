@@ -12,6 +12,7 @@ import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import AuthModal from '@/components/ui/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const BADGE_STYLES: Record<string, { icon: any; className: string }> = {
   'Limited Offer': { icon: Flame,  className: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
@@ -44,34 +45,35 @@ const fallbackPackages = [
   },
 ];
 
-const comparison = [
-  { feature: 'Pages', starter: 'Up to 5', pro: 'Up to 10', premium: 'Unlimited' },
-  { feature: 'Responsive Design', starter: true, pro: true, premium: true },
-  { feature: 'SEO Optimization', starter: 'Basic', pro: 'Advanced', premium: 'Advanced' },
-  { feature: 'CMS Integration', starter: false, pro: true, premium: true },
-  { feature: 'Custom Features', starter: false, pro: false, premium: true },
-  { feature: 'Revisions', starter: '1', pro: '3', premium: '6' },
-  { feature: 'Priority Support', starter: false, pro: true, premium: true },
-  { feature: 'Source Code', starter: false, pro: false, premium: true },
-  { feature: 'Maintenance (1 mo)', starter: false, pro: false, premium: true },
-  { feature: 'Delivery Time', starter: '7 days', pro: '14 days', premium: '21 days' },
-];
-
-const faqs = [
-  { q: 'Can I upgrade my package later?', a: 'Yes! You can always upgrade your package at any time. We\'ll credit the amount already paid.' },
-  { q: 'Is a deposit required?', a: 'Yes, a 50% deposit is required to start the project. The remaining 50% is due upon delivery.' },
-  { q: 'What if I need something not in the packages?', a: 'We handle custom projects too. Use the contact page to describe your needs and we\'ll send a tailored proposal.' },
-  { q: 'Do prices include hosting?', a: 'Prices cover development only. Hosting, domain, and third-party services are separate costs.' },
-];
-
 export default function PricingPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAnnual, setShowAnnual] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
+
+  const comparison = [
+    { feature: t('pricing.compare.pages'),      starter: 'Up to 5',  pro: 'Up to 10', premium: t('pricing.compare.unlimited') },
+    { feature: t('pricing.compare.responsive'), starter: true,       pro: true,        premium: true },
+    { feature: t('pricing.compare.seo'),        starter: t('pricing.compare.basic'), pro: t('pricing.compare.advanced'), premium: t('pricing.compare.advanced') },
+    { feature: t('pricing.compare.cms'),        starter: false,      pro: true,        premium: true },
+    { feature: t('pricing.compare.customFeat'), starter: false,      pro: false,       premium: true },
+    { feature: t('pricing.compare.revisions'),  starter: '1',        pro: '3',         premium: '6' },
+    { feature: t('pricing.compare.support'),    starter: false,      pro: true,        premium: true },
+    { feature: t('pricing.compare.source'),     starter: false,      pro: false,       premium: true },
+    { feature: t('pricing.compare.maint'),      starter: false,      pro: false,       premium: true },
+    { feature: t('pricing.compare.delivery'),   starter: '7 days',   pro: '14 days',   premium: '21 days' },
+  ];
+
+  const faqs = [
+    { q: t('pricing.faq.q1'), a: t('pricing.faq.a1') },
+    { q: t('pricing.faq.q2'), a: t('pricing.faq.a2') },
+    { q: t('pricing.faq.q3'), a: t('pricing.faq.a3') },
+    { q: t('pricing.faq.q4'), a: t('pricing.faq.a4') },
+  ];
 
   useEffect(() => {
     packageAPI.getAll()
@@ -105,13 +107,13 @@ export default function PricingPage() {
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-6">
-              <Zap className="w-3 h-3 text-primary-400" /> Simple, Transparent Pricing
+              <Zap className="w-3 h-3 text-primary-400" /> {t('pricing.page.badge')}
             </span>
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight">
-              The perfect plan<br />for your <span className="gradient-text">next project</span>
+              {t('pricing.page.title1')}<br />{t('pricing.page.title2')} <span className="gradient-text">{t('pricing.page.titleBold')}</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-xl mx-auto">
-              No hidden fees. No surprises. Save up to <span className="text-green-400 font-semibold">47%</span> vs average freelancer market rates.
+              {t('pricing.page.subtitle')} <span className="text-green-400 font-semibold">{t('pricing.page.subtitlePct')}</span> {t('pricing.page.subtitleEnd')}
             </p>
           </motion.div>
         </div>
@@ -140,7 +142,7 @@ export default function PricingPage() {
                   {/* Most Popular pill */}
                   {pkg.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-primary-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full">
-                      <Star className="w-3 h-3" /> Most Popular
+                      <Star className="w-3 h-3" /> {t('pricing.mostPopular')}
                     </div>
                   )}
 
@@ -171,16 +173,16 @@ export default function PricingPage() {
                     {pkg.originalPrice && (
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-slate-500 text-sm line-through">{formatCurrency(pkg.originalPrice)}</span>
-                        <span className="text-slate-500 text-xs">market avg</span>
+                        <span className="text-slate-500 text-xs">{t('pricing.marketAvgLabel')}</span>
                       </div>
                     )}
                     <div className="flex items-end gap-1.5">
                       <span className="text-4xl font-black text-white">{formatCurrency(pkg.price)}</span>
-                      <span className="text-slate-500 text-sm mb-1">/ project</span>
+                      <span className="text-slate-500 text-sm mb-1">{t('pricing.perProjectLabel')}</span>
                     </div>
                     {pkg.originalPrice && (
                       <p className="text-green-400 text-xs font-semibold mt-1.5">
-                        ✓ You save {formatCurrency(pkg.originalPrice - pkg.price)} vs market
+                        ✓ {t('pricing.youSaveLabel').replace('{amount}', formatCurrency(pkg.originalPrice - pkg.price))}
                       </p>
                     )}
                   </div>
@@ -202,7 +204,7 @@ export default function PricingPage() {
                     className="w-full group"
                     onClick={() => choosePlan(pkg)}
                   >
-                    Choose {pkg.name}
+                    {t('pricing.choosePlan')} {pkg.name}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </motion.div>
@@ -216,15 +218,15 @@ export default function PricingPage() {
       <section className="pb-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-2">Compare Plans</h2>
-            <p className="text-slate-400">See exactly what's included in each package.</p>
+            <h2 className="text-3xl font-bold text-white mb-2">{t('pricing.compare.title')}</h2>
+            <p className="text-slate-400">{t('pricing.compare.sub')}</p>
           </div>
           <div className="glass rounded-2xl border border-white/5 overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5">
-                  <th className="text-left p-4 text-slate-400 font-medium text-sm w-1/2">Feature</th>
-                  {['Starter', 'Pro', 'Premium'].map((n) => (
+                  <th className="text-left p-4 text-slate-400 font-medium text-sm w-1/2">{t('pricing.compare.feature')}</th>
+                  {[t('pricing.compare.starter'), t('pricing.compare.pro'), t('pricing.compare.premium')].map((n) => (
                     <th key={n} className="p-4 text-center text-sm font-semibold text-white">{n}</th>
                   ))}
                 </tr>
@@ -233,7 +235,7 @@ export default function PricingPage() {
                 {comparison.map((row, i) => (
                   <tr key={row.feature} className={`border-b border-white/5 ${i % 2 === 0 ? '' : 'bg-white/[0.02]'}`}>
                     <td className="p-4 text-slate-400 text-sm">{row.feature}</td>
-                    {['starter', 'pro', 'premium'].map((key) => {
+                    {(['starter', 'pro', 'premium'] as const).map((key) => {
                       const val = row[key as keyof typeof row];
                       return (
                         <td key={key} className="p-4 text-center">
@@ -259,7 +261,7 @@ export default function PricingPage() {
       <section className="pb-20 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-2">Pricing FAQ</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">{t('pricing.faq.title')}</h2>
           </div>
           <div className="space-y-3">
             {faqs.map((faq, i) => (
@@ -294,11 +296,11 @@ export default function PricingPage() {
             className="glass rounded-3xl p-12 border border-primary-500/20 relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-blue-500/5 pointer-events-none" />
-            <h2 className="text-3xl font-bold text-white mb-3 relative z-10">Need something custom?</h2>
-            <p className="text-slate-400 mb-8 relative z-10">Enterprise projects, complex SaaS, or multi-phase builds — let's discuss a tailored proposal.</p>
+            <h2 className="text-3xl font-bold text-white mb-3 relative z-10">{t('pricing.cta.title')}</h2>
+            <p className="text-slate-400 mb-8 relative z-10">{t('pricing.cta.sub')}</p>
             <Link href="/contact" className="relative z-10 inline-block">
               <Button size="lg" className="group">
-                Get Custom Quote <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                {t('pricing.cta.btn')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </motion.div>

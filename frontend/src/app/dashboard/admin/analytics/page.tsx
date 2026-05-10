@@ -9,6 +9,7 @@ import {
   Activity, Package, Loader2, DollarSign, Target, Zap,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency, formatDate, statusLabels } from '@/lib/utils';
 
 // ─── Type labels ──────────────────────────────────────────────────────────────
@@ -168,6 +169,7 @@ function BarChart({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminAnalyticsPage() {
+  const { t } = useLanguage();
   const [data,    setData]    = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState('');
@@ -184,7 +186,7 @@ export default function AdminAnalyticsPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-primary-400 animate-spin mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">Loading analytics…</p>
+          <p className="text-slate-500 text-sm">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -195,7 +197,7 @@ export default function AdminAnalyticsPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center max-w-sm">
           <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-          <p className="text-white font-medium mb-1">Failed to load analytics</p>
+          <p className="text-white font-medium mb-1">{t('common.error')}</p>
           <p className="text-slate-500 text-sm">{error}</p>
         </div>
       </div>
@@ -253,32 +255,32 @@ export default function AdminAnalyticsPage() {
     <div className="space-y-6 max-w-7xl">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Business Intelligence</h1>
+          <h1 className="text-2xl font-bold text-white">{t('admin.analytics')}</h1>
           <p className="text-slate-400 text-sm mt-1">
-            Live platform analytics — {year}
+            {t('admin.analytics.sub')} — {year}
           </p>
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold">
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-          Live
+          {t('admin.live')}
         </div>
       </motion.div>
 
       {/* ── KPI row ─────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Stat title="Total Revenue"    value={formatCurrency(totalRevenue)}    sub="All paid invoices"    icon={CreditCard} color="green"  index={0} />
-        <Stat title="Total Projects"   value={totalProjects}                   sub="All time"             icon={FolderOpen} color="purple" index={1} />
-        <Stat title="Active Clients"   value={activeClients}                   sub={`${totalClients} total`} icon={Users}   color="blue"   index={2} />
-        <Stat title="Pending Revenue"  value={formatCurrency(pendingRevenue)}  sub="Awaiting payment"     icon={Clock}      color="yellow" index={3} />
+        <Stat title={t('admin.totalRevenue')}   value={formatCurrency(totalRevenue)}   sub={t('admin.allPaid')}                    icon={CreditCard} color="green"  index={0} />
+        <Stat title={t('admin.allProjects')}    value={totalProjects}                  sub={t('admin.allTime')}                    icon={FolderOpen} color="purple" index={1} />
+        <Stat title={t('status.active')}        value={activeClients}                  sub={`${totalClients} total`}               icon={Users}      color="blue"   index={2} />
+        <Stat title={t('admin.pendingRevenue')} value={formatCurrency(pendingRevenue)} sub={t('admin.awaitingPay')}                icon={Clock}      color="yellow" index={3} />
       </div>
 
       {/* ── Secondary KPIs ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Completion Rate',   value: `${completionRate}%`,   color: 'text-green-400'   },
-          { label: 'Paid Invoices',     value: paidCount,              color: 'text-emerald-400' },
-          { label: 'In Progress',       value: byStatus.inProgress,    color: 'text-blue-400'    },
-          { label: 'Completed',         value: byStatus.completed,     color: 'text-primary-400' },
+          { label: t('admin.completionRate'), value: `${completionRate}%`,  color: 'text-green-400'   },
+          { label: t('status.paid'),          value: paidCount,             color: 'text-emerald-400' },
+          { label: t('status.inProgress'),    value: byStatus.inProgress,   color: 'text-blue-400'    },
+          { label: t('status.completed'),     value: byStatus.completed,    color: 'text-primary-400' },
         ].map((s, i) => (
           <motion.div
             key={s.label}
@@ -359,7 +361,7 @@ export default function AdminAnalyticsPage() {
         <div className="lg:col-span-2 glass rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-white font-semibold">Monthly Revenue</h3>
+              <h3 className="text-white font-semibold">{t('admin.monthlyRevenue')}</h3>
               <p className="text-slate-500 text-xs mt-0.5">
                 Real payments data — {year}
               </p>
@@ -379,7 +381,7 @@ export default function AdminAnalyticsPage() {
 
         {/* Status breakdown */}
         <div className="glass rounded-2xl p-6 border border-white/5">
-          <h3 className="text-white font-semibold mb-5">Project Status</h3>
+          <h3 className="text-white font-semibold mb-5">{t('admin.projectStatus')}</h3>
           {statusRows.length === 0 ? (
             <EmptyChart label="No projects yet" />
           ) : (
@@ -403,7 +405,7 @@ export default function AdminAnalyticsPage() {
             </div>
           )}
           <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
-            <span className="text-slate-500 text-xs">Completion rate</span>
+            <span className="text-slate-500 text-xs">{t('admin.completionRate')}</span>
             <span className="text-green-400 font-bold text-sm">{completionRate}%</span>
           </div>
         </div>
@@ -415,7 +417,7 @@ export default function AdminAnalyticsPage() {
         <div className="glass rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="text-white font-semibold">Client Growth</h3>
+              <h3 className="text-white font-semibold">{t('admin.clientGrowth')}</h3>
               <p className="text-slate-500 text-xs mt-0.5">New clients per month — {year}</p>
             </div>
             <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center">
@@ -429,7 +431,7 @@ export default function AdminAnalyticsPage() {
         <div className="glass rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="text-white font-semibold">Projects Created</h3>
+              <h3 className="text-white font-semibold">{t('admin.projectsCreated')}</h3>
               <p className="text-slate-500 text-xs mt-0.5">New projects per month — {year}</p>
             </div>
             <div className="w-8 h-8 rounded-xl bg-primary-500/15 flex items-center justify-center">
@@ -444,7 +446,7 @@ export default function AdminAnalyticsPage() {
       <div className="glass rounded-2xl p-6 border border-white/5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="text-white font-semibold">Project Pipeline Funnel</h3>
+            <h3 className="text-white font-semibold">{t('admin.projectFunnel')}</h3>
             <p className="text-slate-500 text-xs mt-0.5">Distribution of all projects by stage</p>
           </div>
           <div className="flex items-center gap-2 text-blue-400 text-sm font-semibold">
@@ -474,19 +476,19 @@ export default function AdminAnalyticsPage() {
         <div className="mt-5 pt-4 border-t border-white/5 grid grid-cols-3 gap-4 text-center">
           <div>
             <div className="text-lg font-bold text-green-400">{completionRate}%</div>
-            <div className="text-slate-500 text-xs">Completion rate</div>
+            <div className="text-slate-500 text-xs">{t('admin.completionRate')}</div>
           </div>
           <div>
             <div className="text-lg font-bold text-blue-400">
               {totalProjects > 0 ? Math.round(((byStatus.inProgress || 0) / totalProjects) * 100) : 0}%
             </div>
-            <div className="text-slate-500 text-xs">In development</div>
+            <div className="text-slate-500 text-xs">{t('admin.inDevelopment')}</div>
           </div>
           <div>
             <div className="text-lg font-bold text-amber-400">
               {totalProjects > 0 ? Math.round(((byStatus.pending || 0) / totalProjects) * 100) : 0}%
             </div>
-            <div className="text-slate-500 text-xs">Pending review</div>
+            <div className="text-slate-500 text-xs">{t('admin.pendingReview')}</div>
           </div>
         </div>
       </div>
@@ -495,7 +497,7 @@ export default function AdminAnalyticsPage() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* By type */}
         <div className="glass rounded-2xl p-6 border border-white/5">
-          <h3 className="text-white font-semibold mb-5">Projects by Service Type</h3>
+          <h3 className="text-white font-semibold mb-5">{t('admin.projectsByType')}</h3>
           {typeRows.length === 0 ? (
             <EmptyChart label="No projects yet" />
           ) : (
@@ -528,7 +530,7 @@ export default function AdminAnalyticsPage() {
         {/* Recent payments */}
         <div className="glass rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-white font-semibold">Recent Payments</h3>
+            <h3 className="text-white font-semibold">{t('admin.recentPayments')}</h3>
             <Link href="/dashboard/admin/payments" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
               View all <ArrowRight className="w-3 h-3" />
             </Link>
@@ -576,7 +578,7 @@ export default function AdminAnalyticsPage() {
       {/* ── Recent projects table ────────────────────────────────────────────── */}
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-white/5">
-          <h3 className="text-white font-semibold">Recent Projects</h3>
+          <h3 className="text-white font-semibold">{t('admin.recentProjects')}</h3>
           <Link href="/dashboard/admin/projects" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
             View all <ArrowRight className="w-3 h-3" />
           </Link>
@@ -622,7 +624,7 @@ export default function AdminAnalyticsPage() {
       {/* ── Recent clients ───────────────────────────────────────────────────── */}
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-white/5">
-          <h3 className="text-white font-semibold">Recent Clients</h3>
+          <h3 className="text-white font-semibold">{t('admin.recentClients')}</h3>
           <Link href="/dashboard/admin/clients" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
             View all <ArrowRight className="w-3 h-3" />
           </Link>

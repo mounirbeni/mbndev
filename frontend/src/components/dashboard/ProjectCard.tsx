@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Calendar, MessageSquare, ArrowRight } from 'lucide-react';
 import { Project } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { formatDate, projectTypeLabels } from '@/lib/utils';
 
 interface ProjectCardProps {
@@ -14,6 +15,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, href, index = 0 }: ProjectCardProps) {
+  const { t } = useLanguage();
   const client = typeof project.client === 'object' ? project.client : null;
 
   return (
@@ -40,7 +42,7 @@ export default function ProjectCard({ project, href, index = 0 }: ProjectCardPro
           {/* Progress bar */}
           <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-slate-500">Progress</span>
+              <span className="text-slate-500">{t('admin.progress')}</span>
               <span className="text-slate-400">{project.progress}%</span>
             </div>
             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">

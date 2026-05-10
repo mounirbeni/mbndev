@@ -6,54 +6,41 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard,
-  FolderOpen,
-  MessageSquare,
-  CreditCard,
-  Settings,
-  LogOut,
-  Zap,
-  Users,
-  Package,
-  Menu,
-  X,
-  BarChart2,
-  ChevronRight,
-  ShoppingBag,
+  LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
+  Settings, LogOut, Zap, Users, Package, Menu, X, BarChart2,
+  ChevronRight, ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn, getInitials } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ElementType;
+  labelKey: string;
+  href:      string;
+  icon:      React.ElementType;
 }
 
-const adminNav: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard/admin',           icon: LayoutDashboard },
-  { label: 'Orders',    href: '/dashboard/admin/orders',    icon: ShoppingBag },
-  { label: 'Projects',  href: '/dashboard/admin/projects',  icon: FolderOpen },
-  { label: 'Messages',  href: '/dashboard/admin/messages',  icon: MessageSquare },
-  { label: 'Clients',   href: '/dashboard/admin/clients',   icon: Users },
-  { label: 'Packages',  href: '/dashboard/admin/packages',  icon: Package },
-  { label: 'Payments',  href: '/dashboard/admin/payments',  icon: CreditCard },
-  { label: 'Analytics', href: '/dashboard/admin/analytics', icon: BarChart2 },
+const adminNavDef: NavItem[] = [
+  { labelKey: 'dash.nav.dashboard', href: '/dashboard/admin',           icon: LayoutDashboard },
+  { labelKey: 'dash.nav.orders',    href: '/dashboard/admin/orders',    icon: ShoppingBag },
+  { labelKey: 'dash.nav.projects',  href: '/dashboard/admin/projects',  icon: FolderOpen },
+  { labelKey: 'dash.nav.messages',  href: '/dashboard/admin/messages',  icon: MessageSquare },
+  { labelKey: 'dash.nav.clients',   href: '/dashboard/admin/clients',   icon: Users },
+  { labelKey: 'dash.nav.packages',  href: '/dashboard/admin/packages',  icon: Package },
+  { labelKey: 'dash.nav.payments',  href: '/dashboard/admin/payments',  icon: CreditCard },
+  { labelKey: 'dash.nav.analytics', href: '/dashboard/admin/analytics', icon: BarChart2 },
 ];
 
-const clientNav: NavItem[] = [
-  { label: 'Dashboard',   href: '/dashboard/client',           icon: LayoutDashboard },
-  { label: 'My Orders',   href: '/dashboard/client/orders',    icon: ShoppingBag },
-  { label: 'My Projects', href: '/dashboard/client/projects',  icon: FolderOpen },
-  { label: 'Messages',    href: '/dashboard/client/messages',  icon: MessageSquare },
-  { label: 'Payments',    href: '/dashboard/client/payments',  icon: CreditCard },
-  { label: 'Settings',    href: '/dashboard/client/settings',  icon: Settings },
+const clientNavDef: NavItem[] = [
+  { labelKey: 'dash.nav.dashboard',  href: '/dashboard/client',           icon: LayoutDashboard },
+  { labelKey: 'dash.nav.myOrders',   href: '/dashboard/client/orders',    icon: ShoppingBag },
+  { labelKey: 'dash.nav.myProjects', href: '/dashboard/client/projects',  icon: FolderOpen },
+  { labelKey: 'dash.nav.messages',   href: '/dashboard/client/messages',  icon: MessageSquare },
+  { labelKey: 'dash.nav.payments',   href: '/dashboard/client/payments',  icon: CreditCard },
+  { labelKey: 'dash.nav.settings',   href: '/dashboard/client/settings',  icon: Settings },
 ];
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Sidebar panel — shared between desktop permanent sidebar and mobile drawer
-───────────────────────────────────────────────────────────────────────────── */
 interface SidebarProps {
   mobile?: boolean;
   onClose?: () => void;
@@ -61,26 +48,27 @@ interface SidebarProps {
 
 export default function Sidebar({ mobile, onClose }: SidebarProps) {
   const { user, logout, isAdmin } = useAuth();
+  const { t } = useLanguage();
   const pathname = usePathname();
   const router   = useRouter();
-  const nav      = isAdmin ? adminNav : clientNav;
+  const navDef   = isAdmin ? adminNavDef : clientNavDef;
 
   const handleLogout = () => {
     logout();
-    toast.success('Logged out');
+    toast.success(t('toast.loggedOut'));
     router.push('/');
     onClose?.();
   };
 
   const isActive = (href: string) => pathname === href;
 
+  const roleLabel = isAdmin ? t('dash.role.admin') : t('dash.role.client');
+
   return (
     <div
       className={cn(
         'flex flex-col h-full select-none',
-        mobile
-          ? 'w-[280px] sm:w-72'          // mobile drawer width
-          : 'w-64 border-r border-white/6' // desktop sidebar
+        mobile ? 'w-[280px] sm:w-72' : 'w-64 border-r border-white/6'
       )}
       style={{
         background: 'rgba(10, 10, 13, 0.97)',
@@ -96,11 +84,7 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
           paddingBottom: '16px',
         }}
       >
-        <Link
-          href="/"
-          onClick={onClose}
-          className="flex items-center gap-2.5 group"
-        >
+        <Link href="/" onClick={onClose} className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 bg-primary-500 rounded-xl flex items-center justify-center shrink-0"
                style={{ boxShadow: '0 0 16px rgba(124,58,237,0.4)' }}>
             <Zap className="w-4 h-4 text-white" />
@@ -111,7 +95,7 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
         {mobile && (
           <button
             onClick={onClose}
-            aria-label="Close menu"
+            aria-label={t('dash.closeMenu')}
             className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400
                        hover:text-white hover:bg-white/8 active:bg-white/12 transition-colors shrink-0"
           >
@@ -130,7 +114,7 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-white text-sm font-semibold leading-tight truncate">{user?.name}</div>
-            <div className="text-slate-500 text-xs capitalize mt-0.5">{user?.role} account</div>
+            <div className="text-slate-500 text-xs capitalize mt-0.5">{roleLabel}</div>
           </div>
         </div>
       </div>
@@ -138,7 +122,7 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
       {/* ── Nav items ─────────────────────────────────────────────────── */}
       <nav className="flex-1 overflow-y-auto px-3 pt-2 pb-2 space-y-0.5"
            style={{ WebkitOverflowScrolling: 'touch' }}>
-        {nav.map((item) => {
+        {navDef.map((item) => {
           const active = isActive(item.href);
           const Icon   = item.icon;
           return (
@@ -148,18 +132,13 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
               onClick={onClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-all duration-150 group',
-                active
-                  ? 'text-white font-medium'
-                  : 'text-slate-400 hover:text-white'
+                active ? 'text-white font-medium' : 'text-slate-400 hover:text-white'
               )}
               style={active ? {
                 background: 'rgba(124,58,237,0.15)',
                 border:     '1px solid rgba(124,58,237,0.25)',
-              } : {
-                border: '1px solid transparent',
-              }}
+              } : { border: '1px solid transparent' }}
             >
-              {/* Icon container */}
               <div className={cn(
                 'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors',
                 active ? '' : 'group-hover:bg-white/6'
@@ -168,7 +147,7 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
                 <Icon className={cn('w-4 h-4', active ? 'text-primary-400' : 'text-slate-500 group-hover:text-slate-300')} />
               </div>
 
-              <span className="flex-1 leading-none">{item.label}</span>
+              <span className="flex-1 leading-none">{t(item.labelKey)}</span>
 
               {active
                 ? <div className="w-1.5 h-1.5 rounded-full bg-primary-400 shrink-0" />
@@ -195,7 +174,7 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
           <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
             <LogOut className="w-4 h-4" />
           </div>
-          Sign Out
+          {t('dash.signOut')}
         </button>
       </div>
     </div>
@@ -203,23 +182,15 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   MobileSidebar — hamburger trigger + full-screen drawer via React portal.
-
-   WHY PORTAL?
-   The dashboard <header> uses `backdrop-filter` which creates a CSS stacking
-   context. Any `position:fixed` child of that header has its z-index resolved
-   WITHIN that stacking context, not globally — so the drawer ends up painted
-   behind the <main> content. createPortal() attaches the overlay directly to
-   <body>, completely escaping every stacking context.
+   MobileSidebar — hamburger trigger + full-screen drawer via React portal
 ───────────────────────────────────────────────────────────────────────────── */
 export function MobileSidebar() {
   const [open,    setOpen]    = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { t } = useLanguage();
 
-  // Only render portal on client (createPortal needs document)
   useEffect(() => { setMounted(true); }, []);
 
-  // Lock / unlock body scroll when drawer is open
   useEffect(() => {
     if (!mounted) return;
     document.body.style.overflow = open ? 'hidden' : '';
@@ -228,12 +199,10 @@ export function MobileSidebar() {
 
   const handleClose = () => setOpen(false);
 
-  // The overlay rendered via portal — completely outside any stacking context
   const portalContent = (
     <AnimatePresence>
       {open && (
         <>
-          {/* ── Dark blur backdrop ────────────────────────────────────── */}
           <motion.div
             key="sidebar-backdrop"
             initial={{ opacity: 0 }}
@@ -242,16 +211,12 @@ export function MobileSidebar() {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             onClick={handleClose}
             style={{
-              position:        'fixed',
-              inset:           0,
-              zIndex:          9998,
-              background:      'rgba(0, 0, 0, 0.75)',
-              backdropFilter:  'blur(6px)',
+              position: 'fixed', inset: 0, zIndex: 9998,
+              background: 'rgba(0, 0, 0, 0.75)',
+              backdropFilter: 'blur(6px)',
               WebkitBackdropFilter: 'blur(6px)',
             }}
           />
-
-          {/* ── Slide-in drawer ───────────────────────────────────────── */}
           <motion.div
             key="sidebar-drawer"
             initial={{ x: '-100%' }}
@@ -259,11 +224,7 @@ export function MobileSidebar() {
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 320, mass: 0.8 }}
             style={{
-              position: 'fixed',
-              top:      0,
-              left:     0,
-              bottom:   0,
-              zIndex:   9999,
+              position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 9999,
               boxShadow: '4px 0 40px rgba(0,0,0,0.6), 2px 0 16px rgba(0,0,0,0.4)',
             }}
           >
@@ -276,10 +237,9 @@ export function MobileSidebar() {
 
   return (
     <>
-      {/* Hamburger trigger button — stays inside header */}
       <button
         onClick={() => setOpen(true)}
-        aria-label="Open navigation menu"
+        aria-label={t('dash.openMenu')}
         aria-expanded={open}
         className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl
                    text-slate-400 hover:text-white hover:bg-white/8
@@ -288,7 +248,6 @@ export function MobileSidebar() {
         <Menu className="w-5 h-5" />
       </button>
 
-      {/* Portal overlay — rendered directly in document.body */}
       {mounted && createPortal(portalContent, document.body)}
     </>
   );

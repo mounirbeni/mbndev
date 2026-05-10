@@ -6,50 +6,41 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard,
-  FolderOpen,
-  MessageSquare,
-  CreditCard,
-  Settings,
-  Users,
-  BarChart2,
-  ShoppingBag,
+  LayoutDashboard, FolderOpen, MessageSquare,
+  CreditCard, Settings, Users, BarChart2, ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
 interface NavTab {
-  label: string;
-  href: string;
-  icon: React.ElementType;
-  dot?: boolean;
+  labelKey: string;
+  href:     string;
+  icon:     React.ElementType;
+  dot?:     boolean;
 }
 
-const adminTabs: NavTab[] = [
-  { label: 'Home',     href: '/dashboard/admin',           icon: LayoutDashboard },
-  { label: 'Orders',   href: '/dashboard/admin/orders',    icon: ShoppingBag },
-  { label: 'Projects', href: '/dashboard/admin/projects',  icon: FolderOpen },
-  { label: 'Messages', href: '/dashboard/admin/messages',  icon: MessageSquare, dot: true },
-  { label: 'Stats',    href: '/dashboard/admin/analytics', icon: BarChart2 },
+const adminTabsDef: NavTab[] = [
+  { labelKey: 'dash.nav.home',     href: '/dashboard/admin',           icon: LayoutDashboard },
+  { labelKey: 'dash.nav.orders',   href: '/dashboard/admin/orders',    icon: ShoppingBag },
+  { labelKey: 'dash.nav.projects', href: '/dashboard/admin/projects',  icon: FolderOpen },
+  { labelKey: 'dash.nav.messages', href: '/dashboard/admin/messages',  icon: MessageSquare, dot: true },
+  { labelKey: 'dash.nav.stats',    href: '/dashboard/admin/analytics', icon: BarChart2 },
 ];
 
-const clientTabs: NavTab[] = [
-  { label: 'Home',     href: '/dashboard/client',           icon: LayoutDashboard },
-  { label: 'Orders',   href: '/dashboard/client/orders',    icon: ShoppingBag },
-  { label: 'Projects', href: '/dashboard/client/projects',  icon: FolderOpen },
-  { label: 'Messages', href: '/dashboard/client/messages',  icon: MessageSquare, dot: true },
-  { label: 'Settings', href: '/dashboard/client/settings',  icon: Settings },
+const clientTabsDef: NavTab[] = [
+  { labelKey: 'dash.nav.home',     href: '/dashboard/client',           icon: LayoutDashboard },
+  { labelKey: 'dash.nav.orders',   href: '/dashboard/client/orders',    icon: ShoppingBag },
+  { labelKey: 'dash.nav.projects', href: '/dashboard/client/projects',  icon: FolderOpen },
+  { labelKey: 'dash.nav.messages', href: '/dashboard/client/messages',  icon: MessageSquare, dot: true },
+  { labelKey: 'dash.nav.settings', href: '/dashboard/client/settings',  icon: Settings },
 ];
 
-/*
-  BottomNav is rendered via createPortal to document.body so that it sits at
-  the top of the global stacking order — completely outside any backdrop-filter
-  or transform stacking context that could push it behind other fixed elements.
-*/
 export default function BottomNav() {
   const { isAdmin }    = useAuth();
+  const { t }          = useLanguage();
   const pathname       = usePathname();
-  const tabs           = isAdmin ? adminTabs : clientTabs;
+  const tabsDef        = isAdmin ? adminTabsDef : clientTabsDef;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
@@ -65,11 +56,7 @@ export default function BottomNav() {
       aria-label="Mobile navigation"
       className="lg:hidden"
       style={{
-        position: 'fixed',
-        bottom:   0,
-        left:     0,
-        right:    0,
-        zIndex:   9990, // below sidebar (9999) but above everything else
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9990,
         background:           'rgba(8, 8, 11, 0.97)',
         backdropFilter:       'blur(28px) saturate(1.8)',
         WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
@@ -80,7 +67,7 @@ export default function BottomNav() {
         className="flex items-stretch justify-around px-1"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}
       >
-        {tabs.map((tab) => {
+        {tabsDef.map((tab) => {
           const active = isActive(tab.href);
           const Icon   = tab.icon;
 
@@ -91,7 +78,6 @@ export default function BottomNav() {
               className="relative flex flex-col items-center justify-center gap-1 flex-1 py-2 min-h-[56px] group"
               aria-current={active ? 'page' : undefined}
             >
-              {/* Active pill background */}
               {active && (
                 <motion.div
                   layoutId="bottomNavPill"
@@ -101,14 +87,11 @@ export default function BottomNav() {
                 />
               )}
 
-              {/* Icon + dot */}
               <div className="relative z-10">
                 <Icon
                   className={cn(
                     'w-[22px] h-[22px] transition-all duration-200',
-                    active
-                      ? 'text-primary-400'
-                      : 'text-slate-500 group-active:text-slate-300'
+                    active ? 'text-primary-400' : 'text-slate-500 group-active:text-slate-300'
                   )}
                   style={active ? { filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.5))' } : {}}
                   strokeWidth={active ? 2.2 : 1.8}
@@ -121,14 +104,13 @@ export default function BottomNav() {
                 )}
               </div>
 
-              {/* Label */}
               <span
                 className={cn(
                   'relative z-10 text-[10px] font-medium leading-none transition-colors duration-200',
                   active ? 'text-primary-400' : 'text-slate-600 group-active:text-slate-400'
                 )}
               >
-                {tab.label}
+                {t(tab.labelKey)}
               </span>
             </Link>
           );
@@ -137,7 +119,6 @@ export default function BottomNav() {
     </nav>
   );
 
-  // Server: render nothing (portal needs document). Client: portal to body.
   if (!mounted) return null;
   return createPortal(nav, document.body);
 }

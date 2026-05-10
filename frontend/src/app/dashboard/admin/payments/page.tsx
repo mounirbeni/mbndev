@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { paymentAPI } from '@/lib/api';
 import { Payment } from '@/types';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { CreditCard, CheckCircle, Clock, FileText } from 'lucide-react';
@@ -19,6 +20,7 @@ const METHOD_LABELS: Record<string, string> = {
 };
 
 export default function AdminPaymentsPage() {
+  const { t } = useLanguage();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading]   = useState(true);
   const [approving, setApproving] = useState<string | null>(null);
@@ -31,10 +33,8 @@ export default function AdminPaymentsPage() {
       .finally(() => { if (!silent) setLoading(false); });
   };
 
-  // Initial load
   useEffect(() => { fetchPayments(); }, []);
 
-  // Real-time polling (15 s when tab is visible)
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
     const start = () => { timer = setInterval(() => fetchPayments(true), 15_000); };
@@ -50,28 +50,28 @@ export default function AdminPaymentsPage() {
     setApproving(id);
     try {
       await paymentAPI.approveManual(id);
-      toast.success('Payment approved — project created!');
+      toast.success(t('toast.saved'));
       fetchPayments(true);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to approve payment');
+      toast.error(err?.response?.data?.message || t('toast.error'));
     } finally {
       setApproving(null);
     }
   };
 
-  const totalRevenue    = payments.filter((p) => p.status === 'paid').reduce((s, p) => s + p.amount, 0);
-  const pendingVerif    = payments.filter((p) => p.status === 'pending_verification');
-  const pendingAmount   = payments.filter((p) => p.status === 'pending' || p.status === 'pending_verification').reduce((s, p) => s + p.amount, 0);
+  const totalRevenue  = payments.filter((p) => p.status === 'paid').reduce((s, p) => s + p.amount, 0);
+  const pendingVerif  = payments.filter((p) => p.status === 'pending_verification');
+  const pendingAmount = payments.filter((p) => p.status === 'pending' || p.status === 'pending_verification').reduce((s, p) => s + p.amount, 0);
 
   return (
     <div className="space-y-6 max-w-6xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Payments</h1>
+        <h1 className="text-2xl font-bold text-white">{t('admin.payments')}</h1>
         {pendingVerif.length > 0 && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold text-yellow-300"
                style={{ background: 'rgba(234,179,8,0.12)', border: '1px solid rgba(234,179,8,0.25)' }}>
             <Clock className="w-4 h-4" />
-            {pendingVerif.length} awaiting verification
+            {pendingVerif.length} {t('admin.awaitingVerif')}
           </div>
         )}
       </div>
@@ -79,15 +79,15 @@ export default function AdminPaymentsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="glass rounded-2xl p-6 border border-white/5">
-          <p className="text-slate-400 text-sm">Total Revenue</p>
+          <p className="text-slate-400 text-sm">{t('admin.totalRevenue')}</p>
           <p className="text-3xl font-bold text-white mt-1">{formatCurrency(totalRevenue)}</p>
         </div>
         <div className="glass rounded-2xl p-6 border border-white/5">
-          <p className="text-slate-400 text-sm">Pending</p>
+          <p className="text-slate-400 text-sm">{t('status.pending')}</p>
           <p className="text-3xl font-bold text-yellow-400 mt-1">{formatCurrency(pendingAmount)}</p>
         </div>
         <div className="glass rounded-2xl p-6 border border-white/5">
-          <p className="text-slate-400 text-sm">Total Invoices</p>
+          <p className="text-slate-400 text-sm">{t('admin.totalInvoices')}</p>
           <p className="text-3xl font-bold text-white mt-1">{payments.length}</p>
         </div>
       </div>
@@ -103,18 +103,18 @@ export default function AdminPaymentsPage() {
         ) : payments.length === 0 ? (
           <div className="p-12 text-center">
             <CreditCard className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-500 text-sm">No payments yet.</p>
+            <p className="text-slate-500 text-sm">{t('empty.payments')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5">
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Client</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Order / Project</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Amount</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Method</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Status</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Date</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Invoice</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Action</th>
@@ -155,7 +155,7 @@ export default function AdminPaymentsPage() {
                           className="inline-flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors"
                         >
                           <FileText className="w-3.5 h-3.5" />
-                          View
+                          {t('common.view')}
                         </Link>
                       </td>
                       <td className="p-4">
@@ -169,12 +169,12 @@ export default function AdminPaymentsPage() {
                             {approving === pay._id ? (
                               <span className="flex items-center gap-1.5">
                                 <span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
-                                Approving…
+                                {t('admin.approving')}
                               </span>
                             ) : (
                               <span className="flex items-center gap-1.5">
                                 <CheckCircle className="w-3.5 h-3.5" />
-                                Approve
+                                {t('admin.approve')}
                               </span>
                             )}
                           </Button>

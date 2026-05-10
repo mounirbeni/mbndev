@@ -12,6 +12,7 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { orderAPI, paymentAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Button from '@/components/ui/Button';
 
 // ── Payment method config ────────────────────────────────────────────────────
@@ -43,6 +44,7 @@ const METHODS: { id: PayMethod; label: string; desc: string; logo: string }[] = 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function CheckoutPage() {
+  const { t }             = useLanguage();
   const { orderId }       = useParams<{ orderId: string }>();
   const router            = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -61,9 +63,9 @@ export default function CheckoutPage() {
     if (!user) { router.push(`/login?next=/checkout/${orderId}`); return; }
     orderAPI.getOne(orderId)
       .then(({ data }) => setOrder(data.order))
-      .catch((err) => setError(err?.response?.data?.message || 'Order not found'))
+      .catch((err) => setError(err?.response?.data?.message || t('checkout.orderNotFound')))
       .finally(() => setLoading(false));
-  }, [orderId, user, authLoading, router]);
+  }, [orderId, user, authLoading, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const copy = (text: string, key: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -83,7 +85,7 @@ export default function CheckoutPage() {
       setDone(true);
       if (typeof window !== 'undefined') localStorage.removeItem('mbndev_request_draft');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to submit payment');
+      toast.error(err?.response?.data?.message || t('share.paymentFail'));
     } finally {
       setPaying(false);
     }
@@ -99,8 +101,8 @@ export default function CheckoutPage() {
   if (error || !order) return (
     <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center gap-4 p-6 text-center">
       <AlertCircle className="w-12 h-12 text-red-400" />
-      <h1 className="text-xl font-bold text-white">{error || 'Order not found'}</h1>
-      <Link href="/dashboard/client/orders"><Button variant="outline">View My Orders</Button></Link>
+      <h1 className="text-xl font-bold text-white">{error || t('checkout.orderNotFound')}</h1>
+      <Link href="/dashboard/client/orders"><Button variant="outline">{t('checkout.viewMyOrders')}</Button></Link>
     </div>
   );
 
@@ -109,9 +111,9 @@ export default function CheckoutPage() {
       <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
         <Check className="w-8 h-8 text-green-400" />
       </div>
-      <h1 className="text-xl font-bold text-white">This order is already paid</h1>
+      <h1 className="text-xl font-bold text-white">{t('checkout.alreadyPaid')}</h1>
       {order.project && (
-        <Link href={`/dashboard/client/projects/${order.project.id}`}><Button>View Project →</Button></Link>
+        <Link href={`/dashboard/client/projects/${order.project.id}`}><Button>{t('checkout.viewProject')} →</Button></Link>
       )}
     </div>
   );
@@ -127,19 +129,19 @@ export default function CheckoutPage() {
         <div className="w-20 h-20 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-green-400" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-3">Payment submitted</h1>
+        <h1 className="text-2xl font-bold text-white mb-3">{t('checkout.done.title')}</h1>
         <p className="text-slate-400 text-sm leading-relaxed mb-2">
-          We received your payment notification. We&apos;ll verify it and activate your project within a few hours — usually faster.
+          {t('checkout.done.sub1')}
         </p>
         <p className="text-slate-500 text-sm leading-relaxed mb-8">
-          You&apos;ll get a notification (and an email if configured) the moment it&apos;s confirmed.
+          {t('checkout.done.sub2')}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/dashboard/client/orders">
-            <Button size="md">View my orders</Button>
+            <Button size="md">{t('checkout.done.viewOrders')}</Button>
           </Link>
           <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
-            <Button size="md" variant="outline">Contact on WhatsApp</Button>
+            <Button size="md" variant="outline">{t('checkout.done.whatsApp')}</Button>
           </a>
         </div>
       </motion.div>
@@ -158,11 +160,11 @@ export default function CheckoutPage() {
           <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center">
             <Zap className="w-4 h-4 text-white" />
           </div>
-          <span className="text-white font-semibold">Checkout</span>
+          <span className="text-white font-semibold">{t('checkout.title')}</span>
         </div>
         <div className="ml-auto flex items-center gap-1.5 text-xs text-slate-500">
           <Shield className="w-3.5 h-3.5 text-green-400" />
-          Manually verified
+          {t('checkout.verified')}
         </div>
       </header>
 
@@ -184,31 +186,31 @@ export default function CheckoutPage() {
             <div className="space-y-1.5 mb-4 text-sm">
               {order.features?.length > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Features ({order.features.length})</span>
-                  <span className="text-slate-300">included</span>
+                  <span className="text-slate-400">{t('checkout.features')} ({order.features.length})</span>
+                  <span className="text-slate-300">{t('checkout.included')}</span>
                 </div>
               )}
               {order.addons?.includes('fastDelivery') && (
                 <div className="flex justify-between">
-                  <span className="text-slate-400 flex items-center gap-1.5"><Zap className="w-3 h-3 text-amber-400" /> Fast Delivery</span>
-                  <span className="text-amber-400">included</span>
+                  <span className="text-slate-400 flex items-center gap-1.5"><Zap className="w-3 h-3 text-amber-400" /> {t('checkout.fastDelivery')}</span>
+                  <span className="text-amber-400">{t('checkout.included')}</span>
                 </div>
               )}
               <div className="border-t border-white/10 pt-3 flex justify-between font-bold text-base">
-                <span className="text-white">Total Due</span>
+                <span className="text-white">{t('checkout.totalDue')}</span>
                 <span className="text-primary-400 text-xl">${order.totalPrice.toLocaleString()}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-slate-500 pt-3 border-t border-white/5">
               <Clock className="w-3.5 h-3.5 text-primary-400" />
-              Estimated delivery: <span className="text-slate-300">{order.deliveryDays} business days</span>
+              {t('checkout.estDelivery')}: <span className="text-slate-300">{order.deliveryDays} {t('checkout.businessDays')}</span>
             </div>
           </motion.div>
 
           {/* Payment methods */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
-            <h2 className="text-white font-semibold text-sm mb-4">Choose payment method</h2>
+            <h2 className="text-white font-semibold text-sm mb-4">{t('checkout.payMethod')}</h2>
 
             <div className="space-y-2 mb-5">
               {METHODS.map((m) => (
@@ -351,7 +353,7 @@ export default function CheckoutPage() {
             {/* Optional reference / proof field */}
             <div className="mb-5">
               <label className="block text-xs font-medium text-slate-400 mb-1.5">
-                Transaction reference <span className="text-slate-600">(optional but speeds up verification)</span>
+                {t('checkout.txRef')} <span className="text-slate-600">{t('checkout.txRefHint')}</span>
               </label>
               <input
                 type="text"
@@ -365,14 +367,14 @@ export default function CheckoutPage() {
 
             <Button className="w-full" size="lg" onClick={handleSubmit} loading={paying}>
               <Check className="w-4 h-4" />
-              {method === 'cih_bank'   && "I've made the bank transfer"}
-              {method === 'paypal'     && "I've paid via PayPal"}
-              {method === 'taptapsend' && "I've sent via TapTapSend"}
+              {method === 'cih_bank'   && t('checkout.bankDone')}
+              {method === 'paypal'     && t('checkout.paypalDone')}
+              {method === 'taptapsend' && t('checkout.taptapDone')}
             </Button>
 
             <p className="text-xs text-slate-600 text-center mt-3">
-              By proceeding you agree to our{' '}
-              <Link href="/terms" className="text-primary-500 hover:text-primary-400">terms of service</Link>.
+              {t('checkout.terms')}{' '}
+              <Link href="/terms" className="text-primary-500 hover:text-primary-400">{t('checkout.termsLink')}</Link>.
             </p>
           </motion.div>
         </div>

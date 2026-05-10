@@ -9,6 +9,7 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, Edit2, Check } from 'lucide-react';
 
@@ -18,6 +19,7 @@ const emptyForm = {
 };
 
 export default function AdminPackagesPage() {
+  const { t } = useLanguage();
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
@@ -65,15 +67,15 @@ export default function AdminPackagesPage() {
 
       if (editing) {
         await packageAPI.update(editing._id ?? editing.id ?? '', payload);
-        toast.success('Package updated');
+        toast.success(t('toast.saved'));
       } else {
         await packageAPI.create(payload);
-        toast.success('Package created');
+        toast.success(t('toast.saved'));
       }
       setModal(false);
       fetchPackages();
     } catch {
-      toast.error('Failed to save package');
+      toast.error(t('toast.error'));
     } finally {
       setSaving(false);
     }
@@ -83,10 +85,10 @@ export default function AdminPackagesPage() {
     if (!confirm('Deactivate this package?')) return;
     try {
       await packageAPI.delete(id);
-      toast.success('Package deactivated');
+      toast.success(t('toast.deleted'));
       fetchPackages();
     } catch {
-      toast.error('Failed to delete package');
+      toast.error(t('toast.error'));
     }
   };
 
@@ -97,11 +99,11 @@ export default function AdminPackagesPage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Pricing Packages</h1>
-          <p className="text-slate-400 text-sm mt-1">{packages.length} active packages</p>
+          <h1 className="text-2xl font-bold text-white">{t('dash.nav.packages')}</h1>
+          <p className="text-slate-400 text-sm mt-1">{packages.length} {t('status.active').toLowerCase()} packages</p>
         </div>
         <Button size="md" onClick={openCreate}>
-          <Plus className="w-4 h-4" /> New Package
+          <Plus className="w-4 h-4" /> {t('common.create')}
         </Button>
       </div>
 
@@ -148,7 +150,7 @@ export default function AdminPackagesPage() {
       </div>
 
       {/* Modal */}
-      <Modal isOpen={modal} onClose={() => setModal(false)} title={editing ? 'Edit Package' : 'New Package'} size="lg">
+      <Modal isOpen={modal} onClose={() => setModal(false)} title={editing ? t('common.edit') : t('common.create')} size="lg">
         <div className="grid grid-cols-2 gap-4">
           <Input label="Package Name" value={form.name} onChange={set('name')} placeholder="Pro" />
           <Input label="Slug" value={form.slug} onChange={set('slug')} placeholder="pro" />
@@ -175,9 +177,9 @@ export default function AdminPackagesPage() {
           </div>
         </div>
         <div className="flex justify-end gap-3 mt-4">
-          <Button variant="ghost" onClick={() => setModal(false)}>Cancel</Button>
+          <Button variant="ghost" onClick={() => setModal(false)}>{t('common.cancel')}</Button>
           <Button onClick={handleSave} loading={saving}>
-            {editing ? 'Save Changes' : 'Create Package'}
+            {editing ? t('common.save') : t('common.create')}
           </Button>
         </div>
       </Modal>

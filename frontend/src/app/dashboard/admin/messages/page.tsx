@@ -6,12 +6,14 @@ import { MessageSquare, Search, ArrowLeft, Loader2, Zap } from 'lucide-react';
 import { messageAPI } from '@/lib/api';
 import { MessageThread as ThreadType } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtime } from '@/hooks/useRealtime';
 import MessageThread from '@/components/dashboard/MessageThread';
 import { StatusBadge } from '@/components/ui/Badge';
 import { timeAgo, getInitials } from '@/lib/utils';
 
 export default function AdminMessagesPage() {
+  const { t } = useLanguage();
   const [threads,    setThreads]    = useState<ThreadType[]>([]);
   const [selected,   setSelected]   = useState<ThreadType | null>(null);
   const [search,     setSearch]     = useState('');
@@ -20,7 +22,6 @@ export default function AdminMessagesPage() {
   const { user } = useAuth();
   const userId = user?._id || user?.id;
 
-  // ── Load threads ───────────────────────────────────────────────────────────
   useEffect(() => {
     messageAPI.getThreads()
       .then(({ data }) => {
@@ -33,22 +34,21 @@ export default function AdminMessagesPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = threads.filter((t) =>
-    t.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
-    t.client?.name?.toLowerCase().includes(search.toLowerCase())
+  const filtered = threads.filter((thread) =>
+    thread.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
+    thread.client?.name?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalUnread = threads.reduce((sum, t) => sum + t.unreadCount, 0);
+  const totalUnread = threads.reduce((sum, thread) => sum + thread.unreadCount, 0);
 
-  // ── Real-time: update sidebar for incoming messages ────────────────────────
   const realtimeHandlers = useMemo(() => ({
     'message:new': (msg: any) => {
       const pid        = msg.projectId || msg.project;
       const isFromSelf = (msg.sender?._id || msg.sender?.id || msg.senderId) === userId;
       const isActive   = selected?.projectId === pid;
 
-      setThreads((prev) => prev.map((t) => {
-        if (t.projectId !== pid) return t;
+      setThreads((prev) => prev.map((thread) => {
+        if (thread.projectId !== pid) return thread;
         let text = '';
         if (msg.type === 'system') {
           try { text = JSON.parse(msg.content).title; } catch { text = msg.content; }
@@ -56,25 +56,19 @@ export default function AdminMessagesPage() {
           text = (msg.content || '').slice(0, 60);
         }
         const updated: ThreadType = {
-          ...t,
-          lastMessage: {
-            text,
-            type: msg.type || 'user',
-            senderName: msg.sender?.name,
-            createdAt: msg.createdAt,
-          },
+          ...thread,
+          lastMessage: { text, type: msg.type || 'user', senderName: msg.sender?.name, createdAt: msg.createdAt },
           updatedAt: msg.createdAt,
         };
         if (!isActive && !isFromSelf) {
-          updated.unreadCount = t.unreadCount + 1;
+          updated.unreadCount = thread.unreadCount + 1;
         }
         return updated;
       }));
 
-      // Bubble updated thread to top if it has new activity
       if (!isFromSelf) {
         setThreads((prev) => {
-          const idx = prev.findIndex((t) => t.projectId === pid);
+          const idx = prev.findIndex((thread) => thread.projectId === pid);
           if (idx <= 0) return prev;
           const copy = [...prev];
           const [moved] = copy.splice(idx, 1);
@@ -103,6 +97,7 @@ export default function AdminMessagesPage() {
           <button
             onClick={() => setMobileChat(false)}
             className="lg:hidden p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-colors"
+            aria-label={t('common.back')}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -110,17 +105,17 @@ export default function AdminMessagesPage() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3">
             <h1 className="text-xl lg:text-2xl font-bold text-white">
-              {mobileChat && selected ? selected.projectTitle : 'Messages'}
+              {mobileChat && selected ? selected.projectTitle : t('messages.title')}
             </h1>
             {!mobileChat && totalUnread > 0 && (
               <span className="px-2 py-0.5 bg-primary-500 text-white text-xs font-bold rounded-full">
-                {totalUnread} unread
+                {totalUnread} {t('admin.unread')}
               </span>
             )}
           </div>
           {!mobileChat && (
             <p className="text-slate-500 text-sm hidden sm:block mt-0.5">
-              Client conversations across all projects
+              {t('admin.conversations')}
             </p>
           )}
         </div>
@@ -145,7 +140,7 @@ export default function AdminMessagesPage() {
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by project or client…"
+                    placeholder={t('common.search')}
                     className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-primary-500/50"
                   />
                 </div>
@@ -159,17 +154,17 @@ export default function AdminMessagesPage() {
                   </div>
                 ) : filtered.length === 0 ? (
                   <div className="py-8 text-center text-slate-500 text-sm">
-                    {search ? 'No matches found' : 'No projects yet'}
+                    {search ? t('admin.noMatches') : t('empty.projects')}
                   </div>
                 ) : (
-                  filtered.map((t) => {
-                    const isActive  = selected?.projectId === t.projectId;
-                    const clientName = t.client?.name || 'Unknown';
+                  filtered.map((thread) => {
+                    const isActive   = selected?.projectId === thread.projectId;
+                    const clientName = thread.client?.name || 'Unknown';
 
                     return (
                       <button
-                        key={t.projectId}
-                        onClick={() => handleSelect(t)}
+                        key={thread.projectId}
+                        onClick={() => handleSelect(thread)}
                         className={`w-full text-left p-3 rounded-xl transition-all ${
                           isActive
                             ? 'bg-primary-500/15 border border-primary-500/25'
@@ -177,7 +172,6 @@ export default function AdminMessagesPage() {
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          {/* Client avatar */}
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
                             {getInitials(clientName)}
                           </div>
@@ -185,40 +179,40 @@ export default function AdminMessagesPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2 mb-0.5">
                               <span className="text-sm font-medium text-white truncate leading-tight">
-                                {t.projectTitle}
+                                {thread.projectTitle}
                               </span>
                               <div className="flex items-center gap-1.5 shrink-0">
-                                {t.unreadCount > 0 && (
+                                {thread.unreadCount > 0 && (
                                   <span className="min-w-[18px] h-[18px] px-1 bg-primary-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                                    {t.unreadCount > 9 ? '9+' : t.unreadCount}
+                                    {thread.unreadCount > 9 ? '9+' : thread.unreadCount}
                                   </span>
                                 )}
-                                <StatusBadge status={t.projectStatus} />
+                                <StatusBadge status={thread.projectStatus} />
                               </div>
                             </div>
 
                             <p className="text-xs text-slate-500 mb-1.5">{clientName}</p>
 
-                            {t.lastMessage ? (
+                            {thread.lastMessage ? (
                               <div className="flex items-end justify-between gap-2">
                                 <p className={`text-xs leading-snug truncate flex-1 flex items-center gap-1 ${
-                                  t.unreadCount > 0 ? 'text-slate-300 font-medium' : 'text-slate-600'
+                                  thread.unreadCount > 0 ? 'text-slate-300 font-medium' : 'text-slate-600'
                                 }`}>
-                                  {t.lastMessage.type === 'system' ? (
+                                  {thread.lastMessage.type === 'system' ? (
                                     <>
                                       <Zap className="w-2.5 h-2.5 text-amber-400 shrink-0" />
-                                      {t.lastMessage.text}
+                                      {thread.lastMessage.text}
                                     </>
-                                  ) : t.lastMessage.senderName
-                                    ? `${t.lastMessage.senderName}: ${t.lastMessage.text}`
-                                    : t.lastMessage.text}
+                                  ) : thread.lastMessage.senderName
+                                    ? `${thread.lastMessage.senderName}: ${thread.lastMessage.text}`
+                                    : thread.lastMessage.text}
                                 </p>
                                 <span className="text-[10px] text-slate-700 shrink-0">
-                                  {timeAgo(t.lastMessage.createdAt)}
+                                  {timeAgo(thread.lastMessage.createdAt)}
                                 </span>
                               </div>
                             ) : (
-                              <p className="text-xs text-slate-700">No messages yet</p>
+                              <p className="text-xs text-slate-700">{t('messages.noMessages')}</p>
                             )}
                           </div>
                         </div>
@@ -257,8 +251,8 @@ export default function AdminMessagesPage() {
                   <div className="w-16 h-16 bg-primary-500/8 border border-primary-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <MessageSquare className="w-7 h-7 text-primary-400/60" />
                   </div>
-                  <p className="text-slate-400 text-sm font-medium">Select a conversation</p>
-                  <p className="text-slate-600 text-xs mt-1">to view and reply to messages</p>
+                  <p className="text-slate-400 text-sm font-medium">{t('admin.selectConv')}</p>
+                  <p className="text-slate-600 text-xs mt-1">{t('admin.selectConv.sub')}</p>
                 </div>
               </div>
             )

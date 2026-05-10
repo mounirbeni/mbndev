@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft, LayoutDashboard, MessageSquare, Paperclip, CreditCard,
@@ -20,21 +21,21 @@ import {
 import { Skeleton } from '@/components/ui/Skeleton';
 import PlanBadge from '@/components/ui/PlanBadge';
 
-const TABS = [
-  { id: 'overview',  label: 'Overview',  icon: LayoutDashboard },
-  { id: 'messages',  label: 'Messages',  icon: MessageSquare   },
-  { id: 'files',     label: 'Files',     icon: Paperclip       },
-  { id: 'payments',  label: 'Payments',  icon: CreditCard      },
-  { id: 'activity',  label: 'Activity',  icon: Activity        },
+const TAB_DEFS = [
+  { id: 'overview',  labelKey: 'dash.tab.overview',  icon: LayoutDashboard },
+  { id: 'messages',  labelKey: 'dash.nav.messages',  icon: MessageSquare   },
+  { id: 'files',     labelKey: 'dash.tab.files',     icon: Paperclip       },
+  { id: 'payments',  labelKey: 'dash.nav.payments',  icon: CreditCard      },
+  { id: 'activity',  labelKey: 'dash.tab.activity',  icon: Activity        },
 ];
 
-const STATUS_STEPS = [
-  { key: 'pending',     label: 'Submitted'    },
-  { key: 'paid',        label: 'Paid'         },
-  { key: 'in-progress', label: 'In Progress'  },
-  { key: 'review',      label: 'Review'       },
-  { key: 'revision',    label: 'Revision'     },
-  { key: 'completed',   label: 'Completed'    },
+const STATUS_STEP_DEFS = [
+  { key: 'pending',     labelKey: 'status.submitted'  },
+  { key: 'paid',        labelKey: 'status.paid'        },
+  { key: 'in-progress', labelKey: 'status.inProgress'  },
+  { key: 'review',      labelKey: 'status.review'      },
+  { key: 'revision',    labelKey: 'status.revision'    },
+  { key: 'completed',   labelKey: 'status.completed'   },
 ];
 
 const ACTION_ICONS: Record<string, React.ElementType> = {
@@ -51,7 +52,11 @@ const ACTION_ICONS: Record<string, React.ElementType> = {
 export default function ClientProjectWorkspace() {
   const { id }     = useParams<{ id: string }>();
   const { user }   = useAuth();
+  const { t }      = useLanguage();
   const router     = useRouter();
+
+  const TABS = TAB_DEFS.map((tabItem) => ({ ...tabItem, label: t(tabItem.labelKey) }));
+  const STATUS_STEPS = STATUS_STEP_DEFS.map((step) => ({ ...step, label: t(step.labelKey) }));
 
   const [project,  setProject]  = useState<Project | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -79,7 +84,7 @@ export default function ClientProjectWorkspace() {
         return projId === id;
       }));
     } catch {
-      toast.error('Failed to load project');
+      toast.error(t('client.failedLoad'));
       router.push('/dashboard/client/projects');
     } finally {
       setLoading(false);
@@ -125,7 +130,7 @@ export default function ClientProjectWorkspace() {
       setMsgText('');
       const mRes = await messageAPI.get(id);
       setMessages(mRes.data.messages || []);
-    } catch { toast.error('Failed to send message'); }
+    } catch { toast.error(t('client.failedMessage')); }
     finally { setSending(false); }
   };
 
@@ -137,24 +142,24 @@ export default function ClientProjectWorkspace() {
     setUploading(true);
     try {
       await projectAPI.uploadFile(id, fd);
-      toast.success('File uploaded');
+      toast.success(t('client.fileUploaded'));
       const pRes = await projectAPI.getOne(id);
       setProject(pRes.data.project);
-    } catch { toast.error('Upload failed'); }
+    } catch { toast.error(t('client.uploadFailed')); }
     finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
   };
 
   const handlePayment = async (amount: number, description: string) => {
     try {
       await paymentAPI.mock({ projectId: id, amount, description });
-      toast.success('Payment recorded');
+      toast.success(t('client.paymentRecorded'));
       const payRes = await paymentAPI.getAll();
       const allPay: Payment[] = payRes.data.payments || [];
       setPayments(allPay.filter((p) => {
         const projId = typeof p.project === 'object' ? (p.project as any)._id || (p.project as any).id : p.project;
         return projId === id;
       }));
-    } catch { toast.error('Payment failed'); }
+    } catch { toast.error(t('client.paymentFailed')); }
   };
 
   if (loading) {

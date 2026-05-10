@@ -4,18 +4,20 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { projectAPI } from '@/lib/api';
 import { Project, ProjectStatus } from '@/types';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate, projectTypeLabels } from '@/lib/utils';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 import Link from 'next/link';
 import PlanBadge from '@/components/ui/PlanBadge';
 
 const statusOptions: ProjectStatus[] = ['pending', 'in-progress', 'review', 'completed', 'cancelled'];
 
 export default function AdminProjectsPage() {
+  const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -38,7 +40,6 @@ export default function AdminProjectsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, statusFilter]);
 
-  // Real-time polling (30 s when tab is visible)
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
     const start = () => { timer = setInterval(() => fetchProjects(true), 30_000); };
@@ -60,11 +61,11 @@ export default function AdminProjectsPage() {
     setSaving(true);
     try {
       await projectAPI.update(editingProject._id ?? editingProject.id ?? '', editForm);
-      toast.success('Project updated');
+      toast.success(t('toast.saved'));
       setEditingProject(null);
       fetchProjects();
     } catch {
-      toast.error('Failed to update project');
+      toast.error(t('toast.error'));
     } finally {
       setSaving(false);
     }
@@ -74,8 +75,8 @@ export default function AdminProjectsPage() {
     <div className="space-y-6 max-w-7xl">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">All Projects</h1>
-          <p className="text-slate-400 text-sm mt-1">{projects.length} projects total</p>
+          <h1 className="text-2xl font-bold text-white">{t('admin.allProjects')}</h1>
+          <p className="text-slate-400 text-sm mt-1">{projects.length} {t('admin.projectsTotal')}</p>
         </div>
       </div>
 
@@ -86,7 +87,7 @@ export default function AdminProjectsPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search projects..."
+            placeholder={t('common.search')}
             className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-primary-500 w-64 transition-colors"
           />
         </div>
@@ -95,7 +96,7 @@ export default function AdminProjectsPage() {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500"
         >
-          <option value="">All Statuses</option>
+          <option value="">{t('admin.allStatuses')}</option>
           {statusOptions.map((s) => (
             <option key={s} value={s}>
               {s.replace('-', ' ')}
@@ -113,18 +114,18 @@ export default function AdminProjectsPage() {
             ))}
           </div>
         ) : projects.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">No projects found.</div>
+          <div className="p-12 text-center text-slate-500">{t('empty.projects')}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5">
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Project</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Client</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Plan</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Budget</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Status</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Progress</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.progress')}</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Created</th>
                   <th className="p-4" />
                 </tr>
@@ -166,13 +167,13 @@ export default function AdminProjectsPage() {
                             href={`/dashboard/admin/projects/${p._id}`}
                             className="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
                           >
-                            View
+                            {t('common.view')}
                           </Link>
                           <button
                             onClick={() => openEdit(p)}
                             className="text-xs text-primary-400 hover:text-primary-300 transition-colors px-2 py-1 rounded-lg hover:bg-primary-500/10"
                           >
-                            Edit
+                            {t('common.edit')}
                           </button>
                         </div>
                       </td>
@@ -186,11 +187,11 @@ export default function AdminProjectsPage() {
       </div>
 
       {/* Edit Modal */}
-      <Modal isOpen={!!editingProject} onClose={() => setEditingProject(null)} title="Update Project">
+      <Modal isOpen={!!editingProject} onClose={() => setEditingProject(null)} title={t('admin.updateProject')}>
         {editingProject && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-slate-400 mb-1.5">Status</label>
+              <label className="block text-sm text-slate-400 mb-1.5">{t('admin.status')}</label>
               <select
                 value={editForm.status}
                 onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value }))}
@@ -204,7 +205,7 @@ export default function AdminProjectsPage() {
 
             <div>
               <label className="block text-sm text-slate-400 mb-1.5">
-                Progress: {editForm.progress}%
+                {t('admin.progress')}: {editForm.progress}%
               </label>
               <input
                 type="range"
@@ -217,19 +218,19 @@ export default function AdminProjectsPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-slate-400 mb-1.5">Notes (internal)</label>
+              <label className="block text-sm text-slate-400 mb-1.5">{t('admin.notes')}</label>
               <textarea
                 value={editForm.notes}
                 onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
                 rows={3}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-primary-500 resize-none"
-                placeholder="Internal notes..."
+                placeholder={t('admin.notes')}
               />
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="ghost" onClick={() => setEditingProject(null)}>Cancel</Button>
-              <Button onClick={saveEdit} loading={saving}>Save Changes</Button>
+              <Button variant="ghost" onClick={() => setEditingProject(null)}>{t('common.cancel')}</Button>
+              <Button onClick={saveEdit} loading={saving}>{t('common.save')}</Button>
             </div>
           </div>
         )}

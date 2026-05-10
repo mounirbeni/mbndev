@@ -8,14 +8,9 @@ import {
   ArrowRight, Plus, CreditCard, Loader2,
 } from 'lucide-react';
 import { orderAPI } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Button from '@/components/ui/Button';
 import { formatDate, formatCurrency } from '@/lib/utils';
-
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
-  pending:   { label: 'Pending Payment', color: 'text-amber-400',  bg: 'bg-amber-500/10',  icon: Clock         },
-  paid:      { label: 'Paid',            color: 'text-green-400',  bg: 'bg-green-500/10',  icon: CheckCircle2  },
-  cancelled: { label: 'Cancelled',       color: 'text-red-400',    bg: 'bg-red-500/10',    icon: XCircle       },
-};
 
 const SERVICE_LABELS: Record<string, string> = {
   website: 'Website', ecommerce: 'E-Commerce', dashboard: 'SaaS Dashboard',
@@ -23,8 +18,16 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 export default function ClientOrdersPage() {
+  const { t } = useLanguage();
   const [orders,  setOrders]  = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // STATUS_CONFIG built inside component so labels re-evaluate on locale change
+  const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+    pending:   { label: t('orders.pendingPayment'), color: 'text-amber-400',  bg: 'bg-amber-500/10',  icon: Clock         },
+    paid:      { label: t('status.paid'),           color: 'text-green-400',  bg: 'bg-green-500/10',  icon: CheckCircle2  },
+    cancelled: { label: t('status.cancelled'),      color: 'text-red-400',    bg: 'bg-red-500/10',    icon: XCircle       },
+  };
 
   const fetchOrders = (silent = false) => {
     if (!silent) setLoading(true);
@@ -49,28 +52,29 @@ export default function ClientOrdersPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const pending   = orders.filter((o) => o.status === 'pending').length;
-  const paid      = orders.filter((o) => o.status === 'paid').length;
+  const pending    = orders.filter((o) => o.status === 'pending').length;
   const totalSpent = orders.filter((o) => o.status === 'paid').reduce((s, o) => s + o.totalPrice, 0);
+
+  const stats = [
+    { label: t('orders.totalOrders'),   value: orders.length,         color: 'text-white'      },
+    { label: t('orders.pendingPayment'), value: pending,               color: 'text-amber-400'  },
+    { label: t('orders.totalSpent'),     value: formatCurrency(totalSpent), color: 'text-green-400' },
+  ];
 
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-white">My Orders</h1>
+        <h1 className="text-2xl font-bold text-white">{t('dash.nav.myOrders')}</h1>
         <Link href="/request">
           <Button size="sm">
-            <Plus className="w-4 h-4" /> New Order
+            <Plus className="w-4 h-4" /> {t('orders.newOrder')}
           </Button>
         </Link>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: 'Total Orders', value: orders.length, color: 'text-white' },
-          { label: 'Pending Payment', value: pending, color: 'text-amber-400' },
-          { label: 'Total Spent', value: formatCurrency(totalSpent), color: 'text-green-400' },
-        ].map((s) => (
+        {stats.map((s) => (
           <div key={s.label} className="glass rounded-xl p-4 border border-white/5 text-center">
             <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
             <div className="text-slate-500 text-xs mt-0.5">{s.label}</div>
@@ -87,11 +91,11 @@ export default function ClientOrdersPage() {
         ) : orders.length === 0 ? (
           <div className="py-16 text-center">
             <ShoppingBag className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-            <p className="text-slate-400 font-medium">No orders yet</p>
-            <p className="text-slate-600 text-sm mb-5">Ready to build something great?</p>
+            <p className="text-slate-400 font-medium">{t('empty.orders')}</p>
+            <p className="text-slate-600 text-sm mb-5">{t('orders.ready')}</p>
             <Link href="/request">
               <Button size="sm">
-                <Plus className="w-4 h-4" /> Place Your First Order
+                <Plus className="w-4 h-4" /> {t('orders.firstOrder')}
               </Button>
             </Link>
           </div>
@@ -140,7 +144,7 @@ export default function ClientOrdersPage() {
                             href={`/dashboard/client/projects/${order.project.id}`}
                             className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1"
                           >
-                            View Project <ArrowRight className="w-3 h-3" />
+                            {t('orders.viewProject')} <ArrowRight className="w-3 h-3" />
                           </Link>
                         )}
 
@@ -152,7 +156,7 @@ export default function ClientOrdersPage() {
                               style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}
                             >
                               <CreditCard className="w-3.5 h-3.5" />
-                              Pay Now
+                              {t('orders.payNow')}
                             </button>
                           </Link>
                         )}

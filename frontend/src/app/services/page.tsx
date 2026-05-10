@@ -8,120 +8,142 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Market research sources: Upwork, Fiverr Pro, GoodFirms, Clutch — 2026
 // Freelancer avg rates used as "original price" for credible comparisons
-const services = [
-  {
-    icon: Globe,
-    title: 'Custom Websites',
-    tagline: 'Your brand, perfectly built.',
-    description: 'Fully custom, responsive websites designed and developed from scratch to match your brand identity and business goals.',
-    features: ['Pixel-perfect responsive design', 'SEO-optimized structure', 'Performance-first development', 'CMS integration', 'Google Analytics setup', 'Custom domain & hosting support'],
-    price: 799,
-    originalPrice: 1499,
-    badge: 'Limited Offer',
-    badgeIcon: Flame,
-    badgeClass: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
-    slug: 'custom-websites',
-    detailPage: true,
-    color: 'from-primary-500/20 to-blue-500/10',
-    border: 'border-primary-500/30',
-  },
-  {
-    icon: ShoppingCart,
-    title: 'E-Commerce Stores',
-    tagline: 'Sell smarter, scale faster.',
-    description: 'Full-featured online stores with secure payment integration, inventory management, and optimized checkout flows.',
-    features: ['Stripe & PayPal integration', 'Product catalog & filtering', 'Cart & checkout optimization', 'Order management dashboard', 'Inventory tracking', 'Email notifications'],
-    price: 1499,
-    originalPrice: 2999,
-    badge: 'Best Deal',
-    badgeIcon: Tag,
-    badgeClass: 'bg-primary-500/20 text-primary-300 border-primary-500/30',
-    slug: 'ecommerce',
-    detailPage: true,
-    color: 'from-blue-500/20 to-cyan-500/10',
-    border: 'border-blue-500/30',
-  },
-  {
-    icon: BarChart3,
-    title: 'SaaS Dashboards',
-    tagline: 'Complex apps, clean interfaces.',
-    description: 'Complex web applications with user authentication, real-time data, admin panels, and scalable backend architecture.',
-    features: ['JWT authentication system', 'Role-based access control', 'Real-time data updates', 'REST API development', 'Database design & optimization', 'CI/CD deployment pipeline'],
-    price: 2499,
-    originalPrice: 4999,
-    badge: 'Most Popular',
-    badgeIcon: Star,
-    badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-    slug: 'saas',
-    detailPage: false,
-    color: 'from-purple-500/20 to-primary-500/10',
-    border: 'border-purple-500/30',
-  },
-  {
-    icon: Rocket,
-    title: 'Landing Pages',
-    tagline: 'Convert visitors into clients.',
-    description: 'High-converting landing pages with compelling copy structure, animated sections, and CTA optimization.',
-    features: ['Conversion-optimized layout', 'A/B testing ready', 'Fast load time (<2s)', 'Lead capture forms', 'Social proof sections', 'Mobile-first design'],
-    price: 499,
-    originalPrice: 899,
-    badge: 'Quick Launch',
-    badgeIcon: Zap,
-    badgeClass: 'bg-green-500/20 text-green-300 border-green-500/30',
-    slug: 'landing-pages',
-    detailPage: true,
-    color: 'from-green-500/20 to-emerald-500/10',
-    border: 'border-green-500/30',
-  },
-  {
-    icon: Settings,
-    title: 'Web Applications',
-    tagline: 'Custom software, zero compromise.',
-    description: 'Tailored web applications built for your specific business workflow — from internal tools to customer-facing platforms.',
-    features: ['Custom business logic', 'Third-party API integration', 'File upload & management', 'Notifications system', 'Reporting & analytics', 'Scalable architecture'],
-    price: 1999,
-    originalPrice: 3999,
-    badge: 'Best Value',
-    badgeIcon: Trophy,
-    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    slug: 'web-applications',
-    detailPage: true,
-    color: 'from-orange-500/20 to-yellow-500/10',
-    border: 'border-orange-500/30',
-  },
-  {
-    icon: Wrench,
-    title: 'Support & Maintenance',
-    tagline: 'We stay after delivery.',
-    description: 'Ongoing technical support, security updates, performance monitoring, and feature enhancements for existing projects.',
-    features: ['Monthly performance reports', 'Security patches & updates', 'Bug fixes & hotfixes', 'Feature add-ons', 'Uptime monitoring', 'Priority response time'],
-    price: 149,
-    originalPrice: 299,
-    isMonthly: true,
-    badge: 'Flexible Plans',
-    badgeIcon: Shield,
-    badgeClass: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
-    slug: 'maintenance',
-    detailPage: true,
-    color: 'from-slate-500/20 to-slate-600/10',
-    border: 'border-slate-500/30',
-  },
-];
-
-const highlights = [
-  { icon: Zap,    label: 'Fast Delivery',   desc: 'On-time, every time' },
-  { icon: Shield, label: 'Secure & Modern', desc: 'Best practices always' },
-  { icon: Clock,  label: '24h Response',    desc: 'Quick communication' },
-];
 
 function discountPct(original: number, current: number) {
   return Math.round((1 - current / original) * 100);
 }
 
 export default function ServicesPage() {
+  const { t } = useLanguage();
+
+  const services = [
+    {
+      icon: Globe,
+      title: t('services.web.title'),
+      tagline: t('services.web.tagline'),
+      description: t('services.web.desc'),
+      features: [
+        t('services.web.f1'), t('services.web.f2'), t('services.web.f3'),
+        t('services.web.f4'), t('services.web.f5'), t('services.web.f6'),
+      ],
+      price: 799,
+      originalPrice: 1499,
+      badge: 'Limited Offer',
+      badgeIcon: Flame,
+      badgeClass: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+      slug: 'custom-websites',
+      detailPage: true,
+      color: 'from-primary-500/20 to-blue-500/10',
+      border: 'border-primary-500/30',
+    },
+    {
+      icon: ShoppingCart,
+      title: t('services.ecom.page.title'),
+      tagline: t('services.ecom.page.tagline'),
+      description: t('services.ecom.page.desc'),
+      features: [
+        t('services.ecom.page.f1'), t('services.ecom.page.f2'), t('services.ecom.page.f3'),
+        t('services.ecom.page.f4'), t('services.ecom.page.f5'), t('services.ecom.page.f6'),
+      ],
+      price: 1499,
+      originalPrice: 2999,
+      badge: 'Best Deal',
+      badgeIcon: Tag,
+      badgeClass: 'bg-primary-500/20 text-primary-300 border-primary-500/30',
+      slug: 'ecommerce',
+      detailPage: true,
+      color: 'from-blue-500/20 to-cyan-500/10',
+      border: 'border-blue-500/30',
+    },
+    {
+      icon: BarChart3,
+      title: t('services.saas.page.title'),
+      tagline: t('services.saas.page.tagline'),
+      description: t('services.saas.page.desc'),
+      features: [
+        t('services.saas.page.f1'), t('services.saas.page.f2'), t('services.saas.page.f3'),
+        t('services.saas.page.f4'), t('services.saas.page.f5'), t('services.saas.page.f6'),
+      ],
+      price: 2499,
+      originalPrice: 4999,
+      badge: 'Most Popular',
+      badgeIcon: Star,
+      badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+      slug: 'saas',
+      detailPage: false,
+      color: 'from-purple-500/20 to-primary-500/10',
+      border: 'border-purple-500/30',
+    },
+    {
+      icon: Rocket,
+      title: t('services.landing.page.title'),
+      tagline: t('services.landing.page.tagline'),
+      description: t('services.landing.page.desc'),
+      features: [
+        t('services.landing.page.f1'), t('services.landing.page.f2'), t('services.landing.page.f3'),
+        t('services.landing.page.f4'), t('services.landing.page.f5'), t('services.landing.page.f6'),
+      ],
+      price: 499,
+      originalPrice: 899,
+      badge: 'Quick Launch',
+      badgeIcon: Zap,
+      badgeClass: 'bg-green-500/20 text-green-300 border-green-500/30',
+      slug: 'landing-pages',
+      detailPage: true,
+      color: 'from-green-500/20 to-emerald-500/10',
+      border: 'border-green-500/30',
+    },
+    {
+      icon: Settings,
+      title: t('services.webapp.page.title'),
+      tagline: t('services.webapp.page.tagline'),
+      description: t('services.webapp.page.desc'),
+      features: [
+        t('services.webapp.page.f1'), t('services.webapp.page.f2'), t('services.webapp.page.f3'),
+        t('services.webapp.page.f4'), t('services.webapp.page.f5'), t('services.webapp.page.f6'),
+      ],
+      price: 1999,
+      originalPrice: 3999,
+      badge: 'Best Value',
+      badgeIcon: Trophy,
+      badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+      slug: 'web-applications',
+      detailPage: true,
+      color: 'from-orange-500/20 to-yellow-500/10',
+      border: 'border-orange-500/30',
+    },
+    {
+      icon: Wrench,
+      title: t('services.maint.page.title'),
+      tagline: t('services.maint.page.tagline'),
+      description: t('services.maint.page.desc'),
+      features: [
+        t('services.maint.page.f1'), t('services.maint.page.f2'), t('services.maint.page.f3'),
+        t('services.maint.page.f4'), t('services.maint.page.f5'), t('services.maint.page.f6'),
+      ],
+      price: 149,
+      originalPrice: 299,
+      isMonthly: true,
+      badge: 'Flexible Plans',
+      badgeIcon: Shield,
+      badgeClass: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+      slug: 'maintenance',
+      detailPage: true,
+      color: 'from-slate-500/20 to-slate-600/10',
+      border: 'border-slate-500/30',
+    },
+  ];
+
+  const highlights = [
+    { icon: Zap,    label: t('services.hl.fast.label'),     desc: t('services.hl.fast.desc') },
+    { icon: Shield, label: t('services.hl.secure.label'),   desc: t('services.hl.secure.desc') },
+    { icon: Clock,  label: t('services.hl.response.label'), desc: t('services.hl.response.desc') },
+  ];
+
   return (
     <PublicLayout>
       {/* Hero */}
@@ -130,20 +152,21 @@ export default function ServicesPage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-6">
-              <Zap className="w-3 h-3 text-primary-400" /> What We Build
+              <Zap className="w-3 h-3 text-primary-400" /> {t('services.page.badge')}
             </span>
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Every Service You Need<br />
-              <span className="gradient-text">Under One Roof</span>
+              {t('services.page.title1')}<br />
+              <span className="gradient-text">{t('services.page.title2')}</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-4">
-              From landing pages to full SaaS platforms — professional quality at up to{' '}
-              <span className="text-green-400 font-semibold">50% below</span> average market rates.
+              {t('services.page.subtitle')}{' '}
+              <span className="text-green-400 font-semibold">{t('services.page.subtitlePct')}</span>{' '}
+              {t('services.page.subtitleEnd')}
             </p>
             {/* Market comparison trust bar */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-10">
               <TrendingDown className="w-3.5 h-3.5 text-green-400" />
-              <span className="text-green-400 text-xs font-medium">Prices verified against Upwork, Fiverr Pro & GoodFirms — 2026</span>
+              <span className="text-green-400 text-xs font-medium">{t('services.page.trust')}</span>
             </div>
             <div className="flex flex-wrap justify-center gap-8">
               {highlights.map((h) => (
@@ -161,28 +184,32 @@ export default function ServicesPage() {
       <section className="pb-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s, i) => {
-              const Icon = s.icon;
-              const BadgeIcon = s.badgeIcon;
-              const pct = discountPct(s.originalPrice, s.price);
-              const href = s.detailPage ? `/services/${s.slug}` : `/request?service=${s.slug}`;
-              const priceLabel = s.isMonthly
-                ? `$${s.price}/mo`
-                : `From $${s.price.toLocaleString()}`;
-              const origLabel = s.isMonthly
-                ? `$${s.originalPrice}/mo`
-                : `$${s.originalPrice.toLocaleString()}`;
+            {services.map((svc, i) => {
+              const Icon = svc.icon;
+              const BadgeIcon = svc.badgeIcon;
+              const pct = discountPct(svc.originalPrice, svc.price);
+              const href = svc.detailPage ? `/services/${svc.slug}` : `/request?service=${svc.slug}`;
+              const priceLabel = svc.isMonthly
+                ? `$${svc.price}${t('services.page.perMo')}`
+                : `${t('services.page.from')} $${svc.price.toLocaleString()}`;
+              const origLabel = svc.isMonthly
+                ? `$${svc.originalPrice}${t('services.page.perMo')}`
+                : `$${svc.originalPrice.toLocaleString()}`;
+              const saveAmt = (svc.originalPrice - svc.price).toLocaleString();
+              const saveLabel = svc.isMonthly
+                ? t('services.page.savePerMo').replace('{amount}', `$${saveAmt}`)
+                : t('services.page.saveVsMarket').replace('{amount}', `$${saveAmt}`);
 
               return (
                 <motion.div
-                  key={s.slug}
+                  key={svc.slug}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
                 >
                   <Link href={href} className="block h-full">
-                    <div className={`glass rounded-2xl p-8 border ${s.border} bg-gradient-to-br ${s.color} flex flex-col group hover:scale-[1.02] transition-transform duration-300 h-full cursor-pointer relative overflow-hidden`}>
+                    <div className={`glass rounded-2xl p-8 border ${svc.border} bg-gradient-to-br ${svc.color} flex flex-col group hover:scale-[1.02] transition-transform duration-300 h-full cursor-pointer relative overflow-hidden`}>
 
                       {/* Discount % pill — top right */}
                       <div className="absolute top-4 right-4">
@@ -196,17 +223,17 @@ export default function ServicesPage() {
                       </div>
 
                       {/* Promo badge */}
-                      <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-3 w-fit ${s.badgeClass}`}>
+                      <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-3 w-fit ${svc.badgeClass}`}>
                         <BadgeIcon className="w-3 h-3" />
-                        {s.badge}
+                        {svc.badge}
                       </div>
 
-                      <h3 className="text-xl font-bold text-white mb-1">{s.title}</h3>
-                      <p className="text-primary-400 text-sm mb-3 font-medium">{s.tagline}</p>
-                      <p className="text-slate-400 text-sm mb-5 leading-relaxed flex-1">{s.description}</p>
+                      <h3 className="text-xl font-bold text-white mb-1">{svc.title}</h3>
+                      <p className="text-primary-400 text-sm mb-3 font-medium">{svc.tagline}</p>
+                      <p className="text-slate-400 text-sm mb-5 leading-relaxed flex-1">{svc.description}</p>
 
                       <ul className="space-y-2 mb-6">
-                        {s.features.map((f) => (
+                        {svc.features.map((f) => (
                           <li key={f} className="flex items-center gap-2 text-xs text-slate-400">
                             <Check className="w-3.5 h-3.5 text-primary-400 shrink-0" /> {f}
                           </li>
@@ -219,15 +246,15 @@ export default function ServicesPage() {
                           <div>
                             <div className="flex items-center gap-2 mb-0.5">
                               <span className="text-slate-500 text-xs line-through">{origLabel}</span>
-                              <span className="text-slate-500 text-[10px]">market avg</span>
+                              <span className="text-slate-500 text-[10px]">{t('services.page.marketAvg')}</span>
                             </div>
                             <span className="text-white font-bold text-lg">{priceLabel}</span>
                             <p className="text-green-400 text-[10px] font-semibold mt-0.5">
-                              Save ${(s.originalPrice - s.price).toLocaleString()}{s.isMonthly ? '/mo' : ''} vs market
+                              {saveLabel}
                             </p>
                           </div>
                           <span className="flex items-center gap-1.5 text-primary-400 text-sm font-medium group-hover:gap-2.5 transition-all">
-                            {s.detailPage ? 'Learn More' : 'Get Started'}
+                            {svc.detailPage ? t('services.page.learnMore') : t('services.page.getStarted')}
                             <ArrowRight className="w-3.5 h-3.5" />
                           </span>
                         </div>
@@ -251,16 +278,16 @@ export default function ServicesPage() {
             className="glass rounded-3xl p-12 text-center border border-primary-500/20 relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-blue-500/5 pointer-events-none" />
-            <h2 className="text-3xl font-bold text-white mb-3 relative z-10">Not sure which service?</h2>
-            <p className="text-slate-400 mb-8 relative z-10">Tell us about your project and we'll recommend the best approach.</p>
+            <h2 className="text-3xl font-bold text-white mb-3 relative z-10">{t('services.cta.title')}</h2>
+            <p className="text-slate-400 mb-8 relative z-10">{t('services.cta.sub')}</p>
             <div className="flex flex-wrap justify-center gap-4 relative z-10">
               <Link href="/request">
                 <Button size="lg" className="group">
-                  Start a Project <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {t('services.cta.start')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="/contact">
-                <Button size="lg" variant="outline">Talk to Us First</Button>
+                <Button size="lg" variant="outline">{t('services.cta.talk')}</Button>
               </Link>
             </div>
           </motion.div>

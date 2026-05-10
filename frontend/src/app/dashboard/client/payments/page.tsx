@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { paymentAPI } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Payment } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -10,6 +11,7 @@ import { CreditCard, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ClientPaymentsPage() {
+  const { t } = useLanguage();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,10 +42,10 @@ export default function ClientPaymentsPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <h1 className="text-2xl font-bold text-white">Payments</h1>
+      <h1 className="text-2xl font-bold text-white">{t('dash.nav.payments')}</h1>
 
       <div className="glass rounded-2xl p-6 border border-white/5">
-        <p className="text-slate-400 text-sm">Total Paid</p>
+        <p className="text-slate-400 text-sm">{t('invoice.total')}</p>
         <p className="text-4xl font-bold text-white mt-1">{formatCurrency(total)}</p>
       </div>
 

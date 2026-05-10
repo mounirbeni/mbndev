@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { authAPI } from '@/lib/api';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -12,6 +13,7 @@ import { motion } from 'framer-motion';
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
 
   /* ── Profile form ───────────────────────────────────── */
   const [profile, setProfile] = useState({
@@ -22,13 +24,13 @@ export default function SettingsPage() {
   const [savingProfile, setSavingProfile] = useState(false);
 
   const handleSaveProfile = async () => {
-    if (!profile.name.trim()) { toast.error('Name is required'); return; }
+    if (!profile.name.trim()) { toast.error(t('validation.required')); return; }
     setSavingProfile(true);
     try {
       await authAPI.updateProfile(profile);
-      toast.success('Profile updated');
+      toast.success(t('toast.saved'));
     } catch {
-      toast.error('Failed to update profile');
+      toast.error(t('toast.error'));
     } finally {
       setSavingProfile(false);
     }
@@ -39,16 +41,16 @@ export default function SettingsPage() {
   const [savingPwd, setSavingPwd] = useState(false);
 
   const handleChangePassword = async () => {
-    if (!pwd.current || !pwd.next || !pwd.confirm) { toast.error('All fields are required'); return; }
-    if (pwd.next.length < 6) { toast.error('New password must be at least 6 characters'); return; }
-    if (pwd.next !== pwd.confirm) { toast.error('New passwords do not match'); return; }
+    if (!pwd.current || !pwd.next || !pwd.confirm) { toast.error(t('validation.required')); return; }
+    if (pwd.next.length < 6) { toast.error(t('validation.password')); return; }
+    if (pwd.next !== pwd.confirm) { toast.error(t('validation.passwordMatch')); return; }
     setSavingPwd(true);
     try {
       await authAPI.updateProfile({ currentPassword: pwd.current, newPassword: pwd.next });
-      toast.success('Password changed successfully');
+      toast.success(t('toast.passwordReset'));
       setPwd({ current: '', next: '', confirm: '' });
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to change password');
+      toast.error(err?.response?.data?.message || t('toast.error'));
     } finally {
       setSavingPwd(false);
     }
@@ -59,15 +61,15 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-slate-400 text-sm mt-1">Manage your account preferences.</p>
+        <h1 className="text-2xl font-bold text-white">{t('dash.nav.settings')}</h1>
+        <p className="text-slate-400 text-sm mt-1">{t('dash.overview')}</p>
       </motion.div>
 
       {/* ── Profile ──────────────────────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className={cardClass}>
         <div className="flex items-center gap-2 mb-5">
           <User className="w-4 h-4 text-primary-400" />
-          <h2 className="text-base font-semibold text-white">Profile Information</h2>
+          <h2 className="text-base font-semibold text-white">{t('auth.field.name')}</h2>
         </div>
 
         {/* Avatar row */}
@@ -86,33 +88,33 @@ export default function SettingsPage() {
 
         <div className="space-y-4">
           <Input
-            label="Full Name"
+            label={t('auth.field.name')}
             value={profile.name}
             onChange={(e) => setProfile((f) => ({ ...f, name: e.target.value }))}
-            placeholder="Your full name"
+            placeholder={t('auth.signup.namePlaceholder')}
           />
           <Input
-            label="Email Address"
+            label={t('auth.field.email')}
             value={user?.email || ''}
             disabled
             className="opacity-50 cursor-not-allowed"
           />
           <div className="grid sm:grid-cols-2 gap-4">
             <Input
-              label="Company"
+              label={t('auth.signup.company')}
               value={profile.company}
               onChange={(e) => setProfile((f) => ({ ...f, company: e.target.value }))}
-              placeholder="Your company"
+              placeholder={t('auth.signup.companyPlaceholder')}
             />
             <Input
-              label="Phone"
+              label={t('auth.field.phone')}
               value={profile.phone}
               onChange={(e) => setProfile((f) => ({ ...f, phone: e.target.value }))}
               placeholder="+212 6 xx xx xx xx"
             />
           </div>
           <div className="flex justify-end pt-1">
-            <Button onClick={handleSaveProfile} loading={savingProfile}>Save Profile</Button>
+            <Button onClick={handleSaveProfile} loading={savingProfile}>{t('common.save')}</Button>
           </div>
         </div>
       </motion.div>
@@ -121,7 +123,7 @@ export default function SettingsPage() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={cardClass}>
         <div className="flex items-center gap-2 mb-5">
           <Lock className="w-4 h-4 text-yellow-400" />
-          <h2 className="text-base font-semibold text-white">Change Password</h2>
+          <h2 className="text-base font-semibold text-white">{t('auth.reset.title')}</h2>
         </div>
         <div className="space-y-4">
           <Input

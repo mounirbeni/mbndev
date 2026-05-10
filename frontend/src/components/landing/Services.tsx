@@ -2,53 +2,56 @@
 
 import { motion } from 'framer-motion';
 import { Globe, ShoppingCart, BarChart3, Layout, Smartphone, Settings } from 'lucide-react';
-
-const services = [
-  {
-    icon: Globe,
-    title: 'Custom Websites',
-    desc: 'Stunning, high-performance websites tailored to your brand identity and business goals.',
-    features: ['Responsive Design', 'SEO Optimized', 'Fast Loading'],
-    color: 'from-purple-500 to-violet-600',
-  },
-  {
-    icon: ShoppingCart,
-    title: 'E-Commerce Stores',
-    desc: 'Full-featured online stores with seamless payment integration and inventory management.',
-    features: ['Payment Gateway', 'Product Management', 'Order Tracking'],
-    color: 'from-blue-500 to-cyan-600',
-  },
-  {
-    icon: BarChart3,
-    title: 'SaaS Dashboards',
-    desc: 'Complex web applications with real-time data, advanced analytics, and user management.',
-    features: ['Real-time Data', 'User Auth', 'Analytics'],
-    color: 'from-pink-500 to-rose-600',
-  },
-  {
-    icon: Layout,
-    title: 'Landing Pages',
-    desc: 'Conversion-optimized landing pages that turn visitors into paying customers.',
-    features: ['A/B Testing Ready', 'Lead Capture', 'CRO Focused'],
-    color: 'from-green-500 to-emerald-600',
-  },
-  {
-    icon: Smartphone,
-    title: 'Web Applications',
-    desc: 'Powerful web apps with rich interactivity, offline support, and mobile-first UX.',
-    features: ['PWA Support', 'Offline Mode', 'Push Notifications'],
-    color: 'from-orange-500 to-amber-600',
-  },
-  {
-    icon: Settings,
-    title: 'Maintenance & Support',
-    desc: 'Ongoing technical support, performance monitoring, and feature updates post-launch.',
-    features: ['24/7 Monitoring', 'Bug Fixes', 'Feature Updates'],
-    color: 'from-teal-500 to-cyan-600',
-  },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Services() {
+  const { t } = useLanguage();
+
+  const services = [
+    {
+      icon: Globe,
+      title: t('services.custom.title'),
+      desc:  t('services.custom.desc'),
+      features: [t('services.custom.f1'), t('services.custom.f2'), t('services.custom.f3')],
+      color: 'from-purple-500 to-violet-600',
+    },
+    {
+      icon: ShoppingCart,
+      title: t('services.ecom.title'),
+      desc:  t('services.ecom.desc'),
+      features: [t('services.ecom.f1'), t('services.ecom.f2'), t('services.ecom.f3')],
+      color: 'from-blue-500 to-cyan-600',
+    },
+    {
+      icon: BarChart3,
+      title: t('services.saas.title'),
+      desc:  t('services.saas.desc'),
+      features: [t('services.saas.f1'), t('services.saas.f2'), t('services.saas.f3')],
+      color: 'from-pink-500 to-rose-600',
+    },
+    {
+      icon: Layout,
+      title: t('services.landing.title'),
+      desc:  t('services.landing.desc'),
+      features: [t('services.landing.f1'), t('services.landing.f2'), t('services.landing.f3')],
+      color: 'from-green-500 to-emerald-600',
+    },
+    {
+      icon: Smartphone,
+      title: t('services.webapp.title'),
+      desc:  t('services.webapp.desc'),
+      features: [t('services.webapp.f1'), t('services.webapp.f2'), t('services.webapp.f3')],
+      color: 'from-orange-500 to-amber-600',
+    },
+    {
+      icon: Settings,
+      title: t('services.maint.title'),
+      desc:  t('services.maint.desc'),
+      features: [t('services.maint.f1'), t('services.maint.f2'), t('services.maint.f3')],
+      color: 'from-teal-500 to-cyan-600',
+    },
+  ];
+
   return (
     <section id="services" className="py-24 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/5 to-transparent pointer-events-none" />

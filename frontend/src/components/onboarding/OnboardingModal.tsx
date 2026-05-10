@@ -9,29 +9,33 @@ import {
   Package, Trophy, ChevronRight, FileText, Upload, ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const STORAGE_KEY = 'mbndev_onboarding_done';
 
-// ─── Lifecycle mini-visual ────────────────────────────────────────────────────
+// ─── Stage definitions (icons + colors only; labels come from t()) ────────────
 
-const STAGES = [
-  { icon: FileCheck,   label: 'Request',     color: 'text-slate-400',   bg: 'bg-slate-800' },
-  { icon: Zap,         label: 'Review',       color: 'text-amber-400',   bg: 'bg-amber-500/15' },
-  { icon: FolderOpen,  label: 'Development',  color: 'text-blue-400',    bg: 'bg-blue-500/15' },
-  { icon: RotateCcw,   label: 'Revision',     color: 'text-orange-400',  bg: 'bg-orange-500/15' },
-  { icon: Package,     label: 'Delivery',     color: 'text-purple-400',  bg: 'bg-purple-500/15' },
-  { icon: Trophy,      label: 'Complete',     color: 'text-green-400',   bg: 'bg-green-500/15' },
+const STAGE_DEFS = [
+  { icon: FileCheck,  labelKey: 'onboarding.stage.request',     color: 'text-slate-400',  bg: 'bg-slate-800'      },
+  { icon: Zap,        labelKey: 'onboarding.stage.review',      color: 'text-amber-400',  bg: 'bg-amber-500/15'   },
+  { icon: FolderOpen, labelKey: 'onboarding.stage.development', color: 'text-blue-400',   bg: 'bg-blue-500/15'    },
+  { icon: RotateCcw,  labelKey: 'onboarding.stage.revision',    color: 'text-orange-400', bg: 'bg-orange-500/15'  },
+  { icon: Package,    labelKey: 'onboarding.stage.delivery',    color: 'text-purple-400', bg: 'bg-purple-500/15'  },
+  { icon: Trophy,     labelKey: 'onboarding.stage.complete',    color: 'text-green-400',  bg: 'bg-green-500/15'   },
 ];
 
+// ─── Lifecycle mini-visual ────────────────────────────────────────────────────
+
 function LifecycleStrip({ activeIndex = -1 }: { activeIndex?: number }) {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center gap-0 w-full overflow-x-auto pb-1 scrollbar-none">
-      {STAGES.map((s, i) => {
+      {STAGE_DEFS.map((s, i) => {
         const Icon   = s.icon;
         const done   = i < activeIndex;
         const active = i === activeIndex;
         return (
-          <div key={s.label} className="flex items-center gap-0 shrink-0 flex-1 min-w-0">
+          <div key={s.labelKey} className="flex items-center gap-0 shrink-0 flex-1 min-w-0">
             <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
               <div className={cn(
                 'w-9 h-9 rounded-xl flex items-center justify-center transition-all',
@@ -46,10 +50,10 @@ function LifecycleStrip({ activeIndex = -1 }: { activeIndex?: number }) {
                 'text-[10px] font-medium text-center leading-tight',
                 active ? 'text-white' : done ? 'text-green-400/70' : 'text-slate-700'
               )}>
-                {s.label}
+                {t(s.labelKey)}
               </span>
             </div>
-            {i < STAGES.length - 1 && (
+            {i < STAGE_DEFS.length - 1 && (
               <div className={cn(
                 'h-px flex-1 mx-1 mb-4 transition-colors',
                 done ? 'bg-green-500/40' : 'bg-white/8'
@@ -240,44 +244,6 @@ interface Step {
   visual:      React.ReactNode;
 }
 
-const buildSteps = (firstName: string): Step[] => [
-  {
-    id:          'welcome',
-    badge:       'Welcome',
-    title:       `You're in, ${firstName}.`,
-    description: 'MBN DEV is your dedicated workspace for commissioning, tracking, and receiving professional software projects — fully transparent, end-to-end.',
-    visual:      <WelcomeVisual />,
-  },
-  {
-    id:          'workflow',
-    badge:       'How it works',
-    title:       'Every project has a clear journey.',
-    description: "Projects move through defined stages — from your initial request all the way to final delivery. You'll always know exactly where things stand.",
-    visual:      <WorkflowVisual />,
-  },
-  {
-    id:          'messages',
-    badge:       'Communication',
-    title:       'Talk directly to the person building your product.',
-    description: 'No ticket queues, no support bots. Every project has a dedicated message thread where you can ask questions, give feedback, or request changes — in real time.',
-    visual:      <MessagesVisual />,
-  },
-  {
-    id:          'payments',
-    badge:       'Billing',
-    title:       'Simple, transparent payments.',
-    description: "Your price is confirmed in writing before work starts. Submit your payment proof directly on the platform — we verify it and your project activates the same day.",
-    visual:      <PaymentsVisual />,
-  },
-  {
-    id:          'ready',
-    badge:       "You're all set",
-    title:       'Ready to build something great?',
-    description: "Submit your first project brief and we'll review it within 24 hours — confirming scope, timeline, and price upfront before any work begins.",
-    visual:      <ReadyVisual />,
-  },
-];
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
@@ -286,8 +252,49 @@ interface Props {
 }
 
 export default function OnboardingModal({ userName, onClose }: Props) {
+  const { t } = useLanguage();
   const firstName = userName.split(' ')[0];
-  const steps     = buildSteps(firstName);
+
+  // buildSteps inside component so t() re-evaluates on locale change
+  const buildSteps = (): Step[] => [
+    {
+      id:          'welcome',
+      badge:       t('onboarding.step1.badge'),
+      title:       `${t('onboarding.step1.badge')}, ${firstName}.`,
+      description: 'MBN DEV is your dedicated workspace for commissioning, tracking, and receiving professional software projects — fully transparent, end-to-end.',
+      visual:      <WelcomeVisual />,
+    },
+    {
+      id:          'workflow',
+      badge:       t('onboarding.step2.badge'),
+      title:       'Every project has a clear journey.',
+      description: "Projects move through defined stages — from your initial request all the way to final delivery. You'll always know exactly where things stand.",
+      visual:      <WorkflowVisual />,
+    },
+    {
+      id:          'messages',
+      badge:       t('onboarding.step3.badge'),
+      title:       'Talk directly to the person building your product.',
+      description: 'No ticket queues, no support bots. Every project has a dedicated message thread where you can ask questions, give feedback, or request changes — in real time.',
+      visual:      <MessagesVisual />,
+    },
+    {
+      id:          'payments',
+      badge:       t('onboarding.step4.badge'),
+      title:       'Simple, transparent payments.',
+      description: "Your price is confirmed in writing before work starts. Submit your payment proof directly on the platform — we verify it and your project activates the same day.",
+      visual:      <PaymentsVisual />,
+    },
+    {
+      id:          'ready',
+      badge:       t('onboarding.step5.badge'),
+      title:       'Ready to build something great?',
+      description: "Submit your first project brief and we'll review it within 24 hours — confirming scope, timeline, and price upfront before any work begins.",
+      visual:      <ReadyVisual />,
+    },
+  ];
+
+  const steps    = buildSteps();
   const [step, setStep] = useState(0);
   const [dir,  setDir]  = useState(1);   // 1 = forward, -1 = back
 
@@ -419,9 +426,9 @@ export default function OnboardingModal({ userName, onClose }: Props) {
                 className="text-sm text-slate-500 hover:text-slate-300 transition-colors flex items-center gap-1.5"
               >
                 {isFirst ? (
-                  'Skip tour'
+                  t('onboarding.skip')
                 ) : (
-                  <><ArrowLeft className="w-3.5 h-3.5" /> Back</>
+                  <><ArrowLeft className="w-3.5 h-3.5" /> {t('onboarding.back')}</>
                 )}
               </button>
 
@@ -433,7 +440,7 @@ export default function OnboardingModal({ userName, onClose }: Props) {
                       whileTap={{ scale: 0.97 }}
                       className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-primary-500/25 transition-all"
                     >
-                      Start my first project
+                      {t('onboarding.start')}
                       <ArrowRight className="w-4 h-4" />
                     </motion.button>
                   </Link>
@@ -444,7 +451,7 @@ export default function OnboardingModal({ userName, onClose }: Props) {
                     onClick={() => goTo(step + 1)}
                     className="flex items-center gap-2 bg-primary-500/20 hover:bg-primary-500/30 border border-primary-500/30 text-primary-300 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
                   >
-                    Next
+                    {t('onboarding.next')}
                     <ArrowRight className="w-4 h-4" />
                   </motion.button>
                 )}

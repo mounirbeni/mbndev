@@ -8,44 +8,64 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
-
-const skills = [
-  { name: 'React / Next.js', level: 98, color: 'bg-blue-500' },
-  { name: 'Node.js / Express', level: 95, color: 'bg-green-500' },
-  { name: 'TypeScript', level: 92, color: 'bg-blue-400' },
-  { name: 'PostgreSQL / Prisma', level: 88, color: 'bg-indigo-500' },
-  { name: 'MongoDB', level: 85, color: 'bg-emerald-500' },
-  { name: 'UI/UX Design', level: 82, color: 'bg-purple-500' },
-];
-
-const technologies = [
-  { icon: Code2, label: 'Next.js 14' },
-  { icon: Layers, label: 'React' },
-  { icon: Terminal, label: 'Node.js' },
-  { icon: Database, label: 'PostgreSQL' },
-  { icon: Server, label: 'Express.js' },
-  { icon: GitBranch, label: 'Prisma ORM' },
-  { icon: Globe, label: 'Tailwind CSS' },
-  { icon: Zap, label: 'TypeScript' },
-];
-
-const stats = [
-  { icon: Clock, value: '5+', label: 'Years of Experience' },
-  { icon: FolderOpen, value: '40+', label: 'Projects Delivered' },
-  { icon: Users, value: '30+', label: 'Happy Clients' },
-  { icon: Star, value: '100%', label: 'Client Satisfaction' },
-];
-
-const timeline = [
-  { year: '2019', title: 'Started coding journey', desc: 'Self-taught HTML, CSS, JavaScript through online courses and building projects.' },
-  { year: '2020', title: 'First freelance project', desc: 'Delivered first paid website for a local business. Fell in love with the process.' },
-  { year: '2021', title: 'Full Stack mastery', desc: 'Mastered React, Node.js, and databases. Built first SaaS application.' },
-  { year: '2022', title: 'Launched MBN DEV', desc: 'Founded MBN DEV to bring premium web development to Moroccan businesses.' },
-  { year: '2023', title: 'Scaling the platform', desc: 'Grew to 30+ clients. Expanded services to SaaS dashboards and e-commerce.' },
-  { year: '2024', title: 'Going global', desc: 'Built client portal platform. Serving clients across Morocco and beyond.' },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function AboutPage() {
+  const { t } = useLanguage();
+
+  const skills = [
+    { name: 'React / Next.js', level: 98, color: 'bg-blue-500' },
+    { name: 'Node.js / Express', level: 95, color: 'bg-green-500' },
+    { name: 'TypeScript', level: 92, color: 'bg-blue-400' },
+    { name: 'PostgreSQL / Prisma', level: 88, color: 'bg-indigo-500' },
+    { name: 'MongoDB', level: 85, color: 'bg-emerald-500' },
+    { name: 'UI/UX Design', level: 82, color: 'bg-purple-500' },
+  ];
+
+  const technologies = [
+    { icon: Code2, label: 'Next.js 14' },
+    { icon: Layers, label: 'React' },
+    { icon: Terminal, label: 'Node.js' },
+    { icon: Database, label: 'PostgreSQL' },
+    { icon: Server, label: 'Express.js' },
+    { icon: GitBranch, label: 'Prisma ORM' },
+    { icon: Globe, label: 'Tailwind CSS' },
+    { icon: Zap, label: 'TypeScript' },
+  ];
+
+  const stats = [
+    { icon: Clock, value: '5+', label: t('about.stats.experience') },
+    { icon: FolderOpen, value: '40+', label: t('about.stats.projects') },
+    { icon: Users, value: '30+', label: t('about.stats.clients') },
+    { icon: Star, value: '100%', label: t('about.stats.satisfaction') },
+  ];
+
+  const timeline = [
+    { year: '2019', title: t('about.timeline.2019.title'), desc: t('about.timeline.2019.desc') },
+    { year: '2020', title: t('about.timeline.2020.title'), desc: t('about.timeline.2020.desc') },
+    { year: '2021', title: t('about.timeline.2021.title'), desc: t('about.timeline.2021.desc') },
+    { year: '2022', title: t('about.timeline.2022.title'), desc: t('about.timeline.2022.desc') },
+    { year: '2023', title: t('about.timeline.2023.title'), desc: t('about.timeline.2023.desc') },
+    { year: '2024', title: t('about.timeline.2024.title'), desc: t('about.timeline.2024.desc') },
+  ];
+
+  const visionMission = [
+    {
+      label: t('about.vision.label'),
+      title: t('about.vision.title'),
+      desc: t('about.vision.desc'),
+      color: 'border-primary-500/30',
+      gradient: 'from-primary-500/10',
+    },
+    {
+      label: t('about.mission.label'),
+      title: t('about.mission.title'),
+      desc: t('about.mission.desc'),
+      color: 'border-blue-500/30',
+      gradient: 'from-blue-500/10',
+    },
+  ];
+
   return (
     <PublicLayout>
       {/* Hero */}
@@ -54,13 +74,13 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-8">
-              <Zap className="w-3 h-3 text-primary-400" /> The Developer Behind MBN DEV
+              <Zap className="w-3 h-3 text-primary-400" /> {t('about.badge')}
             </span>
             <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Hi, I'm <span className="gradient-text">Mounir Banni</span>
+              {t('about.hero.title')} <span className="gradient-text">{t('about.hero.name')}</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              Full Stack Developer & founder of MBN DEV. I build premium web products that help businesses grow, scale, and succeed in the digital age.
+              {t('about.hero.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -96,22 +116,7 @@ export default function AboutPage() {
       {/* Vision & Mission */}
       <section className="pb-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
-          {[
-            {
-              label: 'My Vision',
-              title: 'A digital future for every Moroccan business',
-              desc: 'I believe every business — from the artisan in Fes to the startup in Casablanca — deserves a world-class digital presence. Technology should not be a privilege. It should be accessible, powerful, and beautifully built.',
-              color: 'border-primary-500/30',
-              gradient: 'from-primary-500/10',
-            },
-            {
-              label: 'My Mission',
-              title: 'Build software that matters, ship products that work',
-              desc: 'MBN DEV is my vehicle to deliver premium software without the agency overhead. Clean code, honest communication, and results-driven development. Every project I take on, I treat as if it\'s my own company.',
-              color: 'border-blue-500/30',
-              gradient: 'from-blue-500/10',
-            },
-          ].map((item) => (
+          {visionMission.map((item) => (
             <motion.div
               key={item.label}
               initial={{ opacity: 0, y: 20 }}
@@ -132,10 +137,10 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <span className="text-xs text-primary-400 font-semibold uppercase tracking-widest mb-3 block">Skills</span>
-              <h2 className="text-3xl font-bold text-white mb-4">Engineered for the modern web</h2>
+              <span className="text-xs text-primary-400 font-semibold uppercase tracking-widest mb-3 block">{t('about.skills.eyebrow')}</span>
+              <h2 className="text-3xl font-bold text-white mb-4">{t('about.skills.title')}</h2>
               <p className="text-slate-400 mb-8 leading-relaxed">
-                5+ years of building production applications has sharpened my technical toolkit. I work across the full stack — from pixel-perfect UI to scalable backend systems.
+                {t('about.skills.subtitle')}
               </p>
               <div className="space-y-4">
                 {skills.map((s, i) => (
@@ -166,14 +171,14 @@ export default function AboutPage() {
 
             {/* Technologies */}
             <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <span className="text-xs text-primary-400 font-semibold uppercase tracking-widest mb-3 block">Technologies</span>
-              <h2 className="text-3xl font-bold text-white mb-8">My daily stack</h2>
+              <span className="text-xs text-primary-400 font-semibold uppercase tracking-widest mb-3 block">{t('about.tech.eyebrow')}</span>
+              <h2 className="text-3xl font-bold text-white mb-8">{t('about.tech.title')}</h2>
               <div className="grid grid-cols-4 gap-3">
-                {technologies.map((t, i) => {
-                  const Icon = t.icon;
+                {technologies.map((tech, i) => {
+                  const Icon = tech.icon;
                   return (
                     <motion.div
-                      key={t.label}
+                      key={tech.label}
                       initial={{ opacity: 0, scale: 0.8 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
@@ -181,7 +186,7 @@ export default function AboutPage() {
                       className="glass rounded-xl p-3 text-center border border-white/5 hover:border-primary-500/30 transition-colors group"
                     >
                       <Icon className="w-5 h-5 text-slate-400 group-hover:text-primary-400 mx-auto mb-2 transition-colors" />
-                      <div className="text-slate-500 text-[10px] font-medium">{t.label}</div>
+                      <div className="text-slate-500 text-[10px] font-medium">{tech.label}</div>
                     </motion.div>
                   );
                 })}
@@ -195,8 +200,8 @@ export default function AboutPage() {
       <section className="pb-20 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <span className="text-xs text-primary-400 font-semibold uppercase tracking-widest mb-3 block">Journey</span>
-            <h2 className="text-3xl font-bold text-white">From Zero to Platform</h2>
+            <span className="text-xs text-primary-400 font-semibold uppercase tracking-widest mb-3 block">{t('about.timeline.eyebrow')}</span>
+            <h2 className="text-3xl font-bold text-white">{t('about.timeline.title')}</h2>
           </div>
           <div className="relative">
             <div className="absolute left-16 top-0 bottom-0 w-px bg-white/10" />
@@ -233,16 +238,16 @@ export default function AboutPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             className="glass rounded-3xl p-12 border border-primary-500/20 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-blue-500/5 pointer-events-none" />
-            <h2 className="text-3xl font-bold text-white mb-3 relative z-10">Let's work together</h2>
-            <p className="text-slate-400 mb-8 relative z-10">Have a project in mind? I'd love to hear about it.</p>
+            <h2 className="text-3xl font-bold text-white mb-3 relative z-10">{t('about.cta.title')}</h2>
+            <p className="text-slate-400 mb-8 relative z-10">{t('about.cta.sub')}</p>
             <div className="flex flex-wrap justify-center gap-4 relative z-10">
               <Link href="/request">
                 <Button size="lg" className="group">
-                  Start a Project <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {t('about.cta.start')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="/contact">
-                <Button size="lg" variant="outline">Get in Touch</Button>
+                <Button size="lg" variant="outline">{t('about.cta.contact')}</Button>
               </Link>
             </div>
           </motion.div>

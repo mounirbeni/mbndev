@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { FolderOpen } from 'lucide-react';
 import Link from 'next/link';
 import { projectAPI } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Project } from '@/types';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import Button from '@/components/ui/Button';
@@ -12,6 +13,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 const statusTabs = ['all', 'pending', 'in-progress', 'review', 'completed'] as const;
 
 export default function ClientProjectsPage() {
+  const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
@@ -45,11 +47,11 @@ export default function ClientProjectsPage() {
     <div className="space-y-6 max-w-7xl">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">My Projects</h1>
-          <p className="text-slate-400 text-sm mt-1">{projects.length} total projects</p>
+          <h1 className="text-2xl font-bold text-white">{t('dash.nav.myProjects')}</h1>
+          <p className="text-slate-400 text-sm mt-1">{projects.length} {t('dash.nav.projects').toLowerCase()}</p>
         </div>
         <Link href="/request">
-          <Button size="md">+ New Project</Button>
+          <Button size="md">+ {t('common.create')}</Button>
         </Link>
       </div>
 
@@ -65,7 +67,7 @@ export default function ClientProjectsPage() {
                 : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
             }`}
           >
-            {tab === 'all' ? 'All' : tab.replace('-', ' ')}
+            {tab === 'all' ? t('common.view') : tab === 'in-progress' ? t('status.inProgress') : tab === 'completed' ? t('status.completed') : tab === 'review' ? t('status.review') : t('status.pending')}
             <span className="ml-1.5 text-xs opacity-60">
               {tab === 'all'
                 ? projects.length
@@ -84,7 +86,7 @@ export default function ClientProjectsPage() {
       ) : filtered.length === 0 ? (
         <div className="glass rounded-2xl p-12 text-center border border-white/5">
           <FolderOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">No projects with this status.</p>
+          <p className="text-slate-400 text-sm">{t('empty.projects')}</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

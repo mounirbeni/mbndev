@@ -1,17 +1,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-
-const steps = [
-  { num: '01', title: 'Discovery Call', desc: 'We discuss your vision, goals, and requirements in detail to craft the perfect plan.' },
-  { num: '02', title: 'Proposal & Quote', desc: 'You receive a detailed proposal with scope, timeline, and transparent pricing.' },
-  { num: '03', title: 'Design & Prototype', desc: 'We create wireframes and a visual prototype for your approval before coding starts.' },
-  { num: '04', title: 'Development', desc: 'Our team builds your project with clean, scalable code and regular progress updates.' },
-  { num: '05', title: 'Review & Revisions', desc: 'You test the product and request changes. We refine until everything is perfect.' },
-  { num: '06', title: 'Launch & Support', desc: 'We deploy your project and remain available for ongoing support and maintenance.' },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Process() {
+  const { t } = useLanguage();
+
+  const steps = [
+    { num: '01', title: t('process.s1.title'), desc: t('process.s1.desc') },
+    { num: '02', title: t('process.s2.title'), desc: t('process.s2.desc') },
+    { num: '03', title: t('process.s3.title'), desc: t('process.s3.desc') },
+    { num: '04', title: t('process.s4.title'), desc: t('process.s4.desc') },
+    { num: '05', title: t('process.s5.title'), desc: t('process.s5.desc') },
+    { num: '06', title: t('process.s6.title'), desc: t('process.s6.desc') },
+  ];
+
   return (
     <section id="process" className="py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -22,13 +25,13 @@ export default function Process() {
           className="text-center mb-16"
         >
           <span className="text-primary-400 text-sm font-medium uppercase tracking-widest mb-3 block">
-            How It Works
+            {t('process.eyebrow')}
           </span>
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-            Our <span className="gradient-text">Process</span>
+            {t('process.title')} <span className="gradient-text">{t('process.title.bold')}</span>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-            A proven 6-step process that delivers exceptional results, every time.
+            {t('process.subtitle')}
           </p>
         </motion.div>
 

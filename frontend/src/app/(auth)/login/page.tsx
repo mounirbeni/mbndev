@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation';
 import { Mail, Lock, Zap, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
 
 export default function LoginPage() {
   const [email, setEmail]       = useState('');
@@ -17,12 +17,11 @@ export default function LoginPage() {
   const [loading, setLoading]   = useState(false);
   const [mounted, setMounted]   = useState(false);
   const { login, user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
-  // Wait for client mount before checking auth to prevent hydration mismatch.
   useEffect(() => { setMounted(true); }, []);
 
-  // Redirect after mount if already logged in
   useEffect(() => {
     if (mounted && user) {
       router.push(user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
@@ -34,11 +33,11 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      toast.success('Welcome back!');
+      toast.success(t('toast.loggedIn'));
       const stored = JSON.parse(localStorage.getItem('mbndev_user') || '{}');
       router.push(stored.role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Invalid credentials');
+      toast.error(err?.response?.data?.message || t('toast.invalidCreds'));
     } finally {
       setLoading(false);
     }
@@ -49,7 +48,6 @@ export default function LoginPage() {
       className="min-h-screen flex flex-col items-center justify-center bg-hero-gradient px-4 py-8"
       style={{ paddingTop: 'max(env(safe-area-inset-top, 0px) + 32px, 48px)' }}
     >
-      {/* Background glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-primary-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <motion.div
@@ -62,26 +60,26 @@ export default function LoginPage() {
         <div className="text-center mb-7">
           <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
             <div className="w-11 h-11 bg-primary-500 rounded-2xl flex items-center justify-center glow-purple">
-              <Zap className="w-5.5 h-5.5 text-white" />
+              <Zap className="w-5 h-5 text-white" />
             </div>
             <span className="text-white font-bold text-xl">MBN DEV</span>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-          <p className="text-slate-400 mt-1.5 text-sm">Sign in to your account</p>
+          <h1 className="text-2xl font-bold text-white">{t('auth.login.title')}</h1>
+          <p className="text-slate-400 mt-1.5 text-sm">{t('auth.login.subtitleShort')}</p>
         </div>
 
         {/* Form card */}
         <div className="glass-strong rounded-2xl p-6 border border-white/8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('auth.field.email')}</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t('auth.placeholder.email')}
                   autoComplete="email"
                   inputMode="email"
                   required
@@ -91,14 +89,14 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('auth.field.password')}</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 <input
                   type={showPw ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder.passwordDots')}
                   autoComplete="current-password"
                   required
                   className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-11 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-primary-500/60 focus:bg-white/8 transition-all"
@@ -114,7 +112,7 @@ export default function LoginPage() {
               </div>
               <div className="flex justify-end mt-1.5">
                 <Link href="/forgot-password" className="text-xs text-slate-500 hover:text-primary-400 transition-colors">
-                  Forgot password?
+                  {t('auth.login.forgot')}
                 </Link>
               </div>
             </div>
@@ -128,19 +126,18 @@ export default function LoginPage() {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  {t('auth.login.submit')}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
-
         </div>
 
         <p className="text-center text-slate-500 text-sm mt-5">
-          Don&apos;t have an account?{' '}
+          {t('auth.login.noAccount')}{' '}
           <Link href="/signup" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
-            Sign up free
+            {t('auth.login.signupFree')}
           </Link>
         </p>
       </motion.div>
