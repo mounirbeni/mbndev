@@ -290,7 +290,7 @@ export default function AdminProjectWorkspace() {
                 onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
                 rows={2}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500 resize-none"
-                placeholder="Internal notes (not visible to client)..." />
+                placeholder={t('admin.notes.hint')} />
             </div>
           </div>
         ) : (

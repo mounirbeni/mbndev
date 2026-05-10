@@ -6,6 +6,7 @@ import { Send, Loader2 } from 'lucide-react';
 import { Message } from '@/types';
 import { messageAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtime } from '@/hooks/useRealtime';
 import { timeAgo, getInitials, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -57,8 +58,8 @@ function SystemMessage({ msg }: { msg: Message }) {
 
 // ─── User message bubble ─────────────────────────────────────────────────────
 
-function UserMessage({ msg, isOwn }: { msg: Message; isOwn: boolean }) {
-  const name = msg.sender?.name || (isOwn ? 'You' : 'Admin');
+function UserMessage({ msg, isOwn, youLabel, adminLabel }: { msg: Message; isOwn: boolean; youLabel: string; adminLabel: string }) {
+  const name = msg.sender?.name || (isOwn ? youLabel : adminLabel);
   const role = msg.sender?.role;
 
   return (
@@ -116,6 +117,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
   const bottomRef    = useRef<HTMLDivElement>(null);
   const inputRef     = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const msgId = (m: any) => m?._id || m?.id || '';
 
@@ -140,7 +142,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
         setMessages(data.messages || []);
         onUnreadChange?.(projectId, 0);
       })
-      .catch(() => toast.error('Failed to load messages'))
+      .catch(() => toast.error(t('client.failedLoad')))
       .finally(() => setLoading(false));
   }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -181,7 +183,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
       });
       setTimeout(() => scrollToBottom('smooth'), 50);
     } catch {
-      toast.error('Failed to send message');
+      toast.error(t('client.failedMessage'));
       setContent(text);
     } finally {
       setSending(false);
@@ -208,7 +210,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
           <div className="min-w-0">
             <h3 className="text-white font-semibold text-sm leading-tight truncate">{projectTitle}</h3>
             <p className="text-slate-500 text-[11px] mt-0.5">
-              {loading ? 'Loading…' : `${messages.length} message${messages.length !== 1 ? 's' : ''}`}
+              {loading ? t('common.loading') : `${messages.length} ${t('client.messages').toLowerCase()}`}
             </p>
           </div>
         </div>
@@ -230,9 +232,9 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
             <div className="w-14 h-14 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-4">
               <Send className="w-5 h-5 text-primary-400" />
             </div>
-            <p className="text-slate-300 text-sm font-semibold">No messages yet</p>
+            <p className="text-slate-300 text-sm font-semibold">{t('client.noMessages')}</p>
             <p className="text-slate-600 text-xs mt-1.5 max-w-[200px]">
-              Start the conversation — we usually respond within a few hours.
+              {t('client.noMessages.sub')}
             </p>
           </div>
         )}
@@ -244,7 +246,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
               return <SystemMessage key={id} msg={msg} />;
             }
             const isOwn = (msg.sender?._id || msg.sender?.id || msg.senderId) === userId;
-            return <UserMessage key={id} msg={msg} isOwn={isOwn} />;
+            return <UserMessage key={id} msg={msg} isOwn={isOwn} youLabel={t('common.you')} adminLabel={t('common.admin')} />;
           })}
         </AnimatePresence>
 
@@ -263,7 +265,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message…"
+            placeholder={t('client.typeMessage')}
             inputMode="text"
             enterKeyHint="send"
             autoComplete="off"

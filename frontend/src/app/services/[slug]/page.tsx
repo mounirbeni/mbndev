@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ─── Service Data ──────────────────────────────────────────────────────────────
 // Market research: Upwork / Fiverr Pro / GoodFirms / Clutch — 2026
@@ -291,6 +292,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
   const service = serviceData[slug];
   if (!service) notFound();
 
+  const { t } = useLanguage();
   const Icon = service.icon;
   const BadgeIcon = service.badgeIcon;
   const pct = discountPct(service.originalPrice, service.price);
@@ -307,9 +309,9 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
         <div className="max-w-5xl mx-auto relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
-            <Link href="/" className="hover:text-slate-300 transition-colors">Home</Link>
+            <Link href="/" className="hover:text-slate-300 transition-colors">{t('nav.home')}</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/services" className="hover:text-slate-300 transition-colors">Services</Link>
+            <Link href="/services" className="hover:text-slate-300 transition-colors">{t('nav.services')}</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-slate-300">{service.title}</span>
           </div>
@@ -329,19 +331,19 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
               {/* Market comparison trust chip */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full mb-6">
                 <TrendingDown className="w-3 h-3 text-green-400" />
-                <span className="text-green-400 text-xs">Save {savingsLabel} vs average market rate</span>
+                <span className="text-green-400 text-xs">{t('services.slug.saveVsMarket').replace('{n}', savingsLabel)}</span>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <Link href={`/request?service=${service.requestType}`}>
                   <Button size="lg" className="group">
-                    Start This Project
+                    {t('services.slug.startProject')}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 <Link href="/contact">
                   <Button size="lg" variant="outline">
-                    <MessageSquare className="w-4 h-4" /> Ask a Question
+                    <MessageSquare className="w-4 h-4" /> {t('services.slug.askQuestion')}
                   </Button>
                 </Link>
               </div>
@@ -371,12 +373,12 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
                 <div className="mb-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-slate-500 text-sm line-through">{origLabel}</span>
-                    <span className="text-slate-500 text-xs">market avg</span>
+                    <span className="text-slate-500 text-xs">{t('services.slug.marketAvg')}</span>
                   </div>
                   <span className="text-4xl font-black text-white">{priceLabel}</span>
                 </div>
                 <p className="text-green-400 text-sm font-semibold mb-1">
-                  ✓ You save {savingsLabel} vs market
+                  {t('services.slug.youSave').replace('{n}', savingsLabel)}
                 </p>
                 <p className="text-slate-500 text-xs mb-6">{service.priceNote}</p>
 
@@ -390,13 +392,13 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
                     </li>
                   ))}
                   {service.features.length > 6 && (
-                    <li className="text-xs text-slate-500 pl-7">+ {service.features.length - 6} more features below</li>
+                    <li className="text-xs text-slate-500 pl-7">{t('services.slug.moreFeatures').replace('{n}', String(service.features.length - 6))}</li>
                   )}
                 </ul>
 
                 <Link href={`/request?service=${service.requestType}`} className="block">
                   <Button size="lg" className="w-full group">
-                    Get Started — {priceLabel}
+                    {t('services.slug.getStarted')} — {priceLabel}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
@@ -415,8 +417,8 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-white mb-3">What's Included</h2>
-            <p className="text-slate-400">Everything you get with every {service.title} project.</p>
+            <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.included')}</h2>
+            <p className="text-slate-400">{t('services.slug.includedSub').replace('{name}', service.title)}</p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
@@ -442,7 +444,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
           </div>
 
           <div className="glass rounded-2xl p-8 border border-white/5">
-            <h3 className="text-white font-semibold mb-6">Complete Feature List</h3>
+            <h3 className="text-white font-semibold mb-6">{t('services.slug.featureList')}</h3>
             <div className="grid sm:grid-cols-2 gap-3">
               {service.features.map((f) => (
                 <div key={f} className="flex items-center gap-3 text-sm text-slate-300">
@@ -466,8 +468,8 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-white mb-3">How It Works</h2>
-            <p className="text-slate-400">A clear, transparent process from first message to final delivery.</p>
+            <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.howItWorks')}</h2>
+            <p className="text-slate-400">{t('services.slug.howSub')}</p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -505,8 +507,8 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-white mb-3">Common Questions</h2>
-            <p className="text-slate-400">Quick answers before you reach out.</p>
+            <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.faqTitle')}</h2>
+            <p className="text-slate-400">{t('services.slug.faqSub')}</p>
           </motion.div>
 
           <div className="space-y-4">
@@ -544,22 +546,22 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
               {/* Savings highlight in CTA */}
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full mb-4">
                 <TrendingDown className="w-3 h-3 text-green-400" />
-                <span className="text-green-400 text-xs font-medium">Save {savingsLabel} vs market — {pct}% off</span>
+                <span className="text-green-400 text-xs font-medium">{t('services.slug.saveVsPct').replace('{n}', savingsLabel).replace('{pct}', String(pct))}</span>
               </div>
-              <h2 className="text-3xl font-bold text-white mb-3">Ready to get started?</h2>
+              <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.cta')}</h2>
               <p className="text-slate-400 mb-8 max-w-md mx-auto">
-                Tell us about your project and we'll send you a custom quote within 24 hours.
+                {t('services.slug.ctaSub')}
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link href={`/request?service=${service.requestType}`}>
                   <Button size="lg" className="group">
-                    Start Your {service.title} Project
+                    {t('services.slug.startYour')} {service.title} {t('services.slug.project')}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 <Link href="/contact">
                   <Button size="lg" variant="outline">
-                    <MessageSquare className="w-4 h-4" /> Contact First
+                    <MessageSquare className="w-4 h-4" /> {t('services.slug.contactFirst')}
                   </Button>
                 </Link>
               </div>

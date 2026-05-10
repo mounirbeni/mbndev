@@ -38,7 +38,8 @@
       "Bash(git commit -m ' *)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(powershell -command \"\\(Get-Content 'C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\\\\app\\\\dashboard\\\\admin\\\\projects\\\\[id]\\\\page.tsx'\\).Count\")"
+      "Bash(powershell -command \"\\(Get-Content 'C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\\\\app\\\\dashboard\\\\admin\\\\projects\\\\[id]\\\\page.tsx'\\).Count\")",
+      "Bash(for f *)"
     ]
   }
 }

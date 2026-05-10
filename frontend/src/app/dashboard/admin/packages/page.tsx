@@ -82,7 +82,7 @@ export default function AdminPackagesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Deactivate this package?')) return;
+    if (!confirm(t('admin.pkg.deactivate'))) return;
     try {
       await packageAPI.delete(id);
       toast.success(t('toast.deleted'));
@@ -100,7 +100,7 @@ export default function AdminPackagesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">{t('dash.nav.packages')}</h1>
-          <p className="text-slate-400 text-sm mt-1">{packages.length} {t('status.active').toLowerCase()} packages</p>
+          <p className="text-slate-400 text-sm mt-1">{packages.length} {t('admin.pkg.count')}</p>
         </div>
         <Button size="md" onClick={openCreate}>
           <Plus className="w-4 h-4" /> {t('common.create')}
@@ -125,7 +125,7 @@ export default function AdminPackagesPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="text-white font-bold">{pkg.name}</h3>
-                    {pkg.popular && <Badge color="purple" className="mt-1">Popular</Badge>}
+                    {pkg.popular && <Badge color="purple" className="mt-1">{t('pricing.popular')}</Badge>}
                   </div>
                   <div className="flex gap-1">
                     <button onClick={() => openEdit(pkg)} className="p-1.5 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-colors">
@@ -152,17 +152,17 @@ export default function AdminPackagesPage() {
       {/* Modal */}
       <Modal isOpen={modal} onClose={() => setModal(false)} title={editing ? t('common.edit') : t('common.create')} size="lg">
         <div className="grid grid-cols-2 gap-4">
-          <Input label="Package Name" value={form.name} onChange={set('name')} placeholder="Pro" />
-          <Input label="Slug" value={form.slug} onChange={set('slug')} placeholder="pro" />
-          <Input label="Price (USD)" type="number" value={form.price} onChange={set('price')} placeholder="699" />
-          <Input label="Pages" type="number" value={form.pages} onChange={set('pages')} placeholder="10" />
-          <Input label="Revisions" type="number" value={form.revisions} onChange={set('revisions')} placeholder="3" />
-          <Input label="Delivery Days" type="number" value={form.deliveryDays} onChange={set('deliveryDays')} placeholder="14" />
+          <Input label={t('admin.pkg.name')} value={form.name} onChange={set('name')} placeholder="Pro" />
+          <Input label={t('admin.pkg.slug')} value={form.slug} onChange={set('slug')} placeholder="pro" />
+          <Input label={t('admin.pkg.price')} type="number" value={form.price} onChange={set('price')} placeholder="699" />
+          <Input label={t('admin.pkg.pages')} type="number" value={form.pages} onChange={set('pages')} placeholder="10" />
+          <Input label={t('admin.pkg.revisions')} type="number" value={form.revisions} onChange={set('revisions')} placeholder="3" />
+          <Input label={t('admin.pkg.delivery')} type="number" value={form.deliveryDays} onChange={set('deliveryDays')} placeholder="14" />
           <div className="col-span-2">
-            <Input label="Short Description" value={form.description} onChange={set('description')} placeholder="Best for growing businesses" />
+            <Input label={t('admin.pkg.desc')} value={form.description} onChange={set('description')} placeholder="Best for growing businesses" />
           </div>
           <div className="col-span-2">
-            <label className="block text-sm text-slate-300 mb-1.5">Features (one per line)</label>
+            <label className="block text-sm text-slate-300 mb-1.5">{t('admin.pkg.features')}</label>
             <textarea
               value={form.features}
               onChange={set('features')}
@@ -173,7 +173,7 @@ export default function AdminPackagesPage() {
           </div>
           <div className="col-span-2 flex items-center gap-2">
             <input type="checkbox" id="popular" checked={form.popular as boolean} onChange={set('popular')} className="accent-primary-500" />
-            <label htmlFor="popular" className="text-sm text-slate-300">Mark as Popular</label>
+            <label htmlFor="popular" className="text-sm text-slate-300">{t('admin.pkg.popular')}</label>
           </div>
         </div>
         <div className="flex justify-end gap-3 mt-4">

@@ -59,7 +59,7 @@ export default function AdminClientsPage() {
             <thead>
               <tr className="border-b border-white/5">
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Plan</th>
+                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('request.packageLabel')}</th>
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('auth.signup.company')}</th>
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('auth.field.phone')}</th>
                 <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>

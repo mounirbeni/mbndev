@@ -18,28 +18,9 @@ import AuthModal from '@/components/ui/AuthModal';
 import PlanBadge from '@/components/ui/PlanBadge';
 import { orderAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const STEPS = ['Service Type', 'Configuration', 'Design', 'Summary'];
-
-const serviceTypes: { value: string; label: string; desc: string; icon: LucideIcon; base: number; marketValue: string }[] = [
-  { value: 'website',   label: 'Website',        desc: 'Landing page / brochure site',      icon: Target,       base: 799,  marketValue: '$1,500+' },
-  { value: 'ecommerce', label: 'E-Commerce',      desc: 'Online store with payments',        icon: ShoppingCart, base: 1499, marketValue: '$3,000+' },
-  { value: 'dashboard', label: 'SaaS Dashboard',  desc: 'Complex web application',           icon: BarChart3,    base: 2499, marketValue: '$8,000+' },
-  { value: 'mobile',    label: 'Mobile App',      desc: 'iOS & Android (React Native/PWA)',  icon: Smartphone,   base: 3999, marketValue: '$12,000+' },
-  { value: 'custom',    label: 'Custom Project',  desc: 'Something unique — let\'s talk',   icon: Lightbulb,    base: 1199, marketValue: '$2,500+' },
-];
-
-const FEATURES: { key: string; label: string; price: number; marketValue: number; desc: string }[] = [
-  { key: 'auth',       label: 'User Authentication',  price: 400, marketValue: 800,  desc: 'Login, register, profiles' },
-  { key: 'payment',    label: 'Payment Integration',  price: 500, marketValue: 950,  desc: 'Stripe, PayPal checkout' },
-  { key: 'dashboard',  label: 'Admin Dashboard',      price: 800, marketValue: 1500, desc: 'Backend control panel' },
-  { key: 'multilang',  label: 'Multi-language',       price: 300, marketValue: 550,  desc: 'i18n / localization' },
-  { key: 'seo',        label: 'SEO Optimization',     price: 250, marketValue: 450,  desc: 'Meta, sitemap, schema' },
-  { key: 'api',        label: 'API Integration',      price: 400, marketValue: 750,  desc: 'Third-party REST APIs' },
-  { key: 'hosting',    label: 'Hosting Setup',        price: 150, marketValue: 280,  desc: 'Deployment & config' },
-];
 
 const BASE_PRICES: Record<string, number> = {
   website: 799, ecommerce: 1499, dashboard: 2499, mobile: 3999, custom: 1199,
@@ -108,24 +89,49 @@ function calcPrice(
   return { total: base + pageExtra + feat + addon, days, base, pageExtra, feat, addon, pkg, includedFeats, includedPages };
 }
 
-// ─── Design Styles ────────────────────────────────────────────────────────────
-
-const designStyles: { value: string; label: string; icon: LucideIcon; desc: string }[] = [
-  { value: 'Minimalist', label: 'Minimalist', icon: Minus,     desc: 'Clean & spacious'        },
-  { value: 'Corporate',  label: 'Corporate',  icon: Briefcase, desc: 'Professional & formal'   },
-  { value: 'Creative',   label: 'Creative',   icon: Wand2,     desc: 'Unique & artistic'       },
-  { value: 'Tech / Dark',label: 'Tech / Dark',icon: Terminal,  desc: 'Dark UI, futuristic'     },
-  { value: 'Luxury',     label: 'Luxury',     icon: Crown,     desc: 'Premium & high-end'      },
-  { value: 'Colorful',   label: 'Colorful',   icon: Palette,   desc: 'Vibrant & energetic'     },
-  { value: 'Modern',     label: 'Modern',     icon: Layers,    desc: 'Sleek & contemporary'    },
-  { value: 'Elegant',    label: 'Elegant',    icon: Feather,   desc: 'Refined & sophisticated' },
-  { value: 'Playful',    label: 'Playful',    icon: Smile,     desc: 'Fun & friendly'          },
-  { value: 'Classic',    label: 'Classic',    icon: BookOpen,  desc: 'Timeless & trustworthy'  },
-];
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function RequestPageContent() {
+  const { t } = useLanguage();
+
+  const STEPS = [
+    t('request.step.serviceType'),
+    t('request.step.configuration'),
+    t('request.step.design'),
+    t('request.step.summary'),
+  ];
+
+  const serviceTypes = [
+    { value: 'website',   label: t('request.svc.website'),   desc: t('request.svc.websiteDesc'),   icon: Target,       base: 799,  marketValue: '$1,500+' },
+    { value: 'ecommerce', label: t('request.svc.ecommerce'),  desc: t('request.svc.ecommerceDesc'),  icon: ShoppingCart, base: 1499, marketValue: '$3,000+' },
+    { value: 'dashboard', label: t('request.svc.dashboard'),  desc: t('request.svc.dashboardDesc'),  icon: BarChart3,    base: 2499, marketValue: '$8,000+' },
+    { value: 'mobile',    label: t('request.svc.mobile'),     desc: t('request.svc.mobileDesc'),     icon: Smartphone,   base: 3999, marketValue: '$12,000+' },
+    { value: 'custom',    label: t('request.svc.custom'),     desc: t('request.svc.customDesc'),     icon: Lightbulb,    base: 1199, marketValue: '$2,500+' },
+  ];
+
+  const FEATURES = [
+    { key: 'auth',       label: t('request.feat.auth'),       price: 400, marketValue: 800,  desc: t('request.feat.authDesc') },
+    { key: 'payment',    label: t('request.feat.payment'),     price: 500, marketValue: 950,  desc: t('request.feat.paymentDesc') },
+    { key: 'dashboard',  label: t('request.feat.dashboard'),   price: 800, marketValue: 1500, desc: t('request.feat.dashboardDesc') },
+    { key: 'multilang',  label: t('request.feat.multilang'),   price: 300, marketValue: 550,  desc: t('request.feat.multilangDesc') },
+    { key: 'seo',        label: t('request.feat.seo'),         price: 250, marketValue: 450,  desc: t('request.feat.seoDesc') },
+    { key: 'api',        label: t('request.feat.api'),         price: 400, marketValue: 750,  desc: t('request.feat.apiDesc') },
+    { key: 'hosting',    label: t('request.feat.hosting'),     price: 150, marketValue: 280,  desc: t('request.feat.hostingDesc') },
+  ];
+
+  const designStyles = [
+    { value: 'Minimalist', label: t('request.design.minimalist'), icon: Minus,     desc: t('request.design.minimalistDesc') },
+    { value: 'Corporate',  label: t('request.design.corporate'),  icon: Briefcase, desc: t('request.design.corporateDesc') },
+    { value: 'Creative',   label: t('request.design.creative'),   icon: Wand2,     desc: t('request.design.creativeDesc') },
+    { value: 'Tech / Dark',label: t('request.design.techDark'),   icon: Terminal,  desc: t('request.design.techDarkDesc') },
+    { value: 'Luxury',     label: t('request.design.luxury'),     icon: Crown,     desc: t('request.design.luxuryDesc') },
+    { value: 'Colorful',   label: t('request.design.colorful'),   icon: Palette,   desc: t('request.design.colorfulDesc') },
+    { value: 'Modern',     label: t('request.design.modern'),     icon: Layers,    desc: t('request.design.modernDesc') },
+    { value: 'Elegant',    label: t('request.design.elegant'),    icon: Feather,   desc: t('request.design.elegantDesc') },
+    { value: 'Playful',    label: t('request.design.playful'),    icon: Smile,     desc: t('request.design.playfulDesc') },
+    { value: 'Classic',    label: t('request.design.classic'),    icon: BookOpen,  desc: t('request.design.classicDesc') },
+  ];
+
   const [step, setStep]         = useState(0);
   const [loading, setLoading]   = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -204,7 +210,7 @@ function RequestPageContent() {
       if (f.designStyle.includes(val))
         return { ...f, designStyle: f.designStyle.filter((s) => s !== val) };
       if (f.designStyle.length >= 3) {
-        toast.error('You can select up to 3 styles');
+        toast.error(t('request.maxStyles'));
         return f;
       }
       return { ...f, designStyle: [...f.designStyle, val] };
@@ -239,13 +245,13 @@ function RequestPageContent() {
         plan,
       });
 
-      toast.success('Order created! Redirecting to checkout…');
+      toast.success(t('request.orderCreated'));
       localStorage.removeItem('mbndev_request_draft');
       localStorage.removeItem('mbndev_request_step');
       localStorage.removeItem('mbndev_selected_plan');
       router.push(`/checkout/${data.order.id}`);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to create order');
+      toast.error(err?.response?.data?.message || t('request.orderFailed'));
     } finally {
       setLoading(false);
     }
@@ -259,6 +265,9 @@ function RequestPageContent() {
   // Extra features = selected features NOT in plan
   const extraFeatures = form.features.filter((k) => !pricing.includedFeats.includes(k));
 
+  // Derived label for the currently selected service type
+  const svcLabel = serviceTypes.find((s) => s.value === form.serviceType)?.label ?? form.serviceType;
+
   return (
     <div className="min-h-screen bg-hero-gradient flex flex-col">
       {/* Header */}
@@ -270,14 +279,14 @@ function RequestPageContent() {
           <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center">
             <Zap className="w-4 h-4 text-white" />
           </div>
-          <span className="text-white font-semibold text-sm sm:text-base">MBN DEV — Request Service</span>
+          <span className="text-white font-semibold text-sm sm:text-base">{t('request.header')}</span>
           {selectedPlan && <PlanBadge plan={selectedPlan} size="sm" />}
         </div>
 
         {/* Live price pill */}
         <div className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold text-primary-300"
              style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)' }}>
-          <span className="text-slate-500 font-normal text-xs">Total</span>
+          <span className="text-slate-500 font-normal text-xs">{t('request.totalLabel')}</span>
           ${pricing.total.toLocaleString()}
         </div>
       </header>
@@ -308,7 +317,8 @@ function RequestPageContent() {
               ))}
             </div>
             <p className="text-center text-slate-500 text-sm">
-              Step {step + 1} of {STEPS.length} — <span className="text-slate-300">{STEPS[step]}</span>
+              {t('request.stepOf').replace('{n}', String(step + 1)).replace('{total}', String(STEPS.length))}{' '}
+              <span className="text-slate-300">{STEPS[step]}</span>
             </p>
           </div>
 
@@ -326,34 +336,34 @@ function RequestPageContent() {
               {/* ── Step 0: Service Type ─────────────────────────────────── */}
               {step === 0 && (
                 <div>
-                  <h2 className="text-xl font-bold text-white mb-1">What do you need?</h2>
-                  <p className="text-slate-400 text-sm mb-4">Select the service type for your project.</p>
+                  <h2 className="text-xl font-bold text-white mb-1">{t('request.whatNeed')}</h2>
+                  <p className="text-slate-400 text-sm mb-4">{t('request.selectService')}</p>
 
                   {/* Plan inclusion banner */}
                   {planData && (
                     <div className="mb-5 p-3.5 rounded-xl border border-green-500/25 bg-green-500/8">
                       <div className="flex items-center gap-2 mb-1.5">
                         <PlanBadge plan={selectedPlan!} size="sm" />
-                        <span className="text-white text-sm font-semibold">Package Active</span>
+                        <span className="text-white text-sm font-semibold">{t('request.packageActive')}</span>
                         <span className="ml-auto text-green-400 text-xs font-bold">
                           ${planData.price.toLocaleString()}
                         </span>
                       </div>
                       <p className="text-green-400/80 text-xs leading-relaxed">{planData.summary}</p>
                       <p className="text-slate-400 text-[10px] mt-1.5">
-                        ✓ Included items are free — only extras beyond your plan are charged
+                        {t('request.includedFree')}
                       </p>
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {serviceTypes.map((t) => {
-                      const Icon   = t.icon;
-                      const active = form.serviceType === t.value;
+                    {serviceTypes.map((svc) => {
+                      const Icon   = svc.icon;
+                      const active = form.serviceType === svc.value;
                       return (
                         <button
-                          key={t.value}
-                          onClick={() => set('serviceType', t.value)}
+                          key={svc.value}
+                          onClick={() => set('serviceType', svc.value)}
                           className={`p-4 rounded-xl text-left border transition-all ${
                             active
                               ? 'bg-primary-500/15 border-primary-500 text-white'
@@ -369,15 +379,15 @@ function RequestPageContent() {
                               <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${
                                 active ? 'bg-primary-500/20 text-primary-300' : 'bg-white/5 text-slate-500'
                               }`}>
-                                {planData ? 'included' : `from $${t.base.toLocaleString()}`}
+                                {planData ? 'included' : `from $${svc.base.toLocaleString()}`}
                               </span>
                               <span className="text-[10px] text-green-500/70 font-medium">
-                                market {t.marketValue}
+                                market {svc.marketValue}
                               </span>
                             </div>
                           </div>
-                          <div className="font-semibold text-sm mt-2.5">{t.label}</div>
-                          <div className="text-xs opacity-60 mt-0.5">{t.desc}</div>
+                          <div className="font-semibold text-sm mt-2.5">{svc.label}</div>
+                          <div className="text-xs opacity-60 mt-0.5">{svc.desc}</div>
                         </button>
                       );
                     })}
@@ -389,8 +399,8 @@ function RequestPageContent() {
               {step === 1 && (
                 <div className="space-y-5">
                   <div>
-                    <h2 className="text-xl font-bold text-white mb-1">Configure Your Project</h2>
-                    <p className="text-slate-400 text-sm">Set up details and select features.</p>
+                    <h2 className="text-xl font-bold text-white mb-1">{t('request.configTitle')}</h2>
+                    <p className="text-slate-400 text-sm">{t('request.configSub')}</p>
                   </div>
 
                   {/* Plan inclusions reminder */}
@@ -398,14 +408,13 @@ function RequestPageContent() {
                     <div className="flex items-start gap-2 p-3 rounded-xl border border-green-500/20 bg-green-500/6">
                       <Check className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />
                       <p className="text-green-400/80 text-xs leading-relaxed">
-                        <span className="text-green-400 font-semibold">{planData.label} Plan:</span>{' '}
-                        {planData.summary} — all marked <span className="font-semibold">FREE</span> below.
+                        <span className="text-green-400 font-semibold">{planData.label} {t('request.planIncluded')}</span>
                       </p>
                     </div>
                   )}
 
                   <Input
-                    label="Project Title *"
+                    label={t('request.projectTitleLabel')}
                     value={form.title}
                     onChange={(e) => set('title', e.target.value)}
                     placeholder="e.g. My Brand's E-Commerce Store"
@@ -413,34 +422,34 @@ function RequestPageContent() {
                   />
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Description *</label>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('request.descriptionLabel')}</label>
                     <textarea
                       value={form.description}
                       onChange={(e) => set('description', e.target.value)}
                       rows={3}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary-500/60 resize-none"
-                      placeholder="Describe what you need — target audience, goals, key requirements…"
+                      placeholder={t('request.descPh')}
                     />
                   </div>
 
                   {/* Pages slider */}
                   <div>
                     <label className="block text-xs font-medium text-slate-400 mb-2 flex flex-wrap items-center gap-1.5">
-                      Number of Pages
+                      {t('request.numPages')}
                       <span className="text-primary-400 font-bold">{form.pages}</span>
                       {planData ? (
                         pricing.includedPages >= 99 ? (
                           <span className="text-green-400 text-[10px] font-semibold bg-green-500/10 px-1.5 py-0.5 rounded-md border border-green-500/20">
-                            unlimited included in your plan
+                            {t('request.unlimitedIncluded')}
                           </span>
                         ) : (
                           <>
                             <span className="text-green-400 text-[10px] font-semibold bg-green-500/10 px-1.5 py-0.5 rounded-md border border-green-500/20">
-                              {pricing.includedPages} included in your plan
+                              {t('request.pagesIncluded').replace('{n}', String(pricing.includedPages))}
                             </span>
                             {form.pages > pricing.includedPages && (
                               <span className="text-slate-500 text-[10px]">
-                                (+${(form.pages - pricing.includedPages) * 50} extra)
+                                {t('request.extraPagesCost').replace('{n}', String((form.pages - pricing.includedPages) * 50))}
                               </span>
                             )}
                           </>
@@ -460,22 +469,22 @@ function RequestPageContent() {
                       className="w-full accent-primary-500"
                     />
                     <div className="flex justify-between text-xs text-slate-600 mt-1">
-                      <span>1 page</span>
+                      <span>{t('request.onePage')}</span>
                       {planData ? (
                         <span className="text-green-500/60">
-                          {pricing.includedPages >= 99 ? 'all pages free' : `${pricing.includedPages} free`}
+                          {pricing.includedPages >= 99 ? t('request.allPagesFree') : `${pricing.includedPages} free`}
                         </span>
                       ) : (
-                        <span>5 pages (base)</span>
+                        <span>{t('request.basePages')}</span>
                       )}
-                      <span>20 pages</span>
+                      <span>{t('request.twentyPages')}</span>
                     </div>
                   </div>
 
                   {/* Features */}
                   <div>
                     <label className="block text-xs font-medium text-slate-400 mb-2">
-                      Features
+                      {t('request.featuresLabel')}
                       <span className="text-slate-600 ml-1">
                         ({pricing.includedFeats.length > 0 && `${pricing.includedFeats.length} included · `}
                         {extraFeatures.length} extra)
@@ -523,8 +532,8 @@ function RequestPageContent() {
                             <div className="flex flex-col items-end shrink-0 gap-0.5">
                               {isIncluded ? (
                                 <>
-                                  <span className="text-xs font-bold text-green-400">FREE</span>
-                                  <span className="text-[9px] text-green-500/50 font-medium">in your plan</span>
+                                  <span className="text-xs font-bold text-green-400">{t('request.freeLabel')}</span>
+                                  <span className="text-[9px] text-green-500/50 font-medium">{t('request.inYourPlan')}</span>
                                 </>
                               ) : (
                                 <>
@@ -545,7 +554,7 @@ function RequestPageContent() {
 
                   {/* Fast delivery add-on */}
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-2">Add-ons</label>
+                    <label className="block text-xs font-medium text-slate-400 mb-2">{t('request.addonsLabel')}</label>
                     <button
                       onClick={() => toggleArr('addons', 'fastDelivery')}
                       className={`flex items-center gap-2.5 p-3 rounded-xl text-left border transition-all w-full ${
@@ -561,20 +570,20 @@ function RequestPageContent() {
                       </div>
                       <div className="flex items-center gap-2 flex-1 text-sm font-medium">
                         <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        Fast Delivery
+                        {t('request.fastDelivery')}
                       </div>
-                      <span className="text-xs text-amber-400">+30% of base · 40% faster delivery</span>
+                      <span className="text-xs text-amber-400">{t('request.fastDeliveryDesc')}</span>
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Additional Notes (optional)</label>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('request.notesLabel')}</label>
                     <textarea
                       value={form.notes}
                       onChange={(e) => set('notes', e.target.value)}
                       rows={2}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary-500/60 resize-none"
-                      placeholder="Anything else we should know…"
+                      placeholder={t('request.notesPh')}
                     />
                   </div>
                 </div>
@@ -584,12 +593,12 @@ function RequestPageContent() {
               {step === 2 && (
                 <div className="space-y-5">
                   <div>
-                    <h2 className="text-xl font-bold text-white mb-1">Design Preferences</h2>
-                    <p className="text-slate-400 text-sm">Help us understand your visual style. (optional)</p>
+                    <h2 className="text-xl font-bold text-white mb-1">{t('request.designTitle')}</h2>
+                    <p className="text-slate-400 text-sm">{t('request.designSub')}</p>
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="block text-xs font-medium text-slate-400">Design Style</label>
+                      <label className="block text-xs font-medium text-slate-400">{t('request.designStyleLabel')}</label>
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${
                         form.designStyle.length === 3
                           ? 'text-primary-300 bg-primary-500/15'
@@ -635,14 +644,14 @@ function RequestPageContent() {
                     </div>
                   </div>
                   <Input
-                    label="Brand Colors (optional)"
+                    label={t('request.brandColors')}
                     value={form.colors}
                     onChange={(e) => set('colors', e.target.value)}
-                    placeholder="e.g. #7c3aed, #3b82f6, white"
+                    placeholder={t('request.colorsPh')}
                   />
                   <div>
                     <label className="block text-xs font-medium text-slate-400 mb-1.5">
-                      Reference Websites (optional)
+                      {t('request.refsLabel')}
                     </label>
                     <textarea
                       value={form.references}
@@ -658,8 +667,8 @@ function RequestPageContent() {
               {/* ── Step 3: Summary ──────────────────────────────────────── */}
               {step === 3 && (
                 <div>
-                  <h2 className="text-xl font-bold text-white mb-1">Order Summary</h2>
-                  <p className="text-slate-400 text-sm mb-5">Review your configuration before proceeding to payment.</p>
+                  <h2 className="text-xl font-bold text-white mb-1">{t('request.summaryTitle')}</h2>
+                  <p className="text-slate-400 text-sm mb-5">{t('request.summarySub')}</p>
 
                   {/* Price breakdown */}
                   <div className="rounded-xl p-4 mb-4 space-y-2"
@@ -671,7 +680,7 @@ function RequestPageContent() {
                         {/* Package header row */}
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
-                            <span className="text-slate-400">{pricing.pkg.label} Package</span>
+                            <span className="text-slate-400">{pricing.pkg.label} {t('request.packageLabel')}</span>
                             <PlanBadge plan={selectedPlan!} size="sm" />
                           </div>
                           <span className="text-white font-semibold">${pricing.base.toLocaleString()}</span>
@@ -682,16 +691,16 @@ function RequestPageContent() {
                           {pricing.includedPages >= 99 ? (
                             <div className="flex justify-between text-xs">
                               <span className="text-green-500/70 flex items-center gap-1">
-                                <Check className="w-2.5 h-2.5" /> Unlimited pages
+                                <Check className="w-2.5 h-2.5" /> {t('request.unlimitedPages')}
                               </span>
-                              <span className="text-green-500/70 font-medium">Included ✓</span>
+                              <span className="text-green-500/70 font-medium">{t('request.includedCheck')} ✓</span>
                             </div>
                           ) : (
                             <div className="flex justify-between text-xs">
                               <span className="text-green-500/70 flex items-center gap-1">
-                                <Check className="w-2.5 h-2.5" /> Up to {pricing.includedPages} pages
+                                <Check className="w-2.5 h-2.5" /> {t('request.upToPages').replace('{n}', String(pricing.includedPages))}
                               </span>
-                              <span className="text-green-500/70 font-medium">Included ✓</span>
+                              <span className="text-green-500/70 font-medium">{t('request.includedCheck')} ✓</span>
                             </div>
                           )}
                           {pricing.includedFeats.map((fKey) => {
@@ -701,7 +710,7 @@ function RequestPageContent() {
                                 <span className="text-green-500/70 flex items-center gap-1">
                                   <Check className="w-2.5 h-2.5" /> {feat.label}
                                 </span>
-                                <span className="text-green-500/70 font-medium">Included ✓</span>
+                                <span className="text-green-500/70 font-medium">{t('request.includedCheck')} ✓</span>
                               </div>
                             ) : null;
                           })}
@@ -710,7 +719,7 @@ function RequestPageContent() {
                     ) : (
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-400">
-                          Base price ({serviceTypes.find((s) => s.value === form.serviceType)?.label})
+                          {`${t('request.basePriceLabel')} (${svcLabel})`}
                         </span>
                         <span className="text-white">${pricing.base.toLocaleString()}</span>
                       </div>
@@ -720,7 +729,7 @@ function RequestPageContent() {
                     {pricing.pageExtra > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-400">
-                          Extra pages ({form.pages - pricing.includedPages} × $50)
+                          {`${t('request.extraPagesLabel')} (${form.pages - pricing.includedPages} × $50)`}
                         </span>
                         <span className="text-white">+${pricing.pageExtra}</span>
                       </div>
@@ -730,7 +739,7 @@ function RequestPageContent() {
                     {pricing.feat > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-400">
-                          {pricing.pkg ? 'Extra features' : 'Features'} ({extraFeatures.length})
+                          {pricing.pkg ? t('request.extraFeaturesLabel') : t('request.featuresCount')} ({extraFeatures.length})
                         </span>
                         <span className="text-white">+${pricing.feat}</span>
                       </div>
@@ -739,49 +748,49 @@ function RequestPageContent() {
                     {/* Fast delivery */}
                     {pricing.addon > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">Fast Delivery add-on</span>
+                        <span className="text-slate-400">{t('request.fastDeliveryAddon')}</span>
                         <span className="text-amber-400">+${pricing.addon}</span>
                       </div>
                     )}
 
                     {/* Total */}
                     <div className="border-t border-white/10 pt-2 flex justify-between font-bold">
-                      <span className="text-white">Total</span>
+                      <span className="text-white">{t('invoice.total')}</span>
                       <span className="text-primary-400 text-lg">${pricing.total.toLocaleString()}</span>
                     </div>
 
                     {/* Delivery estimate */}
                     <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 pt-1">
                       <Calendar className="w-3.5 h-3.5 shrink-0" />
-                      Estimated delivery:{' '}
-                      <span className="text-slate-300">{pricing.days} business days</span>
+                      {t('request.estDelivery')}{' '}
+                      <span className="text-slate-300">{pricing.days} {t('request.businessDays')}</span>
                     </div>
                   </div>
 
                   {/* Summary rows */}
                   <div className="space-y-2 mb-4">
                     {[
-                      selectedPlan && { label: 'Package',  value: planData?.label ?? selectedPlan },
-                      { label: 'Service',   value: serviceTypes.find((s) => s.value === form.serviceType)?.label || form.serviceType },
-                      { label: 'Title',     value: form.title },
-                      { label: 'Pages',     value: `${form.pages}` },
+                      selectedPlan && { label: t('request.packageLabel'),  value: planData?.label ?? selectedPlan },
+                      { label: t('request.serviceLabel'),   value: serviceTypes.find((s) => s.value === form.serviceType)?.label || form.serviceType },
+                      { label: t('request.titleRowLabel'),     value: form.title },
+                      { label: t('request.pagesLabel'),     value: `${form.pages}` },
                       {
-                        label: 'Features',
+                        label: t('request.featuresRow'),
                         value: form.features.length > 0
                           ? [
                               ...pricing.includedFeats.filter((k) => form.features.includes(k)).map((k) => {
                                 const f = FEATURES.find((feat) => feat.key === k);
-                                return f ? `${f.label} (free)` : k;
+                                return f ? `${f.label} ${t('request.freeParens')}` : k;
                               }),
                               ...extraFeatures.map((k) => {
                                 const f = FEATURES.find((feat) => feat.key === k);
                                 return f ? f.label : k;
                               }),
                             ].join(', ')
-                          : 'None',
+                          : t('request.noneValue'),
                       },
-                      { label: 'Add-ons',   value: form.addons.length > 0 ? form.addons.join(', ') : 'None' },
-                      { label: 'Style',     value: form.designStyle.length > 0 ? form.designStyle.join(', ') : 'Not specified' },
+                      { label: t('request.addonsRow'),   value: form.addons.length > 0 ? form.addons.join(', ') : t('request.noneValue') },
+                      { label: t('request.styleLabel'),     value: form.designStyle.length > 0 ? form.designStyle.join(', ') : t('request.notSpecified') },
                     ].filter(Boolean).map(({ label, value }: any) => (
                       <div key={label} className="flex gap-3 py-1.5 border-b border-white/5 last:border-0">
                         <span className="text-slate-500 text-sm w-20 sm:w-24 shrink-0">{label}</span>
@@ -796,7 +805,7 @@ function RequestPageContent() {
                         <ArrowRight className="w-3 h-3 text-primary-400" />
                       </div>
                       <p className="text-primary-300 text-sm">
-                        Click &quot;Proceed to Checkout&quot; — we&apos;ll ask you to create a free account to save your order.
+                        {t('request.authNote')}
                       </p>
                     </div>
                   )}
@@ -809,15 +818,15 @@ function RequestPageContent() {
           {/* Navigation */}
           <div className="flex justify-between mt-5">
             <Button variant="outline" onClick={back} disabled={step === 0}>
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> {t('request.back')}
             </Button>
             {step < STEPS.length - 1 ? (
               <Button onClick={next} disabled={!canNext()}>
-                Next <ArrowRight className="w-4 h-4" />
+                {t('request.next')} <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
               <Button onClick={handleSubmit} loading={loading}>
-                Proceed to Checkout →
+                {t('request.proceedCheckout')}
               </Button>
             )}
           </div>
@@ -828,7 +837,7 @@ function RequestPageContent() {
         open={authOpen}
         onClose={() => setAuthOpen(false)}
         onSuccess={submitOrder}
-        contextMessage="Your project details are saved. Create a free account to proceed to checkout."
+        contextMessage={t('request.authContext')}
       />
     </div>
   );

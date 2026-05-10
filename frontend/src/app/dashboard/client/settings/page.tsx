@@ -127,31 +127,31 @@ export default function SettingsPage() {
         </div>
         <div className="space-y-4">
           <Input
-            label="Current Password"
+            label={t('settings.currentPassword')}
             type="password"
             value={pwd.current}
             onChange={(e) => setPwd((f) => ({ ...f, current: e.target.value }))}
-            placeholder="Your current password"
+            placeholder={t('settings.currentPasswordPh')}
           />
           <div className="grid sm:grid-cols-2 gap-4">
             <Input
-              label="New Password"
+              label={t('auth.reset.newPassword')}
               type="password"
               value={pwd.next}
               onChange={(e) => setPwd((f) => ({ ...f, next: e.target.value }))}
-              placeholder="At least 6 characters"
+              placeholder={t('auth.placeholder.passwordMin')}
             />
             <Input
-              label="Confirm New Password"
+              label={t('auth.reset.confirmPassword')}
               type="password"
               value={pwd.confirm}
               onChange={(e) => setPwd((f) => ({ ...f, confirm: e.target.value }))}
-              placeholder="Repeat new password"
+              placeholder={t('settings.repeatPasswordPh')}
             />
           </div>
           <div className="flex justify-end pt-1">
             <Button onClick={handleChangePassword} loading={savingPwd} variant="outline">
-              Update Password
+              {t('settings.updatePassword')}
             </Button>
           </div>
         </div>
@@ -161,10 +161,10 @@ export default function SettingsPage() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className={cardClass}>
         <div className="flex items-center gap-2 mb-4">
           <Shield className="w-4 h-4 text-green-400" />
-          <h2 className="text-base font-semibold text-white">Need Help?</h2>
+          <h2 className="text-base font-semibold text-white">{t('settings.needHelp')}</h2>
         </div>
         <p className="text-slate-400 text-sm mb-4">
-          Have a question or issue? Reach out to Mounir directly.
+          {t('settings.needHelpSub')}
         </p>
         <div className="flex flex-wrap gap-3">
           <a
@@ -174,32 +174,32 @@ export default function SettingsPage() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 text-[#25D366] text-sm font-semibold hover:bg-[#25D366]/25 transition-all"
           >
             <MessageCircle className="w-4 h-4" />
-            WhatsApp Support
+            {t('settings.whatsappSupport')}
             <ExternalLink className="w-3 h-3 opacity-60" />
           </a>
           <a
             href="tel:+212705914424"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm font-semibold hover:bg-white/10 transition-all"
           >
-            Call Support
+            {t('settings.callSupport')}
           </a>
         </div>
       </motion.div>
 
       {/* ── Danger zone ──────────────────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass rounded-2xl p-6 border border-red-500/15">
-        <h2 className="text-base font-semibold text-red-400 mb-1">Danger Zone</h2>
+        <h2 className="text-base font-semibold text-red-400 mb-1">{t('settings.dangerZone')}</h2>
         <p className="text-slate-500 text-sm mb-4">
-          These actions are irreversible. Please be certain before proceeding.
+          {t('settings.dangerZoneSub')}
         </p>
         <Button
           variant="ghost"
           className="text-red-400 border border-red-500/20 hover:bg-red-500/10"
           onClick={() => {
-            if (confirm('Are you sure you want to sign out of all devices?')) logout();
+            if (confirm(t('settings.signOutConfirm'))) logout();
           }}
         >
-          Sign Out
+          {t('nav.logout')}
         </Button>
       </motion.div>
     </div>

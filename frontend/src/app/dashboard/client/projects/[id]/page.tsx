@@ -189,7 +189,7 @@ export default function ClientProjectWorkspace() {
         href="/dashboard/client/projects"
         className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> All Projects
+        <ArrowLeft className="w-4 h-4" /> {t('client.allProjects')}
       </Link>
 
       {/* Project header */}
@@ -211,12 +211,12 @@ export default function ClientProjectWorkspace() {
           </div>
           <div className="flex items-center gap-4 shrink-0">
             <div className="text-right">
-              <div className="text-slate-400 text-xs mb-0.5">Budget</div>
+              <div className="text-slate-400 text-xs mb-0.5">{t('client.budget')}</div>
               <div className="text-white font-bold">{formatCurrency(project.budget)}</div>
             </div>
             {project.deadline && (
               <div className="text-right">
-                <div className="text-slate-400 text-xs mb-0.5">Deadline</div>
+                <div className="text-slate-400 text-xs mb-0.5">{t('client.deadline')}</div>
                 <div className="text-white font-medium text-sm">{formatDate(project.deadline)}</div>
               </div>
             )}
@@ -226,7 +226,7 @@ export default function ClientProjectWorkspace() {
         {/* Progress bar */}
         <div className="mt-5">
           <div className="flex justify-between text-xs text-slate-400 mb-2">
-            <span>Progress</span>
+            <span>{t('client.progress')}</span>
             <span className="text-primary-400 font-semibold">{project.progress}%</span>
           </div>
           <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -266,20 +266,20 @@ export default function ClientProjectWorkspace() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-white/5 rounded-xl p-1 overflow-x-auto">
-        {TABS.map((t) => {
-          const Icon = t.icon;
+        {TABS.map((tabDef) => {
+          const Icon = tabDef.icon;
           return (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tabDef.id}
+              onClick={() => setTab(tabDef.id)}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap min-w-0 ${
-                tab === t.id
+                tab === tabDef.id
                   ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">{t.label}</span>
+              <span className="hidden sm:inline">{tabDef.label}</span>
             </button>
           );
         })}
@@ -301,14 +301,14 @@ export default function ClientProjectWorkspace() {
               <div className="lg:col-span-2 space-y-5">
                 {/* Description */}
                 <div className="glass rounded-2xl p-5 sm:p-6 border border-white/5">
-                  <h3 className="text-white font-semibold mb-3">Project Description</h3>
+                  <h3 className="text-white font-semibold mb-3">{t('client.projectDescription')}</h3>
                   <p className="text-slate-400 text-sm leading-relaxed">{project.description}</p>
                 </div>
 
                 {/* Features */}
                 {project.features && project.features.length > 0 && (
                   <div className="glass rounded-2xl p-5 sm:p-6 border border-white/5">
-                    <h3 className="text-white font-semibold mb-4">Requested Features</h3>
+                    <h3 className="text-white font-semibold mb-4">{t('client.requestedFeatures')}</h3>
                     <div className="grid sm:grid-cols-2 gap-2">
                       {project.features.map((f: string) => (
                         <div key={f} className="flex items-center gap-2 text-sm text-slate-300">
@@ -322,7 +322,7 @@ export default function ClientProjectWorkspace() {
                 {/* Milestones */}
                 {project.milestones && project.milestones.length > 0 && (
                   <div className="glass rounded-2xl p-5 sm:p-6 border border-white/5">
-                    <h3 className="text-white font-semibold mb-4">Milestones</h3>
+                    <h3 className="text-white font-semibold mb-4">{t('client.milestones')}</h3>
                     <div className="space-y-3">
                       {project.milestones.map((m: any, i: number) => (
                         <div key={i} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl">
@@ -353,14 +353,14 @@ export default function ClientProjectWorkspace() {
               {/* Right sidebar */}
               <div className="space-y-4">
                 <div className="glass rounded-2xl p-5 border border-white/5 space-y-3.5">
-                  <h3 className="text-white font-semibold text-sm">Project Details</h3>
+                  <h3 className="text-white font-semibold text-sm">{t('client.projectDetails')}</h3>
                   {[
-                    { label: 'Status',   value: <StatusBadge status={project.status} /> },
-                    { label: 'Type',     value: project.type?.replace(/-/g, ' ') },
-                    { label: 'Budget',   value: formatCurrency(project.budget) },
-                    { label: 'Deadline', value: project.deadline ? formatDate(project.deadline) : 'Flexible' },
-                    { label: 'Revisions',value: `${(project as any).revisions ?? 0} / ${(project as any).maxRevisions ?? 3}` },
-                    { label: 'Created',  value: formatDate(project.createdAt) },
+                    { label: t('client.status'),    value: <StatusBadge status={project.status} /> },
+                    { label: t('client.type'),       value: project.type?.replace(/-/g, ' ') },
+                    { label: t('client.budget'),     value: formatCurrency(project.budget) },
+                    { label: t('client.deadline'),   value: project.deadline ? formatDate(project.deadline) : t('client.flexible') },
+                    { label: t('client.revisions'),  value: `${(project as any).revisions ?? 0} / ${(project as any).maxRevisions ?? 3}` },
+                    { label: t('client.created'),    value: formatDate(project.createdAt) },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between items-center gap-2">
                       <span className="text-slate-500 text-xs">{label}</span>
@@ -371,19 +371,19 @@ export default function ClientProjectWorkspace() {
 
                 {/* Payment summary */}
                 <div className="glass rounded-2xl p-5 border border-white/5">
-                  <h3 className="text-white font-semibold text-sm mb-4">Payment Summary</h3>
+                  <h3 className="text-white font-semibold text-sm mb-4">{t('client.paymentSummary')}</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Total Budget</span>
+                      <span className="text-slate-400">{t('client.totalBudget')}</span>
                       <span className="text-white font-medium">{formatCurrency(project.budget)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Paid</span>
+                      <span className="text-slate-400">{t('status.paid')}</span>
                       <span className="text-green-400 font-medium">{formatCurrency(paidTotal)}</span>
                     </div>
                     <div className="h-px bg-white/10 my-1" />
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Remaining</span>
+                      <span className="text-slate-400">{t('client.remaining')}</span>
                       <span className="text-yellow-400 font-bold">{formatCurrency(remaining)}</span>
                     </div>
                   </div>
@@ -392,7 +392,7 @@ export default function ClientProjectWorkspace() {
                       onClick={() => setTab('payments')}
                       className="w-full mt-4 py-2 text-xs text-primary-400 border border-primary-500/30 rounded-xl hover:bg-primary-500/10 transition-colors"
                     >
-                      View Payments
+                      {t('client.viewPayments')}
                     </button>
                   )}
                 </div>
@@ -407,8 +407,8 @@ export default function ClientProjectWorkspace() {
                       <MessageSquare className="w-4 h-4 text-primary-400" />
                     </div>
                     <div>
-                      <div className="text-white text-sm font-medium">Messages</div>
-                      <div className="text-slate-500 text-xs">{messages.length} message{messages.length !== 1 ? 's' : ''}</div>
+                      <div className="text-white text-sm font-medium">{t('client.messages')}</div>
+                      <div className="text-slate-500 text-xs">{messages.length} {t('client.messages').toLowerCase()}</div>
                     </div>
                   </div>
                 </button>
@@ -426,7 +426,7 @@ export default function ClientProjectWorkspace() {
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <MessageSquare className="w-10 h-10 text-slate-700 mb-3" />
-                    <p className="text-slate-500 text-sm">No messages yet. Start the conversation!</p>
+                    <p className="text-slate-500 text-sm">{t('client.noMessages')}</p>
                   </div>
                 ) : (
                   messages.map((m: any) => {
@@ -461,7 +461,7 @@ export default function ClientProjectWorkspace() {
                     value={msgText}
                     onChange={(e) => setMsgText(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                    placeholder="Type a message..."
+                    placeholder={t('client.typeMessage')}
                     inputMode="text"
                     enterKeyHint="send"
                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary-500 transition-colors"
@@ -488,20 +488,20 @@ export default function ClientProjectWorkspace() {
                 className="glass rounded-2xl border-2 border-dashed border-white/10 hover:border-primary-500/40 p-10 text-center cursor-pointer transition-colors group"
               >
                 <Upload className="w-8 h-8 text-slate-600 group-hover:text-primary-400 mx-auto mb-3 transition-colors" />
-                <p className="text-slate-400 text-sm">Click to upload a file</p>
-                <p className="text-slate-600 text-xs mt-1">Any file type, max 10MB</p>
+                <p className="text-slate-400 text-sm">{t('client.uploadFile')}</p>
+                <p className="text-slate-600 text-xs mt-1">{t('client.uploadHint')}</p>
                 <input ref={fileInputRef} type="file" className="hidden" onChange={handleUpload} />
               </div>
               {uploading && (
                 <div className="glass rounded-xl p-3 border border-primary-500/20 text-primary-400 text-sm text-center animate-pulse">
-                  Uploading…
+                  {t('client.uploading')}
                 </div>
               )}
 
               {!project.files || project.files.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border border-white/5">
                   <FileText className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-500 text-sm">No files yet.</p>
+                  <p className="text-slate-500 text-sm">{t('client.noFiles')}</p>
                 </div>
               ) : (
                 <div className="glass rounded-2xl border border-white/5 overflow-hidden">
@@ -536,9 +536,9 @@ export default function ClientProjectWorkspace() {
             <div className="space-y-4">
               <div className="grid sm:grid-cols-3 gap-4">
                 {[
-                  { label: 'Total Budget', value: formatCurrency(project.budget),  color: 'text-white'      },
-                  { label: 'Amount Paid',  value: formatCurrency(paidTotal),        color: 'text-green-400'  },
-                  { label: 'Remaining',    value: formatCurrency(remaining),        color: 'text-yellow-400' },
+                  { label: t('client.totalBudget'), value: formatCurrency(project.budget),  color: 'text-white'      },
+                  { label: t('client.amountPaid'),  value: formatCurrency(paidTotal),        color: 'text-green-400'  },
+                  { label: t('client.remaining'),   value: formatCurrency(remaining),        color: 'text-yellow-400' },
                 ].map((s) => (
                   <div key={s.label} className="glass rounded-xl p-4 border border-white/5 text-center">
                     <div className={`text-2xl font-black ${s.color} mb-1`}>{s.value}</div>
@@ -550,16 +550,16 @@ export default function ClientProjectWorkspace() {
               {remaining > 0 && (
                 <div className="glass rounded-xl p-5 border border-primary-500/20 flex items-center justify-between gap-4 flex-wrap">
                   <div>
-                    <div className="text-white font-semibold text-sm">Make a Payment</div>
+                    <div className="text-white font-semibold text-sm">{t('client.makePayment')}</div>
                     <div className="text-slate-400 text-xs mt-0.5">
-                      50% deposit: {formatCurrency(project.budget * 0.5)}
+                      {t('client.depositLabel')} {formatCurrency(project.budget * 0.5)}
                     </div>
                   </div>
                   <Button
                     size="md"
                     onClick={() => handlePayment(Math.round(project.budget * 0.5), '50% Project Deposit')}
                   >
-                    <DollarSign className="w-4 h-4" /> Pay Deposit
+                    <DollarSign className="w-4 h-4" /> {t('client.payDeposit')}
                   </Button>
                 </div>
               )}
@@ -567,12 +567,12 @@ export default function ClientProjectWorkspace() {
               {payments.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border border-white/5">
                   <CreditCard className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-500 text-sm">No payments yet.</p>
+                  <p className="text-slate-500 text-sm">{t('client.noPayments')}</p>
                 </div>
               ) : (
                 <div className="glass rounded-2xl border border-white/5 overflow-hidden">
                   <div className="p-4 border-b border-white/5">
-                    <h3 className="text-white font-semibold text-sm">Payment History</h3>
+                    <h3 className="text-white font-semibold text-sm">{t('client.paymentHistory')}</h3>
                   </div>
                   <div className="divide-y divide-white/5">
                     {payments.map((p: any) => (
@@ -586,7 +586,7 @@ export default function ClientProjectWorkspace() {
                         </div>
                         <div className="flex-1">
                           <div className="text-white text-sm font-medium">
-                            {p.milestoneTitle || p.description || 'Payment'}
+                            {p.milestoneTitle || p.description || t('client.payment')}
                           </div>
                           <div className="text-slate-500 text-xs">{formatDate(p.createdAt)}</div>
                         </div>
@@ -610,12 +610,12 @@ export default function ClientProjectWorkspace() {
               {activeLogs.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border border-white/5">
                   <Activity className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-500 text-sm">No activity yet.</p>
+                  <p className="text-slate-500 text-sm">{t('client.noActivity')}</p>
                 </div>
               ) : (
                 <div className="glass rounded-2xl border border-white/5 overflow-hidden">
                   <div className="p-4 border-b border-white/5">
-                    <h3 className="text-white font-semibold text-sm">Project Timeline</h3>
+                    <h3 className="text-white font-semibold text-sm">{t('client.projectTimeline')}</h3>
                   </div>
                   <div className="divide-y divide-white/5">
                     {activeLogs.map((log: any, i: number) => (
@@ -632,7 +632,7 @@ export default function ClientProjectWorkspace() {
                           <p className="text-slate-200 text-sm">{log.description}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-slate-600 text-xs">
-                              {log.user?.name || 'System'} · {formatDate(log.createdAt)}
+                              {log.user?.name || t('common.system')} · {formatDate(log.createdAt)}
                             </span>
                           </div>
                         </div>
