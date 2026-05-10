@@ -17,6 +17,7 @@ import {
   Send, Check, Clock, AlertCircle, Download, Upload, FileText,
   DollarSign, Edit2, Save, Users, Activity,
   RefreshCw, TrendingUp, Target, Package, Star, Edit3,
+  Share2, Copy, CheckCheck,
 } from 'lucide-react';
 
 const TABS = [
@@ -58,6 +59,8 @@ export default function AdminProjectWorkspace() {
   const [msgText, setMsgText] = useState('');
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -137,6 +140,21 @@ export default function AdminProjectWorkspace() {
     finally { setSending(false); }
   };
 
+  const handleShare = async () => {
+    setSharing(true);
+    try {
+      const { data } = await projectAPI.generateShare(id);
+      await navigator.clipboard.writeText(data.shareUrl);
+      setCopied(true);
+      toast.success('Share link copied to clipboard!');
+      setTimeout(() => setCopied(false), 3000);
+    } catch {
+      toast.error('Failed to generate share link');
+    } finally {
+      setSharing(false);
+    }
+  };
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -172,9 +190,23 @@ export default function AdminProjectWorkspace() {
           <ArrowLeft className="w-4 h-4" /> All Projects
         </Link>
         {!editing ? (
-          <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-            <Edit2 className="w-3.5 h-3.5" /> Edit Project
-          </Button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              disabled={sharing}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all disabled:opacity-50"
+            >
+              {copied
+                ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied!</>
+                : sharing
+                  ? <><span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" /> Generating…</>
+                  : <><Share2 className="w-3.5 h-3.5" /> Share</>
+              }
+            </button>
+            <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+              <Edit2 className="w-3.5 h-3.5" /> Edit Project
+            </Button>
+          </div>
         ) : (
           <div className="flex gap-2">
             <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>

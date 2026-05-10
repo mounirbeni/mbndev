@@ -61,16 +61,18 @@ export const authAPI = {
 };
 
 export const projectAPI = {
-  create:     (data: any)                       => api.post('/projects', data),
-  getMine:    ()                                => api.get('/projects/mine'),
-  getAll:     (params?: any)                    => api.get('/projects', { params }),
-  getOne:     (id: string)                      => api.get(`/projects/${id}`),
-  update:     (id: string, data: any)           => api.put(`/projects/${id}`, data),
-  uploadFile: (id: string, formData: FormData)  =>
+  create:          (data: any)                       => api.post('/projects', data),
+  getMine:         ()                                => api.get('/projects/mine'),
+  getAll:          (params?: any)                    => api.get('/projects', { params }),
+  getOne:          (id: string)                      => api.get(`/projects/${id}`),
+  update:          (id: string, data: any)           => api.put(`/projects/${id}`, data),
+  uploadFile:      (id: string, formData: FormData)  =>
     api.post(`/projects/${id}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  getStats:   ()                                => api.get('/projects/stats'),
+  getStats:        ()                                => api.get('/projects/stats'),
+  generateShare:   (id: string)                      => api.post(`/projects/${id}/share`, {}),
+  getByShareToken: (token: string)                   => api.get(`/projects/share/${token}`),
 };
 
 export const orderAPI = {
@@ -93,6 +95,7 @@ export const paymentAPI = {
   submitManual:   (data: any)  => api.post('/payments/manual', data),
   approveManual:  (id: string) => api.put(`/payments/${id}/approve`, {}),
   getAll:         ()           => api.get('/payments'),
+  getOne:         (id: string) => api.get(`/payments/${id}`),
 };
 
 export const notificationAPI = {

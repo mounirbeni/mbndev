@@ -46,6 +46,32 @@ async function createProjectFromOrder(order, tx = prisma) {
   return project;
 }
 
+// ─── Get single payment (for invoice view) ───────────────────────────────────
+
+exports.getPaymentById = async (req, res, next) => {
+  try {
+    const payment = await prisma.payment.findUnique({
+      where:   { id: req.params.id },
+      include: {
+        project: { select: { id: true, title: true, type: true } },
+        order:   { select: { id: true, title: true, serviceType: true, description: true, features: true } },
+        client:  { select: { id: true, name: true, email: true, company: true, phone: true } },
+      },
+    });
+
+    if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+
+    // Access control: client can only see own payments
+    if (req.user.role !== 'admin' && payment.clientId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized' });
+    }
+
+    res.json({ success: true, payment: fmt(payment) });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ─── Get payments ────────────────────────────────────────────────────────────
 
 exports.getPayments = async (req, res, next) => {

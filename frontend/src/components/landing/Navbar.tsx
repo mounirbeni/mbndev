@@ -9,6 +9,7 @@ import {
   Info, Mail, LayoutDashboard, ChevronRight, LogIn,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { useAuth } from '@/contexts/AuthContext';
 
 const navLinks = [
@@ -98,6 +99,7 @@ export default function Navbar() {
 
             {/* Desktop CTAs — gated on mounted to prevent hydration mismatch */}
             <div className="hidden lg:flex items-center gap-3">
+              <LanguageSwitcher />
               {mounted && user ? (
                 <Link href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'}>
                   <Button size="md">Dashboard →</Button>

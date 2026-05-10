@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const {
   getPayments,
+  getPaymentById,
   mockPayment,
   submitManualPayment,
   approveManualPayment,
@@ -19,5 +20,8 @@ router.post('/mock', protect, mockPayment);
 
 // Get all payments (own for client, all for admin)
 router.get('/', protect, getPayments);
+
+// Get single payment (invoice view — client can only see own)
+router.get('/:id', protect, getPaymentById);
 
 module.exports = router;

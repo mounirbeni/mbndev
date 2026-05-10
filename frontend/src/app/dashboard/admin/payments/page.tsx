@@ -6,7 +6,8 @@ import { paymentAPI } from '@/lib/api';
 import { Payment } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { CreditCard, CheckCircle, Clock } from 'lucide-react';
+import { CreditCard, CheckCircle, Clock, FileText } from 'lucide-react';
+import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 
@@ -115,6 +116,7 @@ export default function AdminPaymentsPage() {
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Method</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Status</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Date</th>
+                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Invoice</th>
                   <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">Action</th>
                 </tr>
               </thead>
@@ -146,6 +148,15 @@ export default function AdminPaymentsPage() {
                       <td className="p-4"><StatusBadge status={pay.status} /></td>
                       <td className="p-4 text-sm text-slate-400">
                         {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
+                      </td>
+                      <td className="p-4">
+                        <Link
+                          href={`/invoice/${pay._id}`}
+                          className="inline-flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          View
+                        </Link>
                       </td>
                       <td className="p-4">
                         {isVerif ? (

@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
-  TrendingUp, FolderOpen, Users, CreditCard, Clock,
+  TrendingUp, TrendingDown, FolderOpen, Users, CreditCard, Clock,
   CheckCircle2, AlertCircle, BarChart2, ArrowRight,
-  Activity, Package, Loader2,
+  Activity, Package, Loader2, DollarSign, Target, Zap,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import { formatCurrency, formatDate, statusLabels } from '@/lib/utils';
@@ -54,6 +54,48 @@ function Stat({
       <div className="text-white text-sm font-medium mt-0.5">{title}</div>
       <div className="text-slate-500 text-xs mt-0.5">{sub}</div>
     </motion.div>
+  );
+}
+
+// ─── Delta badge (MoM change indicator) ──────────────────────────────────────
+
+function Delta({ value }: { value: number }) {
+  if (value === 0) return <span className="text-slate-500 text-xs">–</span>;
+  const isUp = value > 0;
+  const Icon = isUp ? TrendingUp : TrendingDown;
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${isUp ? 'text-green-400' : 'text-red-400'}`}>
+      <Icon className="w-3 h-3" />
+      {isUp ? '+' : ''}{value}%
+    </span>
+  );
+}
+
+// ─── Funnel step ─────────────────────────────────────────────────────────────
+
+function FunnelStep({
+  label, count, total, color, isLast,
+}: { label: string; count: number; total: number; color: string; isLast?: boolean }) {
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <div className={`w-2 h-2 rounded-full shrink-0 ${color}`} />
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between text-xs mb-1">
+          <span className="text-slate-400">{label}</span>
+          <span className="text-white font-semibold">{count}</span>
+        </div>
+        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 0.8 }}
+            className={`h-full ${color} rounded-full opacity-80`}
+          />
+        </div>
+      </div>
+      <span className="text-[10px] text-slate-600 w-8 text-right">{pct}%</span>
+    </div>
   );
 }
 
@@ -173,6 +215,27 @@ export default function AdminAnalyticsPage() {
     ? Math.round((byStatus.completed / totalProjects) * 100)
     : 0;
 
+  const avgProjectValue = totalProjects > 0
+    ? totalRevenue / Math.max(paidCount, 1)
+    : 0;
+
+  // Monthly Recurring Revenue estimation (last 3 paid months avg)
+  const paidMonths = monthlyRevenue.filter((m: any) => !m.future && Number(m.revenue) > 0);
+  const mrrEstimate = paidMonths.length > 0
+    ? paidMonths.slice(-3).reduce((s: number, m: any) => s + Number(m.revenue), 0) / Math.min(paidMonths.length, 3)
+    : 0;
+  const arrEstimate = mrrEstimate * 12;
+
+  // MoM revenue change (last 2 paid months)
+  const revenueChange = paidMonths.length >= 2
+    ? Math.round(((Number(paidMonths.at(-1)?.revenue) - Number(paidMonths.at(-2)?.revenue))
+        / Math.max(Number(paidMonths.at(-2)?.revenue), 1)) * 100)
+    : 0;
+
+  // Pipeline: projects not yet completed or cancelled
+  const activeInPipeline = (byStatus.pending || 0) + (byStatus.paid || 0)
+    + (byStatus.inProgress || 0) + (byStatus.review || 0) + (byStatus.revision || 0);
+
   const statusRows = [
     { label: 'Pending',     count: byStatus.pending,    color: 'bg-amber-500',   text: 'text-amber-400'   },
     { label: 'Paid',        count: byStatus.paid,        color: 'bg-emerald-500', text: 'text-emerald-400' },
@@ -188,11 +251,17 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold text-white">Analytics</h1>
-        <p className="text-slate-400 text-sm mt-1">
-          Live platform data — {year}
-        </p>
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Business Intelligence</h1>
+          <p className="text-slate-400 text-sm mt-1">
+            Live platform analytics — {year}
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          Live
+        </div>
       </motion.div>
 
       {/* ── KPI row ─────────────────────────────────────────────────────────── */}
@@ -222,6 +291,66 @@ export default function AdminAnalyticsPage() {
             <div className="text-slate-500 text-xs mt-0.5">{s.label}</div>
           </motion.div>
         ))}
+      </div>
+
+      {/* ── Business Intelligence row ────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          {
+            icon: DollarSign,
+            label: 'Avg. Project Value',
+            value: formatCurrency(avgProjectValue),
+            sub: 'Per paid invoice',
+            color: 'text-green-400',
+            bg: 'bg-green-500/15',
+            delta: null,
+          },
+          {
+            icon: TrendingUp,
+            label: 'MoM Revenue',
+            value: revenueChange === 0 ? '—' : `${revenueChange > 0 ? '+' : ''}${revenueChange}%`,
+            sub: 'vs previous month',
+            color: revenueChange >= 0 ? 'text-green-400' : 'text-red-400',
+            bg: revenueChange >= 0 ? 'bg-green-500/15' : 'bg-red-500/15',
+            delta: null,
+          },
+          {
+            icon: Zap,
+            label: 'ARR Estimate',
+            value: formatCurrency(arrEstimate),
+            sub: 'Based on avg 3-month MRR',
+            color: 'text-primary-400',
+            bg: 'bg-primary-500/15',
+            delta: null,
+          },
+          {
+            icon: Target,
+            label: 'Active Pipeline',
+            value: activeInPipeline,
+            sub: 'Projects not yet completed',
+            color: 'text-blue-400',
+            bg: 'bg-blue-500/15',
+            delta: null,
+          },
+        ].map((kpi, i) => {
+          const Icon = kpi.icon;
+          return (
+            <motion.div
+              key={kpi.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + i * 0.06 }}
+              className="glass rounded-2xl p-5 border border-white/5"
+            >
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${kpi.bg}`}>
+                <Icon className={`w-4 h-4 ${kpi.color}`} />
+              </div>
+              <div className={`text-2xl font-bold ${kpi.color}`}>{kpi.value}</div>
+              <div className="text-white text-sm font-medium mt-0.5">{kpi.label}</div>
+              <div className="text-slate-500 text-xs mt-0.5">{kpi.sub}</div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* ── Revenue chart + Status breakdown ────────────────────────────────── */}
@@ -308,6 +437,57 @@ export default function AdminAnalyticsPage() {
             </div>
           </div>
           <BarChart data={monthlyProjects} valueKey="count" color="bg-primary-500" />
+        </div>
+      </div>
+
+      {/* ── Project Funnel ───────────────────────────────────────────────────── */}
+      <div className="glass rounded-2xl p-6 border border-white/5">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h3 className="text-white font-semibold">Project Pipeline Funnel</h3>
+            <p className="text-slate-500 text-xs mt-0.5">Distribution of all projects by stage</p>
+          </div>
+          <div className="flex items-center gap-2 text-blue-400 text-sm font-semibold">
+            <Activity className="w-4 h-4" />
+            {activeInPipeline} active
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[
+            { label: 'Pending Review',  count: byStatus.pending   || 0, color: 'bg-amber-500'   },
+            { label: 'Paid — Queued',   count: byStatus.paid      || 0, color: 'bg-emerald-500'  },
+            { label: 'In Development',  count: byStatus.inProgress || 0, color: 'bg-blue-500'   },
+            { label: 'Under Review',    count: byStatus.review    || 0, color: 'bg-purple-500'   },
+            { label: 'Revision',        count: byStatus.revision  || 0, color: 'bg-orange-500'   },
+            { label: 'Completed',       count: byStatus.completed || 0, color: 'bg-green-500'    },
+          ].map((step, i) => (
+            <FunnelStep
+              key={step.label}
+              label={step.label}
+              count={step.count}
+              total={totalProjects}
+              color={step.color}
+              isLast={i === 5}
+            />
+          ))}
+        </div>
+        <div className="mt-5 pt-4 border-t border-white/5 grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div className="text-lg font-bold text-green-400">{completionRate}%</div>
+            <div className="text-slate-500 text-xs">Completion rate</div>
+          </div>
+          <div>
+            <div className="text-lg font-bold text-blue-400">
+              {totalProjects > 0 ? Math.round(((byStatus.inProgress || 0) / totalProjects) * 100) : 0}%
+            </div>
+            <div className="text-slate-500 text-xs">In development</div>
+          </div>
+          <div>
+            <div className="text-lg font-bold text-amber-400">
+              {totalProjects > 0 ? Math.round(((byStatus.pending || 0) / totalProjects) * 100) : 0}%
+            </div>
+            <div className="text-slate-500 text-xs">Pending review</div>
+          </div>
         </div>
       </div>
 

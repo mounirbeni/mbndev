@@ -1,4 +1,5 @@
 const prisma = require('../lib/prisma');
+const jwt    = require('jsonwebtoken');
 const { fmt } = require('../lib/format');
 const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
 const { SM } = require('../lib/systemMessages');
@@ -280,6 +281,80 @@ exports.getStats = async (req, res, next) => {
     ]);
 
     res.json({ success: true, stats: { total, inProgress, completed, pending } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Generate share token (admin only) ───────────────────────────────────────
+
+exports.generateShareToken = async (req, res, next) => {
+  try {
+    const project = await prisma.project.findUnique({ where: { id: req.params.id } });
+    if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+    const token = jwt.sign(
+      { projectId: project.id, type: 'share' },
+      process.env.JWT_SECRET,
+      { expiresIn: '90d' }
+    );
+
+    const base = process.env.CLIENT_URL || 'http://localhost:3000';
+    const shareUrl = `${base}/share/${token}`;
+
+    res.json({ success: true, token, shareUrl });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Get project by share token (public — no auth) ───────────────────────────
+
+exports.getProjectByShareToken = async (req, res, next) => {
+  try {
+    let decoded;
+    try {
+      decoded = jwt.verify(req.params.token, process.env.JWT_SECRET);
+    } catch {
+      return res.status(400).json({ success: false, message: 'Invalid or expired share link' });
+    }
+
+    if (decoded.type !== 'share') {
+      return res.status(400).json({ success: false, message: 'Invalid share link' });
+    }
+
+    const project = await prisma.project.findUnique({
+      where:   { id: decoded.projectId },
+      include: {
+        client:     { select: { name: true, company: true } },
+        milestones: { orderBy: { createdAt: 'asc' } },
+      },
+    });
+
+    if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+    // Return only safe public data — no messages, files, or financial details
+    res.json({
+      success: true,
+      project: fmt({
+        title:      project.title,
+        type:       project.type,
+        status:     project.status,
+        progress:   project.progress,
+        deadline:   project.deadline,
+        createdAt:  project.createdAt,
+        updatedAt:  project.updatedAt,
+        client: {
+          name:    project.client.name,
+          company: project.client.company || null,
+        },
+        milestones: project.milestones.map((m) => ({
+          title:   m.title,
+          status:  m.status,
+          dueDate: m.dueDate,
+        })),
+      }),
+    });
   } catch (err) {
     next(err);
   }
