@@ -39,12 +39,7 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(powershell -command \"\\(Get-Content 'C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\\\\app\\\\dashboard\\\\admin\\\\projects\\\\[id]\\\\page.tsx'\\).Count\")",
-      "Bash(for f *)",
-      "Bash(Get-Content \"C:\\\\Users\\\\mouni\\\\Desktop\\\\mbndev\\\\frontend\\\\src\\\\lib\\\\i18n\\\\translations.ts\")",
-      "Bash(Measure-Object -Line)",
-      "Bash(Select-Object -ExpandProperty Lines)",
-      "Bash(ls /mnt/c/Users/mouni/Desktop/mbndev/frontend/src/components/dashboard/)",
-      "Bash(ls /mnt/c/Users/mouni/Desktop/mbndev/frontend/src/components/)"
+      "Bash(for f *)"
     ]
   }
 }

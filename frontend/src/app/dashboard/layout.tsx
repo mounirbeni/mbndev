@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar, { MobileSidebar } from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/mobile/BottomNav';
@@ -11,32 +12,99 @@ import { Zap } from 'lucide-react';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
 import { getInitials } from '@/lib/utils';
 import Link from 'next/link';
+import { useHaptic } from '@/hooks/useHaptic';
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Swipe-to-open sidebar gesture (left edge → right swipe ≥ 60px)
+───────────────────────────────────────────────────────────────────────────── */
+function useSwipeToOpenSidebar(onOpen: () => void) {
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  useEffect(() => {
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      touchStartX.current = t.clientX;
+      touchStartY.current = t.clientY;
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (touchStartX.current === null || touchStartY.current === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+      /* Only fire if: started within 20px of left edge, swiped right ≥ 60px,
+         and more horizontal than vertical (not a vertical scroll) */
+      if (touchStartX.current <= 20 && dx >= 60 && dy < 80) {
+        onOpen();
+      }
+      touchStartX.current = null;
+      touchStartY.current = null;
+    };
+
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchend',   onTouchEnd,   { passive: true });
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend',   onTouchEnd);
+    };
+  }, [onOpen]);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Scroll-hide header hook — hides header on scroll down, shows on scroll up
+───────────────────────────────────────────────────────────────────────────── */
+function useScrollHideHeader() {
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
+  const scrollEl    = useRef<HTMLElement | null>(null);
+
+  const onScroll = () => {
+    const el = scrollEl.current;
+    if (!el) return;
+    const y = el.scrollTop;
+    if (y < 10) { setHidden(false); lastScrollY.current = y; return; }
+    setHidden(y > lastScrollY.current + 4);
+    lastScrollY.current = y;
+  };
+
+  return { hidden, scrollRef: scrollEl, onScroll };
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const haptic = useHaptic();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { hidden, scrollRef, onScroll } = useScrollHideHeader();
 
+  /* Redirect unauthenticated users */
   useEffect(() => {
     if (!loading && !user) router.push('/login');
   }, [user, loading, router]);
 
+  /* Swipe-from-left-edge opens sidebar on mobile */
+  useSwipeToOpenSidebar(() => {
+    if (window.innerWidth >= 1024) return; // desktop only uses permanent sidebar
+    haptic('light');
+    setSidebarOpen(true);
+  });
+
   /* ── Loading / unauthenticated skeleton ──────────────────────────────── */
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0d' }}>
-        {/* Mobile skeleton top bar */}
+      <div className="min-h-dvh flex flex-col" style={{ background: '#0a0a0d' }}>
         <div
           className="lg:hidden shrink-0 px-4 flex items-center justify-between"
           style={{
-            paddingTop:    'max(env(safe-area-inset-top, 0px), 0px)',
-            height:        'calc(56px + max(env(safe-area-inset-top, 0px), 0px))',
-            background:    'rgba(10,10,13,0.97)',
-            borderBottom:  '1px solid rgba(255,255,255,0.07)',
+            paddingTop:   'max(env(safe-area-inset-top, 0px), 0px)',
+            height:       'calc(56px + max(env(safe-area-inset-top, 0px), 0px))',
+            background:   'rgba(10,10,13,0.97)',
+            borderBottom: '1px solid rgba(255,255,255,0.07)',
           }}
         >
-          <div className="w-9 h-9 rounded-xl bg-white/5 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-white/5 animate-pulse" />
           <div className="w-20 h-4 rounded-lg bg-white/5 animate-pulse" />
-          <div className="w-9 h-9 rounded-xl bg-white/5 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-white/5 animate-pulse" />
         </div>
         <div className="flex-1 p-4 lg:p-6">
           <SkeletonDashboard />
@@ -47,34 +115,50 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   /* ── Authenticated layout ─────────────────────────────────────────────── */
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#0a0a0d' }}>
-
+    <div
+      className="flex overflow-hidden"
+      style={{ height: '100dvh', background: '#0a0a0d' }}
+    >
       {/* ── Desktop permanent sidebar (hidden on mobile) ─────────────── */}
       <div className="hidden lg:flex flex-col shrink-0">
         <Sidebar />
       </div>
 
+      {/* ── Mobile sidebar — controlled externally via state ─────────── */}
+      <MobileSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+
       {/* ── Content column ───────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        {/* Mobile top bar
-            IMPORTANT: No backdrop-filter here — it would create a stacking
-            context that traps fixed children (MobileSidebar drawer, BottomNav).
-            We use a solid near-opaque background instead.                     */}
-        <header
+        {/* ── Mobile top bar ─────────────────────────────────────────── */}
+        {/* IMPORTANT: No backdrop-filter here — creates a stacking context
+            that would trap fixed children (MobileSidebar, BottomNav).    */}
+        <motion.header
+          animate={{ y: hidden ? '-100%' : '0%' }}
+          transition={{ duration: 0.26, ease: [0.32, 0.72, 0, 1] }}
           className="lg:hidden shrink-0 px-4 flex items-center justify-between relative"
           style={{
             paddingTop:   'max(env(safe-area-inset-top, 0px), 0px)',
             height:       'calc(56px + max(env(safe-area-inset-top, 0px), 0px))',
-            background:   'rgba(10, 10, 13, 0.98)',
+            background:   'rgba(10, 10, 13, 0.99)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
-            // NO backdrop-filter — avoids creating stacking context
+            zIndex:       100,
           }}
         >
-          {/* Left: hamburger */}
-          <MobileSidebar />
+          {/* Left: hamburger — wired to state instead of its own toggle */}
+          <button
+            onClick={() => { haptic('light'); setSidebarOpen(true); }}
+            aria-label="Open menu"
+            className="w-10 h-10 flex items-center justify-center rounded-xl
+                       text-slate-400 active:text-white active:bg-white/8
+                       transition-colors touch-target"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.9} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h10" />
+            </svg>
+          </button>
 
-          {/* Center: brand (absolutely centred so it doesn't shift) */}
+          {/* Center: brand */}
           <Link
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2"
@@ -101,9 +185,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {getInitials(user.name)}
             </div>
           </div>
-        </header>
+        </motion.header>
 
-        {/* Desktop top bar */}
+        {/* ── Desktop top bar ──────────────────────────────────────── */}
         <header
           className="hidden lg:flex shrink-0 items-center justify-between px-6 py-3"
           style={{
@@ -128,24 +212,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {/* Page content
-            Bottom padding on mobile = BottomNav height (56px) + safe-area + gap */}
+        {/* ── Page content ─────────────────────────────────────────── */}
         <main
-          className="flex-1 overflow-y-auto p-4 lg:p-6"
+          ref={scrollRef as React.RefObject<HTMLDivElement>}
+          className="flex-1 overflow-y-auto p-4 lg:p-6 inertial-scroll"
+          onScroll={onScroll}
           style={{
-            WebkitOverflowScrolling: 'touch',
-            overscrollBehavior:      'contain',
-            paddingBottom:           'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+            /* Bottom padding: BottomNav (58px) + safe-area + gap */
+            paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 74px)',
           }}
         >
           {children}
         </main>
       </div>
 
-      {/* BottomNav — portalled to body inside its own component */}
+      {/* BottomNav — portalled to body */}
       <BottomNav />
 
-      {/* Floating WhatsApp / support button */}
+      {/* Floating support button */}
       <FloatingSupport />
     </div>
   );

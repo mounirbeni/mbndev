@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, FolderOpen, MessageSquare,
   CreditCard, Settings, Users, BarChart2, ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHaptic } from '@/hooks/useHaptic';
 import { cn } from '@/lib/utils';
 
 interface NavTab {
@@ -40,6 +41,7 @@ export default function BottomNav() {
   const { isAdmin }    = useAuth();
   const { t }          = useLanguage();
   const pathname       = usePathname();
+  const haptic         = useHaptic();
   const tabsDef        = isAdmin ? adminTabsDef : clientTabsDef;
   const [mounted, setMounted] = useState(false);
 
@@ -56,16 +58,24 @@ export default function BottomNav() {
       aria-label="Mobile navigation"
       className="lg:hidden"
       style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9990,
-        background:           'rgba(8, 8, 11, 0.97)',
-        backdropFilter:       'blur(28px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-        borderTop: '1px solid rgba(255,255,255,0.07)',
+        position:             'fixed',
+        bottom:               0,
+        left:                 0,
+        right:                0,
+        zIndex:               9990,
+        background:           'rgba(7, 7, 10, 0.97)',
+        backdropFilter:       'blur(32px) saturate(1.9)',
+        WebkitBackdropFilter: 'blur(32px) saturate(1.9)',
+        borderTop:            '1px solid rgba(255,255,255,0.08)',
       }}
     >
       <div
-        className="flex items-stretch justify-around px-1"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}
+        className="flex items-stretch justify-around"
+        style={{
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
+          paddingLeft:   'max(env(safe-area-inset-left, 0px), 0px)',
+          paddingRight:  'max(env(safe-area-inset-right, 0px), 0px)',
+        }}
       >
         {tabsDef.map((tab) => {
           const active = isActive(tab.href);
@@ -75,43 +85,75 @@ export default function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className="relative flex flex-col items-center justify-center gap-1 flex-1 py-2 min-h-[56px] group"
+              onClick={() => haptic('selection')}
+              className="relative flex flex-col items-center justify-center gap-[3px] flex-1 py-2.5 min-h-[58px] group select-none"
               aria-current={active ? 'page' : undefined}
             >
+              {/* Active pill background */}
               {active && (
                 <motion.div
                   layoutId="bottomNavPill"
-                  className="absolute inset-x-1 top-1.5 h-[34px] rounded-xl"
-                  style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.22)' }}
-                  transition={{ type: 'spring', damping: 30, stiffness: 350 }}
+                  className="absolute inset-x-1.5 top-1.5 h-[36px] rounded-[14px]"
+                  style={{
+                    background: 'rgba(124,58,237,0.18)',
+                    border:     '1px solid rgba(124,58,237,0.28)',
+                  }}
+                  transition={{ type: 'spring', damping: 28, stiffness: 380, mass: 0.7 }}
                 />
               )}
 
-              <div className="relative z-10">
-                <Icon
-                  className={cn(
-                    'w-[22px] h-[22px] transition-all duration-200',
-                    active ? 'text-primary-400' : 'text-slate-500 group-active:text-slate-300'
-                  )}
-                  style={active ? { filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.5))' } : {}}
-                  strokeWidth={active ? 2.2 : 1.8}
-                />
-                {tab.dot && (
-                  <span
-                    className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-primary-500"
-                    style={{ border: '2px solid rgba(8,8,11,1)' }}
+              {/* Icon + notification dot */}
+              <div className="relative z-10 flex items-center justify-center w-[26px] h-[26px]">
+                <motion.div
+                  animate={active ? { scale: 1.08 } : { scale: 1 }}
+                  transition={{ type: 'spring', damping: 22, stiffness: 400 }}
+                >
+                  <Icon
+                    className={cn(
+                      'transition-colors duration-200',
+                      active
+                        ? 'text-primary-400 w-[22px] h-[22px]'
+                        : 'text-slate-500 group-active:text-slate-300 w-[21px] h-[21px]'
+                    )}
+                    style={
+                      active
+                        ? { filter: 'drop-shadow(0 0 5px rgba(168,85,247,0.55))' }
+                        : undefined
+                    }
+                    strokeWidth={active ? 2.2 : 1.75}
                   />
+                </motion.div>
+
+                {/* Notification dot — pulsing ring when active */}
+                {tab.dot && (
+                  <span className="absolute -top-0.5 -right-1 flex">
+                    <span className="absolute inline-flex h-2 w-2 rounded-full bg-primary-500 opacity-75 animate-ping" />
+                    <span
+                      className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"
+                      style={{ border: '1.5px solid rgba(7,7,10,1)' }}
+                    />
+                  </span>
                 )}
               </div>
 
-              <span
-                className={cn(
-                  'relative z-10 text-[10px] font-medium leading-none transition-colors duration-200',
-                  active ? 'text-primary-400' : 'text-slate-600 group-active:text-slate-400'
-                )}
-              >
-                {t(tab.labelKey)}
-              </span>
+              {/* Label */}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={active ? 'active' : 'inactive'}
+                  initial={{ opacity: 0, y: 2 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -2 }}
+                  transition={{ duration: 0.15 }}
+                  className={cn(
+                    'relative z-10 text-[9.5px] font-medium leading-none tracking-wide transition-colors duration-200',
+                    active
+                      ? 'text-primary-400'
+                      : 'text-slate-600 group-active:text-slate-400'
+                  )}
+                >
+                  {t(tab.labelKey)}
+                </motion.span>
+              </AnimatePresence>
             </Link>
           );
         })}

@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
-  Settings, LogOut, Zap, Users, Package, Menu, X, BarChart2,
+  Settings, LogOut, Zap, Users, Package, X, BarChart2,
   ChevronRight, ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -182,22 +182,28 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   MobileSidebar — hamburger trigger + full-screen drawer via React portal
+   MobileSidebar — controlled drawer via React portal.
+   The open/close state is lifted to the dashboard layout so swipe-from-edge
+   and the hamburger button both work through a single state.
 ───────────────────────────────────────────────────────────────────────────── */
-export function MobileSidebar() {
-  const [open,    setOpen]    = useState(false);
+interface MobileSidebarProps {
+  open:         boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const [mounted, setMounted] = useState(false);
-  const { t } = useLanguage();
 
   useEffect(() => { setMounted(true); }, []);
 
+  /* Lock body scroll while drawer is open */
   useEffect(() => {
     if (!mounted) return;
     document.body.style.overflow = open ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [open, mounted]);
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => onOpenChange(false);
 
   const portalContent = (
     <AnimatePresence>
@@ -211,10 +217,12 @@ export function MobileSidebar() {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             onClick={handleClose}
             style={{
-              position: 'fixed', inset: 0, zIndex: 9998,
-              background: 'rgba(0, 0, 0, 0.75)',
-              backdropFilter: 'blur(6px)',
-              WebkitBackdropFilter: 'blur(6px)',
+              position:             'fixed',
+              inset:                0,
+              zIndex:               9998,
+              background:           'rgba(0, 0, 0, 0.78)',
+              backdropFilter:       'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
             }}
           />
           <motion.div
@@ -224,8 +232,12 @@ export function MobileSidebar() {
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 320, mass: 0.8 }}
             style={{
-              position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 9999,
-              boxShadow: '4px 0 40px rgba(0,0,0,0.6), 2px 0 16px rgba(0,0,0,0.4)',
+              position:  'fixed',
+              top:       0,
+              left:      0,
+              bottom:    0,
+              zIndex:    9999,
+              boxShadow: '4px 0 48px rgba(0,0,0,0.65), 2px 0 16px rgba(0,0,0,0.4)',
             }}
           >
             <Sidebar mobile onClose={handleClose} />
@@ -235,20 +247,6 @@ export function MobileSidebar() {
     </AnimatePresence>
   );
 
-  return (
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        aria-label={t('dash.openMenu')}
-        aria-expanded={open}
-        className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl
-                   text-slate-400 hover:text-white hover:bg-white/8
-                   active:bg-white/12 active:scale-95 transition-all"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
-
-      {mounted && createPortal(portalContent, document.body)}
-    </>
-  );
+  if (!mounted) return null;
+  return createPortal(portalContent, document.body);
 }

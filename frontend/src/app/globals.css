@@ -278,3 +278,290 @@ input, textarea, select {
   padding-left: env(safe-area-inset-left, 16px);
   padding-right: env(safe-area-inset-right, 16px);
 }
+
+/* ── Dynamic viewport height ─────────────────────────────────────────────── */
+/* Eliminates the iOS/Android URL-bar jump — use instead of 100vh on mobile  */
+.h-dvh     { height: 100dvh; }
+.min-h-dvh { min-height: 100dvh; }
+.max-h-dvh { max-height: 100dvh; }
+
+/* Small (static) and large (expanded) viewport fallbacks */
+.h-svh     { height: 100svh; }
+.min-h-svh { min-height: 100svh; }
+.h-lvh     { height: 100lvh; }
+
+/* ── App-like page entry animation ───────────────────────────────────────── */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: pageEnter 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* ── Bottom sheet system ─────────────────────────────────────────────────── */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9990;
+}
+
+.sheet-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9991;
+  background: rgba(14, 14, 18, 0.98);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 24px 24px 0 0;
+  padding-bottom: max(env(safe-area-inset-bottom), 12px);
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 2px;
+  margin: 12px auto 4px;
+  flex-shrink: 0;
+}
+
+/* ── Pull-to-refresh indicator ───────────────────────────────────────────── */
+.ptr-indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
+}
+.ptr-indicator.ptr-ready {
+  background: rgba(124, 58, 237, 0.3);
+}
+
+/* ── Mobile card — app-like touch feedback ───────────────────────────────── */
+.mobile-card {
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  transition: transform 0.13s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.13s ease,
+              background 0.1s ease;
+}
+.mobile-card:active {
+  transform: scale(0.977);
+  background: rgba(22, 22, 28, 0.9);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.28);
+}
+
+/* ── iOS-style list rows ─────────────────────────────────────────────────── */
+.ios-list {
+  background: var(--glass-bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.ios-row {
+  display: flex;
+  align-items: center;
+  padding: 13px 16px;
+  min-height: 52px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  transition: background 0.1s ease;
+  cursor: pointer;
+}
+.ios-row:last-child { border-bottom: none; }
+.ios-row:active     { background: rgba(255, 255, 255, 0.055); }
+
+/* ── Horizontal tab scroll ───────────────────────────────────────────────── */
+.tab-scroll {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 8px;
+  padding-bottom: 2px; /* don't clip shadow */
+}
+.tab-scroll::-webkit-scrollbar { display: none; }
+.tab-scroll > * { scroll-snap-align: start; flex-shrink: 0; }
+
+/* ── Horizontal scroll fade hint ─────────────────────────────────────────── */
+.scroll-fade-right {
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
+
+/* ── Inertial content scroll ─────────────────────────────────────────────── */
+.inertial-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ── Top loading bar ─────────────────────────────────────────────────────── */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 99999;
+  background: linear-gradient(90deg, #7c3aed, #a855f7, #3b82f6);
+  background-size: 200% 100%;
+  animation: shimmer 1s linear infinite;
+}
+
+/* ── Haptic-style visual press ────────────────────────────────────────────── */
+@keyframes hapticPulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+.haptic:active {
+  animation: hapticPulse 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Swipe edge zone (invisible touch target for gesture detection) ───────── */
+.swipe-edge-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 16px;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* ── Content scroll — aware of fixed bottom nav ───────────────────────────── */
+.scroll-with-nav {
+  padding-bottom: calc(max(env(safe-area-inset-bottom, 0px), 8px) + 60px);
+}
+
+/* ── Mobile section spacing ───────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .mobile-px { padding-left: 16px; padding-right: 16px; }
+  .mobile-gap-sm { gap: 10px !important; }
+  .mobile-col { flex-direction: column !important; }
+  .mobile-full { width: 100% !important; }
+}
+
+/* ── Sticky submit bar (forms) ───────────────────────────────────────────── */
+.sticky-submit {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px) + 12px, 16px);
+  background: rgba(10, 10, 13, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* ── Notification badge ──────────────────────────────────────────────────── */
+.badge-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #a855f7;
+  border: 2px solid #08080b;
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.6);
+}
+
+/* ── Swipe-to-dismiss container ──────────────────────────────────────────── */
+.swipe-container {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Floating action button ──────────────────────────────────────────────── */
+.fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.08);
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.14s ease;
+}
+.fab:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 8px;
+}
+
+/* ── Modal / overlay entrance ────────────────────────────────────────────── */
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-enter {
+  animation: modalEnter 0.24s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* ── Contextual header hide on scroll (mobile) ───────────────────────────── */
+.header-hide {
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.header-hide.hidden-up {
+  transform: translateY(-100%);
+}
+
+/* ── Better scrollbar on mobile-visible areas ────────────────────────────── */
+@media (max-width: 1023px) {
+  ::-webkit-scrollbar { width: 0; height: 0; }
+}
+
+/* ── Touch optimized input spacing ──────────────────────────────────────── */
+@media (max-width: 1023px) {
+  input, textarea, select {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+}
+
+/* ── App-like stat card ──────────────────────────────────────────────────── */
+.stat-card {
+  background: var(--glass-bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 16px;
+  transition: transform 0.13s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.stat-card:active { transform: scale(0.975); }
