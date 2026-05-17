@@ -71,16 +71,16 @@ export default function ClientProjectsPage() {
         </Link>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 flex-wrap">
+      {/* Filter tabs — horizontally scrollable */}
+      <div className="tab-scroll pb-1">
         {statusTabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`px-3 py-1.5 rounded-lg text-sm capitalize transition-all ${
+            className={`flex-shrink-0 px-3.5 py-2 rounded-xl text-sm capitalize transition-all press-scale ${
               filter === tab
                 ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
-                : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+                : 'text-slate-400 hover:text-white bg-white/5 border border-transparent hover:bg-white/10'
             }`}
           >
             {tab === 'all' ? t('portfolio.cat.all') : tab === 'in-progress' ? t('status.inProgress') : tab === 'completed' ? t('status.completed') : tab === 'review' ? t('status.review') : t('status.pending')}

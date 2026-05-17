@@ -77,12 +77,18 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title={t('admin.allProjects')}  value={loading ? '—' : (a?.totalProjects ?? 0)}              subtitle={t('admin.allTime')}     icon={FolderOpen} color="purple" index={0} />
-        <StatsCard title={t('status.inProgress')}  value={loading ? '—' : (a?.byStatus.inProgress ?? 0)}        subtitle={t('dash.overview')}     icon={Clock}      color="blue"   index={1} />
-        <StatsCard title={t('status.completed')}   value={loading ? '—' : (a?.byStatus.completed ?? 0)}         subtitle={t('dash.recent')}       icon={TrendingUp}  color="green"  index={2} />
-        <StatsCard title={t('admin.totalRevenue')} value={loading ? '—' : formatCurrency(a?.totalRevenue ?? 0)} subtitle={t('admin.allPaid')}     icon={CreditCard}  color="yellow" index={3} />
+      {/* Stats — scrolls horizontally on mobile, 4-col grid on desktop */}
+      <div className="tab-scroll lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible -mx-0.5 px-0.5">
+        {[
+          { title: t('admin.allProjects'),  value: loading ? '—' : (a?.totalProjects ?? 0),              subtitle: t('admin.allTime'),  icon: FolderOpen, color: 'purple' as const, index: 0 },
+          { title: t('status.inProgress'),  value: loading ? '—' : (a?.byStatus.inProgress ?? 0),        subtitle: t('dash.overview'),  icon: Clock,      color: 'blue'   as const, index: 1 },
+          { title: t('status.completed'),   value: loading ? '—' : (a?.byStatus.completed ?? 0),         subtitle: t('dash.recent'),    icon: TrendingUp,  color: 'green'  as const, index: 2 },
+          { title: t('admin.totalRevenue'), value: loading ? '—' : formatCurrency(a?.totalRevenue ?? 0), subtitle: t('admin.allPaid'),  icon: CreditCard,  color: 'yellow' as const, index: 3 },
+        ].map((s) => (
+          <div key={s.title} className="w-[152px] flex-shrink-0 lg:w-auto">
+            <StatsCard {...s} />
+          </div>
+        ))}
       </div>
 
       {/* Projects + Clients */}

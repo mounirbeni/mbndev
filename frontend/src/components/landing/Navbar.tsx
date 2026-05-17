@@ -235,12 +235,6 @@ export default function Navbar() {
 
               {/* CTA section */}
               <div className="px-3 pt-2 pb-1 flex flex-col gap-2">
-                {/* Language switcher on mobile */}
-                <div className="flex items-center justify-between px-3 py-2">
-                  <span className="text-slate-500 text-sm">{t('nav.language') ?? 'Language'}</span>
-                  <LanguageSwitcher />
-                </div>
-
                 {mounted && user ? (
                   <Link
                     href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'}

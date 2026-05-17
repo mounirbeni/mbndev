@@ -7,6 +7,7 @@ import {
   FolderOpen, MessageSquare, CreditCard, Clock, ArrowRight, Plus,
   Sparkles, CheckCircle2, Package, RotateCcw, Zap, AlertTriangle, RefreshCcw,
 } from 'lucide-react';
+import { useHaptic } from '@/hooks/useHaptic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { projectAPI, messageAPI } from '@/lib/api';
@@ -21,6 +22,7 @@ import ProjectLifecycle from '@/components/dashboard/ProjectLifecycle';
 export default function ClientDashboard() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const haptic = useHaptic();
   const [projects, setProjects] = useState<Project[]>([]);
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -98,7 +100,7 @@ export default function ClientDashboard() {
             {t('dash.overview')}
           </p>
         </div>
-        <Link href="/request">
+        <Link href="/request" className="hidden sm:block">
           <Button size="md">
             <Plus className="w-4 h-4" />
             {t('common.create')}
@@ -106,12 +108,18 @@ export default function ClientDashboard() {
         </Link>
       </motion.div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title={t('dash.nav.myProjects')} value={projects.length} subtitle={t('dash.recent')} icon={FolderOpen} color="purple" index={0} />
-        <StatsCard title={t('status.inProgress')} value={inProgress} subtitle={t('dash.overview')} icon={Clock} color="blue" index={1} />
-        <StatsCard title={t('status.completed')} value={completed} subtitle={t('dash.recent')} icon={CreditCard} color="green" index={2} />
-        <StatsCard title={t('dash.nav.messages')} value={unread} subtitle={t('empty.notifications.sub')} icon={MessageSquare} color="yellow" index={3} />
+      {/* Stats — scrolls horizontally on mobile, 4-col grid on desktop */}
+      <div className="tab-scroll lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible -mx-0.5 px-0.5">
+        {[
+          { title: t('dash.nav.myProjects'), value: projects.length, subtitle: t('dash.recent'),                icon: FolderOpen,   color: 'purple' as const, index: 0 },
+          { title: t('status.inProgress'),   value: inProgress,      subtitle: t('dash.overview'),              icon: Clock,        color: 'blue'   as const, index: 1 },
+          { title: t('status.completed'),    value: completed,        subtitle: t('dash.recent'),               icon: CreditCard,   color: 'green'  as const, index: 2 },
+          { title: t('dash.nav.messages'),   value: unread,           subtitle: t('empty.notifications.sub'),   icon: MessageSquare, color: 'yellow' as const, index: 3 },
+        ].map((s) => (
+          <div key={s.title} className="w-[152px] flex-shrink-0 lg:w-auto">
+            <StatsCard {...s} />
+          </div>
+        ))}
       </div>
 
       {/* Recent Projects */}
@@ -227,6 +235,16 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+      {/* FAB — mobile only, new project */}
+      <Link
+        href="/request"
+        onClick={() => haptic('medium')}
+        aria-label="New project"
+        className="sm:hidden fab fixed right-4 z-[100] bg-gradient-to-br from-primary-600 to-primary-500"
+        style={{ bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 66px)' }}
+      >
+        <Plus className="w-6 h-6 text-white" />
+      </Link>
     </div>
   );
 }
