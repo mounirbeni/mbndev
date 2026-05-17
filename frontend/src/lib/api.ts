@@ -16,9 +16,14 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 401 handling — clear session and redirect, but only ONCE per page-life
-// to avoid mid-request redirect loops if multiple in-flight calls 401.
+// 401 handling — clear session and redirect, but only ONCE per redirect to
+// avoid mid-request loops if multiple in-flight calls 401 simultaneously.
 let unauthorizedHandled = false;
+
+/** Call after a successful login to re-arm the 401 redirect guard. */
+export function resetUnauthorizedFlag() {
+  unauthorizedHandled = false;
+}
 
 api.interceptors.response.use(
   (res) => res,

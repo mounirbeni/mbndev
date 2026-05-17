@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title:       'Services',
-  description: 'Custom websites, e-commerce stores, SaaS dashboards, and web applications — built to elevate your business with prices up to 50% below market rates.',
+  title:       'Web Development Services',
+  description: 'Custom websites, e-commerce stores, SaaS dashboards, and web applications built by MBN DEV — fast, modern, and priced competitively for businesses worldwide.',
   alternates: { canonical: 'https://mbndev.com/services' },
   openGraph: {
     title:       'Services — MBN DEV',

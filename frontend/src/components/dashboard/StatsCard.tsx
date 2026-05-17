@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,7 +21,7 @@ const colorMap = {
   yellow: { icon: 'bg-yellow-500/20 text-yellow-400', border: 'hover:border-yellow-500/30' },
 };
 
-export default function StatsCard({
+const StatsCard = memo(function StatsCard({
   title,
   value,
   subtitle,
@@ -54,4 +55,6 @@ export default function StatsCard({
       </div>
     </motion.div>
   );
-}
+});
+
+export default StatsCard;

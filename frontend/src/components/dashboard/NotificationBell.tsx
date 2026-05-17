@@ -67,7 +67,7 @@ export default function NotificationBell() {
     setLoading(true);
     notificationAPI.getAll()
       .then(({ data }) => setNotifs(data.notifications || []))
-      .catch(console.error)
+      .catch((err) => { console.error(err); setNotifs([]); })
       .finally(() => setLoading(false));
   }, [open]);
 

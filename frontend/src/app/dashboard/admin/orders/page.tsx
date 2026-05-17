@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   ShoppingBag, Clock, CheckCircle2, XCircle, ArrowRight,
-  Search, Loader2, DollarSign,
+  Search, Loader2, DollarSign, AlertTriangle, RefreshCcw,
 } from 'lucide-react';
 import { orderAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,6 +20,7 @@ export default function AdminOrdersPage() {
   const { t } = useLanguage();
   const [orders,  setOrders]  = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [search,  setSearch]  = useState('');
   const [filter,  setFilter]  = useState<string>('all');
 
@@ -30,15 +31,18 @@ export default function AdminOrdersPage() {
     cancelled: { label: t('status.cancelled'),      color: 'text-red-400',   bg: 'bg-red-500/10',   icon: XCircle      },
   };
 
-  const fetchOrders = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchOrders = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     orderAPI.getAll(filter !== 'all' ? { status: filter } : {})
       .then(({ data }) => setOrders(data.orders || []))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, [filter]);
 
-  useEffect(() => { fetchOrders(); }, [filter]);
+  useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
@@ -48,8 +52,7 @@ export default function AdminOrdersPage() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [fetchOrders]);
 
   const filtered = orders.filter((o) =>
     !search ||
@@ -77,6 +80,19 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchOrders(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="text-2xl font-bold text-white">{t('admin.orders')}</h1>
         <div className="text-slate-400 text-sm">

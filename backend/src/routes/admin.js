@@ -165,6 +165,10 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
       projectsByType.map((r) => [r.type, r._count.id])
     );
 
+    // Cache for 60 s — analytics data is expensive (3 raw SQL queries).
+    // Private because it's role-gated; no-cache directive would block it.
+    res.setHeader('Cache-Control', 'private, max-age=60, stale-while-revalidate=30');
+
     res.json({
       success: true,
       analytics: {

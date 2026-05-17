@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   FolderOpen, MessageSquare, CreditCard, Clock, ArrowRight, Plus,
-  Sparkles, CheckCircle2, Package, RotateCcw, Zap,
+  Sparkles, CheckCircle2, Package, RotateCcw, Zap, AlertTriangle, RefreshCcw,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,22 +24,27 @@ export default function ClientDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const { show: showOnboarding, dismiss: dismissOnboarding } = useOnboarding();
 
-  const fetchData = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchData = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     Promise.all([projectAPI.getMine(), messageAPI.getUnread()])
       .then(([pRes, mRes]) => {
         setProjects(pRes.data.projects);
         setUnread(mRes.data.count);
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load your dashboard. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, []);
 
   // Initial load
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
+  // Refresh on SSE events
   // Real-time polling (20 s when tab is visible)
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
@@ -49,8 +54,7 @@ export default function ClientDashboard() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchData]);
 
   const inProgress = projects.filter((p) => p.status === 'in-progress').length;
   const completed = projects.filter((p) => p.status === 'completed').length;
@@ -62,6 +66,21 @@ export default function ClientDashboard() {
       {showOnboarding && (
         <OnboardingModal userName={user?.name || t('common.there')} onClose={dismissOnboarding} />
       )}
+      {/* Error state */}
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchData(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

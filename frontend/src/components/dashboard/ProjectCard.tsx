@@ -1,8 +1,9 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Calendar, MessageSquare, ArrowRight } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { Project } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,7 +15,7 @@ interface ProjectCardProps {
   index?: number;
 }
 
-export default function ProjectCard({ project, href, index = 0 }: ProjectCardProps) {
+const ProjectCard = memo(function ProjectCard({ project, href, index = 0 }: ProjectCardProps) {
   const { t } = useLanguage();
   const client = typeof project.client === 'object' ? project.client : null;
 
@@ -73,4 +74,6 @@ export default function ProjectCard({ project, href, index = 0 }: ProjectCardPro
       </Link>
     </motion.div>
   );
-}
+});
+
+export default ProjectCard;

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FolderOpen } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { FolderOpen, AlertTriangle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import { projectAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,17 +17,21 @@ export default function ClientProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const fetchProjects = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchProjects = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     projectAPI.getMine()
       .then(({ data }) => setProjects(data.projects))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, []);
 
   // Initial load
-  useEffect(() => { fetchProjects(); }, []);
+  useEffect(() => { fetchProjects(); }, [fetchProjects]);
 
   // Real-time polling (20 s when tab is visible)
   useEffect(() => {
@@ -38,13 +42,25 @@ export default function ClientProjectsPage() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchProjects]);
 
   const filtered = filter === 'all' ? projects : projects.filter((p) => p.status === filter);
 
   return (
     <div className="space-y-6 max-w-7xl">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchProjects(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">{t('dash.nav.myProjects')}</h1>

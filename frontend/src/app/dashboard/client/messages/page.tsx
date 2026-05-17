@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, ArrowLeft, Loader2, Zap } from 'lucide-react';
+import { MessageSquare, ArrowLeft, Loader2, Zap, AlertTriangle, RefreshCcw } from 'lucide-react';
 import { messageAPI } from '@/lib/api';
 import { MessageThread as ThreadType } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,12 +17,14 @@ export default function ClientMessagesPage() {
   const [threads,    setThreads]    = useState<ThreadType[]>([]);
   const [selected,   setSelected]   = useState<ThreadType | null>(null);
   const [loading,    setLoading]    = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [mobileChat, setMobileChat] = useState(false);
   const { user } = useAuth();
   const userId = user?._id || user?.id;
 
   // ── Load threads ───────────────────────────────────────────────────────────
-  useEffect(() => {
+  const fetchThreads = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     messageAPI.getThreads()
       .then(({ data }) => {
         setThreads(data.threads || []);
@@ -30,9 +32,14 @@ export default function ClientMessagesPage() {
           setSelected(data.threads[0]);
         }
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load data. Please try again.');
+      })
+      .finally(() => { if (!silent) setLoading(false); });
   }, []);
+
+  useEffect(() => { fetchThreads(); }, [fetchThreads]);
 
   // ── Real-time: update sidebar unread counts for non-active threads ─────────
   const realtimeHandlers = useMemo(() => ({
@@ -74,6 +81,20 @@ export default function ClientMessagesPage() {
 
   return (
     <div className="max-w-7xl h-[calc(100svh-8rem)] min-h-[400px] flex flex-col">
+
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 mb-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchThreads(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Header */}
       <div className={`mb-4 lg:mb-6 flex items-center gap-3 ${mobileChat ? 'lg:flex hidden' : 'flex'}`}>

@@ -12,7 +12,7 @@ import { User, Lock, Shield, MessageCircle, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, refresh } = useAuth();
   const { t } = useLanguage();
 
   /* ── Profile form ───────────────────────────────────── */
@@ -28,6 +28,7 @@ export default function SettingsPage() {
     setSavingProfile(true);
     try {
       await authAPI.updateProfile(profile);
+      await refresh();
       toast.success(t('toast.saved'));
     } catch {
       toast.error(t('toast.error'));

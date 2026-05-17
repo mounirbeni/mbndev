@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import {
   FileText, Zap, Code2, RotateCcw, Package, Trophy, CheckCircle2,
@@ -95,7 +96,7 @@ interface Props {
   className?: string;
 }
 
-export default function ProjectLifecycle({ status, compact = false, animated = true, className }: Props) {
+const ProjectLifecycle = memo(function ProjectLifecycle({ status, compact = false, animated = true, className }: Props) {
   const { t } = useLanguage();
   const STAGES = buildStages(t);
   const activeIndex = STAGES.findIndex((s) => s.key.includes(status ?? ''));
@@ -250,4 +251,6 @@ export default function ProjectLifecycle({ status, compact = false, animated = t
       )}
     </div>
   );
-}
+});
+
+export default ProjectLifecycle;

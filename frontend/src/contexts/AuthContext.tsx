@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
-import { authAPI } from '@/lib/api';
+import { authAPI, resetUnauthorizedFlag } from '@/lib/api';
 import { User } from '@/types';
 
 interface AuthContextValue {
@@ -86,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const persistSession = useCallback((token: string, user: User) => {
+    resetUnauthorizedFlag();
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem(USER_KEY, JSON.stringify(user));
     setAuthCookie(user.role);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { packageAPI } from '@/lib/api';
 import { Package } from '@/types';
@@ -11,7 +11,7 @@ import Input from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, Edit2, Check } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, AlertTriangle, RefreshCcw } from 'lucide-react';
 
 const emptyForm = {
   name: '', slug: '', price: '', description: '', features: '',
@@ -26,15 +26,20 @@ export default function AdminPackagesPage() {
   const [editing, setEditing] = useState<Package | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const fetchPackages = () => {
+  const fetchPackages = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     packageAPI.getAll()
       .then(({ data }) => setPackages(data.packages))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  };
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
+      .finally(() => { if (!silent) setLoading(false); });
+  }, []);
 
-  useEffect(() => { fetchPackages(); }, []);
+  useEffect(() => { fetchPackages(); }, [fetchPackages]);
 
   const openCreate = () => {
     setEditing(null);
@@ -97,6 +102,19 @@ export default function AdminPackagesPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchPackages(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">{t('dash.nav.packages')}</h1>

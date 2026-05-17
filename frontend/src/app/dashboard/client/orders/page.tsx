@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   ShoppingBag, Clock, CheckCircle2, XCircle,
-  ArrowRight, Plus, CreditCard, Loader2,
+  ArrowRight, Plus, CreditCard, Loader2, AlertTriangle, RefreshCcw,
 } from 'lucide-react';
 import { orderAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,6 +21,7 @@ export default function ClientOrdersPage() {
   const { t } = useLanguage();
   const [orders,  setOrders]  = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // STATUS_CONFIG built inside component so labels re-evaluate on locale change
   const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
@@ -29,16 +30,19 @@ export default function ClientOrdersPage() {
     cancelled: { label: t('status.cancelled'),      color: 'text-red-400',    bg: 'bg-red-500/10',    icon: XCircle       },
   };
 
-  const fetchOrders = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchOrders = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     orderAPI.getAll()
       .then(({ data }) => setOrders(data.orders || []))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, []);
 
   // Initial load
-  useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
   // Real-time polling (20 s when tab is visible)
   useEffect(() => {
@@ -49,8 +53,7 @@ export default function ClientOrdersPage() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchOrders]);
 
   const pending    = orders.filter((o) => o.status === 'pending').length;
   const totalSpent = orders.filter((o) => o.status === 'paid').reduce((s, o) => s + o.totalPrice, 0);
@@ -63,6 +66,19 @@ export default function ClientOrdersPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchOrders(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-white">{t('dash.nav.myOrders')}</h1>
         <Link href="/request">

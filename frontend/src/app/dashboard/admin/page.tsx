@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FolderOpen, Users, CreditCard, Clock, ArrowRight, TrendingUp } from 'lucide-react';
+import { FolderOpen, Users, CreditCard, Clock, ArrowRight, TrendingUp, AlertTriangle, RefreshCcw } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import { Project, User, Payment } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -28,16 +28,20 @@ export default function AdminDashboard() {
   const { t } = useLanguage();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const fetchAnalytics = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchAnalytics = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     adminAPI.getAnalytics()
       .then(({ data }) => setAnalytics(data.analytics))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load analytics. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, []);
 
-  useEffect(() => { fetchAnalytics(); }, []);
+  useEffect(() => { fetchAnalytics(); }, [fetchAnalytics]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
@@ -47,8 +51,7 @@ export default function AdminDashboard() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchAnalytics]);
 
   const a = analytics;
 
@@ -58,6 +61,21 @@ export default function AdminDashboard() {
         <h1 className="text-2xl font-bold text-white">{t('admin.dashboard')}</h1>
         <p className="text-slate-400 text-sm mt-1">{t('admin.dashboard.sub')}</p>
       </motion.div>
+
+      {/* Error state */}
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchAnalytics(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

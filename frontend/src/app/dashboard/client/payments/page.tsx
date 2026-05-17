@@ -1,30 +1,34 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { paymentAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Payment } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { CreditCard, FileText } from 'lucide-react';
+import { CreditCard, FileText, AlertTriangle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ClientPaymentsPage() {
   const { t } = useLanguage();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const fetchPayments = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchPayments = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     paymentAPI.getAll()
       .then(({ data }) => setPayments(data.payments))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, []);
 
   // Initial load
-  useEffect(() => { fetchPayments(); }, []);
+  useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
   // Real-time polling (20 s when tab is visible)
   useEffect(() => {
@@ -35,13 +39,25 @@ export default function ClientPaymentsPage() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchPayments]);
 
   const total = payments.filter((p) => p.status === 'paid').reduce((s, p) => s + p.amount, 0);
 
   return (
     <div className="space-y-6 max-w-4xl">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchPayments(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <h1 className="text-2xl font-bold text-white">{t('dash.nav.payments')}</h1>
 
       <div className="glass rounded-2xl p-6 border border-white/5">

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title:       'About',
-  description: 'MBN DEV is a Moroccan platform by Mounir Banni — a senior software engineer building modern, fast, and high-performing websites and web applications.',
+  title:       'About Mounir Banni & MBN DEV',
+  description: 'MBN DEV is built by Mounir Banni — a senior software engineer based in Morocco, building fast, modern, and high-performing websites and web applications for clients worldwide.',
   alternates: { canonical: 'https://mbndev.com/about' },
   openGraph: {
     title:       'About — MBN DEV',

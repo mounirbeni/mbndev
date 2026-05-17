@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { projectAPI } from '@/lib/api';
 import { Project, ProjectStatus } from '@/types';
@@ -10,7 +10,7 @@ import { formatCurrency, formatDate, getProjectTypeLabel } from '@/lib/utils';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
-import { Search } from 'lucide-react';
+import { Search, AlertTriangle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import PlanBadge from '@/components/ui/PlanBadge';
 
@@ -25,20 +25,23 @@ export default function AdminProjectsPage() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editForm, setEditForm] = useState({ status: '', progress: 0, notes: '' });
   const [saving, setSaving] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const fetchProjects = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchProjects = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     projectAPI
       .getAll({ search, status: statusFilter })
       .then(({ data }) => setProjects(data.projects))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, [search, statusFilter]);
 
   useEffect(() => {
     fetchProjects();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, statusFilter]);
+  }, [fetchProjects]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
@@ -48,8 +51,7 @@ export default function AdminProjectsPage() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, statusFilter]);
+  }, [fetchProjects]);
 
   const openEdit = (p: Project) => {
     setEditingProject(p);
@@ -73,6 +75,19 @@ export default function AdminProjectsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchProjects(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">{t('admin.allProjects')}</h1>

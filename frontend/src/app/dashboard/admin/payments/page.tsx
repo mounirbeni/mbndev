@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { paymentAPI } from '@/lib/api';
 import { Payment } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { CreditCard, CheckCircle, Clock, FileText } from 'lucide-react';
+import { CreditCard, CheckCircle, Clock, FileText, AlertTriangle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -23,17 +23,21 @@ export default function AdminPaymentsPage() {
   const { t } = useLanguage();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading]   = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [approving, setApproving] = useState<string | null>(null);
 
-  const fetchPayments = (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchPayments = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     paymentAPI.getAll()
       .then(({ data }) => setPayments(data.payments))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
       .finally(() => { if (!silent) setLoading(false); });
-  };
+  }, []);
 
-  useEffect(() => { fetchPayments(); }, []);
+  useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
@@ -43,8 +47,7 @@ export default function AdminPaymentsPage() {
     start();
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchPayments]);
 
   const handleApprove = async (id: string) => {
     setApproving(id);
@@ -65,6 +68,19 @@ export default function AdminPaymentsPage() {
 
   return (
     <div className="space-y-6 max-w-6xl">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchPayments(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">{t('admin.payments')}</h1>
         {pendingVerif.length > 0 && (

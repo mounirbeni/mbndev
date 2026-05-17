@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { adminAPI } from '@/lib/api';
 import { User } from '@/types';
@@ -9,19 +9,26 @@ import { formatDate, getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import PlanBadge from '@/components/ui/PlanBadge';
 import toast from 'react-hot-toast';
-import { Users } from 'lucide-react';
+import { Users, AlertTriangle, RefreshCcw } from 'lucide-react';
 
 export default function AdminClientsPage() {
   const { t } = useLanguage();
   const [clients, setClients] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchClients = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     adminAPI.getClients()
       .then(({ data }) => setClients(data.clients))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        console.error(err);
+        if (!silent) setFetchError('Failed to load. Please try again.');
+      })
+      .finally(() => { if (!silent) setLoading(false); });
   }, []);
+
+  useEffect(() => { fetchClients(); }, [fetchClients]);
 
   const toggleStatus = async (id: string) => {
     try {
@@ -37,6 +44,19 @@ export default function AdminClientsPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
+      {fetchError && (
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-300 flex-1">{fetchError}</span>
+          <button
+            onClick={() => fetchClients(false)}
+            className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
       <div>
         <h1 className="text-2xl font-bold text-white">{t('admin.clients')}</h1>
         <p className="text-slate-400 text-sm mt-1">{clients.length} {t('admin.clients.count')}</p>
