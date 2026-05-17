@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   TrendingUp, TrendingDown, FolderOpen, Users, CreditCard, Clock,
   CheckCircle2, AlertCircle, BarChart2, ArrowRight,
-  Activity, Package, Loader2, DollarSign, Target, Zap,
+  Activity, Package, Loader2, DollarSign, Target, Zap, RefreshCcw,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -159,16 +159,21 @@ function BarChart({
 
 export default function AdminAnalyticsPage() {
   const { t } = useLanguage();
-  const [data,    setData]    = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState('');
+  const [data,       setData]       = useState<any>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchAnalytics = useCallback((silent = false) => {
+    if (!silent) { setLoading(true); setFetchError(null); }
     adminAPI.getAnalytics()
       .then(({ data: res }) => setData(res.analytics))
-      .catch((err) => setError(err?.response?.data?.message || t('admin.analytics.loadError')))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch((err) => {
+        if (!silent) setFetchError(err?.response?.data?.message || t('admin.analytics.loadError'));
+      })
+      .finally(() => { if (!silent) setLoading(false); });
+  }, [t]);
+
+  useEffect(() => { fetchAnalytics(); }, [fetchAnalytics]);
 
   if (loading) {
     return (
@@ -181,13 +186,20 @@ export default function AdminAnalyticsPage() {
     );
   }
 
-  if (error || !data) {
+  if (fetchError || !data) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center max-w-sm">
           <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
           <p className="text-white font-medium mb-1">{t('common.error')}</p>
-          <p className="text-slate-500 text-sm">{error}</p>
+          <p className="text-slate-500 text-sm mb-4">{fetchError}</p>
+          <button
+            onClick={() => fetchAnalytics(false)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/8 border border-white/10 text-slate-300 hover:text-white text-sm font-medium transition-colors"
+          >
+            <RefreshCcw className="w-3.5 h-3.5" />
+            Retry
+          </button>
         </div>
       </div>
     );

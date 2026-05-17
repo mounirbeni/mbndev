@@ -269,7 +269,7 @@ function RequestPageContent() {
   const svcLabel = serviceTypes.find((s) => s.value === form.serviceType)?.label ?? form.serviceType;
 
   return (
-    <div className="min-h-screen bg-hero-gradient flex flex-col">
+    <div className="min-h-dvh bg-hero-gradient flex flex-col">
       {/* Header */}
       <header className="glass border-b border-white/5 px-4 sm:px-6 py-4 flex items-center gap-4 shrink-0">
         <Link href="/" className="text-slate-400 hover:text-white transition-colors">
@@ -846,7 +846,7 @@ function RequestPageContent() {
 export default function RequestPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-dark-300 flex items-center justify-center">
+      <div className="min-h-dvh bg-dark-300 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
       </div>
     }>

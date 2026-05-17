@@ -137,6 +137,7 @@ export default function ClientProjectWorkspace() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 50 * 1024 * 1024) { toast.error('File too large. Maximum size is 50MB.'); return; }
     const fd = new FormData();
     fd.append('file', file);
     setUploading(true);
@@ -265,14 +266,14 @@ export default function ClientProjectWorkspace() {
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white/5 rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-white/5 rounded-xl p-1 overflow-x-auto scrollbar-none">
         {TABS.map((tabDef) => {
           const Icon = tabDef.icon;
           return (
             <button
               key={tabDef.id}
               onClick={() => setTab(tabDef.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap min-w-0 ${
+              className={`flex-shrink-0 sm:flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap press-scale ${
                 tab === tabDef.id
                   ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
                   : 'text-slate-400 hover:text-white'
@@ -490,7 +491,7 @@ export default function ClientProjectWorkspace() {
                 <Upload className="w-8 h-8 text-slate-600 group-hover:text-primary-400 mx-auto mb-3 transition-colors" />
                 <p className="text-slate-400 text-sm">{t('client.uploadFile')}</p>
                 <p className="text-slate-600 text-xs mt-1">{t('client.uploadHint')}</p>
-                <input ref={fileInputRef} type="file" className="hidden" onChange={handleUpload} />
+                <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.doc,.docx,.zip,.rar,.png,.jpg,.jpeg,.gif,.svg,.webp,.mp4,.txt,.csv,.xlsx,.xls" onChange={handleUpload} />
               </div>
               {uploading && (
                 <div className="glass rounded-xl p-3 border border-primary-500/20 text-primary-400 text-sm text-center animate-pulse">

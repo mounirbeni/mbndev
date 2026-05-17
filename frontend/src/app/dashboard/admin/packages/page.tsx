@@ -34,7 +34,7 @@ export default function AdminPackagesPage() {
       .then(({ data }) => setPackages(data.packages))
       .catch((err) => {
         console.error(err);
-        if (!silent) setFetchError('Failed to load. Please try again.');
+        if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
   }, []);

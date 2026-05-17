@@ -139,6 +139,14 @@ exports.updateProject = async (req, res, next) => {
   try {
     const { status, progress, notes, deadline, budget } = req.body;
 
+    // Validate progress range
+    if (progress !== undefined) {
+      const p = Number(progress);
+      if (isNaN(p) || p < 0 || p > 100) {
+        return res.status(400).json({ success: false, message: 'progress must be a number between 0 and 100' });
+      }
+    }
+
     // Fetch current project for comparison
     const current = await prisma.project.findUnique({ where: { id: req.params.id } });
     if (!current) return res.status(404).json({ success: false, message: 'Project not found' });

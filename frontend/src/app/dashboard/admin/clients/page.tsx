@@ -23,7 +23,7 @@ export default function AdminClientsPage() {
       .then(({ data }) => setClients(data.clients))
       .catch((err) => {
         console.error(err);
-        if (!silent) setFetchError('Failed to load. Please try again.');
+        if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
   }, []);

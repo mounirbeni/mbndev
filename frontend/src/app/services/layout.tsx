@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
 
 export const metadata: Metadata = {
   title:       'Web Development Services',
@@ -12,6 +13,25 @@ export const metadata: Metadata = {
   },
 };
 
+const servicesSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Web Development Services by MBN DEV',
+  url: 'https://mbndev.com/services',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, item: { '@type': 'Service', name: 'Landing Page', description: 'High-converting landing pages designed to grow your business.', provider: { '@type': 'Organization', name: 'MBN DEV' } } },
+    { '@type': 'ListItem', position: 2, item: { '@type': 'Service', name: 'Business Website', description: 'Professional multi-page websites for established businesses.', provider: { '@type': 'Organization', name: 'MBN DEV' } } },
+    { '@type': 'ListItem', position: 3, item: { '@type': 'Service', name: 'E-Commerce Store', description: 'Full-featured online stores built on modern web technology.', provider: { '@type': 'Organization', name: 'MBN DEV' } } },
+    { '@type': 'ListItem', position: 4, item: { '@type': 'Service', name: 'SaaS Platform', description: 'Scalable software-as-a-service applications with user management.', provider: { '@type': 'Organization', name: 'MBN DEV' } } },
+    { '@type': 'ListItem', position: 5, item: { '@type': 'Service', name: 'Web Application', description: 'Custom web apps and dashboards tailored to your workflow.', provider: { '@type': 'Organization', name: 'MBN DEV' } } },
+  ],
+};
+
 export default function ServicesLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <JsonLd data={servicesSchema} />
+      {children}
+    </>
+  );
 }

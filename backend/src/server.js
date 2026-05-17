@@ -5,8 +5,26 @@ const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const path         = require('path');
 const prisma       = require('./lib/prisma');
+const pinoHttp     = require('pino-http');
 
 const app = express();
+
+// ─── Request logging (errors only: 4xx / 5xx) ────────────────────────────────
+app.use(pinoHttp({
+  autoLogging: {
+    ignore: (req) => false, // let customSuccessMessage suppress 2xx/3xx below
+  },
+  customSuccessMessage: () => false,          // suppress successful responses
+  customErrorMessage:   (req, res) =>
+    `${req.method} ${req.url} → ${res.statusCode}`,
+  // Only write a log line when the status is 400+
+  customAttributeKeys: { responseTime: 'ms' },
+  customLogLevel: (req, res, err) => {
+    if (res.statusCode >= 500 || err) return 'error';
+    if (res.statusCode >= 400)        return 'warn';
+    return 'silent'; // suppress 1xx / 2xx / 3xx entirely
+  },
+}));
 
 // Trust proxy (Vercel / nginx) — required for express-rate-limit and X-Forwarded-For
 app.set('trust proxy', 1);

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
 
 export const metadata: Metadata = {
   title:       'About Mounir Banni & MBN DEV',
@@ -12,6 +13,23 @@ export const metadata: Metadata = {
   },
 };
 
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Mounir Banni',
+  url: 'https://mbndev.com/about',
+  jobTitle: 'Senior Software Engineer & Founder',
+  worksFor: { '@type': 'Organization', name: 'MBN DEV', url: 'https://mbndev.com' },
+  description: 'Full-stack web developer specializing in React, Next.js, and Node.js. Building fast, modern web products for businesses worldwide.',
+  address: { '@type': 'PostalAddress', addressCountry: 'MA', addressRegion: 'Morocco' },
+  sameAs: ['https://github.com/mbndev'],
+};
+
 export default function AboutLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <JsonLd data={personSchema} />
+      {children}
+    </>
+  );
 }

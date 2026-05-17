@@ -123,6 +123,12 @@ export default function AdminProjectWorkspace() {
   }, [tab, messages]);
 
   const saveEdits = async () => {
+    if (editForm.progress < 0 || editForm.progress > 100) {
+      toast.error('Progress must be between 0 and 100.'); return;
+    }
+    if (editForm.budget < 0) {
+      toast.error('Budget cannot be negative.'); return;
+    }
     setSaving(true);
     try {
       await projectAPI.update(id, editForm);
@@ -163,6 +169,7 @@ export default function AdminProjectWorkspace() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 50 * 1024 * 1024) { toast.error('File too large. Maximum size is 50MB.'); return; }
     const fd = new FormData();
     fd.append('file', file);
     setUploading(true);
@@ -311,13 +318,13 @@ export default function AdminProjectWorkspace() {
         )}
       </motion.div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-white/5 rounded-xl p-1">
+      {/* Tabs — horizontal scroll on mobile */}
+      <div className="flex gap-1 bg-white/5 rounded-xl p-1 overflow-x-auto scrollbar-none">
         {TABS.map((tabItem) => {
           const Icon = tabItem.icon;
           return (
             <button key={tabItem.id} onClick={() => setTab(tabItem.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex-shrink-0 sm:flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all press-scale ${
                 tab === tabItem.id ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' : 'text-slate-400 hover:text-white'
               }`}>
               <Icon className="w-4 h-4" /><span className="hidden sm:inline">{tabItem.label}</span>
@@ -400,7 +407,7 @@ export default function AdminProjectWorkspace() {
 
           {/* MESSAGES */}
           {tab === 'messages' && (
-            <div className="glass rounded-2xl border border-white/5 flex flex-col" style={{ height: '60vh' }}>
+            <div className="glass rounded-2xl border border-white/5 flex flex-col h-[60vh] min-h-[320px]">
               <div className="flex-1 overflow-y-auto p-5 space-y-4">
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
@@ -460,7 +467,7 @@ export default function AdminProjectWorkspace() {
                 className="glass rounded-2xl border-2 border-dashed border-white/10 hover:border-primary-500/40 p-10 text-center cursor-pointer transition-colors group">
                 <Upload className="w-8 h-8 text-slate-600 group-hover:text-primary-400 mx-auto mb-3 transition-colors" />
                 <p className="text-slate-400 text-sm">{t('admin.uploadFile')}</p>
-                <input ref={fileInputRef} type="file" className="hidden" onChange={handleUpload} />
+                <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.doc,.docx,.zip,.rar,.png,.jpg,.jpeg,.gif,.svg,.webp,.mp4,.txt,.csv,.xlsx,.xls" onChange={handleUpload} />
               </div>
               {uploading && <div className="glass rounded-xl p-3 border border-primary-500/20 text-primary-400 text-sm text-center animate-pulse">Uploading...</div>}
               {!project.files || project.files.length === 0 ? (

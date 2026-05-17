@@ -36,7 +36,7 @@ export default function ClientOrdersPage() {
       .then(({ data }) => setOrders(data.orders || []))
       .catch((err) => {
         console.error(err);
-        if (!silent) setFetchError('Failed to load. Please try again.');
+        if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
   }, []);
