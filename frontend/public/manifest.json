@@ -12,13 +12,13 @@
   "categories": ["business", "productivity"],
   "icons": [
     {
-      "src": "/images/logo.png",
+      "src": "/images/logo.jpeg",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/logo.png",
+      "src": "/images/logo.jpeg",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -30,14 +30,14 @@
       "short_name": "Projects",
       "description": "View all your projects",
       "url": "/dashboard/client/projects",
-      "icons": [{ "src": "/images/logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/images/logo.jpeg", "sizes": "192x192" }]
     },
     {
       "name": "Messages",
       "short_name": "Messages",
       "description": "Chat with your developer",
       "url": "/dashboard/client/messages",
-      "icons": [{ "src": "/images/logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/images/logo.jpeg", "sizes": "192x192" }]
     }
   ]
 }

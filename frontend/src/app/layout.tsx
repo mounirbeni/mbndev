@@ -77,9 +77,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" dir="ltr" className="dark">
       <head>
-        <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.png" />
-        <link rel="icon" type="image/png" sizes="32x32"  href="/favicon.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/images/logo.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.jpeg" />
+        <link rel="icon" type="image/jpeg" sizes="32x32"  href="/images/logo.jpeg" />
+        <link rel="icon" type="image/jpeg" sizes="192x192" href="/images/logo.jpeg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://api.mbndev.com" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
