@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import Logo3D from '@/components/ui/Logo3D';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function LegalPageNav() {
@@ -9,9 +10,7 @@ export function LegalPageNav() {
   return (
     <nav className="border-b border-white/5 px-4 sm:px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
       <Link href="/" className="flex items-center gap-2.5">
-        <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-          <Zap className="w-4 h-4 text-white" />
-        </div>
+        <Logo3D size="sm" />
         <span className="text-white font-bold">MBN DEV</span>
       </Link>
       <Link

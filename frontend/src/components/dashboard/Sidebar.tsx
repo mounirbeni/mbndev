@@ -7,9 +7,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
-  Settings, LogOut, Zap, Users, Package, X, BarChart2,
+  Settings, LogOut, Users, Package, X, BarChart2,
   ChevronRight, ShoppingBag,
 } from 'lucide-react';
+import Logo3D from '@/components/ui/Logo3D';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn, getInitials } from '@/lib/utils';
@@ -85,10 +86,7 @@ export default function Sidebar({ mobile, onClose }: SidebarProps) {
         }}
       >
         <Link href="/" onClick={onClose} className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 bg-primary-500 rounded-xl flex items-center justify-center shrink-0"
-               style={{ boxShadow: '0 0 16px rgba(124,58,237,0.4)' }}>
-            <Zap className="w-4 h-4 text-white" />
-          </div>
+          <Logo3D size="sm" />
           <span className="text-white font-bold text-[15px]">MBN DEV</span>
         </Link>
 

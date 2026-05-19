@@ -5,10 +5,11 @@ import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
-  Zap, CheckCircle2, Clock, AlertCircle, ExternalLink,
+  CheckCircle2, Clock, AlertCircle, ExternalLink,
   Calendar, Target, Users,
 } from 'lucide-react';
 import { projectAPI } from '@/lib/api';
+import Logo3D from '@/components/ui/Logo3D';
 import ProjectLifecycle, { ProjectStatus } from '@/components/dashboard/ProjectLifecycle';
 import { formatDate, getProjectTypeLabel } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -58,9 +59,7 @@ export default function SharePage() {
       <nav className="border-b border-white/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
+            <Logo3D size="sm" />
             <span className="text-white font-bold text-sm">MBN DEV</span>
           </Link>
           <span className="text-xs text-slate-500 border border-white/10 px-3 py-1 rounded-full">

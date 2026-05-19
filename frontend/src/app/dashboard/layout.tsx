@@ -8,7 +8,7 @@ import Sidebar, { MobileSidebar } from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/mobile/BottomNav';
 import NotificationBell from '@/components/dashboard/NotificationBell';
 import FloatingSupport from '@/components/ui/FloatingSupport';
-import { Zap } from 'lucide-react';
+import Logo3D from '@/components/ui/Logo3D';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
 import { getInitials } from '@/lib/utils';
 import Link from 'next/link';
@@ -163,12 +163,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2"
           >
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: '#7c3aed' }}
-            >
-              <Zap className="w-3.5 h-3.5 text-white" />
-            </div>
+            <Logo3D size="sm" />
             <span className="text-white font-bold text-sm tracking-wide select-none">
               MBN DEV
             </span>

@@ -6,7 +6,8 @@ import { paymentAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Printer, ArrowLeft, CheckCircle2, Clock, AlertCircle, Zap } from 'lucide-react';
+import { Printer, ArrowLeft, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import Logo3D from '@/components/ui/Logo3D';
 
 function InvoiceStatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   if (status === 'paid') {
@@ -153,9 +154,7 @@ export default function InvoicePage() {
               {/* Brand */}
               <div>
                 <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center print:bg-violet-600">
-                    <Zap className="w-5 h-5 text-white" />
-                  </div>
+                  <Logo3D size="md" />
                   <span className="text-xl font-black text-gray-900 tracking-tight">MBN DEV</span>
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed">

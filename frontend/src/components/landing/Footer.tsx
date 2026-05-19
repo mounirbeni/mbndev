@@ -5,6 +5,7 @@ import {
   ShieldCheck, MessageCircle, ArrowUpRight,
 } from 'lucide-react';
 import Link from 'next/link';
+import Logo3D from '@/components/ui/Logo3D';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const SOCIALS = [
@@ -118,9 +119,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
+              <Logo3D size="md" />
               <span className="text-white font-bold text-lg">MBN DEV</span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed mb-5">

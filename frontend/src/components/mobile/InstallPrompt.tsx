@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Zap, Star } from 'lucide-react';
+import { X, Download, Star } from 'lucide-react';
+import Logo3D from '@/components/ui/Logo3D';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
 
@@ -79,15 +80,7 @@ export default function InstallPrompt() {
           >
             <div className="flex items-start gap-3">
               {/* App icon */}
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                style={{
-                  background: 'linear-gradient(135deg,#7c3aed,#2563eb)',
-                  boxShadow:  '0 4px 16px rgba(124,58,237,0.4)',
-                }}
-              >
-                <Zap className="w-6 h-6 text-white" />
-              </div>
+              <Logo3D size="lg" />
 
               <div className="flex-1 min-w-0">
                 <div className="text-white text-[15px] font-bold leading-tight">{t('install.title')}</div>

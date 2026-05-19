@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Zap, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
+import Logo3D from '@/components/ui/Logo3D';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -21,9 +22,7 @@ export default function NotFound() {
       >
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-2.5 mb-12">
-          <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
+          <Logo3D size="md" />
           <span className="text-white font-bold text-xl">MBN DEV</span>
         </Link>
 

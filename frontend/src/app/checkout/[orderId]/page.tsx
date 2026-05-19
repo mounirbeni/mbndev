@@ -14,6 +14,7 @@ import { orderAPI, paymentAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getProjectTypeLabel } from '@/lib/utils';
+import Logo3D from '@/components/ui/Logo3D';
 import Button from '@/components/ui/Button';
 
 // ── Payment method config ────────────────────────────────────────────────────
@@ -153,9 +154,7 @@ export default function CheckoutPage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
+          <Logo3D size="sm" />
           <span className="text-white font-semibold">{t('checkout.title')}</span>
         </div>
         <div className="ml-auto flex items-center gap-1.5 text-xs text-slate-500">
