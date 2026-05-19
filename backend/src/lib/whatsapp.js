@@ -1,35 +1,37 @@
-// ─── WhatsApp via UltraMsg ────────────────────────────────────────────────────
-// Uses UltraMsg API to send WhatsApp messages to the admin number.
+// ─── Telegram Bot Notifications ───────────────────────────────────────────────
+// Uses the official Telegram Bot API — free, never blocks accounts.
 // Never throws — all call-sites use fire-and-forget .catch(() => {}).
 
-const https = require('https');
-const querystring = require('querystring');
+const https   = require('https');
 
-const INSTANCE = process.env.ULTRAMSG_INSTANCE;  // e.g. "instance176472"
-const TOKEN    = process.env.ULTRAMSG_TOKEN;      // e.g. "0qj2cnstmc0mwaqd"
-const ADMIN_WA = process.env.ADMIN_WHATSAPP;      // e.g. "+212601439975"
-const APP_URL  = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const CHAT_ID   = process.env.TELEGRAM_CHAT_ID;
+const APP_URL   = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-const configured = !!(INSTANCE && TOKEN && ADMIN_WA);
+const configured = !!(BOT_TOKEN && CHAT_ID);
 
 // ─── Core send ───────────────────────────────────────────────────────────────
 
-function sendWhatsApp(to, message) {
+function sendTelegram(message) {
   if (!configured) {
-    console.log(`[whatsapp:dev] → ${to}\n${message}\n`);
+    console.log(`[telegram:dev]\n${message}\n`);
     return Promise.resolve({ sent: false, reason: 'not_configured' });
   }
 
-  const body = querystring.stringify({ token: TOKEN, to, body: message });
+  const body = JSON.stringify({
+    chat_id:    CHAT_ID,
+    text:       message,
+    parse_mode: 'Markdown',
+  });
 
   return new Promise((resolve) => {
     const req = https.request(
       {
-        hostname: 'api.ultramsg.com',
-        path:     `/${INSTANCE}/messages/chat`,
+        hostname: 'api.telegram.org',
+        path:     `/bot${BOT_TOKEN}/sendMessage`,
         method:   'POST',
         headers:  {
-          'Content-Type':   'application/x-www-form-urlencoded',
+          'Content-Type':   'application/json',
           'Content-Length': Buffer.byteLength(body),
         },
       },
@@ -40,14 +42,14 @@ function sendWhatsApp(to, message) {
           if (res.statusCode === 200) {
             resolve({ sent: true });
           } else {
-            console.error('[whatsapp] UltraMsg error:', res.statusCode, data.slice(0, 120));
+            console.error('[telegram] error:', res.statusCode, data.slice(0, 120));
             resolve({ sent: false, reason: `HTTP ${res.statusCode}` });
           }
         });
       }
     );
     req.on('error', (err) => {
-      console.error('[whatsapp] request error:', err.message);
+      console.error('[telegram] request error:', err.message);
       resolve({ sent: false, reason: err.message });
     });
     req.write(body);
@@ -55,15 +57,12 @@ function sendWhatsApp(to, message) {
   });
 }
 
-const admin = (msg) => sendWhatsApp(ADMIN_WA, msg);
-
 // ─── Message templates ────────────────────────────────────────────────────────
 
 const wa = {
 
-  // ── New client registered ───────────────────────────────────────────────
   welcome: ({ user }) =>
-    admin([
+    sendTelegram([
       `👋 *New Client Registered — MBN DEV*`,
       ``,
       `👤 Name: ${user.name}`,
@@ -73,9 +72,8 @@ const wa = {
       `👉 ${APP_URL}/dashboard/admin/clients`,
     ].join('\n')),
 
-  // ── New order received ──────────────────────────────────────────────────
   newOrder: ({ client, order }) =>
-    admin([
+    sendTelegram([
       `🛒 *New Order — MBN DEV*`,
       ``,
       `👤 Client: ${client.name}`,
@@ -88,9 +86,8 @@ const wa = {
       `👉 ${APP_URL}/dashboard/admin/orders`,
     ].join('\n')),
 
-  // ── Payment submitted (needs verification) ──────────────────────────────
   paymentSubmitted: ({ client, order, method }) =>
-    admin([
+    sendTelegram([
       `💳 *Payment Submitted — Action Required*`,
       ``,
       `👤 Client: ${client.name}`,
@@ -103,9 +100,8 @@ const wa = {
       `👉 ${APP_URL}/dashboard/admin/payments`,
     ].join('\n')),
 
-  // ── Payment verified ────────────────────────────────────────────────────
   paymentVerified: ({ client, order }) =>
-    admin([
+    sendTelegram([
       `✅ *Payment Verified — MBN DEV*`,
       ``,
       `👤 Client: ${client.name}`,
@@ -115,7 +111,6 @@ const wa = {
       `Project is now active. Client notified by email.`,
     ].join('\n')),
 
-  // ── Project status update ───────────────────────────────────────────────
   projectStatusUpdate: ({ client, project, toStatus }) => {
     const labels = {
       pending:       '⏳ Queued',
@@ -126,7 +121,7 @@ const wa = {
       completed:     '✅ Completed',
       cancelled:     '❌ Cancelled',
     };
-    return admin([
+    return sendTelegram([
       `📊 *Project Updated — MBN DEV*`,
       ``,
       `👤 Client: ${client.name}`,
@@ -137,9 +132,8 @@ const wa = {
     ].join('\n'));
   },
 
-  // ── New message from client ─────────────────────────────────────────────
   newClientMessage: ({ client, project, preview }) =>
-    admin([
+    sendTelegram([
       `💬 *New Message — MBN DEV*`,
       ``,
       `👤 From: ${client.name}`,
@@ -151,4 +145,4 @@ const wa = {
 
 };
 
-module.exports = { sendWhatsApp, wa };
+module.exports = { sendTelegram, wa };
