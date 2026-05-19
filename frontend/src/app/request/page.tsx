@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import Image from 'next/image';
+import Logo3D from '@/components/ui/Logo3D';
 import {
   ArrowLeft, ArrowRight, Check, Zap, Target, ShoppingCart,
   BarChart3, Palette, Settings, Lightbulb, Smartphone,
@@ -277,17 +277,7 @@ function RequestPageContent() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex items-center gap-2">
-          <Image
-            src="/images/logo.png"
-            alt="MBN DEV"
-            width={36}
-            height={36}
-            className="w-9 h-9 object-contain shrink-0"
-            style={{
-              mixBlendMode: 'screen',
-              filter: 'brightness(1.5) contrast(1.1) drop-shadow(0 0 8px rgba(124,58,237,0.6))',
-            }}
-          />
+          <Logo3D size="md" />
           <span className="text-white font-semibold text-sm sm:text-base">{t('request.header')}</span>
           {selectedPlan && <PlanBadge plan={selectedPlan} size="sm" />}
         </div>

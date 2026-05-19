@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import Logo3D from '@/components/ui/Logo3D';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { authAPI } from '@/lib/api';
@@ -56,17 +56,7 @@ export default function ResetPasswordPage() {
       >
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <Image
-              src="/images/logo.png"
-              alt="MBN DEV"
-              width={56}
-              height={56}
-              className="w-14 h-14 object-contain"
-              style={{
-                mixBlendMode: 'screen',
-                filter: 'brightness(1.6) contrast(1.1) drop-shadow(0 0 16px rgba(124,58,237,0.75))',
-              }}
-            />
+            <Logo3D size="lg" />
             <span className="text-white font-bold text-xl">MBN DEV</span>
           </Link>
         </div>

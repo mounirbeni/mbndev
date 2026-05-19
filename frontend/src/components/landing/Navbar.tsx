@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import Logo3D from '@/components/ui/Logo3D';
 import {
   Menu, X, Zap, Home, Briefcase, FolderOpen, DollarSign,
   Info, Mail, LayoutDashboard, ChevronRight, LogIn,
@@ -83,19 +83,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="group-active:scale-95 transition-transform shrink-0">
-                <Image
-                  src="/images/logo.png"
-                  alt="MBN DEV"
-                  width={42}
-                  height={42}
-                  className="w-[42px] h-[42px] object-contain"
-                  style={{
-                    mixBlendMode: 'screen',
-                    filter: 'brightness(1.5) contrast(1.1) drop-shadow(0 0 10px rgba(124,58,237,0.65))',
-                  }}
-                />
-              </div>
+              <Logo3D size="md" className="group-active:scale-95 transition-transform" />
               <div>
                 <div className="text-white font-bold text-[15px] leading-none">MBN DEV</div>
                 <div className="text-slate-500 text-[10px] leading-none mt-0.5">by Mounir Banni</div>
