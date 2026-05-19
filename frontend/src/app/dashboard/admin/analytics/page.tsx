@@ -22,26 +22,31 @@ function Stat({
   title: string; value: string | number; sub: string;
   icon: any; color: string; index: number;
 }) {
-  const colors: Record<string, string> = {
-    green:  'bg-green-500/15 text-green-400',
-    blue:   'bg-blue-500/15 text-blue-400',
-    purple: 'bg-primary-500/15 text-primary-400',
-    yellow: 'bg-amber-500/15 text-amber-400',
-    red:    'bg-red-500/15 text-red-400',
+  const colorMap: Record<string, { icon: string; glow: string; accent: string }> = {
+    green:  { icon: 'bg-emerald-500/15 text-emerald-400', glow: '0 0 12px rgba(16,185,129,0.18)', accent: 'from-emerald-600 via-emerald-500 to-teal-500' },
+    blue:   { icon: 'bg-blue-500/15 text-blue-400',       glow: '0 0 12px rgba(59,130,246,0.18)',  accent: 'from-blue-600 via-blue-500 to-cyan-500'       },
+    purple: { icon: 'bg-primary-500/15 text-primary-400', glow: '0 0 12px rgba(124,58,237,0.18)', accent: 'from-primary-600 via-primary-500 to-violet-500' },
+    yellow: { icon: 'bg-amber-500/15 text-amber-400',     glow: '0 0 12px rgba(245,158,11,0.18)', accent: 'from-amber-600 via-amber-500 to-yellow-500'    },
+    red:    { icon: 'bg-red-500/15 text-red-400',         glow: '0 0 12px rgba(239,68,68,0.18)',  accent: 'from-red-600 via-red-500 to-rose-500'          },
   };
+  const c = colorMap[color] || colorMap.purple;
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className="glass rounded-2xl p-5 border border-white/5"
+      className="relative glass rounded-2xl border border-white/5 overflow-hidden"
     >
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${colors[color] || colors.purple}`}>
-        <Icon className="w-4 h-4" />
+      <div className={`h-[3px] bg-gradient-to-r ${c.accent}`} />
+      <div className="p-5">
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${c.icon}`}
+             style={{ boxShadow: c.glow }}>
+          <Icon className="w-4 h-4" strokeWidth={1.8} />
+        </div>
+        <div className="text-2xl font-black text-white tabular-nums">{value}</div>
+        <div className="text-white text-sm font-medium mt-0.5">{title}</div>
+        <div className="text-slate-500 text-xs mt-0.5">{sub}</div>
       </div>
-      <div className="text-2xl font-bold text-white">{value}</div>
-      <div className="text-white text-sm font-medium mt-0.5">{title}</div>
-      <div className="text-slate-500 text-xs mt-0.5">{sub}</div>
     </motion.div>
   );
 }
@@ -267,15 +272,18 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t('admin.analytics')}</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{t('admin.analytics')}</h1>
           <p className="text-slate-400 text-sm mt-1">
             {t('admin.analytics.sub')} — {year}
           </p>
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold shrink-0">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+          </span>
           {t('admin.live')}
         </div>
       </motion.div>

@@ -63,11 +63,20 @@ export default function ClientProjectsPage() {
       )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t('dash.nav.myProjects')}</h1>
-          <p className="text-slate-400 text-sm mt-1">{projects.length} {t('dash.nav.projects').toLowerCase()}</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            {t('dash.nav.myProjects')}
+          </h1>
+          <p className="text-slate-400 text-sm mt-1">
+            {loading ? 'Loading...' : `${projects.length} project${projects.length !== 1 ? 's' : ''} total`}
+          </p>
         </div>
         <Link href="/request">
-          <Button size="md">+ {t('common.create')}</Button>
+          <Button size="md">
+            <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+            </svg>
+            {t('common.create')}
+          </Button>
         </Link>
       </div>
 
@@ -96,13 +105,38 @@ export default function ClientProjectsPage() {
       {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-36 rounded-2xl" />
+            <div key={i} className="glass rounded-2xl border border-white/5 overflow-hidden">
+              <div className="h-[3px] skeleton-shimmer" />
+              <div className="p-5 space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                  <Skeleton className="h-5 w-16 rounded-full shrink-0" />
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-2.5 w-16" />
+                    <Skeleton className="h-2.5 w-8" />
+                  </div>
+                  <Skeleton className="h-1.5 w-full rounded-full" />
+                </div>
+                <div className="flex justify-between">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-3 w-8" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass rounded-2xl p-12 text-center border border-white/5">
-          <FolderOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">{t('empty.projects')}</p>
+          <div className="w-16 h-16 rounded-2xl bg-white/4 border border-white/6 flex items-center justify-center mx-auto mb-4">
+            <FolderOpen className="w-7 h-7 text-slate-600" />
+          </div>
+          <p className="text-slate-300 text-sm font-medium mb-1">{t('empty.projects')}</p>
+          <p className="text-slate-600 text-xs">{t('empty.projects.sub')}</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

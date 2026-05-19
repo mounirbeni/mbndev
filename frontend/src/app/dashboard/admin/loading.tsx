@@ -4,7 +4,7 @@ export default function AdminLoading() {
       {/* Stats skeleton */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="glass rounded-2xl p-4 sm:p-5 border border-white/6 animate-pulse">
+          <div key={i} className="glass rounded-2xl p-4 sm:p-5 border border-white/6 skeleton-shimmer">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 space-y-2">
                 <div className="h-3 bg-white/8 rounded w-2/3" />

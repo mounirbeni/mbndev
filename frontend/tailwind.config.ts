@@ -44,6 +44,7 @@ const config: Config = {
       },
       animation: {
         'float':          'float 6s ease-in-out infinite',
+        'float-fast':     'float 3s ease-in-out infinite',
         'pulse-slow':     'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'glow':           'glow 2s ease-in-out infinite alternate',
         'slide-up':       'slideUp 0.5s ease-out',
@@ -53,7 +54,11 @@ const config: Config = {
         'fade-in-fast':   'fadeIn 0.2s ease-out',
         'scale-in':       'scaleIn 0.2s ease-out',
         'tab-in':         'tabIn 0.25s cubic-bezier(0.32,0.72,0,1)',
-        'skeleton':       'skeleton 1.6s ease infinite',
+        'skeleton':       'skeleton 1.4s ease infinite',
+        'shimmer':        'shimmer 1.8s linear infinite',
+        'count-up':       'countUp 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
+        'border-flow':    'borderFlow 3s linear infinite',
+        'gradient':       'gradient 4s linear infinite',
       },
       keyframes: {
         float: {
@@ -88,10 +93,26 @@ const config: Config = {
           '0%':   { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
+        shimmer: {
+          '0%':   { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
+        },
+        countUp: {
+          from: { opacity: '0', transform: 'translateY(12px)' },
+          to:   { opacity: '1', transform: 'translateY(0)' },
+        },
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%':      { backgroundPosition: '100% 50%' },
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
+      },
+      backgroundSize: {
+        '200%': '200% 200%',
+        '300%': '300% 300%',
       },
       backdropBlur: {
         xs:  '2px',
@@ -108,11 +129,12 @@ const config: Config = {
         28: '0.28',
       },
       spacing: {
-        '13': '3.25rem',
-        '15': '3.75rem',
-        '18': '4.5rem',
-        '22': '5.5rem',
-        '26': '6.5rem',
+        '4.5': '1.125rem',
+        '13':  '3.25rem',
+        '15':  '3.75rem',
+        '18':  '4.5rem',
+        '22':  '5.5rem',
+        '26':  '6.5rem',
       },
       minHeight: {
         'touch': '44px',

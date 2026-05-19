@@ -128,7 +128,7 @@ export default function AdminPackagesPage() {
       <div className="grid md:grid-cols-3 gap-4">
         {loading
           ? Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="glass rounded-2xl h-64 animate-pulse" />
+              <div key={i} className="glass rounded-2xl h-64 skeleton-shimmer" />
             ))
           : packages.map((pkg, i) => (
               <motion.div

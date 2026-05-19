@@ -102,9 +102,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             borderBottom: '1px solid rgba(255,255,255,0.07)',
           }}
         >
-          <div className="w-10 h-10 rounded-xl bg-white/5 animate-pulse" />
-          <div className="w-20 h-4 rounded-lg bg-white/5 animate-pulse" />
-          <div className="w-10 h-10 rounded-xl bg-white/5 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-white/5 skeleton-shimmer" />
+          <div className="w-20 h-4 rounded-lg bg-white/5 skeleton-shimmer" />
+          <div className="w-10 h-10 rounded-xl bg-white/5 skeleton-shimmer" />
         </div>
         <div className="flex-1 p-4 lg:p-6">
           <SkeletonDashboard />
@@ -184,25 +184,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* ── Desktop top bar ──────────────────────────────────────── */}
         <header
-          className="hidden lg:flex shrink-0 items-center justify-between px-6 py-3"
+          className="hidden lg:flex shrink-0 items-center justify-between px-6 py-3.5"
           style={{
-            background:   'rgba(10, 10, 13, 0.97)',
-            borderBottom: '1px solid rgba(255,255,255,0.07)',
+            background:   'rgba(8, 8, 11, 0.98)',
+            borderBottom: '1px solid rgba(255,255,255,0.065)',
           }}
         >
-          <div />
+          {/* Left: breadcrumb placeholder (pages can portal content here later) */}
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-500" />
+            <span className="text-slate-500 text-xs font-medium">Dashboard</span>
+          </div>
+
+          {/* Right: controls */}
           <div className="flex items-center gap-3">
             <NotificationBell />
-            <div className="text-right">
-              <div className="text-white text-sm font-medium">{user.name}</div>
-              <div className="text-slate-500 text-xs capitalize">{user.role}</div>
-            </div>
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center
-                         text-white font-bold text-xs shrink-0"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
-            >
-              {getInitials(user.name)}
+
+            {/* Divider */}
+            <div className="w-px h-6 bg-white/8" />
+
+            {/* Avatar + name */}
+            <div className="flex items-center gap-2.5">
+              <div className="text-right">
+                <div className="text-white text-sm font-semibold leading-tight">{user.name}</div>
+                <div className="text-slate-500 text-[11px] capitalize mt-0.5">{user.role}</div>
+              </div>
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center
+                           text-white font-bold text-xs shrink-0 cursor-default
+                           ring-2 ring-primary-500/20"
+                style={{ background: 'linear-gradient(135deg,#6d28d9,#3b82f6)' }}
+              >
+                {getInitials(user.name)}
+              </div>
             </div>
           </div>
         </header>

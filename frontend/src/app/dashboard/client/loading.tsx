@@ -9,7 +9,7 @@ export default function ClientLoading() {
       {/* Stats skeleton */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="glass rounded-2xl p-4 sm:p-5 border border-white/6 animate-pulse">
+          <div key={i} className="glass rounded-2xl p-4 sm:p-5 border border-white/6 skeleton-shimmer">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 space-y-2">
                 <div className="h-3 bg-white/8 rounded w-2/3" />
@@ -23,7 +23,7 @@ export default function ClientLoading() {
       {/* Cards skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="glass rounded-2xl p-5 border border-white/6 space-y-3 animate-pulse">
+          <div key={i} className="glass rounded-2xl p-5 border border-white/6 space-y-3 skeleton-shimmer">
             <div className="flex justify-between items-start">
               <div className="space-y-1.5 flex-1">
                 <div className="h-4 bg-white/8 rounded w-3/4" />

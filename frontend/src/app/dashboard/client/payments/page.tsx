@@ -58,35 +58,66 @@ export default function ClientPaymentsPage() {
           </button>
         </div>
       )}
-      <h1 className="text-2xl font-bold text-white">{t('dash.nav.payments')}</h1>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            {t('dash.nav.payments')}
+          </h1>
+          <p className="text-slate-400 text-sm mt-1">
+            {loading ? 'Loading...' : `${payments.length} transaction${payments.length !== 1 ? 's' : ''}`}
+          </p>
+        </div>
+      </div>
 
-      <div className="glass rounded-2xl p-6 border border-white/5">
-        <p className="text-slate-400 text-sm">{t('invoice.total')}</p>
-        <p className="text-4xl font-bold text-white mt-1">{formatCurrency(total)}</p>
+      {/* Total revenue card */}
+      <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
+        <div className="h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500" />
+        <div className="p-5 flex items-center justify-between">
+          <div>
+            <p className="text-slate-400 text-sm mb-1">{t('invoice.total')} paid</p>
+            <p className="text-3xl font-black text-white tabular-nums">
+              {formatCurrency(total)}
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 flex items-center justify-center">
+            <CreditCard className="w-6 h-6 text-emerald-400" strokeWidth={1.8} />
+          </div>
+        </div>
       </div>
 
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         {loading ? (
-          <div className="p-6 space-y-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
+          <div className="divide-y divide-white/5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 p-4">
+                <div className="w-9 h-9 rounded-xl skeleton-shimmer shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3.5 w-1/3 rounded skeleton-shimmer" />
+                  <div className="h-2.5 w-1/5 rounded skeleton-shimmer" />
+                </div>
+                <div className="h-5 w-16 rounded-full skeleton-shimmer" />
+                <div className="h-4 w-20 rounded skeleton-shimmer" />
+              </div>
             ))}
           </div>
         ) : payments.length === 0 ? (
-          <div className="p-12 text-center">
-            <CreditCard className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">{t('client.noPayments')}</p>
+          <div className="p-14 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/6 flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="w-6 h-6 text-slate-600" strokeWidth={1.5} />
+            </div>
+            <p className="text-slate-300 text-sm font-medium mb-1">{t('client.noPayments')}</p>
+            <p className="text-slate-600 text-xs">Your payment history will appear here</p>
           </div>
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.project')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.milestone')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.amount')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.date')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('invoice.title')}</th>
+              <tr className="border-b border-white/6">
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.project')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('admin.col.milestone')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.amount')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('admin.status')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('admin.col.date')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('invoice.title')}</th>
               </tr>
             </thead>
             <tbody>
@@ -101,12 +132,12 @@ export default function ClientPaymentsPage() {
                     className="border-b border-white/5 hover:bg-white/2 transition-colors"
                   >
                     <td className="p-4 text-sm text-white">{project?.title || '—'}</td>
-                    <td className="p-4 text-sm text-slate-400">{pay.milestoneTitle || '—'}</td>
+                    <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">{pay.milestoneTitle || '—'}</td>
                     <td className="p-4 text-sm font-semibold text-white">{formatCurrency(pay.amount)}</td>
-                    <td className="p-4">
+                    <td className="p-4 hidden md:table-cell">
                       <StatusBadge status={pay.status} />
                     </td>
-                    <td className="p-4 text-sm text-slate-400">
+                    <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
                       {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
                     </td>
                     <td className="p-4">

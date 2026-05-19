@@ -90,26 +90,28 @@ export default function AdminProjectsPage() {
       )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t('admin.allProjects')}</h1>
-          <p className="text-slate-400 text-sm mt-1">{projects.length} {t('admin.projectsTotal')}</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{t('admin.allProjects')}</h1>
+          <p className="text-slate-400 text-sm mt-1">
+            {loading ? 'Loading...' : `${projects.length} ${t('admin.projectsTotal')}`}
+          </p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+        <div className="relative flex-1 min-w-[200px] max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('common.search')}
-            className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-primary-500 w-64 transition-colors"
+            className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-primary-500/60 focus:bg-white/8 transition-all"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500"
+          className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-primary-500/60 transition-colors"
         >
           <option value="">{t('admin.allStatuses')}</option>
           {statusOptions.map((s) => (
@@ -123,26 +125,44 @@ export default function AdminProjectsPage() {
       {/* Table */}
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         {loading ? (
-          <div className="p-6 space-y-3">
+          <div className="divide-y divide-white/5">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
+              <div key={i} className="flex items-center gap-4 p-4">
+                <div className="flex-1 space-y-2">
+                  <div className="h-3.5 w-2/5 rounded skeleton-shimmer" />
+                  <div className="h-2.5 w-1/4 rounded skeleton-shimmer" />
+                </div>
+                <div className="h-5 w-14 rounded-full skeleton-shimmer hidden sm:block" />
+                <div className="h-3.5 w-16 rounded skeleton-shimmer hidden md:block" />
+                <div className="h-5 w-16 rounded-full skeleton-shimmer" />
+                <div className="flex items-center gap-2 hidden lg:flex">
+                  <div className="h-1.5 w-20 rounded-full skeleton-shimmer" />
+                  <div className="h-3 w-8 rounded skeleton-shimmer" />
+                </div>
+              </div>
             ))}
           </div>
         ) : projects.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">{t('empty.projects')}</div>
+          <div className="p-14 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/6 flex items-center justify-center mx-auto mb-4">
+              <Search className="w-6 h-6 text-slate-600" strokeWidth={1.5} />
+            </div>
+            <p className="text-slate-300 text-sm font-medium mb-1">{t('empty.projects')}</p>
+            <p className="text-slate-600 text-xs">Try adjusting your search or filters</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/5">
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.project')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.col.plan')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('client.budget')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.progress')}</th>
-                  <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('client.created')}</th>
-                  <th className="p-4" />
+                <tr className="border-b border-white/6">
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.project')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('admin.clients')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('admin.col.plan')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('client.budget')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.status')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('admin.progress')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('client.created')}</th>
+                  <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody>
@@ -160,11 +180,11 @@ export default function AdminProjectsPage() {
                         <div className="text-white text-sm font-medium">{p.title}</div>
                         <div className="text-slate-500 text-xs">{getProjectTypeLabel(p.type, t)}</div>
                       </td>
-                      <td className="p-4 text-sm text-slate-400">{client?.name || '—'}</td>
-                      <td className="p-4"><PlanBadge plan={p.package} /></td>
-                      <td className="p-4 text-sm font-medium text-white">{formatCurrency(p.budget)}</td>
+                      <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">{client?.name || '—'}</td>
+                      <td className="p-4 hidden md:table-cell"><PlanBadge plan={p.package} /></td>
+                      <td className="p-4 text-sm font-medium text-white hidden md:table-cell">{formatCurrency(p.budget)}</td>
                       <td className="p-4"><StatusBadge status={p.status} /></td>
-                      <td className="p-4">
+                      <td className="p-4 hidden lg:table-cell">
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-1.5 bg-white/10 rounded-full overflow-hidden">
                             <div
@@ -175,18 +195,18 @@ export default function AdminProjectsPage() {
                           <span className="text-xs text-slate-400">{p.progress}%</span>
                         </div>
                       </td>
-                      <td className="p-4 text-sm text-slate-400">{formatDate(p.createdAt)}</td>
+                      <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">{formatDate(p.createdAt)}</td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <Link
                             href={`/dashboard/admin/projects/${p._id}`}
-                            className="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                            className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
                           >
                             {t('common.view')}
                           </Link>
                           <button
                             onClick={() => openEdit(p)}
-                            className="text-xs text-primary-400 hover:text-primary-300 transition-colors px-2 py-1 rounded-lg hover:bg-primary-500/10"
+                            className="text-xs text-primary-400 hover:text-primary-300 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-primary-500/10 border border-transparent hover:border-primary-500/20"
                           >
                             {t('common.edit')}
                           </button>

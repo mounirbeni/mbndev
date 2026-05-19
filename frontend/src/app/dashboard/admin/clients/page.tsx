@@ -9,7 +9,7 @@ import { formatDate, getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import PlanBadge from '@/components/ui/PlanBadge';
 import toast from 'react-hot-toast';
-import { Users, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX } from 'lucide-react';
 
 export default function AdminClientsPage() {
   const { t } = useLanguage();
@@ -42,6 +42,9 @@ export default function AdminClientsPage() {
     }
   };
 
+  const activeCount   = clients.filter((c) => c.isActive).length;
+  const inactiveCount = clients.length - activeCount;
+
   return (
     <div className="space-y-6 max-w-5xl">
       {fetchError && (
@@ -57,33 +60,93 @@ export default function AdminClientsPage() {
           </button>
         </div>
       )}
+
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">{t('admin.clients')}</h1>
-        <p className="text-slate-400 text-sm mt-1">{clients.length} {t('admin.clients.count')}</p>
+        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          {t('admin.clients')}
+        </h1>
+        <p className="text-slate-400 text-sm mt-1">
+          {loading ? 'Loading...' : `${clients.length} ${t('admin.clients.count')}`}
+        </p>
       </div>
 
+      {/* Stats */}
+      {!loading && clients.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
+            <div className="h-[3px] bg-gradient-to-r from-primary-600 via-primary-500 to-violet-500" />
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-xs mb-0.5">{t('admin.clients')}</p>
+                <p className="text-2xl font-black text-white">{clients.length}</p>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-primary-500/15 flex items-center justify-center">
+                <Users className="w-4.5 h-4.5 text-primary-400" strokeWidth={1.8} />
+              </div>
+            </div>
+          </div>
+          <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
+            <div className="h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500" />
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-xs mb-0.5">{t('status.active')}</p>
+                <p className="text-2xl font-black text-emerald-400">{activeCount}</p>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                <UserCheck className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.8} />
+              </div>
+            </div>
+          </div>
+          <div className="relative glass rounded-2xl border border-white/5 overflow-hidden col-span-2 sm:col-span-1">
+            <div className="h-[3px] bg-gradient-to-r from-red-600 via-red-500 to-rose-500" />
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-xs mb-0.5">{t('status.inactive')}</p>
+                <p className="text-2xl font-black text-red-400">{inactiveCount}</p>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center">
+                <UserX className="w-4.5 h-4.5 text-red-400" strokeWidth={1.8} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         {loading ? (
-          <div className="p-6 space-y-3">
+          <div className="divide-y divide-white/5">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
+              <div key={i} className="flex items-center gap-4 p-4">
+                <div className="w-8 h-8 rounded-full skeleton-shimmer shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3.5 w-1/3 rounded skeleton-shimmer" />
+                  <div className="h-2.5 w-1/2 rounded skeleton-shimmer" />
+                </div>
+                <div className="h-5 w-16 rounded-full skeleton-shimmer hidden sm:block" />
+                <div className="h-5 w-12 rounded-full skeleton-shimmer" />
+              </div>
             ))}
           </div>
         ) : clients.length === 0 ? (
-          <div className="p-12 text-center">
-            <Users className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-500 text-sm">{t('empty.clients')}</p>
+          <div className="p-14 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/6 flex items-center justify-center mx-auto mb-4">
+              <Users className="w-6 h-6 text-slate-600" strokeWidth={1.5} />
+            </div>
+            <p className="text-slate-300 text-sm font-medium mb-1">{t('empty.clients')}</p>
+            <p className="text-slate-600 text-xs">Registered clients will appear here</p>
           </div>
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.clients')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('request.packageLabel')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('auth.signup.company')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('auth.field.phone')}</th>
-                <th className="text-left p-4 text-xs text-slate-500 font-medium uppercase">{t('admin.status')}</th>
-                <th className="p-4" />
+              <tr className="border-b border-white/6">
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.clients')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('request.packageLabel')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('auth.signup.company')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('auth.field.phone')}</th>
+                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.status')}</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -93,22 +156,27 @@ export default function AdminClientsPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.04 }}
-                  className="border-b border-white/5 hover:bg-white/2 transition-colors"
+                  className="border-b border-white/5 hover:bg-white/[0.02] transition-colors"
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                        style={{ background: 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
+                      >
                         {getInitials(c.name)}
                       </div>
-                      <div>
-                        <div className="text-white text-sm font-medium">{c.name}</div>
-                        <div className="text-slate-500 text-xs">{c.email}</div>
+                      <div className="min-w-0">
+                        <div className="text-white text-sm font-medium truncate">{c.name}</div>
+                        <div className="text-slate-500 text-xs truncate">{c.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="p-4"><PlanBadge plan={c.plan} /></td>
-                  <td className="p-4 text-sm text-slate-400">{c.company || '—'}</td>
-                  <td className="p-4 text-sm text-slate-400">{c.createdAt ? formatDate(c.createdAt) : '—'}</td>
+                  <td className="p-4 hidden sm:table-cell"><PlanBadge plan={c.plan} /></td>
+                  <td className="p-4 text-sm text-slate-400 hidden md:table-cell">{c.company || '—'}</td>
+                  <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
+                    {c.createdAt ? formatDate(c.createdAt) : '—'}
+                  </td>
                   <td className="p-4">
                     <Badge color={c.isActive ? 'green' : 'red'}>
                       {c.isActive ? t('status.active') : t('status.inactive')}
@@ -117,7 +185,7 @@ export default function AdminClientsPage() {
                   <td className="p-4">
                     <button
                       onClick={() => toggleStatus(c._id ?? c.id ?? '')}
-                      className="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                      className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
                     >
                       {t('admin.toggle')}
                     </button>

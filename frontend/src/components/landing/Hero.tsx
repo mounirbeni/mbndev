@@ -132,12 +132,19 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-dvh flex flex-col justify-center overflow-hidden bg-hero-gradient"
-      style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}
+      className="relative min-h-dvh flex flex-col justify-center overflow-hidden"
+      style={{
+        paddingTop: 'max(env(safe-area-inset-top), 0px)',
+        background: 'linear-gradient(160deg, #080811 0%, #0c0620 40%, #080811 75%, #050510 100%)',
+      }}
     >
+      {/* Dot grid */}
+      <div className="absolute inset-0 dot-grid opacity-30 pointer-events-none" />
+
       {/* Background glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-500/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/3 w-[700px] h-[700px] bg-primary-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-blue-500/8 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-2/3 left-1/4 w-[300px] h-[300px] bg-violet-500/6 rounded-full blur-[80px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 pb-8 w-full">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100dvh-7rem)]">

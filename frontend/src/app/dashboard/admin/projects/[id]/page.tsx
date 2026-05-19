@@ -184,9 +184,9 @@ export default function AdminProjectWorkspace() {
   if (loading) {
     return (
       <div className="space-y-4 max-w-5xl">
-        <div className="h-24 glass rounded-2xl animate-pulse" />
-        <div className="h-12 glass rounded-xl animate-pulse" />
-        <div className="h-96 glass rounded-2xl animate-pulse" />
+        <div className="h-24 glass rounded-2xl skeleton-shimmer" />
+        <div className="h-12 glass rounded-xl skeleton-shimmer" />
+        <div className="h-96 glass rounded-2xl skeleton-shimmer" />
       </div>
     );
   }
