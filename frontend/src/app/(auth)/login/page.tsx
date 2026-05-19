@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, Zap, ArrowRight, Eye, EyeOff, ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, ChevronLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -78,8 +79,8 @@ export default function LoginPage() {
           {/* Logo + heading */}
           <div className="text-center mb-7">
             <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
-              <div className="w-12 h-12 bg-primary-500 rounded-2xl flex items-center justify-center glow-purple">
-                <Zap className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center">
+                <Image src="/images/logo.png" alt="MBN DEV" width={48} height={48} className="w-full h-full object-contain" />
               </div>
               <span className="text-white font-bold text-xl">MBN DEV</span>
             </Link>

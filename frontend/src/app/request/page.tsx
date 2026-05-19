@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 import {
   ArrowLeft, ArrowRight, Check, Zap, Target, ShoppingCart,
   BarChart3, Palette, Settings, Lightbulb, Smartphone,
@@ -276,8 +277,8 @@ function RequestPageContent() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
+          <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center">
+            <Image src="/images/logo.png" alt="MBN DEV" width={28} height={28} className="w-full h-full object-contain" />
           </div>
           <span className="text-white font-semibold text-sm sm:text-base">{t('request.header')}</span>
           {selectedPlan && <PlanBadge plan={selectedPlan} size="sm" />}

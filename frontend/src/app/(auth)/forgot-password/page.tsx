@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Zap, Mail, Lock, CheckCircle2 } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Mail, Lock, CheckCircle2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { authAPI } from '@/lib/api';
@@ -41,8 +42,8 @@ export default function ForgotPasswordPage() {
       >
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center glow-purple">
-              <Zap className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center">
+              <Image src="/images/logo.png" alt="MBN DEV" width={40} height={40} className="w-full h-full object-contain" />
             </div>
             <span className="text-white font-bold text-xl">MBN DEV</span>
           </Link>
