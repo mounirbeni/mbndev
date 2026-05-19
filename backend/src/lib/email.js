@@ -276,7 +276,7 @@ ${pre}
               <p style="margin:0 0 6px;font-size:12px;line-height:1.7;color:${T.textDim};font-family:${T.font};">${footerText}</p>
               <p style="margin:0;font-size:12px;color:#1e293b;font-family:${T.font};">
                 &copy; ${new Date().getFullYear()} MBN DEV &nbsp;&middot;&nbsp;
-                <a href="${APP_URL}" style="color:#334155;text-decoration:none;">mbndev.vercel.app</a>
+                <a href="${APP_URL}" style="color:#334155;text-decoration:none;">mbndev.ma</a>
               </p>
             </td>
           </tr>

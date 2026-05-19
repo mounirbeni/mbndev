@@ -5,6 +5,7 @@ const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
 const { SM } = require('../lib/systemMessages');
 const realtime = require('../lib/realtime');
 const { sendEmail, templates } = require('../lib/email');
+const { wa } = require('../lib/whatsapp');
 
 // Shared include for client details on every project query
 const withClient = {
@@ -188,7 +189,7 @@ exports.updateProject = async (req, res, next) => {
       // Email the client
       const fullClient = await prisma.user.findUnique({
         where:  { id: project.clientId },
-        select: { email: true, name: true },
+        select: { email: true, name: true, phone: true },
       });
       if (fullClient?.email) {
         sendEmail({
@@ -200,6 +201,7 @@ exports.updateProject = async (req, res, next) => {
             toStatus:   STATUS_LABELS[status] || status,
           }),
         }).catch(() => {});
+        wa.projectStatusUpdate({ client: fullClient, project, toStatus: status }).catch(() => {});
       }
     }
 

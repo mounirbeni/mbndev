@@ -3,6 +3,7 @@ const { fmt } = require('../lib/format');
 const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
 const { SM } = require('../lib/systemMessages');
 const { sendEmail, templates } = require('../lib/email');
+const { wa } = require('../lib/whatsapp');
 
 const SERVICE_TYPE_LABELS = {
   website:   'Website',
@@ -150,13 +151,14 @@ exports.submitManualPayment = async (req, res, next) => {
       metadata: { orderId: order.id },
     }).catch(() => {});
 
-    // Email admin
+    // Email + WhatsApp admin — fire-and-forget
     if (process.env.ADMIN_EMAIL) {
       sendEmail({
         to:      process.env.ADMIN_EMAIL,
         ...templates.adminPaymentSubmitted({ order, client: order.client, method: label }),
       }).catch(() => {});
     }
+    wa.paymentSubmitted({ client: order.client, order, method: label }).catch(() => {});
 
     res.json({ success: true, payment: fmt(payment) });
   } catch (err) { next(err); }
@@ -208,7 +210,7 @@ exports.approveManualPayment = async (req, res, next) => {
       // System message in project chat
       SM.paymentVerified(project.id).catch(() => {});
 
-      // Email client
+      // Email + WhatsApp client — fire-and-forget
       sendEmail({
         to:      payment.client.email,
         ...templates.paymentVerified({
@@ -216,6 +218,11 @@ exports.approveManualPayment = async (req, res, next) => {
           order:   payment.order,
           project,
         }),
+      }).catch(() => {});
+      wa.paymentVerified({
+        client:    payment.client,
+        order:     payment.order,
+        projectId: project.id,
       }).catch(() => {});
     } else {
       await prisma.payment.update({

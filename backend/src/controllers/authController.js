@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { sendEmail, templates } = require('../lib/email');
+const { wa } = require('../lib/whatsapp');
 
 const APP_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
@@ -36,8 +37,9 @@ exports.register = async (req, res, next) => {
       data: { name, email, password: hashed, company: company || '' },
     });
 
-    // Welcome email — fire-and-forget
+    // Welcome email + WhatsApp — fire-and-forget
     sendEmail({ to: user.email, ...templates.welcome({ user }) }).catch(() => {});
+    wa.welcome({ user }).catch(() => {});
 
     sendToken(user, 201, res);
   } catch (err) {

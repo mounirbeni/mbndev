@@ -3,6 +3,7 @@ const { fmt } = require('../lib/format');
 const { notifyAdmins } = require('../lib/notifications');
 const { calculatePrice, VALID_PLANS } = require('../lib/pricing');
 const { sendEmail, templates } = require('../lib/email');
+const { wa } = require('../lib/whatsapp');
 
 // POST /api/orders — Create a new order (client)
 exports.createOrder = async (req, res, next) => {
@@ -65,11 +66,12 @@ exports.createOrder = async (req, res, next) => {
       metadata: { orderId: order.id, clientId: req.user.id },
     }).catch((err) => console.error('[notifyAdmins] failed:', err));
 
-    // Email confirmation to client
+    // Email + WhatsApp — fire-and-forget
     sendEmail({
       to: req.user.email,
       ...templates.orderPlaced({ user: req.user, order }),
     }).catch(() => {});
+    wa.newOrder({ client: req.user, order }).catch(() => {});
 
     res.status(201).json({ success: true, order: fmt(order) });
   } catch (err) {
