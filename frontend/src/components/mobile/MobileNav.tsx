@@ -499,62 +499,68 @@ function BottomBar({
               href={tab.href}
               onClick={() => haptic('selection')}
               className="relative flex flex-col items-center justify-center gap-[3px]
-                         flex-1 py-2.5 min-h-[58px] group select-none"
+                         flex-1 py-2.5 min-h-[58px] select-none"
               aria-current={active ? 'page' : undefined}
             >
-              {/* Sliding pill indicator */}
+              {/* Slim top accent — slides between tabs via shared layoutId */}
               {active && (
                 <motion.div
-                  layoutId="tab-pill"
-                  className="absolute inset-x-1.5 top-1.5 h-[36px] rounded-[14px]"
+                  layoutId="tab-indicator"
+                  className="absolute top-0 rounded-full"
                   style={{
-                    background: 'rgba(124,58,237,0.18)',
-                    border:     '1px solid rgba(124,58,237,0.3)',
+                    width:      20,
+                    height:     3,
+                    background: 'linear-gradient(90deg, #8b5cf6, #c4b5fd)',
                   }}
-                  transition={{ type: 'spring', damping: 28, stiffness: 400, mass: 0.65 }}
+                  transition={{ type: 'spring', damping: 26, stiffness: 360, mass: 0.5 }}
                 />
               )}
 
               {/* Icon */}
-              <div className="relative z-10 w-[26px] h-[26px] flex items-center justify-center">
+              <div className="relative w-[26px] h-[26px] flex items-center justify-center">
                 <motion.div
-                  animate={active ? { scale: 1.1 } : { scale: 1 }}
-                  transition={{ type: 'spring', damping: 18, stiffness: 380 }}
+                  animate={active ? { scale: 1.06, y: -1 } : { scale: 1, y: 0 }}
+                  transition={{ type: 'spring', damping: 20, stiffness: 340, mass: 0.6 }}
                 >
                   <Icon
                     style={{
-                      width:  active ? 22 : 21,
-                      height: active ? 22 : 21,
-                      color:  active ? '#a78bfa' : 'rgba(100,116,139,0.85)',
-                      filter: active ? 'drop-shadow(0 0 6px rgba(167,139,250,0.6))' : undefined,
-                      transition: 'color 0.15s',
+                      width:      21,
+                      height:     21,
+                      color:      active ? '#c4b5fd' : 'rgba(100,116,139,0.6)',
+                      filter:     active
+                        ? 'drop-shadow(0 0 7px rgba(196,181,253,0.28))'
+                        : undefined,
+                      transition: 'color 0.2s, filter 0.2s',
                     }}
-                    strokeWidth={active ? 2.2 : 1.75}
+                    strokeWidth={active ? 2 : 1.7}
                   />
                 </motion.div>
 
-                {/* Notification dot */}
+                {/* Notification dot — compact */}
                 {tab.dot && (
-                  <span className="absolute -top-0.5 -right-1 flex">
-                    <span className="absolute inline-flex h-2 w-2 rounded-full bg-primary-500 opacity-70 animate-ping" />
+                  <span className="absolute top-0 -right-0.5 flex">
+                    <span className="absolute inline-flex h-1.5 w-1.5 rounded-full bg-primary-400 opacity-60 animate-ping" />
                     <span
-                      className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"
-                      style={{ border: '1.5px solid rgba(6,6,9,1)' }}
+                      className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-400"
+                      style={{ border: '1.5px solid rgba(6,6,9,0.98)' }}
                     />
                   </span>
                 )}
               </div>
 
               {/* Label */}
-              <span
-                className="relative z-10 text-[9.5px] font-medium leading-none tracking-wide"
+              <motion.span
+                animate={{ opacity: active ? 1 : 0.55 }}
+                transition={{ duration: 0.18 }}
+                className="text-[9px] leading-none tracking-[0.02em]"
                 style={{
-                  color:      active ? '#a78bfa' : 'rgba(100,116,139,0.7)',
-                  transition: 'color 0.15s',
+                  color:      active ? '#c4b5fd' : 'rgba(148,163,184,1)',
+                  fontWeight: active ? 600 : 400,
+                  transition: 'color 0.2s',
                 }}
               >
                 {t(tab.labelKey)}
-              </span>
+              </motion.span>
             </Link>
           );
         })}
@@ -566,49 +572,50 @@ function BottomBar({
           aria-expanded={sheetOpen}
           className="relative flex flex-col items-center justify-center gap-[3px]
                      flex-1 py-2.5 min-h-[58px] select-none"
-          whileTap={{ scale: 0.9 }}
-          transition={{ duration: 0.1 }}
+          whileTap={{ scale: 0.88 }}
+          transition={{ type: 'spring', damping: 18, stiffness: 400 }}
         >
-          {/* Pill when sheet is open */}
+          {/* Slim top accent when sheet is open */}
           {sheetOpen && (
             <motion.div
-              layoutId="tab-pill"
-              className="absolute inset-x-1.5 top-1.5 h-[36px] rounded-[14px]"
+              layoutId="tab-indicator"
+              className="absolute top-0 rounded-full"
               style={{
-                background: 'rgba(255,255,255,0.08)',
-                border:     '1px solid rgba(255,255,255,0.14)',
+                width:      20,
+                height:     3,
+                background: 'rgba(226,232,240,0.45)',
               }}
-              transition={{ type: 'spring', damping: 28, stiffness: 400, mass: 0.65 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 360, mass: 0.5 }}
             />
           )}
 
           {/* Animated icon: LayoutGrid ↔ X */}
-          <div className="relative z-10 w-[26px] h-[26px] flex items-center justify-center">
+          <div className="w-[26px] h-[26px] flex items-center justify-center">
             <AnimatePresence mode="popLayout" initial={false}>
               {sheetOpen ? (
                 <motion.div
                   key="x-icon"
-                  initial={{ rotate: -120, opacity: 0, scale: 0.5 }}
-                  animate={{ rotate: 0,    opacity: 1, scale: 1   }}
-                  exit={{    rotate: 120,  opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
+                  initial={{ rotate: -90, opacity: 0, scale: 0.6 }}
+                  animate={{ rotate: 0,   opacity: 1, scale: 1   }}
+                  exit={{    rotate: 90,  opacity: 0, scale: 0.6 }}
+                  transition={{ type: 'spring', damping: 18, stiffness: 340, mass: 0.6 }}
                 >
                   <X
-                    style={{ width: 21, height: 21, color: 'rgba(226,232,240,0.9)' }}
-                    strokeWidth={2.1}
+                    style={{ width: 21, height: 21, color: 'rgba(226,232,240,0.8)' }}
+                    strokeWidth={1.9}
                   />
                 </motion.div>
               ) : (
                 <motion.div
                   key="grid-icon"
-                  initial={{ rotate: 120,  opacity: 0, scale: 0.5 }}
-                  animate={{ rotate: 0,    opacity: 1, scale: 1   }}
-                  exit={{    rotate: -120, opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
+                  initial={{ rotate: 90,  opacity: 0, scale: 0.6 }}
+                  animate={{ rotate: 0,   opacity: 1, scale: 1   }}
+                  exit={{    rotate: -90, opacity: 0, scale: 0.6 }}
+                  transition={{ type: 'spring', damping: 18, stiffness: 340, mass: 0.6 }}
                 >
                   <LayoutGrid
-                    style={{ width: 21, height: 21, color: 'rgba(100,116,139,0.85)' }}
-                    strokeWidth={1.75}
+                    style={{ width: 21, height: 21, color: 'rgba(100,116,139,0.6)' }}
+                    strokeWidth={1.7}
                   />
                 </motion.div>
               )}
@@ -619,12 +626,15 @@ function BottomBar({
           <AnimatePresence mode="wait" initial={false}>
             <motion.span
               key={sheetOpen ? 'close-lbl' : 'more-lbl'}
-              initial={{ opacity: 0, y: 3 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{    opacity: 0, y: -3 }}
-              transition={{ duration: 0.14 }}
-              className="relative z-10 text-[9.5px] font-medium leading-none tracking-wide"
-              style={{ color: sheetOpen ? 'rgba(226,232,240,0.85)' : 'rgba(100,116,139,0.7)' }}
+              initial={{ opacity: 0, y: 2 }}
+              animate={{ opacity: sheetOpen ? 1 : 0.55, y: 0 }}
+              exit={{    opacity: 0, y: -2 }}
+              transition={{ duration: 0.15 }}
+              className="text-[9px] leading-none tracking-[0.02em]"
+              style={{
+                color:      sheetOpen ? 'rgba(226,232,240,1)' : 'rgba(148,163,184,1)',
+                fontWeight: sheetOpen ? 600 : 400,
+              }}
             >
               {sheetOpen ? 'Close' : 'More'}
             </motion.span>
