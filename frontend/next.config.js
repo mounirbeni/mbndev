@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'http',  hostname: 'localhost' },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
-      { protocol: 'https', hostname: '*.mbndev.com' },
+      { protocol: 'https', hostname: '*.mbndev.ma' },
     ],
     formats: ['image/avif', 'image/webp'],
   },
@@ -49,7 +49,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://api.mbndev.com wss://api.mbndev.com https://fonts.googleapis.com",
+              "connect-src 'self' https://mbndev.ma wss://mbndev.ma https://fonts.googleapis.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
