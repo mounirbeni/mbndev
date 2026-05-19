@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { useRouter, usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/dashboard/Sidebar';
 import MobileNav from '@/components/mobile/MobileNav';
@@ -36,6 +36,7 @@ function useScrollHideHeader() {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router            = useRouter();
+  const pathname          = usePathname();
   const { hidden, scrollRef, onScroll } = useScrollHideHeader();
 
   /* Redirect unauthenticated users */
@@ -166,17 +167,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* ── Page content ─────────────────────────────────────────── */}
         <main
           ref={scrollRef as React.RefObject<HTMLDivElement>}
-          className="flex-1 overflow-y-auto p-4 lg:p-6 inertial-scroll"
+          className="flex-1 overflow-y-auto inertial-scroll"
           onScroll={onScroll}
           style={{
-            /*
-             * Bottom padding: clears the BottomBar (≈58px) + safe-area + gap.
-             * On lg+ the BottomBar is hidden so we use a smaller offset.
-             */
             paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 74px)',
           }}
         >
-          {children}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="p-4 lg:p-6 min-h-full"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 
