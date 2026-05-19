@@ -4,54 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import Sidebar, { MobileSidebar } from '@/components/dashboard/Sidebar';
-import BottomNav from '@/components/mobile/BottomNav';
+import Sidebar from '@/components/dashboard/Sidebar';
+import MobileNav from '@/components/mobile/MobileNav';
 import NotificationBell from '@/components/dashboard/NotificationBell';
 import FloatingSupport from '@/components/ui/FloatingSupport';
 import Logo3D from '@/components/ui/Logo3D';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
 import { getInitials } from '@/lib/utils';
 import Link from 'next/link';
-import { useHaptic } from '@/hooks/useHaptic';
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Swipe-to-open sidebar gesture (left edge → right swipe ≥ 60px)
-───────────────────────────────────────────────────────────────────────────── */
-function useSwipeToOpenSidebar(onOpen: () => void) {
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-
-  useEffect(() => {
-    const onTouchStart = (e: TouchEvent) => {
-      const t = e.touches[0];
-      touchStartX.current = t.clientX;
-      touchStartY.current = t.clientY;
-    };
-
-    const onTouchEnd = (e: TouchEvent) => {
-      if (touchStartX.current === null || touchStartY.current === null) return;
-      const dx = e.changedTouches[0].clientX - touchStartX.current;
-      const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-      /* Only fire if: started within 20px of left edge, swiped right ≥ 60px,
-         and more horizontal than vertical (not a vertical scroll) */
-      if (touchStartX.current <= 20 && dx >= 60 && dy < 80) {
-        onOpen();
-      }
-      touchStartX.current = null;
-      touchStartY.current = null;
-    };
-
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    document.addEventListener('touchend',   onTouchEnd,   { passive: true });
-    return () => {
-      document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchend',   onTouchEnd);
-    };
-  }, [onOpen]);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Scroll-hide header hook — hides header on scroll down, shows on scroll up
+   Scroll-hide header hook — hides mobile header on scroll-down, shows on up
 ───────────────────────────────────────────────────────────────────────────── */
 function useScrollHideHeader() {
   const [hidden, setHidden] = useState(false);
@@ -72,9 +35,7 @@ function useScrollHideHeader() {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  const router = useRouter();
-  const haptic = useHaptic();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router            = useRouter();
   const { hidden, scrollRef, onScroll } = useScrollHideHeader();
 
   /* Redirect unauthenticated users */
@@ -82,29 +43,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!loading && !user) router.push('/login');
   }, [user, loading, router]);
 
-  /* Swipe-from-left-edge opens sidebar on mobile */
-  useSwipeToOpenSidebar(() => {
-    if (window.innerWidth >= 1024) return; // desktop only uses permanent sidebar
-    haptic('light');
-    setSidebarOpen(true);
-  });
-
-  /* ── Loading / unauthenticated skeleton ──────────────────────────────── */
+  /* ── Loading / unauthenticated skeleton ─────────────────────────────── */
   if (loading || !user) {
     return (
-      <div className="min-h-dvh flex flex-col" style={{ background: '#0a0a0d' }}>
+      <div className="min-h-dvh flex flex-col" style={{ background: '#08080b' }}>
+        {/* Skeleton mobile header */}
         <div
           className="lg:hidden shrink-0 px-4 flex items-center justify-between"
           style={{
             paddingTop:   'max(env(safe-area-inset-top, 0px), 0px)',
-            height:       'calc(56px + max(env(safe-area-inset-top, 0px), 0px))',
-            background:   'rgba(10,10,13,0.97)',
-            borderBottom: '1px solid rgba(255,255,255,0.07)',
+            height:       'calc(52px + max(env(safe-area-inset-top, 0px), 0px))',
+            background:   'rgba(8,8,11,0.98)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
           }}
         >
-          <div className="w-10 h-10 rounded-xl bg-white/5 skeleton-shimmer" />
-          <div className="w-20 h-4 rounded-lg bg-white/5 skeleton-shimmer" />
-          <div className="w-10 h-10 rounded-xl bg-white/5 skeleton-shimmer" />
+          <div className="w-24 h-5 rounded-lg skeleton-shimmer" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl skeleton-shimmer" />
+            <div className="w-9 h-9 rounded-xl skeleton-shimmer" />
+          </div>
         </div>
         <div className="flex-1 p-4 lg:p-6">
           <SkeletonDashboard />
@@ -113,72 +70,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  /* ── Authenticated layout ─────────────────────────────────────────────── */
+  /* ── Authenticated layout ────────────────────────────────────────────── */
   return (
+    /*
+     * layout-frame: receives the iOS-style push-back transform when the
+     * NavSheet opens (class applied by MobileNav via body.nav-sheet-open).
+     * overflow:hidden is required for border-radius clipping on scale.
+     */
     <div
-      className="flex overflow-hidden"
-      style={{ height: '100dvh', background: '#0a0a0d' }}
+      className="flex overflow-hidden layout-frame"
+      style={{ height: '100dvh', background: '#08080b' }}
     >
-      {/* ── Desktop permanent sidebar (hidden on mobile) ─────────────── */}
+      {/* ── Desktop permanent sidebar ─────────────────────────────────── */}
       <div className="hidden lg:flex flex-col shrink-0">
         <Sidebar />
       </div>
-
-      {/* ── Mobile sidebar — controlled externally via state ─────────── */}
-      <MobileSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
       {/* ── Content column ───────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* ── Mobile top bar ─────────────────────────────────────────── */}
-        {/* IMPORTANT: No backdrop-filter here — creates a stacking context
-            that would trap fixed children (MobileSidebar, BottomNav).    */}
+        {/*
+         * IMPORTANT: No backdrop-filter here — creates a stacking context
+         * that would trap fixed children (NavSheet, BottomBar).
+         */}
         <motion.header
           animate={{ y: hidden ? '-100%' : '0%' }}
-          transition={{ duration: 0.26, ease: [0.32, 0.72, 0, 1] }}
-          className="lg:hidden shrink-0 px-4 flex items-center justify-between relative"
+          transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] }}
+          className="lg:hidden shrink-0 flex items-center justify-between px-4 relative"
           style={{
             paddingTop:   'max(env(safe-area-inset-top, 0px), 0px)',
-            height:       'calc(56px + max(env(safe-area-inset-top, 0px), 0px))',
-            background:   'rgba(10, 10, 13, 0.99)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
+            height:       'calc(52px + max(env(safe-area-inset-top, 0px), 0px))',
+            background:   'rgba(8, 8, 11, 0.99)',
+            borderBottom: '1px solid rgba(255,255,255,0.065)',
             zIndex:       100,
           }}
         >
-          {/* Left: hamburger — wired to state instead of its own toggle */}
-          <button
-            onClick={() => { haptic('light'); setSidebarOpen(true); }}
-            aria-label="Open menu"
-            className="w-10 h-10 flex items-center justify-center rounded-xl
-                       text-slate-400 active:text-white active:bg-white/8
-                       transition-colors touch-target"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.9} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h10" />
-            </svg>
-          </button>
-
-          {/* Center: brand */}
-          <Link
-            href="/"
-            className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2"
-          >
+          {/* Left: Logo + Brand */}
+          <Link href="/" className="flex items-center gap-2.5 select-none">
             <Logo3D size="sm" />
-            <span className="text-white font-bold text-sm tracking-wide select-none">
-              MBN DEV
-            </span>
+            <span className="text-white font-bold text-[14px] tracking-wide">MBN DEV</span>
           </Link>
 
-          {/* Right: notification bell + avatar */}
+          {/* Right: Notification bell + Avatar (avatar tap → open NavSheet) */}
           <div className="flex items-center gap-2">
             <NotificationBell />
-            <div
+            <button
+              onClick={() => document.dispatchEvent(new CustomEvent('open-nav-sheet'))}
+              aria-label="Open navigation"
               className="w-9 h-9 rounded-xl flex items-center justify-center
-                         text-white font-bold text-xs shrink-0"
+                         text-white font-bold text-xs shrink-0 select-none
+                         active:opacity-75 transition-opacity"
               style={{ background: 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
             >
               {getInitials(user.name)}
-            </div>
+            </button>
           </div>
         </motion.header>
 
@@ -190,20 +136,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             borderBottom: '1px solid rgba(255,255,255,0.065)',
           }}
         >
-          {/* Left: breadcrumb placeholder (pages can portal content here later) */}
+          {/* Left: breadcrumb indicator */}
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-primary-500" />
             <span className="text-slate-500 text-xs font-medium">Dashboard</span>
           </div>
 
-          {/* Right: controls */}
+          {/* Right: notification bell + divider + avatar */}
           <div className="flex items-center gap-3">
             <NotificationBell />
-
-            {/* Divider */}
             <div className="w-px h-6 bg-white/8" />
-
-            {/* Avatar + name */}
             <div className="flex items-center gap-2.5">
               <div className="text-right">
                 <div className="text-white text-sm font-semibold leading-tight">{user.name}</div>
@@ -227,7 +169,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           className="flex-1 overflow-y-auto p-4 lg:p-6 inertial-scroll"
           onScroll={onScroll}
           style={{
-            /* Bottom padding: BottomNav (58px) + safe-area + gap */
+            /*
+             * Bottom padding: clears the BottomBar (≈58px) + safe-area + gap.
+             * On lg+ the BottomBar is hidden so we use a smaller offset.
+             */
             paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 74px)',
           }}
         >
@@ -235,10 +180,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
 
-      {/* BottomNav — portalled to body */}
-      <BottomNav />
+      {/* ── Mobile navigation (BottomBar + NavSheet) ─────────────── */}
+      <MobileNav />
 
-      {/* Floating support button */}
+      {/* ── Floating support button ──────────────────────────────── */}
       <FloatingSupport />
     </div>
   );

@@ -117,6 +117,26 @@ body {
   -webkit-backdrop-filter: blur(40px) saturate(1.8);
 }
 
+/* ── Mobile nav: iOS-style content push-back when sheet is open ──────────── */
+.layout-frame {
+  transform-origin: center 32%;
+  transition:
+    transform   0.40s cubic-bezier(0.32, 0.72, 0, 1),
+    border-radius 0.40s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+body.nav-sheet-open .layout-frame {
+  transform:     scale(0.924) translateY(-18px);
+  border-radius: 18px;
+}
+/* Prevent layout-frame overflow from clipping desktop sidebar at lg+ */
+@media (min-width: 1024px) {
+  body.nav-sheet-open .layout-frame {
+    transform:     none;
+    border-radius: 0;
+  }
+}
+
 /* ── Effects ──────────────────────────────────────────────────────────────── */
 .glow-purple {
   box-shadow:
