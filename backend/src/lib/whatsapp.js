@@ -1,73 +1,50 @@
-// ─── WhatsApp Business Cloud API ─────────────────────────────────────────────
-// Uses Meta's WhatsApp Cloud API (no extra packages — built-in https).
-// Falls back to stdout in dev when credentials are not configured.
+// ─── WhatsApp via CallMeBot ───────────────────────────────────────────────────
+// CallMeBot is a free service that sends WhatsApp messages to a single
+// registered number (the admin). No Meta Business account required.
+//
+// Setup (one-time, 1 minute):
+//   1. Open WhatsApp and message +34 644 57 52 87
+//   2. Send exactly: "I allow callmebot to send me messages"
+//   3. You'll receive your API key — add it to CALLMEBOT_API_KEY in .env
+//
 // Never throws — all call-sites use fire-and-forget .catch(() => {}).
 
 const https = require('https');
 
-const TOKEN    = process.env.WHATSAPP_TOKEN;
-const PHONE_ID = process.env.WHATSAPP_PHONE_ID;
-const ADMIN_WA = process.env.ADMIN_WHATSAPP;   // e.g. "212612345678"
-const APP_URL  = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
+const API_KEY   = process.env.CALLMEBOT_API_KEY;
+const ADMIN_WA  = process.env.ADMIN_WHATSAPP;   // e.g. "212612345678" (no +)
+const APP_URL   = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-const configured = !!(TOKEN && PHONE_ID);
+const configured = !!(API_KEY && ADMIN_WA);
 
 // ─── Core send ───────────────────────────────────────────────────────────────
 
-function sendWhatsApp(to, message) {
-  if (!to) return Promise.resolve({ sent: false, reason: 'no_recipient' });
-
-  // Normalise number — strip spaces, dashes, leading +
-  const phone = String(to).replace(/[\s\-()]/g, '').replace(/^\+/, '');
-
+function sendWhatsApp(message) {
   if (!configured) {
-    console.log(`[whatsapp:dev] → ${phone}\n${message}\n`);
+    console.log(`[whatsapp:dev]\n${message}\n`);
     return Promise.resolve({ sent: false, reason: 'not_configured' });
   }
 
-  const body = JSON.stringify({
-    messaging_product: 'whatsapp',
-    to:   phone,
-    type: 'text',
-    text: { body: message, preview_url: false },
-  });
+  const phone = String(ADMIN_WA).replace(/[\s\-()]/g, '').replace(/^\+/, '');
+  const text  = encodeURIComponent(message);
+  const path  = `/whatsapp.php?phone=${phone}&text=${text}&apikey=${API_KEY}`;
 
   return new Promise((resolve) => {
-    const req = https.request(
-      {
-        hostname: 'graph.facebook.com',
-        path:     `/v20.0/${PHONE_ID}/messages`,
-        method:   'POST',
-        headers:  {
-          Authorization:  `Bearer ${TOKEN}`,
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body),
-        },
-      },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => { data += chunk; });
-        res.on('end', () => {
-          try {
-            const json = JSON.parse(data);
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              resolve({ sent: true, id: json.messages?.[0]?.id });
-            } else {
-              console.error('[whatsapp] send failed:', json.error?.message || data);
-              resolve({ sent: false, reason: json.error?.message || `HTTP ${res.statusCode}` });
-            }
-          } catch {
-            resolve({ sent: false, reason: 'parse_error' });
-          }
-        });
-      }
-    );
-    req.on('error', (err) => {
+    https.get({ hostname: 'api.callmebot.com', path }, (res) => {
+      let data = '';
+      res.on('data', (c) => { data += c; });
+      res.on('end', () => {
+        if (res.statusCode === 200) {
+          resolve({ sent: true });
+        } else {
+          console.error('[whatsapp] CallMeBot error:', res.statusCode, data.slice(0, 120));
+          resolve({ sent: false, reason: `HTTP ${res.statusCode}` });
+        }
+      });
+    }).on('error', (err) => {
       console.error('[whatsapp] request error:', err.message);
       resolve({ sent: false, reason: err.message });
     });
-    req.write(body);
-    req.end();
   });
 }
 
@@ -75,9 +52,9 @@ function sendWhatsApp(to, message) {
 
 const wa = {
 
-  // ── Admin: new order received ───────────────────────────────────────────
+  // ── New order received ──────────────────────────────────────────────────
   newOrder: ({ client, order }) =>
-    sendWhatsApp(ADMIN_WA, [
+    sendWhatsApp([
       `🛒 *New Order — MBN DEV*`,
       ``,
       `👤 Client: ${client.name}`,
@@ -90,9 +67,9 @@ const wa = {
       `👉 ${APP_URL}/dashboard/admin/orders`,
     ].join('\n')),
 
-  // ── Admin: payment submitted (needs verification) ───────────────────────
+  // ── Payment submitted (needs verification) ──────────────────────────────
   paymentSubmitted: ({ client, order, method }) =>
-    sendWhatsApp(ADMIN_WA, [
+    sendWhatsApp([
       `💳 *Payment Submitted — Action Required*`,
       ``,
       `👤 Client: ${client.name}`,
@@ -105,9 +82,9 @@ const wa = {
       `👉 ${APP_URL}/dashboard/admin/payments`,
     ].join('\n')),
 
-  // ── Admin: new message from client ──────────────────────────────────────
+  // ── New message from client ─────────────────────────────────────────────
   newClientMessage: ({ client, project, preview }) =>
-    sendWhatsApp(ADMIN_WA, [
+    sendWhatsApp([
       `💬 *New Message — MBN DEV*`,
       ``,
       `👤 From: ${client.name}`,
@@ -117,75 +94,51 @@ const wa = {
       `👉 ${APP_URL}/dashboard/admin/messages`,
     ].filter(Boolean).join('\n')),
 
-  // ── Client: payment verified ─────────────────────────────────────────────
-  paymentVerified: ({ client, order, projectId }) =>
-    client.phone
-      ? sendWhatsApp(client.phone, [
-          `✅ *Payment Verified — MBN DEV*`,
-          ``,
-          `Hi ${client.name.split(' ')[0]}, your payment has been verified! 🎉`,
-          ``,
-          `📌 Project: ${order.title}`,
-          `💰 Amount: $${Number(order.totalPrice).toLocaleString('en-US')}`,
-          ``,
-          `Work starts immediately. Track progress in your dashboard:`,
-          `👉 ${APP_URL}/dashboard/client/projects/${projectId}`,
-          ``,
-          `Questions? Reply here or message us on the platform.`,
-        ].join('\n'))
-      : Promise.resolve({ sent: false, reason: 'no_client_phone' }),
+  // ── Payment verified (admin info only — email handles client) ───────────
+  paymentVerified: ({ client, order }) =>
+    sendWhatsApp([
+      `✅ *Payment Verified — MBN DEV*`,
+      ``,
+      `👤 Client: ${client.name}`,
+      `📌 Project: ${order.title}`,
+      `💰 Amount: $${Number(order.totalPrice).toLocaleString('en-US')}`,
+      ``,
+      `Project is now active. Client has been notified by email.`,
+    ].join('\n')),
 
-  // ── Client: project status update ────────────────────────────────────────
+  // ── Project status update (admin info only — email handles client) ──────
   projectStatusUpdate: ({ client, project, toStatus }) => {
     const labels = {
-      pending:    '⏳ Queued',
-      active:     '🚀 Started',
-      in_review:  '👀 In Review',
-      revision:   '🔄 In Revision',
-      delivered:  '📦 Delivered',
-      completed:  '✅ Completed',
-      cancelled:  '❌ Cancelled',
+      pending:     '⏳ Queued',
+      active:      '🚀 Started',
+      'in-progress': '🔨 In Progress',
+      review:      '👀 In Review',
+      revision:    '🔄 Revision',
+      completed:   '✅ Completed',
+      cancelled:   '❌ Cancelled',
     };
-    const statusLine = labels[toStatus] || toStatus;
-    return client.phone
-      ? sendWhatsApp(client.phone, [
-          `📊 *Project Update — MBN DEV*`,
-          ``,
-          `Hi ${client.name.split(' ')[0]}!`,
-          ``,
-          `📌 Project: ${project.title}`,
-          `📈 Status: ${statusLine}`,
-          ``,
-          toStatus === 'in_review'
-            ? `A deliverable is ready for your review. Please check and share feedback.`
-            : toStatus === 'delivered'
-            ? `Your project has been delivered! Review everything and confirm when satisfied.`
-            : toStatus === 'completed'
-            ? `Your project is complete. Source files have been handed over. 🎉`
-            : `Your project status has been updated.`,
-          ``,
-          `👉 ${APP_URL}/dashboard/client/projects/${project.id}`,
-        ].join('\n'))
-      : Promise.resolve({ sent: false, reason: 'no_client_phone' });
+    return sendWhatsApp([
+      `📊 *Project Updated — MBN DEV*`,
+      ``,
+      `👤 Client: ${client.name}`,
+      `📌 Project: ${project.title}`,
+      `📈 Status: ${labels[toStatus] || toStatus}`,
+      ``,
+      `👉 ${APP_URL}/dashboard/admin/projects/${project.id}`,
+    ].join('\n'));
   },
 
-  // ── Client: welcome ──────────────────────────────────────────────────────
+  // ── New client registered ───────────────────────────────────────────────
   welcome: ({ user }) =>
-    user.phone
-      ? sendWhatsApp(user.phone, [
-          `👋 *Welcome to MBN DEV!*`,
-          ``,
-          `Hi ${user.name.split(' ')[0]}, your account is ready.`,
-          ``,
-          `🚀 Request your first project:`,
-          `👉 ${APP_URL}/request`,
-          ``,
-          `📊 Your dashboard:`,
-          `👉 ${APP_URL}/dashboard/client`,
-          ``,
-          `Any questions? Just reply to this message.`,
-        ].join('\n'))
-      : Promise.resolve({ sent: false, reason: 'no_client_phone' }),
+    sendWhatsApp([
+      `👋 *New Client Registered — MBN DEV*`,
+      ``,
+      `👤 Name: ${user.name}`,
+      `📧 Email: ${user.email}`,
+      `🏢 Company: ${user.company || '—'}`,
+      ``,
+      `👉 ${APP_URL}/dashboard/admin/clients`,
+    ].join('\n')),
 
 };
 
