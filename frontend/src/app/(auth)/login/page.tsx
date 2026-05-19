@@ -79,9 +79,17 @@ export default function LoginPage() {
           {/* Logo + heading */}
           <div className="text-center mb-7">
             <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
-              <div className="w-12 h-12 bg-primary-500 rounded-2xl flex items-center justify-center glow-purple overflow-hidden">
-                <Image src="/images/logo.png" alt="MBN DEV" width={48} height={48} className="w-full h-full object-contain scale-125" style={{ mixBlendMode: 'screen' }} />
-              </div>
+              <Image
+                src="/images/logo.png"
+                alt="MBN DEV"
+                width={64}
+                height={64}
+                className="w-16 h-16 object-contain"
+                style={{
+                  mixBlendMode: 'screen',
+                  filter: 'brightness(1.6) contrast(1.1) drop-shadow(0 0 18px rgba(124,58,237,0.75))',
+                }}
+              />
               <span className="text-white font-bold text-xl">MBN DEV</span>
             </Link>
             <h1 className="text-2xl font-bold text-white">{t('auth.login.title')}</h1>

@@ -277,9 +277,17 @@ function RequestPageContent() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center overflow-hidden">
-            <Image src="/images/logo.png" alt="MBN DEV" width={28} height={28} className="w-full h-full object-contain scale-125" style={{ mixBlendMode: 'screen' }} />
-          </div>
+          <Image
+            src="/images/logo.png"
+            alt="MBN DEV"
+            width={36}
+            height={36}
+            className="w-9 h-9 object-contain shrink-0"
+            style={{
+              mixBlendMode: 'screen',
+              filter: 'brightness(1.5) contrast(1.1) drop-shadow(0 0 8px rgba(124,58,237,0.6))',
+            }}
+          />
           <span className="text-white font-semibold text-sm sm:text-base">{t('request.header')}</span>
           {selectedPlan && <PlanBadge plan={selectedPlan} size="sm" />}
         </div>

@@ -56,9 +56,17 @@ export default function ResetPasswordPage() {
       >
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center glow-purple overflow-hidden">
-              <Image src="/images/logo.png" alt="MBN DEV" width={40} height={40} className="w-full h-full object-contain scale-125" style={{ mixBlendMode: 'screen' }} />
-            </div>
+            <Image
+              src="/images/logo.png"
+              alt="MBN DEV"
+              width={56}
+              height={56}
+              className="w-14 h-14 object-contain"
+              style={{
+                mixBlendMode: 'screen',
+                filter: 'brightness(1.6) contrast(1.1) drop-shadow(0 0 16px rgba(124,58,237,0.75))',
+              }}
+            />
             <span className="text-white font-bold text-xl">MBN DEV</span>
           </Link>
         </div>
