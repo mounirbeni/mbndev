@@ -114,8 +114,8 @@ export default function SignupPage() {
           {/* Logo + heading */}
           <div className="text-center mb-7">
             <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
-              <div className="w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center">
-                <Image src="/images/logo.png" alt="MBN DEV" width={48} height={48} className="w-full h-full object-contain" />
+              <div className="w-12 h-12 flex items-center justify-center">
+                <Image src="/images/logo.png" alt="MBN DEV" width={48} height={48} className="w-full h-full object-contain" style={{ mixBlendMode: 'screen' }} />
               </div>
               <span className="text-white font-bold text-xl">MBN DEV</span>
             </Link>

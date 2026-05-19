@@ -83,8 +83,8 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center group-active:scale-95 transition-transform shrink-0">
-                <Image src="/images/logo.png" alt="MBN DEV" width={36} height={36} className="w-full h-full object-contain" />
+              <div className="w-9 h-9 flex items-center justify-center group-active:scale-95 transition-transform shrink-0">
+                <Image src="/images/logo.png" alt="MBN DEV" width={36} height={36} className="w-full h-full object-contain" style={{ mixBlendMode: 'screen' }} />
               </div>
               <div>
                 <div className="text-white font-bold text-[15px] leading-none">MBN DEV</div>
