@@ -57,6 +57,9 @@ export const metadata: Metadata = {
     creator:     '@mbndev',
     images:      ['/og-image.png'],
   },
+  verification: {
+    google: '6iPR0xchv0BJth7bark-LIj4vvX1djZU9hS_oWjZPYA',
+  },
   other: {
     'mobile-web-app-capable':    'yes',
     'msapplication-TileColor':   '#7c3aed',
