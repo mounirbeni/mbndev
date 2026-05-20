@@ -15,7 +15,7 @@ export default function ContactPage() {
 
   // Data arrays inside component so labels re-evaluate on locale change
   const contactInfo = [
-    { icon: Mail,    label: t('contact.info.email'),    value: 'hello@mbndev.com',                     href: 'mailto:hello@mbndev.com'   },
+    { icon: Mail,    label: t('contact.info.email'),    value: 'hello@mbndev.ma',                     href: 'mailto:hello@mbndev.ma'   },
     { icon: Phone,   label: t('contact.info.whatsapp'), value: t('contact.info.whatsappVal'),           href: 'https://wa.me/212705914424' },
     { icon: MapPin,  label: t('contact.info.location'), value: t('contact.info.locationVal'),           href: null                        },
     { icon: Clock,   label: t('contact.info.response'), value: t('contact.info.responseVal'),           href: null                        },
@@ -116,7 +116,7 @@ export default function ContactPage() {
                   <ArrowRight className="w-3.5 h-3.5 text-green-400 ml-auto group-hover:translate-x-1 transition-transform" />
                 </a>
                 <a
-                  href="mailto:hello@mbndev.com"
+                  href="mailto:hello@mbndev.ma"
                   className="flex items-center gap-3 p-3 bg-primary-500/10 border border-primary-500/20 rounded-xl hover:border-primary-500/40 transition-colors group"
                 >
                   <Mail className="w-4 h-4 text-primary-400 shrink-0" />

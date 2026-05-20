@@ -19,10 +19,10 @@ export const metadata: Metadata = {
     'SaaS development', 'web design Morocco', 'Morocco web developer',
     'landing page', 'portfolio website', 'business website',
   ],
-  authors:      [{ name: 'Mounir Banni', url: 'https://mbndev.com' }],
+  authors:      [{ name: 'Mounir Banni', url: 'https://mbndev.ma' }],
   creator:      'Mounir Banni',
   publisher:    'MBN DEV',
-  metadataBase: new URL('https://mbndev.com'),
+  metadataBase: new URL('https://mbndev.ma'),
   manifest:     '/manifest.json',
   robots: {
     index:  true,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title:       'MBN DEV — Custom Websites & Web Apps',
     description: 'Custom websites, SaaS platforms, and web apps built by Mounir Banni. Fast, modern, and tailored to your business.',
     type:        'website',
-    url:         'https://mbndev.com',
+    url:         'https://mbndev.ma',
     siteName:    'MBN DEV',
     locale:      'en_US',
     images: [
@@ -80,7 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://api.mbndev.com" />
+        <link rel="dns-prefetch" href="https://mbndev.ma" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>

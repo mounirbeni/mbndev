@@ -28,7 +28,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   if (!meta) {
     return { title: 'Service', description: 'MBN DEV service detail.' };
   }
-  const url = `https://mbndev.com/services/${params.slug}`;
+  const url = `https://mbndev.ma/services/${params.slug}`;
   return {
     title:       meta.title,
     description: meta.description,

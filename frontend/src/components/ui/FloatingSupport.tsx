@@ -8,7 +8,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 
 const WA_URL = 'https://wa.me/212705914424';
 const TEL    = 'tel:+212705914424';
-const MAILTO = 'mailto:hello@mbndev.com';
+const MAILTO = 'mailto:hello@mbndev.ma';
 
 export default function FloatingSupport() {
   const [open, setOpen] = useState(false);
@@ -76,7 +76,7 @@ export default function FloatingSupport() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-2xl glass border border-white/10 text-white text-sm font-semibold shadow-lg shadow-black/30 transition-all active:scale-95"
             >
               <Mail className="w-4 h-4 shrink-0 text-blue-400" />
-              hello@mbndev.com
+              hello@mbndev.ma
             </a>
           </motion.div>
         )}
