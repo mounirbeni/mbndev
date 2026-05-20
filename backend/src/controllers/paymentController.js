@@ -151,9 +151,9 @@ exports.submitManualPayment = async (req, res, next) => {
       metadata: { orderId: order.id },
     }).catch(() => {});
 
-    // Email + WhatsApp admin — fire-and-forget
+    // Email + WhatsApp admin — await so Vercel serverless doesn't kill before sending
     if (process.env.ADMIN_EMAIL) {
-      sendEmail({
+      await sendEmail({
         to:      process.env.ADMIN_EMAIL,
         ...templates.adminPaymentSubmitted({ order, client: order.client, method: label }),
       }).catch(() => {});
@@ -210,8 +210,8 @@ exports.approveManualPayment = async (req, res, next) => {
       // System message in project chat
       SM.paymentVerified(project.id).catch(() => {});
 
-      // Email + WhatsApp client — fire-and-forget
-      sendEmail({
+      // Email + WhatsApp client — await so Vercel serverless doesn't kill before sending
+      await sendEmail({
         to:      payment.client.email,
         ...templates.paymentVerified({
           client:  payment.client,

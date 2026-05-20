@@ -192,7 +192,7 @@ exports.updateProject = async (req, res, next) => {
         select: { email: true, name: true, phone: true },
       });
       if (fullClient?.email) {
-        sendEmail({
+        await sendEmail({
           to: fullClient.email,
           ...templates.projectStatusUpdate({
             client:     fullClient,

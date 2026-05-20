@@ -37,8 +37,8 @@ exports.register = async (req, res, next) => {
       data: { name, email, password: hashed, company: company || '' },
     });
 
-    // Welcome email + WhatsApp — fire-and-forget
-    sendEmail({ to: user.email, ...templates.welcome({ user }) }).catch(() => {});
+    // Welcome email + WhatsApp — await so Vercel serverless doesn't kill the request before sending
+    await sendEmail({ to: user.email, ...templates.welcome({ user }) }).catch(() => {});
     wa.welcome({ user }).catch(() => {});
 
     sendToken(user, 201, res);
@@ -106,7 +106,7 @@ exports.forgotPassword = async (req, res, next) => {
       });
 
       const resetUrl = `${APP_URL}/reset-password/${rawToken}`;
-      sendEmail({
+      await sendEmail({
         to: user.email,
         ...templates.passwordReset({ user, resetUrl }),
       }).catch(() => {});

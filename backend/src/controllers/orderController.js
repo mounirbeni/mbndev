@@ -66,8 +66,8 @@ exports.createOrder = async (req, res, next) => {
       metadata: { orderId: order.id, clientId: req.user.id },
     }).catch((err) => console.error('[notifyAdmins] failed:', err));
 
-    // Email + WhatsApp — fire-and-forget
-    sendEmail({
+    // Email + WhatsApp — await so Vercel serverless doesn't kill before sending
+    await sendEmail({
       to: req.user.email,
       ...templates.orderPlaced({ user: req.user, order }),
     }).catch(() => {});
