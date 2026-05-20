@@ -6,7 +6,7 @@ import { paymentAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Printer, ArrowLeft, CheckCircle2, Clock, AlertCircle, Download } from 'lucide-react';
+import { Printer, ArrowLeft, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 
 export default function InvoicePage() {
   const { id }   = useParams<{ id: string }>();
