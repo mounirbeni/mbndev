@@ -44,7 +44,7 @@ const localBusinessSchema = {
   logo: 'https://mbndev.ma/og-image.png',
   image: 'https://mbndev.ma/og-image.png',
   telephone: '+212705914424',
-  email: 'admin@mbndev.ma',
+  email: 'contact@mbndev.ma',
   address: {
     '@type': 'PostalAddress',
     addressCountry: 'MA',

@@ -160,7 +160,7 @@ export default function InvoicePage() {
                 <p className="text-xs text-gray-400 leading-relaxed">
                   {t('invoice.brand.tagline')}<br />
                   {t('invoice.brand.location')}<br />
-                  hello@mbndev.ma
+                  contact@mbndev.ma
                 </p>
               </div>
 
@@ -177,7 +177,7 @@ export default function InvoicePage() {
               <div>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t('invoice.from')}</p>
                 <p className="text-sm font-bold text-gray-900">MBN DEV</p>
-                <p className="text-xs text-gray-500 mt-0.5">hello@mbndev.ma</p>
+                <p className="text-xs text-gray-500 mt-0.5">contact@mbndev.ma</p>
                 <p className="text-xs text-gray-500">Morocco</p>
               </div>
               <div>
@@ -268,7 +268,7 @@ export default function InvoicePage() {
               </p>
               <div className="text-right">
                 <p className="text-xs text-gray-400">mbndev.ma</p>
-                <p className="text-xs text-gray-400">hello@mbndev.ma</p>
+                <p className="text-xs text-gray-400">contact@mbndev.ma</p>
               </div>
             </div>
           </div>

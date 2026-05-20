@@ -23,13 +23,13 @@ const contactSchema = {
     '@type': 'Organization',
     name: 'MBN DEV',
     url: 'https://mbndev.ma',
-    email: 'hello@mbndev.ma',
+    email: 'contact@mbndev.ma',
     telephone: '+212705914424',
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',
       availableLanguage: ['English', 'French', 'Arabic'],
-      email: 'hello@mbndev.ma',
+      email: 'contact@mbndev.ma',
     },
   },
 };
