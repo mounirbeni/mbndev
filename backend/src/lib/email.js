@@ -1,53 +1,71 @@
 // ─── Email infrastructure ────────────────────────────────────────────────────
-// Uses Nodemailer with SMTP (your domain email server).
-// Falls back to stdout in dev when SMTP credentials are not configured.
+// Uses Brevo Transactional Email HTTP API — works on Vercel (no SMTP blocking).
+// Falls back to stdout in dev when BREVO_API_KEY is not configured.
 // Never throws — all call-sites use fire-and-forget .catch(() => {}).
 
-const nodemailer = require('nodemailer');
+const https   = require('https');
 
-const FROM    = process.env.EMAIL_FROM    || 'MBN DEV <contact@mbndev.ma>';
-const APP_URL = (process.env.CLIENT_URL   || 'http://localhost:3000').replace(/\/$/, '');
+const FROM    = process.env.EMAIL_FROM || 'MBN DEV <contact@mbndev.ma>';
+const APP_URL = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-let transporter = null;
-try {
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    transporter = nodemailer.createTransport({
-      host:   process.env.SMTP_HOST,
-      port:   Number(process.env.SMTP_PORT) || 465,
-      secure: Number(process.env.SMTP_PORT) !== 587,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      tls: { rejectUnauthorized: false },
-    });
-    transporter.verify().catch((err) =>
-      console.error('[email] SMTP verify failed:', err.message)
-    );
-  }
-} catch (err) {
-  console.error('[email] transporter init failed:', err.message);
+// Parse "Name <email>" → { name, email }
+function parseSender(from) {
+  const m = from.match(/^(.+?)\s*<(.+?)>$/);
+  return m ? { name: m[1].trim(), email: m[2].trim() } : { name: 'MBN DEV', email: from };
 }
 
 // ─── Core send ───────────────────────────────────────────────────────────────
 
 async function sendEmail({ to, subject, html, text }) {
   if (!to) return { sent: false, reason: 'no_recipient' };
-  if (!transporter) {
+
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
     console.log(`[email:dev] → ${to}  ::  ${subject}`);
-    return { sent: false, reason: 'no_smtp_configured' };
+    return { sent: false, reason: 'no_brevo_key' };
   }
-  try {
-    const info = await transporter.sendMail({
-      from: FROM, to, subject,
-      html,
-      text: text || stripHtml(html),
+
+  const sender = parseSender(FROM);
+  const body   = JSON.stringify({
+    sender,
+    to:          [{ email: to }],
+    subject,
+    htmlContent: html,
+    textContent: text || stripHtml(html),
+  });
+
+  return new Promise((resolve) => {
+    const req = https.request(
+      {
+        hostname: 'api.brevo.com',
+        path:     '/v3/smtp/email',
+        method:   'POST',
+        headers:  {
+          'api-key':        apiKey,
+          'Content-Type':   'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (c) => { data += c; });
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve({ sent: true, id: JSON.parse(data)?.messageId });
+          } else {
+            console.error('[email] Brevo error:', res.statusCode, data.slice(0, 200));
+            resolve({ sent: false, reason: `HTTP ${res.statusCode}: ${data.slice(0, 100)}` });
+          }
+        });
+      }
+    );
+    req.on('error', (err) => {
+      console.error('[email] request error:', err.message);
+      resolve({ sent: false, reason: err.message });
     });
-    return { sent: true, id: info.messageId };
-  } catch (err) {
-    console.error('[email] send threw:', err.message);
-    return { sent: false, reason: err.message };
-  }
+    req.write(body);
+    req.end();
+  });
 }
 
 // ─── Utilities ───────────────────────────────────────────────────────────────
