@@ -1,38 +1,49 @@
 // ─── Email infrastructure ────────────────────────────────────────────────────
-// Uses Resend when RESEND_API_KEY is present; falls back to stdout in dev.
+// Uses Nodemailer with SMTP (your domain email server).
+// Falls back to stdout in dev when SMTP credentials are not configured.
 // Never throws — all call-sites use fire-and-forget .catch(() => {}).
 
-let resend = null;
+const nodemailer = require('nodemailer');
+
+const FROM    = process.env.EMAIL_FROM    || 'MBN DEV <contact@mbndev.ma>';
+const APP_URL = (process.env.CLIENT_URL   || 'http://localhost:3000').replace(/\/$/, '');
+
+let transporter = null;
 try {
-  if (process.env.RESEND_API_KEY) {
-    const { Resend } = require('resend');
-    resend = new Resend(process.env.RESEND_API_KEY);
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    transporter = nodemailer.createTransport({
+      host:   process.env.SMTP_HOST,
+      port:   Number(process.env.SMTP_PORT) || 465,
+      secure: Number(process.env.SMTP_PORT) !== 587,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: { rejectUnauthorized: false },
+    });
+    transporter.verify().catch((err) =>
+      console.error('[email] SMTP verify failed:', err.message)
+    );
   }
 } catch (err) {
-  console.error('[email] resend init failed:', err.message);
+  console.error('[email] transporter init failed:', err.message);
 }
-
-const FROM    = process.env.EMAIL_FROM || 'MBN DEV <onboarding@resend.dev>';
-const APP_URL = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 // ─── Core send ───────────────────────────────────────────────────────────────
 
 async function sendEmail({ to, subject, html, text }) {
   if (!to) return { sent: false, reason: 'no_recipient' };
-  if (!resend) {
+  if (!transporter) {
     console.log(`[email:dev] → ${to}  ::  ${subject}`);
-    return { sent: false, reason: 'no_provider_configured' };
+    return { sent: false, reason: 'no_smtp_configured' };
   }
   try {
-    const { data, error } = await resend.emails.send({
-      from: FROM, to, subject, html,
+    const info = await transporter.sendMail({
+      from: FROM, to, subject,
+      html,
       text: text || stripHtml(html),
     });
-    if (error) {
-      console.error('[email] send failed:', error);
-      return { sent: false, reason: error.message };
-    }
-    return { sent: true, id: data?.id };
+    return { sent: true, id: info.messageId };
   } catch (err) {
     console.error('[email] send threw:', err.message);
     return { sent: false, reason: err.message };
