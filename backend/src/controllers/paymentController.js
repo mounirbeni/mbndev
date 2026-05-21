@@ -219,6 +219,19 @@ exports.approveManualPayment = async (req, res, next) => {
           project,
         }),
       }).catch(() => {});
+
+      // Invoice email — send receipt with invoice number
+      const paidPayment = await prisma.payment.findUnique({ where: { id } });
+      await sendEmail({
+        to: payment.client.email,
+        ...templates.invoiceEmail({
+          client:  payment.client,
+          payment: { ...paidPayment, _id: id },
+          order:   payment.order,
+          project,
+        }),
+      }).catch(() => {});
+
       wa.paymentVerified({
         client:    payment.client,
         order:     payment.order,

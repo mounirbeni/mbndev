@@ -480,6 +480,59 @@ const templates = {
     }),
   }),
 
+  // ── Invoice email ─────────────────────────────────────────────────────────
+  invoiceEmail: ({ client, payment, order, project }) => {
+    const first      = client.name.split(' ')[0];
+    const year       = new Date(payment.createdAt).getFullYear();
+    const invoiceNum = `INV-${year}-${(payment._id || payment.id || '').slice(-6).toUpperCase()}`;
+    const isPaid     = payment.status === 'paid';
+    const paidDate   = payment.paidAt ? new Date(payment.paidAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null;
+    const issueDate  = new Date(payment.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const title      = order?.title || project?.title || 'Web Development Service';
+    const METHOD_LABELS = { cih_bank: 'CIH Bank Transfer', paypal: 'PayPal', taptapsend: 'TapTapSend', mock: 'Online Payment' };
+    const methodLabel = METHOD_LABELS[payment.method] || 'Manual Payment';
+    const amountFmt  = `$${Number(payment.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    return {
+      subject: isPaid
+        ? `Invoice ${invoiceNum} — Paid ${amountFmt}`
+        : `Invoice ${invoiceNum} — ${amountFmt} due`,
+      html: layout({
+        preheader: isPaid
+          ? `Your invoice ${invoiceNum} has been paid. Thank you!`
+          : `Invoice ${invoiceNum} for ${amountFmt} from MBN DEV.`,
+        badgeHtml: isPaid
+          ? badge('Payment confirmed', { bg: T.greenBg, color: T.green, border: T.greenBorder })
+          : badge(invoiceNum),
+        heading: isPaid ? `Invoice paid — thank you, ${first}.` : `Invoice for ${first}`,
+        intro: isPaid
+          ? `Your payment of ${amountFmt} has been received and confirmed. Your receipt is below.`
+          : `Please find your invoice below. Reach out if you have any questions.`,
+        body: [
+          infoBox([
+            ['Invoice',    invoiceNum],
+            ['Issue date', issueDate],
+            ...(paidDate ? [['Paid on', paidDate, { color: T.green }]] : []),
+            ['Description', title],
+            ['Method',     methodLabel],
+            ['Amount',     amountFmt, { bold: true, color: isPaid ? T.green : T.purpleLight }],
+          ]),
+          isPaid
+            ? notice(`Payment of <strong style="color:${T.green};">${amountFmt}</strong> confirmed. All source code and assets will be delivered upon project completion.`, { type: 'success' })
+            : notice(`To complete your payment, visit your client portal and follow the payment instructions. Contact us if you need assistance.`, { type: 'info' }),
+          ctaButton(
+            isPaid ? 'Open my project →' : 'View my portal →',
+            isPaid && project?.id
+              ? `${APP_URL}/dashboard/client/projects/${project.id}`
+              : `${APP_URL}/dashboard/client/payments`
+          ),
+          textBlock(`View or print your invoice at any time from your <a href="${APP_URL}/invoice/${payment._id || payment.id}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">client portal →</a>`, { mt: '0' }),
+        ].join(''),
+        footer: `This invoice was sent to ${e(client.email)} for services provided by MBN DEV.`,
+      }),
+    };
+  },
+
   // ── Project status update ─────────────────────────────────────────────────
   projectStatusUpdate: ({ client, project, fromStatus, toStatus }) => {
     const first  = client.name.split(' ')[0];

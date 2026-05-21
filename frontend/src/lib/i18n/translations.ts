@@ -325,6 +325,7 @@ const en: Dict = {
   'dash.nav.clients':     'Clients',
   'dash.nav.packages':    'Packages',
   'dash.nav.payments':    'Payments',
+  'dash.nav.invoices':    'Invoices',
   'dash.nav.analytics':   'Analytics',
   'dash.nav.settings':    'Settings',
   'dash.nav.home':        'Home',
