@@ -683,6 +683,170 @@ const templates = {
     };
   },
 
+  // ── Week 1: "Haven't started yet?" nudge ────────────────────────────────────
+  // Send to users who signed up but never placed an order.
+  getStarted: ({ user }) => {
+    const first      = (user?.name || 'there').split(' ')[0];
+    const requestUrl = `${APP_URL}/request`;
+    return {
+      subject: `${first}, your workspace is ready — let's build something`,
+      html: layout({
+        preheader: `You signed up for MBN DEV but haven't started a project yet. Here's how to kick things off in 5 minutes.`,
+        badgeHtml: badge('Get started', { bg: T.greenBg, color: T.green, border: T.greenBorder }),
+        heading:   `Your workspace is set up, ${first}. Let's use it.`,
+        intro:     `You created your MBN DEV account — but you haven't launched a project yet. That's totally fine. Here's everything you need to go from zero to a live brief in under 5 minutes.`,
+        body: [
+          divider('28px 0 24px'),
+          steps([
+            {
+              title: 'Tell us what you want to build',
+              desc:  'Fill out the project request form — stack, scope, timeline, budget. It takes about 3 minutes. No commitment yet.',
+            },
+            {
+              title: 'Get a fixed price in writing',
+              desc:  'We review every brief within 24 hours and send back a clear quote. No surprises, no hourly billing.',
+            },
+            {
+              title: 'Pay once, track everything',
+              desc:  'After payment, your private project workspace opens — with live progress, file sharing, and direct messaging.',
+            },
+          ]),
+          divider('8px 0 24px'),
+          notice(`We work on <strong style="color:${T.green};">websites, e-commerce stores, SaaS dashboards, and mobile apps</strong>. If you're not sure what you need, describe the problem and we'll figure it out together.`, { type: 'success' }),
+          ctaButton('Start my project request →', requestUrl),
+          textBlock(`Or if you have questions first, just <a href="${APP_URL}/dashboard/client/messages" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">send us a message</a> — we reply fast.`, { mt: '4' }),
+        ].join(''),
+        footer: `You received this because you have an account on MBN DEV and haven't started a project yet.`,
+      }),
+    };
+  },
+
+  // ── Week 1 (active clients): personal check-in ───────────────────────────────
+  checkIn: ({ user }) => {
+    const first   = (user?.name || 'there').split(' ')[0];
+    const dashUrl = `${APP_URL}/dashboard/client`;
+    return {
+      subject: `Checking in — how's everything going, ${first}?`,
+      html: layout({
+        preheader: `A quick note from the MBN DEV team. Your feedback matters and we want to hear from you.`,
+        badgeHtml: badge('Personal note', { bg: T.blueBg, color: T.blue, border: T.blueBorder }),
+        heading:   `Hey ${first} — just checking in.`,
+        intro:     `A week or so in, and we want to make sure everything is running smoothly for you. This is a real email, not an automated sequence — we genuinely want to know how your experience has been.`,
+        body: [
+          divider('28px 0 24px'),
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">`,
+          ...[
+            ['Is your dashboard doing what you need it to?', 'If anything feels confusing or slow, tell us. We ship fixes fast.'],
+            ['Are you getting the project updates you expect?', 'Every status change and milestone posts a message in your project chat automatically.'],
+            ['Do you have questions about payment or invoices?', 'All your receipts and invoices are in the Payments section of your dashboard.'],
+          ].map(([q, a]) =>
+            `<tr><td style="padding:0 0 14px;">` +
+            `<div style="background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:18px 20px;">` +
+            `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:5px;">${q}</div>` +
+            `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">${a}</div>` +
+            `</div></td></tr>`
+          ).join(''),
+          `</table>`,
+          notice(`Reply directly to this email — or <a href="${APP_URL}/dashboard/client/messages" style="color:${T.blue};text-decoration:none;font-weight:500;">open the in-app chat</a>. Either way, a real person reads and responds.`, { type: 'info' }),
+          ctaButton('Open my dashboard', dashUrl),
+        ].join(''),
+        footer: `You received this because you have an active account on MBN DEV.`,
+      }),
+    };
+  },
+
+  // ── Week 2: what we're building next ─────────────────────────────────────────
+  comingSoon: ({ user }) => {
+    const first   = (user?.name || 'there').split(' ')[0];
+    const dashUrl = `${APP_URL}/dashboard/client`;
+    return {
+      subject: `What's coming next on MBN DEV — June preview`,
+      html: layout({
+        preheader: `A sneak peek at the features we're building right now. Your feedback shaped these.`,
+        badgeHtml: badge('Coming soon', { bg: T.amberBg, color: T.amber, border: T.amberBorder }),
+        heading:   `Here's what we're building next, ${first}.`,
+        intro:     `Based on feedback from clients like you, here's a preview of what's coming to MBN DEV over the next few weeks.`,
+        body: [
+          divider('28px 0 24px'),
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">`,
+          ...[
+            ['🧾', 'Stripe Payments', 'Almost ready', T.green, T.greenBg, T.greenBorder,
+              'Pay by card directly in the platform — no bank transfers, no back-and-forth. One click and you\'re live.'],
+            ['📊', 'Project Analytics', 'In progress', T.amber, T.amberBg, T.amberBorder,
+              'A live progress chart inside your project — see time spent per milestone, completion rate, and delivery forecast.'],
+            ['🔔', 'Mobile Push Notifications', 'Planned', T.blue, T.blueBg, T.blueBorder,
+              'Get notified on your phone the second your project status changes or a new message arrives.'],
+            ['🌍', 'Arabic Interface', 'Planned', T.purpleLight, T.purpleBg, T.purpleBorder,
+              'Full Arabic language support across the entire platform — RTL layout included.'],
+          ].map(([icon, title, status, color, bg, border, desc]) =>
+            `<tr><td style="padding:0 0 12px;">` +
+            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d0d15;border:1px solid ${T.border};border-radius:14px;">` +
+            `<tr><td style="padding:18px 20px;">` +
+            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">` +
+            `<tr>` +
+            `<td style="font-size:20px;padding-right:14px;vertical-align:top;width:32px;line-height:1.5;">${icon}</td>` +
+            `<td style="vertical-align:top;">` +
+            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>` +
+            `<td><div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:5px;">${title}</div></td>` +
+            `<td style="text-align:right;"><div style="display:inline-block;background:${bg};color:${color};border:1px solid ${border};font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;font-family:${T.font};">${status}</div></td>` +
+            `</tr></table>` +
+            `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">${desc}</div>` +
+            `</td></tr></table></td></tr></table></td></tr>`
+          ).join(''),
+          `</table>`,
+          divider('20px 0 24px'),
+          notice(`Want to influence what we build next? <a href="${APP_URL}/dashboard/client/messages" style="color:${T.amber};text-decoration:none;font-weight:500;">Send us your top request</a> — the most-requested features move up the list.`, { type: 'warning' }),
+          ctaButton('Go to my dashboard', dashUrl),
+        ].join(''),
+        footer: `You received this because you have an account on MBN DEV. This is a product roadmap preview — not a guarantee of delivery dates.`,
+      }),
+    };
+  },
+
+  // ── Week 2: limited-time offer ────────────────────────────────────────────────
+  specialOffer: ({ user }) => {
+    const first      = (user?.name || 'there').split(' ')[0];
+    const requestUrl = `${APP_URL}/request`;
+    const expiry     = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return {
+      subject: `${first} — exclusive offer inside (expires ${expiry})`,
+      html: layout({
+        preheader: `A limited offer for MBN DEV clients. Valid for one week only.`,
+        badgeHtml: badge('Limited offer', { bg: T.amberBg, color: T.amber, border: T.amberBorder }),
+        heading:   `A special offer, just for you.`,
+        intro:     `As one of our early clients, we want to give you something back. For the next 7 days, we're offering an exclusive deal on new projects.`,
+        body: [
+          divider('28px 0 24px'),
+
+          // Offer card
+          `<div style="background:linear-gradient(135deg,${T.purpleBg},#0e0816);border:1px solid ${T.purpleBorder};border-radius:18px;padding:32px 28px;text-align:center;margin:0 0 24px;">`,
+          `<div style="font-size:36px;margin-bottom:12px;">🎁</div>`,
+          `<div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};margin-bottom:10px;">Exclusive client offer</div>`,
+          `<div style="font-size:32px;font-weight:800;color:#fff;font-family:${T.font};letter-spacing:-0.04em;margin-bottom:8px;">10% off your next project</div>`,
+          `<div style="font-size:14px;color:${T.textSecond};font-family:${T.font};line-height:1.7;margin-bottom:20px;">Start a new project request before <strong style="color:${T.amber};">${expiry}</strong> and get 10% off the total price — applied automatically.</div>`,
+          `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">`,
+          `<tr><td style="border-radius:12px;" bgcolor="${T.purple}">`,
+          `<!--[if !mso]><!-->`,
+          `<a href="${requestUrl}" style="background:linear-gradient(135deg,${T.purple},${T.purpleDark});display:inline-block;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:12px;font-family:${T.font};letter-spacing:-0.01em;">Claim my 10% discount →</a>`,
+          `<!--<![endif]-->`,
+          `</td></tr></table>`,
+          `</div>`,
+
+          infoBox([
+            ['Discount',     '10% off total project price'],
+            ['Applies to',   'All project types'],
+            ['Valid until',  expiry,             { color: T.amber, bold: true }],
+            ['How to use',   'Start a request — we apply it manually before invoicing'],
+          ]),
+
+          notice(`This offer is exclusive to existing MBN DEV clients and cannot be combined with other promotions. To claim, simply start a new project request before the expiry date and mention this email.`, { type: 'info' }),
+        ].join(''),
+        footer: `You received this exclusive offer because you have an account on MBN DEV. Offer valid until ${expiry}.`,
+      }),
+    };
+  },
+
 };
 
 // ─── Broadcast helper ─────────────────────────────────────────────────────────

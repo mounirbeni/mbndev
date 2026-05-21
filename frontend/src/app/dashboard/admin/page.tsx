@@ -96,7 +96,11 @@ export default function AdminDashboard() {
   }, [fetchAnalytics]);
 
   const TEMPLATES = [
-    { key: 'platformUpdate', label: 'May 2026 — Platform Update' },
+    { key: 'platformUpdate', label: 'May 2026 — Platform Update',    when: 'Now',    color: 'violet' },
+    { key: 'getStarted',     label: 'Week 1 — Get started nudge',    when: 'Week 1', color: 'green'  },
+    { key: 'checkIn',        label: 'Week 1 — Personal check-in',    when: 'Week 1', color: 'blue'   },
+    { key: 'comingSoon',     label: 'Week 2 — What\'s coming next',  when: 'Week 2', color: 'amber'  },
+    { key: 'specialOffer',   label: 'Week 2 — 10% discount offer',   when: 'Week 2', color: 'amber'  },
   ];
 
   const sendBroadcast = async () => {
@@ -186,21 +190,31 @@ export default function AdminDashboard() {
 
                 {/* Template selector */}
                 <div className="space-y-1.5 mb-4">
-                  {TEMPLATES.map((tpl) => (
-                    <button
-                      key={tpl.key}
-                      onClick={() => setSelectedTemplate(tpl.key)}
-                      className={[
-                        'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all border',
-                        selectedTemplate === tpl.key
-                          ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
-                          : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10',
-                      ].join(' ')}
-                    >
-                      <Mail className="w-3.5 h-3.5 inline mr-2 opacity-70" />
-                      {tpl.label}
-                    </button>
-                  ))}
+                  {TEMPLATES.map((tpl) => {
+                    const whenColors: Record<string, string> = {
+                      'Now':    'bg-violet-500/20 text-violet-300',
+                      'Week 1': 'bg-blue-500/20 text-blue-300',
+                      'Week 2': 'bg-amber-500/20 text-amber-300',
+                    };
+                    return (
+                      <button
+                        key={tpl.key}
+                        onClick={() => setSelectedTemplate(tpl.key)}
+                        className={[
+                          'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all border flex items-center gap-2',
+                          selectedTemplate === tpl.key
+                            ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
+                            : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10',
+                        ].join(' ')}
+                      >
+                        <Mail className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                        <span className="flex-1 text-xs">{tpl.label}</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${whenColors[tpl.when] ?? ''}`}>
+                          {tpl.when}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Send / Cancel */}

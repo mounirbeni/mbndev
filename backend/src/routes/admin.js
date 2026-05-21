@@ -276,6 +276,10 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
 
 const BROADCAST_TEMPLATES = {
   platformUpdate: (user) => templates.platformUpdate({ user }),
+  getStarted:     (user) => templates.getStarted({ user }),
+  checkIn:        (user) => templates.checkIn({ user }),
+  comingSoon:     (user) => templates.comingSoon({ user }),
+  specialOffer:   (user) => templates.specialOffer({ user }),
 };
 
 router.post('/broadcast', protect, authorize('admin'), async (req, res, next) => {
