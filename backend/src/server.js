@@ -140,15 +140,18 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));
 
-// ─── Health check (verifies DB) ──────────────────────────────────────────────
+// ─── Health check (verifies DB + realtime stats) ─────────────────────────────
 app.get('/api/health', async (req, res) => {
+  const realtime = require('./lib/realtime');
   try {
     await prisma.$queryRaw`SELECT 1`;
     res.json({
       status:    'ok',
       db:        'connected',
+      realtime:  realtime.stats(),
       uptime:    process.uptime(),
       timestamp: new Date().toISOString(),
+      version:   process.env.npm_package_version || '1.0.0',
     });
   } catch (err) {
     res.status(503).json({
@@ -164,20 +167,43 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// ─── Global error handler ────────────────────────────────────────────────────
+// ─── Global error handler ─────────────────────────────────────────────────────
+// Structured: logs request ID + status so errors are traceable in Vercel logs.
 app.use((err, req, res, _next) => {
-  // CORS errors come through here
+  // CORS errors
   if (err.message?.startsWith('CORS:')) {
     return res.status(403).json({ success: false, message: err.message });
   }
 
-  // Don't leak stack traces in production
-  const isProd = process.env.NODE_ENV === 'production';
-  if (!isProd) console.error(err.stack);
+  // Multer errors (file upload validation)
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ success: false, message: 'File too large. Maximum 10 MB.' });
+  }
+  if (err.message?.startsWith('File extension') || err.message?.startsWith('MIME type')) {
+    return res.status(400).json({ success: false, message: err.message });
+  }
 
-  res.status(err.status || 500).json({
-    success: false,
-    message: isProd ? 'Internal Server Error' : (err.message || 'Internal Server Error'),
+  const status  = err.status || err.statusCode || 500;
+  const isProd  = process.env.NODE_ENV === 'production';
+  const reqId   = req.requestId || 'unknown';
+
+  if (status >= 500) {
+    // Always log 5xx — structured so Vercel can index it
+    console.error(JSON.stringify({
+      level:     'error',
+      requestId: reqId,
+      method:    req.method,
+      url:       req.originalUrl,
+      status,
+      message:   err.message,
+      stack:     isProd ? undefined : err.stack,
+    }));
+  }
+
+  res.status(status).json({
+    success:   false,
+    message:   isProd && status >= 500 ? 'Internal Server Error' : (err.message || 'Internal Server Error'),
+    requestId: reqId,
   });
 });
 

@@ -170,26 +170,54 @@ exports.approveManualPayment = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    // ── Optimistic-lock: only proceed if status is still pending_verification ──
+    // The update is atomic — if two admins click "approve" simultaneously,
+    // only one UPDATE will match (status filter), the other gets count=0.
+    const locked = await prisma.payment.updateMany({
+      where: { id, status: 'pending_verification' },
+      data:  { status: 'processing' }, // intermediate guard state
+    });
+
+    if (locked.count === 0) {
+      // Either not found OR already approved by a concurrent request
+      const existing = await prisma.payment.findUnique({
+        where:  { id },
+        select: { id: true, status: true },
+      });
+      if (!existing) return res.status(404).json({ success: false, message: 'Payment not found' });
+      return res.status(409).json({
+        success: false,
+        message: `Payment is already ${existing.status} — cannot approve again.`,
+      });
+    }
+
+    // Reload with relations now that we exclusively own it
     const payment = await prisma.payment.findUnique({
       where:   { id },
       include: { order: true, client: true },
     });
-    if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
-    if (payment.status !== 'pending_verification') {
-      return res.status(400).json({ success: false, message: 'Payment is not pending verification' });
-    }
 
     let project = null;
     if (payment.orderId && payment.order && payment.order.status === 'pending') {
       // Atomically: create project, link order=paid, mark payment=paid
-      project = await prisma.$transaction(async (tx) => {
-        const p = await createProjectFromOrder(payment.order, tx);
-        await tx.payment.update({
-          where: { id },
-          data:  { status: 'paid', paidAt: new Date(), projectId: p.id },
+      try {
+        project = await prisma.$transaction(async (tx) => {
+          const p = await createProjectFromOrder(payment.order, tx);
+          await tx.payment.update({
+            where: { id },
+            data:  { status: 'paid', paidAt: new Date(), projectId: p.id },
+          });
+          return p;
         });
-        return p;
-      });
+      } catch (txErr) {
+        // Roll back the intermediate 'processing' status so the payment
+        // can be retried. Re-throw so the global handler responds 500.
+        await prisma.payment.updateMany({
+          where: { id, status: 'processing' },
+          data:  { status: 'pending_verification' },
+        }).catch(() => {});
+        throw txErr;
+      }
 
       await logActivity(
         project.id,
@@ -238,6 +266,7 @@ exports.approveManualPayment = async (req, res, next) => {
         projectId: project.id,
       }).catch(() => {});
     } else {
+      // No linked order — just mark paid directly
       await prisma.payment.update({
         where: { id },
         data:  { status: 'paid', paidAt: new Date() },

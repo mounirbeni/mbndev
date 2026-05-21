@@ -1,13 +1,15 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+
+// ─── Axios instance ───────────────────────────────────────────────────────────
 
 const api = axios.create({
   baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
-  // Don't auto-throw on 4xx — let callers decide
-  timeout: 30_000,
+  timeout: 30_000, // 30 s — matches Vercel function timeout
 });
 
-// Attach JWT token to every request
+// ─── Request interceptor — attach JWT ────────────────────────────────────────
+
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('mbndev_token');
@@ -16,53 +18,103 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 401 handling — clear session and redirect, but only ONCE per redirect to
-// avoid mid-request loops if multiple in-flight calls 401 simultaneously.
-let unauthorizedHandled = false;
+// ─── 401 guard ────────────────────────────────────────────────────────────────
+// Only redirect ONCE per session. Multiple in-flight calls that all 401
+// simultaneously would otherwise each trigger a redirect.
 
-/** Call after a successful login to re-arm the 401 redirect guard. */
+let _unauthorizedHandled = false;
+
+/** Re-arm after a successful login. */
 export function resetUnauthorizedFlag() {
-  unauthorizedHandled = false;
+  _unauthorizedHandled = false;
 }
 
-api.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    const status = error.response?.status;
+function handle401(url: string) {
+  if (_unauthorizedHandled) return;
+  // Never redirect during auth establishment calls
+  const isAuthCall = url?.includes('/auth/login') || url?.includes('/auth/register');
+  if (isAuthCall) return;
 
-    if (status === 401 && typeof window !== 'undefined' && !unauthorizedHandled) {
-      // Don't redirect during the very calls that establish a session
-      const url = error.config?.url || '';
-      const isAuthEndpoint = url.includes('/auth/login') || url.includes('/auth/register');
-      if (!isAuthEndpoint) {
-        unauthorizedHandled = true;
-        localStorage.removeItem('mbndev_token');
-        localStorage.removeItem('mbndev_user');
-        // Clear the middleware cookie too
-        document.cookie = 'mbndev_auth=; path=/; max-age=0; samesite=lax';
+  _unauthorizedHandled = true;
 
-        // Preserve current path so login can redirect back
-        const next = encodeURIComponent(window.location.pathname + window.location.search);
-        // Don't redirect if we're already on a public page
-        if (!/^\/(login|signup|forgot-password|$)/.test(window.location.pathname)) {
-          window.location.href = `/login?next=${next}`;
-        }
-      }
+  // Clear all auth state
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('mbndev_token');
+    localStorage.removeItem('mbndev_user');
+    document.cookie = 'mbndev_auth=; path=/; max-age=0; samesite=lax';
+
+    const next = encodeURIComponent(window.location.pathname + window.location.search);
+    const isPublic = /^\/(login|signup|forgot-password|reset-password|$)/.test(
+      window.location.pathname,
+    );
+    if (!isPublic) {
+      window.location.href = `/login?next=${next}`;
     }
-    return Promise.reject(error);
   }
+}
+
+// ─── Retry logic ─────────────────────────────────────────────────────────────
+// Retry on network errors and 5xx responses, with exponential back-off.
+// Only idempotent methods are retried automatically.
+
+const RETRYABLE_METHODS   = new Set(['get', 'head', 'options', 'put', 'delete']);
+const MAX_RETRIES         = 2;
+const RETRY_BASE_DELAY_MS = 500;
+
+function shouldRetry(error: AxiosError, retryCount: number): boolean {
+  if (retryCount >= MAX_RETRIES) return false;
+  const method = error.config?.method?.toLowerCase() ?? '';
+  if (!RETRYABLE_METHODS.has(method)) return false;
+  // Retry network errors (no response at all)
+  if (!error.response) return true;
+  // Retry server errors (502/503/504 — transient gateway/lambda issues)
+  const status = error.response.status;
+  return status === 502 || status === 503 || status === 504;
+}
+
+function delay(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+// ─── Response interceptor ─────────────────────────────────────────────────────
+
+api.interceptors.response.use(
+  (res: AxiosResponse) => res,
+  async (error: AxiosError) => {
+    const status = error.response?.status;
+    const url    = error.config?.url ?? '';
+
+    // 401 → clear session + redirect
+    if (status === 401 && typeof window !== 'undefined') {
+      handle401(url);
+    }
+
+    // Retry transient failures
+    const config = error.config as AxiosRequestConfig & { _retryCount?: number };
+    const retryCount = config._retryCount ?? 0;
+
+    if (shouldRetry(error, retryCount)) {
+      config._retryCount = retryCount + 1;
+      const backoff = RETRY_BASE_DELAY_MS * Math.pow(2, retryCount);
+      await delay(backoff);
+      return api(config);
+    }
+
+    return Promise.reject(error);
+  },
 );
 
-// ─── API namespaces ──────────────────────────────────────────────────────────
+// ─── API namespaces ───────────────────────────────────────────────────────────
 
 export const authAPI = {
-  register:        (data: any)         => api.post('/auth/register', data),
-  login:           (data: any)         => api.post('/auth/login', data),
-  getMe:           ()                  => api.get('/auth/me'),
-  updateProfile:   (data: any)         => api.put('/auth/profile', data),
-  forgotPassword:  (email: string)     => api.post('/auth/forgot-password', { email }),
-  resetPassword:   (token: string, newPassword: string) =>
-                                          api.post('/auth/reset-password', { token, newPassword }),
+  register:      (data: any)                          => api.post('/auth/register', data),
+  login:         (data: any)                          => api.post('/auth/login', data),
+  getMe:         ()                                   => api.get('/auth/me'),
+  updateProfile: (data: any)                          => api.put('/auth/profile', data),
+  forgotPassword:(email: string)                      => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token: string, newPassword: string) => api.post('/auth/reset-password', { token, newPassword }),
+  checkEmail:    (email: string)                      => api.post('/auth/check-email', { email }),
+  checkPhone:    (phone: string)                      => api.post('/auth/check-phone', { phone }),
 };
 
 export const projectAPI = {
@@ -74,6 +126,7 @@ export const projectAPI = {
   uploadFile:      (id: string, formData: FormData)  =>
     api.post(`/projects/${id}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60_000, // file uploads get a longer timeout
     }),
   getStats:        ()                                => api.get('/projects/stats'),
   generateShare:   (id: string)                      => api.post(`/projects/${id}/share`, {}),
@@ -81,46 +134,47 @@ export const projectAPI = {
 };
 
 export const orderAPI = {
-  create:        (data: any)    => api.post('/orders', data),
-  getAll:        (params?: any) => api.get('/orders', { params }),
-  getOne:        (id: string)   => api.get(`/orders/${id}`),
-  cancel:        (id: string)   => api.put(`/orders/${id}/cancel`),
-  getPrice:      (params: any)  => api.get('/orders/price', { params }),
+  create:    (data: any)    => api.post('/orders', data),
+  getAll:    (params?: any) => api.get('/orders', { params }),
+  getOne:    (id: string)   => api.get(`/orders/${id}`),
+  cancel:    (id: string)   => api.put(`/orders/${id}/cancel`),
+  getPrice:  (params: any)  => api.get('/orders/price', { params }),
 };
 
 export const messageAPI = {
-  getThreads: ()                              => api.get('/messages/threads'),
-  get:        (projectId: string)             => api.get(`/messages/${projectId}`),
-  send:       (projectId: string, data: any)  => api.post(`/messages/${projectId}`, data),
-  getUnread:  ()                              => api.get('/messages/unread'),
+  getThreads: ()                                         => api.get('/messages/threads'),
+  get:        (projectId: string, before?: string)       =>
+    api.get(`/messages/${projectId}`, { params: before ? { before } : {} }),
+  send:       (projectId: string, data: any)             => api.post(`/messages/${projectId}`, data),
+  getUnread:  ()                                         => api.get('/messages/unread'),
 };
 
 export const paymentAPI = {
-  mock:           (data: any)  => api.post('/payments/mock', data),
-  submitManual:   (data: any)  => api.post('/payments/manual', data),
-  approveManual:  (id: string) => api.put(`/payments/${id}/approve`, {}),
-  getAll:         ()           => api.get('/payments'),
-  getOne:         (id: string) => api.get(`/payments/${id}`),
+  mock:          (data: any)  => api.post('/payments/mock', data),
+  submitManual:  (data: any)  => api.post('/payments/manual', data),
+  approveManual: (id: string) => api.put(`/payments/${id}/approve`, {}),
+  getAll:        ()           => api.get('/payments'),
+  getOne:        (id: string) => api.get(`/payments/${id}`),
 };
 
 export const notificationAPI = {
-  getAll:       ()           => api.get('/notifications'),
-  getUnread:    ()           => api.get('/notifications/unread-count'),
-  markRead:     (id: string) => api.put(`/notifications/${id}/read`),
-  markAllRead:  ()           => api.put('/notifications/read-all'),
+  getAll:      ()           => api.get('/notifications'),
+  getUnread:   ()           => api.get('/notifications/unread-count'),
+  markRead:    (id: string) => api.put(`/notifications/${id}/read`),
+  markAllRead: ()           => api.put('/notifications/read-all'),
 };
 
 export const packageAPI = {
-  getAll:  ()                       => api.get('/packages'),
-  create:  (data: any)              => api.post('/packages', data),
-  update:  (id: string, data: any)  => api.put(`/packages/${id}`, data),
-  delete:  (id: string)             => api.delete(`/packages/${id}`),
+  getAll: ()                       => api.get('/packages'),
+  create: (data: any)              => api.post('/packages', data),
+  update: (id: string, data: any)  => api.put(`/packages/${id}`, data),
+  delete: (id: string)             => api.delete(`/packages/${id}`),
 };
 
 export const adminAPI = {
-  getClients:    ()           => api.get('/admin/clients'),
-  toggleClient:  (id: string) => api.put(`/admin/clients/${id}/toggle`),
-  getAnalytics:  ()           => api.get('/admin/analytics'),
+  getClients:   ()           => api.get('/admin/clients'),
+  toggleClient: (id: string) => api.put(`/admin/clients/${id}/toggle`),
+  getAnalytics: ()           => api.get('/admin/analytics'),
 };
 
 export default api;

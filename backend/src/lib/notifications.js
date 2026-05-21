@@ -1,19 +1,27 @@
+'use strict';
+
 const prisma   = require('./prisma');
 const realtime = require('./realtime');
+const cache    = require('./cache');
 
+// ─── notify ──────────────────────────────────────────────────────────────────
 /**
- * Create a notification for a user AND push it over the realtime stream.
- * Safe to call — never throws, just logs errors.
+ * Create a Notification record for one user and push it over SSE.
+ * Never throws — logs errors instead.
  */
 async function notify(userId, { type, title, message, link = null, metadata = null }) {
   try {
     const notif = await prisma.notification.create({
       data: { userId, type, title, message, link, metadata },
     });
-    // Push to user's open SSE connections (if any) for instant UI update
     realtime.publishToUser(userId, 'notification:new', {
-      id: notif.id, type: notif.type, title: notif.title, message: notif.message,
-      link: notif.link, metadata: notif.metadata, read: false,
+      id:        notif.id,
+      type:      notif.type,
+      title:     notif.title,
+      message:   notif.message,
+      link:      notif.link,
+      metadata:  notif.metadata,
+      read:      false,
       createdAt: notif.createdAt,
     });
     return notif;
@@ -23,44 +31,68 @@ async function notify(userId, { type, title, message, link = null, metadata = nu
   }
 }
 
+// ─── getAdminIds ─────────────────────────────────────────────────────────────
 /**
- * Notify all admin users.
+ * Return active admin user IDs, cached for 2 minutes.
+ * Avoids a full-table scan on every admin notification.
  */
-async function notifyAdmins(payload) {
-  try {
-    const admins = await prisma.user.findMany({
-      where:  { role: 'admin', isActive: true },
-      select: { id: true },
-    });
-    await Promise.all(admins.map((a) => notify(a.id, payload)));
-  } catch (err) {
-    console.error('[notifyAdmins] Failed:', err.message);
-  }
+async function getAdminIds() {
+  return cache.getOrSet(
+    cache.KEYS.ADMIN_IDS,
+    async () => {
+      const admins = await prisma.user.findMany({
+        where:  { role: 'admin', isActive: true },
+        select: { id: true },
+      });
+      return admins.map((a) => a.id);
+    },
+    cache.ADMIN_IDS_TTL,
+  );
 }
 
 /**
- * Log an activity on a project AND push to realtime listeners.
+ * Invalidate the cached admin ID list (call after creating/deactivating admins).
+ */
+function invalidateAdminCache() {
+  cache.del(cache.KEYS.ADMIN_IDS);
+}
+
+// ─── notifyAdmins ─────────────────────────────────────────────────────────────
+/**
+ * Notify all active admin users using cached IDs.
+ * Each admin gets an individual Notification record for their own read state.
+ */
+async function notifyAdmins(payload) {
+  try {
+    const adminIds = await getAdminIds();
+    if (adminIds.length === 0) return;
+    // Run in parallel but don't let one failure abort the others
+    await Promise.allSettled(adminIds.map((id) => notify(id, payload)));
+  } catch (err) {
+    console.error('[notifyAdmins] Failed to fetch admin IDs:', err.message);
+  }
+}
+
+// ─── logActivity ─────────────────────────────────────────────────────────────
+/**
+ * Persist an ActivityLog record and push the event over SSE to the project's
+ * client and all admins.
+ * Never throws — logs errors instead.
  */
 async function logActivity(projectId, userId, action, description, metadata = null) {
   try {
-    const log = await prisma.activityLog.create({
-      data: { projectId, userId, action, description, metadata },
-    });
-
-    // Notify the project's client and all admins of the activity
-    const project = await prisma.project.findUnique({
-      where:  { id: projectId },
-      select: { id: true, clientId: true, status: true },
-    });
+    const [log, project] = await Promise.all([
+      prisma.activityLog.create({
+        data: { projectId, userId, action, description, metadata },
+      }),
+      prisma.project.findUnique({
+        where:  { id: projectId },
+        select: { clientId: true },
+      }),
+    ]);
 
     if (project) {
-      const event = {
-        projectId,
-        action,
-        description,
-        metadata,
-        createdAt: log.createdAt,
-      };
+      const event = { projectId, action, description, metadata, createdAt: log.createdAt };
       realtime.publishToUser(project.clientId, 'project:activity', event);
       realtime.publishToAdmins('project:activity', event);
     }
@@ -72,4 +104,4 @@ async function logActivity(projectId, userId, action, description, metadata = nu
   }
 }
 
-module.exports = { notify, notifyAdmins, logActivity };
+module.exports = { notify, notifyAdmins, logActivity, invalidateAdminCache };

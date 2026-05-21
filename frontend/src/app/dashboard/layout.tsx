@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +10,7 @@ import NotificationBell from '@/components/dashboard/NotificationBell';
 import FloatingSupport from '@/components/ui/FloatingSupport';
 import Logo3D from '@/components/ui/Logo3D';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { getInitials } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -19,7 +20,7 @@ import Link from 'next/link';
 function useScrollHideHeader() {
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
-  const scrollEl    = useRef<HTMLElement | null>(null);
+  const scrollEl    = useRef<HTMLDivElement | null>(null);
 
   const onScroll = () => {
     const el = scrollEl.current;
@@ -30,7 +31,7 @@ function useScrollHideHeader() {
     lastScrollY.current = y;
   };
 
-  return { hidden, scrollRef: scrollEl, onScroll };
+  return { hidden, scrollRef: scrollEl as React.RefObject<HTMLDivElement>, onScroll };
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -166,7 +167,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* ── Page content ─────────────────────────────────────────── */}
         <main
-          ref={scrollRef as React.RefObject<HTMLDivElement>}
+          ref={scrollRef}
           className="flex-1 overflow-y-auto inertial-scroll"
           onScroll={onScroll}
           style={{
@@ -182,7 +183,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="p-4 lg:p-6 min-h-full"
             >
-              {children}
+              <ErrorBoundary scope="Dashboard" resetLabel="Reload section">
+                {children}
+              </ErrorBoundary>
             </motion.div>
           </AnimatePresence>
         </main>

@@ -1,17 +1,19 @@
+'use strict';
+
 const prisma   = require('../lib/prisma');
 const { fmt }  = require('../lib/format');
 const realtime = require('../lib/realtime');
 
+const MESSAGE_PAGE_SIZE = 50; // messages per page
+
 // ─── GET /api/messages/threads ───────────────────────────────────────────────
-// Returns all project threads with unread counts + last message preview.
-// Used to populate the messages sidebar.
 exports.getThreads = async (req, res, next) => {
   try {
     const isAdmin = req.user.role === 'admin';
     const userId  = req.user.id;
 
     const projects = await prisma.project.findMany({
-      where:   isAdmin ? {} : { clientId: userId },
+      where:  isAdmin ? {} : { clientId: userId },
       select: {
         id:        true,
         title:     true,
@@ -20,7 +22,7 @@ exports.getThreads = async (req, res, next) => {
         client: { select: { id: true, name: true, avatar: true } },
         messages: {
           orderBy: { createdAt: 'desc' },
-          take: 1,
+          take:    1,
           select: {
             content:   true,
             type:      true,
@@ -52,8 +54,8 @@ exports.getThreads = async (req, res, next) => {
       if (last) {
         if (last.type === 'system') {
           try {
-            const parsed  = JSON.parse(last.content);
-            lastMessage = { text: parsed.title, type: 'system', createdAt: last.createdAt };
+            const parsed = JSON.parse(last.content);
+            lastMessage  = { text: parsed.title, type: 'system', createdAt: last.createdAt };
           } catch {
             lastMessage = { text: last.content.slice(0, 60), type: 'system', createdAt: last.createdAt };
           }
@@ -78,7 +80,7 @@ exports.getThreads = async (req, res, next) => {
       };
     });
 
-    // Conversations with unread messages bubble to top
+    // Conversations with unread messages bubble to the top
     threads.sort((a, b) => {
       if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
@@ -90,10 +92,13 @@ exports.getThreads = async (req, res, next) => {
   }
 };
 
-// ─── GET /api/messages/:projectId ───────────────────────────────────────────
+// ─── GET /api/messages/:projectId ────────────────────────────────────────────
+// Supports cursor-based pagination via ?before=<messageId>
+// Returns up to MESSAGE_PAGE_SIZE messages in ascending time order.
 exports.getMessages = async (req, res, next) => {
   try {
     const { projectId } = req.params;
+    const { before }    = req.query; // cursor: fetch messages older than this ID
 
     const project = await prisma.project.findUnique({
       where:  { id: projectId },
@@ -103,41 +108,65 @@ exports.getMessages = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
-
     if (req.user.role === 'client' && project.clientId !== req.user.id) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
 
+    // Resolve cursor to a timestamp
+    let cursorFilter = {};
+    if (before) {
+      const cursorMsg = await prisma.message.findUnique({
+        where:  { id: before },
+        select: { createdAt: true },
+      });
+      if (cursorMsg) {
+        cursorFilter = { createdAt: { lt: cursorMsg.createdAt } };
+      }
+    }
+
     const messages = await prisma.message.findMany({
-      where:   { projectId },
+      where:   { projectId, ...cursorFilter },
       include: { sender: { select: { id: true, name: true, avatar: true, role: true } } },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' }, // fetch newest-first for cursor, then reverse
+      take:    MESSAGE_PAGE_SIZE,
     });
 
-    // Mark all unread messages from others as read in one query
-    await prisma.message.updateMany({
-      where: {
-        projectId,
-        isRead: false,
-        OR: [
-          { senderId: { not: req.user.id } },
-          { senderId: null },
-        ],
-      },
-      data: { isRead: true },
-    });
+    // Reverse so client receives chronological order
+    messages.reverse();
 
-    res.json({ success: true, messages: fmt(messages) });
+    // Mark fetched messages from others as read (only the visible page)
+    const unreadIds = messages
+      .filter((m) => !m.isRead && m.senderId !== req.user.id)
+      .map((m) => m.id);
+
+    if (unreadIds.length > 0) {
+      prisma.message.updateMany({
+        where: { id: { in: unreadIds } },
+        data:  { isRead: true },
+      }).catch(() => {}); // fire-and-forget — don't block the response
+    }
+
+    res.json({
+      success:  true,
+      messages: fmt(messages),
+      hasMore:  messages.length === MESSAGE_PAGE_SIZE,
+      // oldest message ID is the next cursor for "load more" (load older)
+      nextCursor: messages.length > 0 ? messages[0].id : null,
+    });
   } catch (err) {
     next(err);
   }
 };
 
-// ─── POST /api/messages/:projectId ──────────────────────────────────────────
+// ─── POST /api/messages/:projectId ───────────────────────────────────────────
 exports.sendMessage = async (req, res, next) => {
   try {
     const { content }   = req.body;
     const { projectId } = req.params;
+
+    if (!content || typeof content !== 'string' || !content.trim()) {
+      return res.status(400).json({ success: false, message: 'Message content is required.' });
+    }
 
     const project = await prisma.project.findUnique({
       where:  { id: projectId },
@@ -147,13 +176,12 @@ exports.sendMessage = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
-
     if (req.user.role === 'client' && project.clientId !== req.user.id) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
 
     const message = await prisma.message.create({
-      data:    { content, projectId, senderId: req.user.id, type: 'user' },
+      data:    { content: content.trim(), projectId, senderId: req.user.id, type: 'user' },
       include: { sender: { select: { id: true, name: true, avatar: true, role: true } } },
     });
 
@@ -171,12 +199,12 @@ exports.sendMessage = async (req, res, next) => {
   }
 };
 
-// ─── GET /api/messages/unread ────────────────────────────────────────────────
+// ─── GET /api/messages/unread ─────────────────────────────────────────────────
 exports.getUnreadCount = async (req, res, next) => {
   try {
     const count = await prisma.message.count({
       where: {
-        isRead: false,
+        isRead:  false,
         project: req.user.role === 'admin' ? {} : { clientId: req.user.id },
         OR: [
           { senderId: { not: req.user.id } },

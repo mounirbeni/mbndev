@@ -95,34 +95,35 @@ async function recordLoginAttempt(email, req, success) {
 
 /**
  * Check whether an email is currently locked out due to too many failed logins.
+ * Uses a single DB query — fetches the recent failures and computes both the
+ * count and the most-recent timestamp in JS rather than making two round-trips.
  *
  * Returns: { locked: boolean, remainingMs: number, attemptsLeft: number }
  */
 async function checkLoginBruteForce(email) {
-  const since = new Date(Date.now() - LOGIN_WINDOW_MS);
+  const since      = new Date(Date.now() - LOGIN_WINDOW_MS);
   const normalised = normalizeEmail(email);
 
-  const failCount = await prisma.loginAttempt.count({
+  // Fetch just enough rows to make the decision — at most LOGIN_MAX_FAILS + 1
+  const recentFails = await prisma.loginAttempt.findMany({
     where: {
-      email:   normalised,
-      success: false,
+      email:     normalised,
+      success:   false,
       createdAt: { gte: since },
     },
+    orderBy: { createdAt: 'desc' },
+    take:    LOGIN_MAX_FAILS + 1, // one extra tells us if we're over the limit
+    select:  { createdAt: true },
   });
+
+  const failCount = recentFails.length;
 
   if (failCount < LOGIN_MAX_FAILS) {
     return { locked: false, remainingMs: 0, attemptsLeft: LOGIN_MAX_FAILS - failCount };
   }
 
-  // Find the most recent failure to calculate remaining lockout time
-  const latest = await prisma.loginAttempt.findFirst({
-    where: { email: normalised, success: false, createdAt: { gte: since } },
-    orderBy: { createdAt: 'desc' },
-  });
-
-  const lockUntil = latest
-    ? new Date(latest.createdAt.getTime() + LOGIN_LOCK_MS)
-    : new Date();
+  // Most recent failure is recentFails[0] (ordered desc)
+  const lockUntil   = new Date(recentFails[0].createdAt.getTime() + LOGIN_LOCK_MS);
   const remainingMs = Math.max(0, lockUntil.getTime() - Date.now());
 
   return { locked: remainingMs > 0, remainingMs, attemptsLeft: 0 };

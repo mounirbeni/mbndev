@@ -2,6 +2,8 @@ const router = require('express').Router();
 const { protect, authorize } = require('../middleware/auth');
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
+const { invalidateAdminCache } = require('../lib/notifications');
+const cache = require('../lib/cache');
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
 
@@ -25,6 +27,8 @@ router.put('/clients/:id/toggle', protect, authorize('admin'), async (req, res, 
       data:   { isActive: !existing.isActive },
       select: { id: true, name: true, email: true, isActive: true, role: true },
     });
+    // If toggling an admin, invalidate the cached admin ID list
+    if (existing.role === 'admin') invalidateAdminCache();
     res.json({ success: true, user: fmt(user) });
   } catch (err) { next(err); }
 });
@@ -36,6 +40,44 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
     const now   = new Date();
     const year  = now.getFullYear();
     const month = now.getMonth(); // 0-indexed
+    const cacheKey = `${cache.KEYS.ANALYTICS}:${year}:${month}`;
+
+    // ── Serve from cache if fresh ────────────────────────────────────────────
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.setHeader('Cache-Control', 'private, max-age=60, stale-while-revalidate=30');
+      return res.json({
+        success: true,
+        analytics: {
+          totalProjects:  cached.totalProjects,
+          totalClients:   cached.totalClients,
+          activeClients:  cached.activeClients,
+          totalRevenue:   cached.paidPayments._sum.amount    || 0,
+          pendingRevenue: cached.pendingPayments._sum.amount || 0,
+          paidCount:      cached.paidPayments._count.id,
+          pendingCount:   cached.pendingPayments._count.id,
+          totalPayments:  cached.totalPayments,
+          byStatus: {
+            pending:    cached.statusMap['pending']     || 0,
+            paid:       cached.statusMap['paid']        || 0,
+            inProgress: cached.statusMap['in-progress'] || 0,
+            review:     cached.statusMap['review']      || 0,
+            revision:   cached.statusMap['revision']    || 0,
+            completed:  cached.statusMap['completed']   || 0,
+            cancelled:  cached.statusMap['cancelled']   || 0,
+          },
+          byType:          cached.typeMap,
+          monthlyRevenue:  cached.monthlyRevenue,
+          monthlyClients:  cached.monthlyClients,
+          monthlyProjects: cached.monthlyProjects,
+          recentProjects:  fmt(cached.recentProjects),
+          recentPayments:  fmt(cached.recentPayments),
+          recentClients:   fmt(cached.recentClients),
+          year,
+          currentMonth: month,
+        },
+      });
+    }
 
     // ── Core counts (all single-query) ──────────────────────────────────────
     const [
@@ -165,8 +207,25 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
       projectsByType.map((r) => [r.type, r._count.id])
     );
 
-    // Cache for 60 s — analytics data is expensive (3 raw SQL queries).
-    // Private because it's role-gated; no-cache directive would block it.
+    // Cache the analytics payload in process memory for 60 s.
+    // The HTTP response also carries Cache-Control so browser caches help.
+    cache.set(cacheKey, {
+      totalProjects,
+      totalClients,
+      activeClients,
+      paidPayments,
+      pendingPayments,
+      totalPayments,
+      statusMap: Object.fromEntries(projectsByStatus.map((r) => [r.status, r._count.id])),
+      typeMap:   Object.fromEntries(projectsByType.map((r)   => [r.type,   r._count.id])),
+      monthlyRevenue,
+      monthlyClients,
+      monthlyProjects,
+      recentProjects,
+      recentPayments,
+      recentClients,
+    }, 60_000);
+
     res.setHeader('Cache-Control', 'private, max-age=60, stale-while-revalidate=30');
 
     res.json({
