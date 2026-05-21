@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -39,6 +39,17 @@
   --dur-base:   180ms;
   --dur-slow:   320ms;
   --dur-slower: 500ms;
+
+  /* ── Luxury / Gold accent system ─────────────────────────────────── */
+  --gold-100: #fdf6e3;
+  --gold-200: #f0d89a;
+  --gold-300: #d4a843;
+  --gold-400: #c9984a;
+  --gold-500: #b8882e;
+  --gold-600: #9a6f1e;
+  --gold-glow: rgba(201, 168, 76, 0.18);
+  --gold-border: rgba(201, 168, 76, 0.22);
+  --gold-text: #d4b86a;
 }
 
 /* ── Reset ────────────────────────────────────────────────────────────────── */
@@ -63,6 +74,90 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* ── Luxury display font ──────────────────────────────────────────────────── */
+.font-display {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+}
+
+/* ── Gold / luxury utilities ──────────────────────────────────────────────── */
+.text-gold        { color: var(--gold-text); }
+.border-gold      { border-color: var(--gold-border); }
+.bg-gold-glow     { background: var(--gold-glow); }
+
+.gold-text-gradient {
+  background: linear-gradient(135deg, #f0d89a 0%, #c9a84c 40%, #d4b86a 70%, #b8882e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.luxury-card {
+  background: rgba(8, 8, 12, 0.95);
+  border: 1px solid rgba(201, 168, 76, 0.14);
+  backdrop-filter: blur(32px) saturate(1.6);
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 60px rgba(201,168,76,0.04);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.luxury-card:hover {
+  border-color: rgba(201, 168, 76, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 32px 80px rgba(0,0,0,0.7),
+    0 0 80px rgba(201,168,76,0.08);
+}
+
+.luxury-card-featured {
+  background: rgba(10, 8, 16, 0.98);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,0.08) inset,
+    0 40px 100px rgba(0,0,0,0.7),
+    0 0 80px rgba(201,168,76,0.12),
+    0 0 160px rgba(124,58,237,0.08);
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 168, 76, 0.06) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: goldShimmer 3s ease-in-out infinite;
+}
+@keyframes goldShimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.luxury-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+}
+
+.luxury-number {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  line-height: 1;
+  background: linear-gradient(135deg, rgba(201,168,76,0.25) 0%, rgba(201,168,76,0.06) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  user-select: none;
+}
+
+@keyframes luxuryFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Scrollbar ────────────────────────────────────────────────────────────── */
