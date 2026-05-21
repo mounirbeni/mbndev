@@ -380,7 +380,7 @@ exports.resetPassword = async (req, res, next) => {
     await prisma.$transaction([
       prisma.user.update({
         where: { id: record.userId },
-        data:  { password: hashed },
+        data:  { password: hashed, passwordChangedAt: new Date() },
       }),
       prisma.passwordResetToken.update({
         where: { id: record.id },
@@ -418,7 +418,10 @@ exports.updateProfile = async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'New password must be at least 8 characters.' });
       }
       const hashed = await bcrypt.hash(newPassword, 12);
-      await prisma.user.update({ where: { id: req.user.id }, data: { password: hashed } });
+      await prisma.user.update({
+        where: { id: req.user.id },
+        data:  { password: hashed, passwordChangedAt: new Date() },
+      });
       return res.json({ success: true, message: 'Password updated successfully.' });
     }
 

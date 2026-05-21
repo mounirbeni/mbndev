@@ -3,8 +3,9 @@ const path   = require('path');
 const fs     = require('fs');
 const crypto = require('crypto');
 
+// SVG is intentionally excluded: browsers execute JS inside SVG — stored XSS risk.
 const ALLOWED_MIMES = new Set([
-  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
   'application/pdf',
   'application/zip', 'application/x-zip-compressed',
   'application/msword',
@@ -13,7 +14,7 @@ const ALLOWED_MIMES = new Set([
 ]);
 
 const ALLOWED_EXTS = new Set([
-  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
+  '.jpg', '.jpeg', '.png', '.gif', '.webp',
   '.pdf', '.zip', '.doc', '.docx', '.txt',
 ]);
 

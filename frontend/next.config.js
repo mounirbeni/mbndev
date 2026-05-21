@@ -1,4 +1,45 @@
 /** @type {import('next').NextConfig} */
+
+const isProd = process.env.NODE_ENV === 'production';
+
+// ─── Content Security Policy ──────────────────────────────────────────────────
+// In development, Next.js fast-refresh uses eval() — 'unsafe-eval' is required.
+// In production, drop it entirely for a strict CSP.
+
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
+  : null;
+
+const connectSrc = [
+  "'self'",
+  'https://mbndev.ma',
+  'wss://mbndev.ma',
+  'https://api.mbndev.ma',
+  'https://fonts.googleapis.com',
+  API_ORIGIN,
+  !isProd && 'http://localhost:5000',
+  !isProd && 'ws://localhost:*',        // HMR websocket
+].filter(Boolean).join(' ');
+
+const scriptSrc = isProd
+  ? "'self' 'unsafe-inline'"            // Next.js inline scripts are hashed/nonce'd at runtime
+  : "'self' 'unsafe-inline' 'unsafe-eval'"; // dev: eval needed for fast-refresh
+
+const csp = [
+  "default-src 'self'",
+  `script-src ${scriptSrc}`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  `connect-src ${connectSrc}`,
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+  "upgrade-insecure-requests",
+].join('; ');
+
+// ─── Next.js config ───────────────────────────────────────────────────────────
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -8,16 +49,14 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
   },
-  // Enable experimental partial pre-rendering for better performance
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react'],
   },
-  // Compiler optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+    removeConsole: isProd ? { exclude: ['error', 'warn'] } : false,
   },
   async rewrites() {
-    return process.env.NODE_ENV === 'production'
+    return isProd
       ? [] // handled by vercel.json rewrites in prod
       : [
           {
@@ -26,35 +65,24 @@ const nextConfig = {
           },
         ];
   },
-  // Security headers
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          { key: 'X-Frame-Options',           value: 'DENY' },
-          { key: 'X-Content-Type-Options',     value: 'nosniff' },
-          { key: 'X-DNS-Prefetch-Control',     value: 'on' },
-          { key: 'Referrer-Policy',            value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy',         value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'X-Frame-Options',        value: 'DENY' },
+          { key: 'X-Content-Type-Options',  value: 'nosniff' },
+          { key: 'X-DNS-Prefetch-Control',  value: 'on' },
+          { key: 'Referrer-Policy',         value: 'strict-origin-when-cross-origin' },
           {
-            key: 'Strict-Transport-Security',
+            key:   'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=()',
+          },
+          {
+            key:   'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
           },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://mbndev.ma wss://mbndev.ma https://fonts.googleapis.com",
-              "frame-ancestors 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-            ].join('; '),
-          },
+          { key: 'Content-Security-Policy', value: csp },
         ],
       },
     ];

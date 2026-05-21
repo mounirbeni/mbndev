@@ -1,11 +1,27 @@
 require('dotenv').config();
+
+// ─── Startup env validation ───────────────────────────────────────────────────
+const REQUIRED_ENV = [
+  'DATABASE_URL',
+  'JWT_SECRET',
+  'CLIENT_URL',
+];
+const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
+if (missingEnv.length) {
+  console.error(`[startup] Missing required environment variable(s): ${missingEnv.join(', ')}`);
+  process.exit(1);
+}
+
 const express      = require('express');
 const cors         = require('cors');
 const helmet       = require('helmet');
+const hpp          = require('hpp');
 const rateLimit    = require('express-rate-limit');
+const crypto       = require('crypto');
 const path         = require('path');
-const prisma       = require('./lib/prisma');
-const pinoHttp     = require('pino-http');
+const prisma             = require('./lib/prisma');
+const pinoHttp           = require('pino-http');
+const { sanitizeBody }   = require('./middleware/sanitize');
 
 const app = express();
 
@@ -61,9 +77,28 @@ app.use(cors({
   credentials: true,
 }));
 
-// ─── JSON parsing ────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+// ─── Request ID ──────────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  const id = req.headers['x-request-id'] || crypto.randomUUID();
+  req.requestId = id;
+  res.setHeader('X-Request-ID', id);
+  next();
+});
+
+// ─── HTTP Parameter Pollution protection ─────────────────────────────────────
+app.use(hpp());
+
+// ─── JSON parsing (tight limits per surface) ─────────────────────────────────
+// Auth endpoints only need small payloads
+app.use('/api/auth',  express.json({ limit: '32kb' }));
+app.use('/api/auth',  express.urlencoded({ extended: false, limit: '32kb' }));
+// File upload routes handled by multer — no global body parsing needed there
+// Everything else: 256kb (generous but bounded)
+app.use(express.json({ limit: '256kb' }));
+app.use(express.urlencoded({ extended: true, limit: '256kb' }));
+
+// ─── Sanitize req.body (strip HTML tags / null bytes) ────────────────────────
+app.use(sanitizeBody);
 
 // ─── Rate limiting ───────────────────────────────────────────────────────────
 const authLimiter = rateLimit({
