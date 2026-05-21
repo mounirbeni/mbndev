@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AuthModal from '@/components/ui/AuthModal';
 import { packageAPI } from '@/lib/api';
@@ -13,19 +13,19 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const defaultPackages: Package[] = [
   {
     _id: '1', name: 'Starter', slug: 'starter', price: 799, originalPrice: 1499, badge: 'Limited Offer',
-    description: 'The perfect entry point for startups and personal brands seeking a refined online presence.',
+    description: 'A refined online presence for startups and personal brands.',
     features: ['Up to 5 Pages', 'Responsive Design', 'Contact Form', 'Basic SEO', '2 Revisions', 'Delivery in 14 days'],
     popular: false,
   },
   {
     _id: '2', name: 'Pro', slug: 'pro', price: 1799, originalPrice: 2999, badge: 'Best Deal',
-    description: 'For ambitious businesses demanding excellence — full-featured and built to scale.',
+    description: 'Full-featured and built to scale — the choice of ambitious businesses.',
     features: ['Up to 10 Pages', 'Responsive Design', 'CMS Integration', 'Advanced SEO', '3 Revisions', 'Priority Support', 'Analytics Setup', 'Delivery in 21 days'],
     popular: true,
   },
   {
     _id: '3', name: 'Premium', slug: 'premium', price: 3499, originalPrice: 5499, badge: 'Best Value',
-    description: 'An uncompromising, bespoke digital experience crafted to your exact vision.',
+    description: 'A bespoke digital experience crafted without compromise.',
     features: ['Unlimited Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance'],
     popular: false,
   },
@@ -34,8 +34,6 @@ const defaultPackages: Package[] = [
 function discountPct(original: number, current: number) {
   return Math.round((1 - current / original) * 100);
 }
-
-const TIER_LABELS = ['I', 'II', 'III'];
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -70,52 +68,50 @@ export default function Pricing() {
   return (
     <section id="pricing" className="py-32 relative overflow-hidden">
 
-      {/* Background atmosphere */}
+      {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(201,168,76,0.04) 0%, transparent 70%)' }} />
-        <div className="absolute top-2/3 left-1/4 w-[400px] h-[300px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.05) 0%, transparent 70%)' }} />
-        <div className="absolute inset-0 ambient-grid opacity-20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.06) 0%, transparent 70%)' }} />
+        <div className="absolute inset-0 ambient-grid opacity-25" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
 
-        {/* ── Section header ── */}
-        <div ref={headerRef} className="text-center mb-24">
+        {/* ── Header ── */}
+        <div ref={headerRef} className="text-center mb-20">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center justify-center mb-8"
+            className="flex items-center justify-center mb-7"
           >
             <span className="section-label">{t('pricing.eyebrow')}</span>
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 28 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight leading-[1.04]"
+            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-5 tracking-tight leading-[1.04]"
           >
             {t('pricing.title.simple')}{' '}
-            <span className="gold-text-gradient font-display italic">{t('pricing.title.bold')}</span>
-            <br className="hidden sm:block" />{' '}
-            <span className="text-slate-400 font-display">{t('pricing.title.end')}</span>
+            <span className="gradient-text">{t('pricing.title.bold')}</span>
+            <br className="hidden sm:block" />
+            <span className="text-slate-500 font-semibold text-4xl sm:text-5xl lg:text-6xl">{t('pricing.title.end')}</span>
           </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="text-slate-500 max-w-xl mx-auto text-lg leading-relaxed"
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-slate-500 max-w-lg mx-auto text-lg leading-relaxed"
           >
             {t('pricing.subtitle').replace('{pct}', '47%')}
           </motion.p>
         </div>
 
         {/* ── Cards ── */}
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+        <div className="grid md:grid-cols-3 gap-5 lg:gap-6 items-stretch">
           {packages.map((pkg, i) => {
             const pct = pkg.originalPrice ? discountPct(pkg.originalPrice, pkg.price) : 0;
             const savings = pkg.originalPrice ? pkg.originalPrice - pkg.price : 0;
@@ -127,122 +123,122 @@ export default function Pricing() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.8, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.75, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 className="relative flex flex-col"
               >
+                {/* Featured outer glow ring */}
                 {isFeatured && (
-                  <div className="absolute -inset-px rounded-3xl pointer-events-none"
+                  <div
+                    className="absolute -inset-px rounded-[28px] pointer-events-none"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(201,168,76,0.3) 0%, rgba(201,168,76,0.08) 50%, rgba(124,58,237,0.2) 100%)',
+                      background: 'linear-gradient(135deg, rgba(124,58,237,0.5) 0%, rgba(168,85,247,0.2) 50%, rgba(59,130,246,0.3) 100%)',
                     }}
                   />
                 )}
 
-                <div
-                  className={`relative flex flex-col h-full rounded-3xl overflow-hidden ${
-                    isFeatured ? 'luxury-card-featured' : 'luxury-card'
-                  }`}
-                >
-                  {/* Gold shimmer for featured */}
-                  {isFeatured && <div className="absolute inset-0 gold-shimmer pointer-events-none" />}
+                <div className={`relative flex flex-col h-full rounded-3xl overflow-hidden ${
+                  isFeatured ? 'premium-surface-featured' : 'premium-surface'
+                }`}>
+
+                  {/* Shimmer on featured */}
+                  {isFeatured && <div className="absolute inset-0 premium-shimmer pointer-events-none" />}
 
                   {/* Top accent beam */}
                   <div
                     className="absolute top-0 left-0 right-0 h-px"
                     style={{
                       background: isFeatured
-                        ? 'linear-gradient(90deg, transparent, rgba(201,168,76,0.7), transparent)'
-                        : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)',
+                        ? 'linear-gradient(90deg, transparent, rgba(168,85,247,0.8), rgba(124,58,237,0.5), transparent)'
+                        : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)',
                     }}
                   />
 
                   <div className="relative z-10 p-8 lg:p-10 flex flex-col h-full">
 
-                    {/* Tier header */}
+                    {/* Header row */}
                     <div className="flex items-start justify-between mb-8">
                       <div>
-                        {/* Roman numeral */}
-                        <p className={`font-display text-xs font-semibold tracking-[0.25em] uppercase mb-1 ${
-                          isFeatured ? 'text-gold' : 'text-slate-600'
+                        <p className={`text-[10px] font-semibold tracking-[0.22em] uppercase mb-1.5 ${
+                          isFeatured ? 'text-violet-400' : 'text-slate-600'
                         }`}>
-                          Tier {TIER_LABELS[i]}
+                          {isFeatured ? '✦ Most Selected' : 'Package'}
                         </p>
-                        <h3 className={`font-display text-2xl font-bold tracking-tight ${
-                          isFeatured ? 'text-white' : 'text-slate-200'
-                        }`}>
-                          {pkg.name}
-                        </h3>
+                        <h3 className="text-2xl font-bold text-white tracking-tight">{pkg.name}</h3>
                       </div>
 
-                      {/* Save badge */}
                       {pct > 0 && (
-                        <div
-                          className="shrink-0 text-xs font-bold px-2.5 py-1 rounded-full"
+                        <span
+                          className="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full"
                           style={{
-                            background: isFeatured ? 'rgba(201,168,76,0.15)' : 'rgba(255,255,255,0.06)',
-                            border: isFeatured ? '1px solid rgba(201,168,76,0.3)' : '1px solid rgba(255,255,255,0.08)',
-                            color: isFeatured ? '#d4b86a' : '#94a3b8',
+                            background: isFeatured ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.05)',
+                            border: isFeatured ? '1px solid rgba(124,58,237,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                            color: isFeatured ? '#c4b5fd' : '#64748b',
                           }}
                         >
                           -{pct}%
-                        </div>
+                        </span>
                       )}
                     </div>
 
                     {/* Price */}
-                    <div className="mb-6">
+                    <div className="mb-7">
                       {pkg.originalPrice && (
-                        <p className="text-slate-600 text-sm line-through mb-1">
+                        <p className="text-slate-700 text-sm line-through mb-1.5 tabular-nums">
                           ${pkg.originalPrice.toLocaleString()}
                         </p>
                       )}
-                      <div className="flex items-end gap-2">
-                        <span
-                          className={`font-display text-6xl lg:text-7xl font-bold leading-none tracking-tight ${
-                            isFeatured ? 'gold-text-gradient' : 'text-white'
-                          }`}
-                        >
+                      <div className="flex items-baseline gap-1">
+                        <span className={`text-6xl lg:text-7xl font-black leading-none tracking-tight tabular-nums ${
+                          isFeatured ? 'text-white' : 'text-white'
+                        }`}>
                           ${pkg.price.toLocaleString()}
                         </span>
                       </div>
-                      <p className="text-slate-500 text-xs mt-2 uppercase tracking-widest">{t('pricing.perProject')}</p>
+                      <p className="text-slate-600 text-[11px] tracking-widest uppercase mt-2">per project</p>
                       {savings > 0 && (
-                        <p className={`text-xs font-semibold mt-1.5 ${isFeatured ? 'text-gold' : 'text-slate-400'}`}>
-                          You save ${savings.toLocaleString()}
+                        <p className={`text-xs font-semibold mt-2 ${
+                          isFeatured ? 'text-violet-400' : 'text-slate-500'
+                        }`}>
+                          Save ${savings.toLocaleString()}
                         </p>
                       )}
                     </div>
 
                     {/* Divider */}
-                    <div className="luxury-divider mb-6" style={{
-                      background: isFeatured
-                        ? 'linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent)'
-                        : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)',
-                    }} />
+                    <div
+                      className="mb-7 h-px"
+                      style={{
+                        background: isFeatured
+                          ? 'linear-gradient(90deg, transparent, rgba(124,58,237,0.4), transparent)'
+                          : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)',
+                      }}
+                    />
 
                     {/* Description */}
-                    <p className="text-slate-400 text-sm leading-relaxed mb-8">
+                    <p className="text-slate-500 text-sm leading-relaxed mb-8">
                       {pkg.description}
                     </p>
 
                     {/* Features */}
                     <ul className="space-y-3.5 mb-10 flex-1">
                       {pkg.features?.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3 text-sm">
+                        <li key={feature} className="flex items-center gap-3">
                           <div
-                            className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+                            className="w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0"
                             style={{
-                              background: isFeatured ? 'rgba(201,168,76,0.15)' : 'rgba(124,58,237,0.12)',
-                              border: isFeatured ? '1px solid rgba(201,168,76,0.3)' : '1px solid rgba(124,58,237,0.25)',
+                              background: isFeatured ? 'rgba(124,58,237,0.15)' : 'rgba(255,255,255,0.05)',
+                              border: isFeatured ? '1px solid rgba(124,58,237,0.35)' : '1px solid rgba(255,255,255,0.08)',
                             }}
                           >
                             <Check
                               className="w-2.5 h-2.5"
-                              style={{ color: isFeatured ? '#d4b86a' : '#a855f7' }}
+                              style={{ color: isFeatured ? '#a78bfa' : '#475569' }}
                               strokeWidth={2.5}
                             />
                           </div>
-                          <span className={isFeatured ? 'text-slate-200' : 'text-slate-400'}>{feature}</span>
+                          <span className={`text-sm ${isFeatured ? 'text-slate-300' : 'text-slate-500'}`}>
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -250,18 +246,37 @@ export default function Pricing() {
                     {/* CTA */}
                     <button
                       onClick={() => choosePlan(pkg)}
-                      className={`group w-full relative rounded-2xl py-4 px-6 text-sm font-semibold transition-all duration-300 overflow-hidden ${
-                        isFeatured
-                          ? 'text-[#0a0808]'
-                          : 'text-white border border-white/10 hover:border-white/20 bg-white/4 hover:bg-white/7'
-                      }`}
+                      className="group relative w-full rounded-2xl py-4 text-sm font-semibold transition-all duration-300 overflow-hidden"
                       style={isFeatured ? {
-                        background: 'linear-gradient(135deg, #d4a843 0%, #c9984a 50%, #b8882e 100%)',
-                        boxShadow: '0 8px 32px rgba(201,168,76,0.3), 0 0 0 1px rgba(201,168,76,0.4) inset',
-                      } : {}}
+                        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
+                        color: '#fff',
+                        boxShadow: '0 8px 32px rgba(124,58,237,0.35), 0 0 0 1px rgba(168,85,247,0.3) inset',
+                      } : {
+                        background: 'rgba(255,255,255,0.04)',
+                        color: '#94a3b8',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isFeatured) {
+                          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.08)';
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(124,58,237,0.3)';
+                          (e.currentTarget as HTMLButtonElement).style.color = '#e2e8f0';
+                        } else {
+                          (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 12px 40px rgba(124,58,237,0.5), 0 0 0 1px rgba(168,85,247,0.4) inset';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isFeatured) {
+                          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)';
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)';
+                          (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8';
+                        } else {
+                          (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 32px rgba(124,58,237,0.35), 0 0 0 1px rgba(168,85,247,0.3) inset';
+                        }
+                      }}
                     >
                       {isFeatured && (
-                        <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <span className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       )}
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         {t('pricing.choose')}
@@ -270,44 +285,24 @@ export default function Pricing() {
                     </button>
                   </div>
                 </div>
-
-                {/* Featured label below card */}
-                {isFeatured && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.6 }}
-                    className="text-center text-[11px] font-semibold tracking-[0.2em] uppercase mt-3"
-                    style={{ color: '#d4b86a' }}
-                  >
-                    ✦ Most Selected
-                  </motion.p>
-                )}
               </motion.div>
             );
           })}
         </div>
 
-        {/* ── Bottom quote ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+        {/* ── Bottom line ── */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="text-center mt-20"
+          transition={{ delay: 0.5 }}
+          className="text-center text-slate-600 mt-14 text-sm"
         >
-          <div className="luxury-divider max-w-xs mx-auto mb-8" />
-          <p className="font-display italic text-slate-500 text-lg mb-3">
-            "Every great business deserves a great digital presence."
-          </p>
-          <p className="text-slate-600 text-sm">
-            {t('pricing.custom')}{' '}
-            <a href="#contact" className="transition-colors duration-200 font-medium" style={{ color: '#d4b86a' }}>
-              {t('pricing.letstalk')} →
-            </a>
-          </p>
-        </motion.div>
+          {t('pricing.custom')}{' '}
+          <a href="#contact" className="text-violet-400 hover:text-violet-300 font-medium transition-colors">
+            {t('pricing.letstalk')} →
+          </a>
+        </motion.p>
       </div>
 
       <AuthModal

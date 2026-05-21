@@ -4,6 +4,69 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+function StepNumber({ n }: { n: string }) {
+  return (
+    <span
+      className="font-black leading-none tabular-nums select-none"
+      style={{
+        background: 'linear-gradient(135deg, rgba(124,58,237,0.22) 0%, rgba(168,85,247,0.06) 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      }}
+    >
+      {n}
+    </span>
+  );
+}
+
+function Step({ step, index }: { step: { num: string; title: string; desc: string }; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 28 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.75, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      className="group relative rounded-3xl overflow-hidden premium-surface p-8 lg:p-10"
+    >
+      {/* Top beam on hover */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-400"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.55), transparent)' }}
+      />
+
+      {/* Watermark number */}
+      <div
+        className="absolute top-0 right-0 leading-none select-none pointer-events-none"
+        style={{ fontSize: 'clamp(88px, 11vw, 140px)', lineHeight: 0.85 }}
+      >
+        <StepNumber n={step.num} />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10">
+        <div
+          className="inline-flex items-center justify-center w-10 h-10 rounded-2xl mb-6 shrink-0"
+          style={{
+            background: 'rgba(124,58,237,0.1)',
+            border: '1px solid rgba(124,58,237,0.22)',
+          }}
+        >
+          <span className="text-xs font-bold text-violet-400 tabular-nums">{step.num}</span>
+        </div>
+
+        <h3 className="text-xl font-bold text-white mb-3 leading-snug tracking-tight">
+          {step.title}
+        </h3>
+        <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Process() {
   const { t } = useLanguage();
   const headerRef = useRef<HTMLDivElement>(null);
@@ -23,22 +86,22 @@ export default function Process() {
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 ambient-grid opacity-15" />
+        <div className="absolute inset-0 ambient-grid opacity-20" />
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(201,168,76,0.03) 0%, transparent 70%)' }}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px]"
+          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.05) 0%, transparent 70%)' }}
         />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
 
         {/* ── Header ── */}
-        <div ref={headerRef} className="text-center mb-24">
+        <div ref={headerRef} className="text-center mb-20">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center justify-center mb-8"
+            className="flex items-center justify-center mb-7"
           >
             <span className="section-label">{t('process.eyebrow')}</span>
           </motion.div>
@@ -47,10 +110,10 @@ export default function Process() {
             initial={{ opacity: 0, y: 28 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight leading-[1.04]"
+            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-5 tracking-tight leading-[1.04]"
           >
             {t('process.title')}{' '}
-            <span className="gold-text-gradient font-display italic">{t('process.title.bold')}</span>
+            <span className="gradient-text">{t('process.title.bold')}</span>
           </motion.h2>
 
           <motion.p
@@ -63,130 +126,12 @@ export default function Process() {
           </motion.p>
         </div>
 
-        {/* ── Steps: alternating layout on desktop ── */}
-        <div className="space-y-0">
-          {steps.map((step, i) => {
-            const isEven = i % 2 === 0;
-            const stepRef = useRef<HTMLDivElement>(null);
-            const inView = useInView(stepRef, { once: true, margin: '-60px' });
-
-            return (
-              <motion.div
-                key={step.num}
-                ref={stepRef}
-                initial={{ opacity: 0, x: isEven ? -32 : 32 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className={`group relative flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-0 lg:gap-0`}
-              >
-                {/* Left / Right content block */}
-                <div className={`flex-1 py-12 lg:py-16 ${isEven ? 'lg:pr-20 lg:text-right' : 'lg:pl-20 lg:text-left'} text-left px-4 lg:px-0`}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={inView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.7, delay: 0.2 }}
-                  >
-                    <p className="font-display font-semibold text-xs tracking-[0.25em] uppercase mb-4 gold-text-gradient">
-                      Step {step.num}
-                    </p>
-                    <h3 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
-                      {step.title}
-                    </h3>
-                    <p className="text-slate-500 text-base leading-relaxed max-w-sm">
-                      {step.desc}
-                    </p>
-                  </motion.div>
-                </div>
-
-                {/* Center number column */}
-                <div className="hidden lg:flex flex-col items-center shrink-0 w-32 relative">
-                  {/* Vertical line above */}
-                  {i > 0 && (
-                    <div
-                      className="w-px flex-1 mb-4"
-                      style={{
-                        background: 'linear-gradient(to bottom, rgba(201,168,76,0.15), rgba(201,168,76,0.05))',
-                        minHeight: '40px',
-                      }}
-                    />
-                  )}
-
-                  {/* Number bubble */}
-                  <div
-                    className="relative w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 group-hover:scale-110"
-                    style={{
-                      background: 'rgba(201,168,76,0.06)',
-                      border: '1px solid rgba(201,168,76,0.2)',
-                      boxShadow: '0 0 0 8px rgba(201,168,76,0.03)',
-                    }}
-                  >
-                    <span
-                      className="font-display font-bold text-sm tracking-tight"
-                      style={{ color: '#d4b86a' }}
-                    >
-                      {step.num}
-                    </span>
-                  </div>
-
-                  {/* Vertical line below */}
-                  {i < steps.length - 1 && (
-                    <div
-                      className="w-px mt-4"
-                      style={{
-                        background: 'linear-gradient(to bottom, rgba(201,168,76,0.05), rgba(201,168,76,0.15))',
-                        minHeight: '40px',
-                        flex: 1,
-                      }}
-                    />
-                  )}
-                </div>
-
-                {/* Right / Left spacer */}
-                <div className="flex-1 hidden lg:block" />
-
-                {/* Mobile: show step number inline */}
-                <div className="lg:hidden flex items-center gap-3 px-4 pb-2">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.18)' }}
-                  >
-                    <span className="font-display font-bold text-xs" style={{ color: '#d4b86a' }}>
-                      {step.num}
-                    </span>
-                  </div>
-                  <div className="flex-1 h-px" style={{ background: 'rgba(201,168,76,0.1)' }} />
-                </div>
-
-                {/* Watermark giant number — desktop only */}
-                <div
-                  className={`hidden lg:block absolute pointer-events-none select-none ${isEven ? 'left-0' : 'right-0'}`}
-                  style={{ top: '50%', transform: 'translateY(-50%)' }}
-                >
-                  <span
-                    className="luxury-number font-display font-bold"
-                    style={{ fontSize: 'clamp(100px, 12vw, 180px)', opacity: 0.6 }}
-                  >
-                    {step.num}
-                  </span>
-                </div>
-              </motion.div>
-            );
-          })}
+        {/* ── Steps grid ── */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          {steps.map((step, i) => (
+            <Step key={step.num} step={step} index={i} />
+          ))}
         </div>
-
-        {/* ── Bottom CTA ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="text-center mt-20"
-        >
-          <div className="luxury-divider max-w-xs mx-auto mb-8" />
-          <p className="font-display italic text-slate-500 text-lg">
-            "From first call to final launch — we own every step."
-          </p>
-        </motion.div>
 
       </div>
     </section>
