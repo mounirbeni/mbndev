@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo3D from '@/components/ui/Logo3D';
@@ -24,6 +24,10 @@ export default function Navbar() {
   const haptic     = useHaptic();
   const sheetRef   = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
+
+  // Scroll progress bar
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
 
   const navLinks = [
     { label: t('nav.home'),      href: '/',          icon: Home },
@@ -76,6 +80,14 @@ export default function Navbar() {
         className="fixed top-0 left-0 right-0 z-50 glass-nav transition-shadow duration-300"
         style={{ boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.35)' : 'none' }}
       >
+        {/* Scroll progress bar */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-[1.5px] origin-left z-50"
+          style={{
+            scaleX,
+            background: 'linear-gradient(90deg, #7c3aed, #a855f7, #3b82f6, #06b6d4)',
+          }}
+        />
         <div
           className="max-w-7xl mx-auto px-4 sm:px-6"
           style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}
