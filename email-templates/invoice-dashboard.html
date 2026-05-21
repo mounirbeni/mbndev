@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MBN DEV — Invoice System</title>
+<style>
+/* ── Reset & Base ─────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#000000;
+  --dark:#08080f;
+  --card:#0c0c16;
+  --card2:#0f0f1c;
+  --border:rgba(255,255,255,.06);
+  --border2:rgba(255,255,255,.04);
+  --purple:#7B2EFF;
+  --violet:#9D4DFF;
+  --purple-light:#A855F7;
+  --purple-glow:rgba(123,46,255,.35);
+  --green:#10b981;
+  --green-bg:rgba(16,185,129,.08);
+  --green-border:rgba(16,185,129,.18);
+  --amber:#f59e0b;
+  --amber-bg:rgba(245,158,11,.08);
+  --amber-border:rgba(245,158,11,.18);
+  --red:#f87171;
+  --red-bg:rgba(248,113,113,.08);
+  --red-border:rgba(248,113,113,.18);
+  --blue:#60a5fa;
+  --blue-bg:rgba(96,165,250,.08);
+  --text-1:#ffffff;
+  --text-2:#94a3b8;
+  --text-3:#475569;
+  --text-4:#1e293b;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --mono:'SF Mono','Fira Code','Cascadia Code',monospace;
+  --radius:20px;
+  --radius-sm:12px;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);
+  color:var(--text-1);
+  font-family:var(--font);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Layout ───────────────────────────────────────────── */
+.app{display:flex;min-height:100vh}
+
+/* ── Sidebar ──────────────────────────────────────────── */
+.sidebar{
+  width:240px;
+  background:var(--dark);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  position:fixed;
+  top:0;left:0;bottom:0;
+  z-index:100;
+  padding:28px 0;
+}
+.sidebar-logo{
+  padding:0 20px 32px;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:20px;
+}
+.logo-mark{
+  display:flex;align-items:center;gap:10px;
+}
+.logo-icon{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,#7B2EFF,#9D4DFF);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;color:#fff;
+  box-shadow:0 0 20px rgba(123,46,255,.5);
+  flex-shrink:0;
+}
+.logo-name{font-size:15px;font-weight:800;letter-spacing:-.02em;}
+.logo-name span{color:#9D4DFF;}
+
+.nav-section{padding:0 12px;margin-bottom:8px;}
+.nav-label{
+  font-size:10px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text-4);
+  padding:0 8px;margin-bottom:6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  font-size:13px;font-weight:500;color:var(--text-3);
+  cursor:pointer;transition:all .15s;
+  text-decoration:none;margin-bottom:2px;
+}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text-2)}
+.nav-item.active{
+  background:rgba(123,46,255,.12);
+  color:#fff;font-weight:600;
+  border:1px solid rgba(123,46,255,.2);
+}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{
+  margin-left:auto;background:var(--purple);color:#fff;
+  font-size:10px;font-weight:700;border-radius:99px;
+  padding:2px 7px;min-width:18px;text-align:center;
+}
+
+.sidebar-bottom{
+  margin-top:auto;padding:20px 12px 0;
+  border-top:1px solid var(--border2);
+}
+.user-card{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border2);
+}
+.user-avatar{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,#7B2EFF,#9D4DFF);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{font-size:10px;color:var(--text-3);}
+
+/* ── Main ─────────────────────────────────────────────── */
+.main{margin-left:240px;flex:1;padding:32px 36px;max-width:calc(100vw - 240px);}
+
+/* ── Top bar ──────────────────────────────────────────── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:36px;
+}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-.03em;}
+.page-sub{font-size:13px;color:var(--text-3);margin-top:3px;}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:10px 18px;border-radius:10px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  border:none;transition:all .15s;white-space:nowrap;
+  font-family:var(--font);
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--purple),var(--violet));
+  color:#fff;
+  box-shadow:0 0 20px rgba(123,46,255,.4),0 4px 12px rgba(0,0,0,.3);
+}
+.btn-primary:hover{box-shadow:0 0 28px rgba(123,46,255,.55),0 6px 16px rgba(0,0,0,.4);}
+.btn-ghost{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  color:var(--text-2);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.07);color:#fff;}
+
+/* ── Stats Grid ───────────────────────────────────────── */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:16px;margin-bottom:28px;
+}
+.stat-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.stat-card.purple::before{background:linear-gradient(90deg,#7B2EFF,#9D4DFF);}
+.stat-card.green::before{background:linear-gradient(90deg,#10b981,#059669);}
+.stat-card.amber::before{background:linear-gradient(90deg,#f59e0b,#d97706);}
+.stat-card.red::before{background:linear-gradient(90deg,#f87171,#ef4444);}
+.stat-card:hover{border-color:rgba(123,46,255,.2);}
+
+.stat-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:15px;}
+.stat-icon.purple{background:rgba(123,46,255,.12);border:1px solid rgba(123,46,255,.2);}
+.stat-icon.green{background:var(--green-bg);border:1px solid var(--green-border);}
+.stat-icon.amber{background:var(--amber-bg);border:1px solid var(--amber-border);}
+.stat-icon.red{background:var(--red-bg);border:1px solid var(--red-border);}
+
+.stat-value{font-size:32px;font-weight:800;letter-spacing:-.05em;line-height:1;margin-bottom:8px;}
+.stat-value.purple{color:#fff;}
+.stat-value.green{color:var(--green);}
+.stat-value.amber{color:var(--amber);}
+.stat-value.red{color:var(--red);}
+
+.stat-change{font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:5px;}
+.stat-up{color:var(--green);font-weight:600;}
+.stat-down{color:var(--red);font-weight:600;}
+
+/* ── Charts Row ───────────────────────────────────────── */
+.charts-row{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:28px;}
+
+.chart-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;
+}
+.chart-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
+.chart-title{font-size:15px;font-weight:700;letter-spacing:-.01em;}
+.chart-sub{font-size:12px;color:var(--text-3);margin-top:3px;}
+.chart-amount{font-size:28px;font-weight:800;letter-spacing:-.04em;color:#fff;}
+.chart-up{font-size:11px;font-weight:700;color:var(--green);background:var(--green-bg);
+  border:1px solid var(--green-border);border-radius:99px;padding:3px 10px;margin-left:8px;}
+
+/* SVG Bar Chart */
+.bar-chart{width:100%;height:120px;}
+.bar{fill:url(#barGrad);rx:4;transition:opacity .2s;}
+.bar:hover{opacity:.8;}
+.bar-label{fill:var(--text-4);font-size:9px;font-family:var(--font);}
+
+/* Donut chart */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;padding-top:8px;}
+.donut-legend{width:100%;margin-top:20px;}
+.legend-item{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid var(--border2);}
+.legend-item:last-child{border-bottom:none;}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:10px;}
+.legend-label{font-size:12px;color:var(--text-2);display:flex;align-items:center;flex:1;}
+.legend-val{font-size:12px;font-weight:700;color:var(--text-1);}
+
+/* ── Invoice Table ────────────────────────────────────── */
+.table-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:28px;
+}
+.table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px;border-bottom:1px solid var(--border);
+}
+.table-title{font-size:15px;font-weight:700;}
+.table-actions{display:flex;align-items:center;gap:8px;}
+
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:8px;padding:7px 12px;
+}
+.search-box input{
+  background:none;border:none;outline:none;
+  color:#fff;font-size:12px;font-family:var(--font);width:140px;
+}
+.search-box input::placeholder{color:var(--text-4);}
+
+.filter-btn{
+  padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--text-3);cursor:pointer;font-family:var(--font);
+}
+
+table{width:100%;border-collapse:collapse;}
+thead th{
+  padding:12px 24px;text-align:left;
+  font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-4);
+  background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);
+}
+tbody tr{border-bottom:1px solid var(--border2);transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.02);}
+tbody td{padding:16px 24px;font-size:13px;vertical-align:middle;}
+
+.invoice-id{
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  color:#fff;letter-spacing:.02em;
+}
+.client-cell{display:flex;align-items:center;gap:10px;}
+.client-avatar{
+  width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,#7B2EFF,#9D4DFF);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.client-name{font-weight:600;font-size:13px;}
+.client-email{font-size:11px;color:var(--text-3);}
+
+.amount{font-weight:800;font-size:14px;letter-spacing:-.02em;}
+
+.status-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 12px;border-radius:99px;
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+}
+.status-badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.status-paid{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+.status-paid::before{background:var(--green);}
+.status-pending{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+.status-pending::before{background:var(--amber);}
+.status-overdue{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.status-overdue::before{background:var(--red);}
+.status-partial{background:var(--blue-bg);border:1px solid rgba(96,165,250,.18);color:var(--blue);}
+.status-partial::before{background:var(--blue);}
+.status-refunded{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text-3);}
+.status-refunded::before{background:var(--text-3);}
+
+.date-cell{color:var(--text-3);font-size:12px;}
+
+.action-btn{
+  padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;
+  background:rgba(123,46,255,.1);border:1px solid rgba(123,46,255,.2);
+  color:#9D4DFF;cursor:pointer;font-family:var(--font);transition:all .15s;
+}
+.action-btn:hover{background:rgba(123,46,255,.18);color:#fff;}
+
+/* ── Invoice View ─────────────────────────────────────── */
+.invoice-view{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.invoice-view-header{
+  background:linear-gradient(160deg,#0e0018 0%,#08000f 100%);
+  padding:40px 44px;
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.invoice-view-header::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(123,46,255,.2) 0%,transparent 70%);
+}
+.invoice-view-header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--purple),transparent);
+}
+
+.invoice-meta{display:flex;justify-content:space-between;align-items:flex-start;}
+.invoice-brand{display:flex;flex-direction:column;gap:4px;}
+.invoice-number{font-size:13px;color:var(--text-3);font-family:var(--mono);margin-bottom:2px;}
+.invoice-number strong{color:#fff;}
+.invoice-status-row{margin-top:12px;}
+
+.invoice-body{padding:40px 44px;}
+.bill-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:36px;}
+.bill-section p{margin-bottom:3px;}
+.bill-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-4);margin-bottom:10px;}
+.bill-name{font-size:14px;font-weight:700;color:#fff;}
+.bill-detail{font-size:12px;color:var(--text-3);line-height:1.7;}
+
+.meta-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-bottom:32px;
+}
+.meta-item{padding:18px 20px;border-right:1px solid var(--border);}
+.meta-item:last-child{border-right:none;}
+.meta-item-label{font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-4);margin-bottom:6px;}
+.meta-item-value{font-size:13px;font-weight:600;color:#fff;}
+.meta-item-value.green{color:var(--green);}
+
+/* Line items */
+.items-table{width:100%;border-collapse:collapse;margin-bottom:28px;}
+.items-table th{
+  padding:11px 16px;text-align:left;
+  font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-4);
+  background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+}
+.items-table td{padding:18px 16px;font-size:13px;border-bottom:1px solid var(--border2);}
+.items-table tr:last-child td{border-bottom:none;}
+.item-name{font-weight:600;color:#fff;}
+.item-desc{font-size:11px;color:var(--text-3);margin-top:3px;}
+.item-qty{color:var(--text-3);text-align:center;}
+.item-rate{color:var(--text-2);text-align:right;}
+.item-total{font-weight:800;color:#fff;text-align:right;font-size:14px;}
+
+/* Totals */
+.totals-row{display:flex;justify-content:flex-end;margin-bottom:32px;}
+.totals-box{width:280px;}
+.totals-line{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--border2);}
+.totals-line:last-child{border-bottom:none;padding-top:14px;}
+.totals-line-label{font-size:13px;color:var(--text-3);}
+.totals-line-val{font-size:13px;color:var(--text-2);font-weight:500;}
+.totals-final .totals-line-label{font-size:15px;font-weight:800;color:#fff;}
+.totals-final .totals-line-val{font-size:18px;font-weight:800;color:var(--violet);}
+
+/* Payment / CTA */
+.invoice-cta{
+  display:flex;align-items:center;gap:12px;
+  padding:24px;background:rgba(123,46,255,.06);
+  border:1px solid rgba(123,46,255,.14);border-radius:14px;margin-bottom:32px;
+}
+.invoice-cta-text{flex:1;}
+.invoice-cta-label{font-size:13px;font-weight:700;margin-bottom:3px;}
+.invoice-cta-sub{font-size:12px;color:var(--text-3);}
+
+/* QR + signature */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.qr-box{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:14px;padding:20px;display:flex;align-items:center;gap:16px;
+}
+.qr-code{
+  width:72px;height:72px;background:#fff;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;padding:6px;
+}
+.qr-code svg{width:60px;height:60px;}
+.qr-info{flex:1;}
+.qr-label{font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:4px;}
+.qr-value{font-size:12px;font-family:var(--mono);color:var(--violet);}
+
+.sig-box{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:14px;padding:20px;display:flex;flex-direction:column;
+  justify-content:space-between;
+}
+.sig-label{font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-4);}
+.sig-name{font-size:16px;font-weight:800;color:#fff;
+  font-style:italic;letter-spacing:.02em;margin:12px 0 8px;}
+.sig-line{height:1px;background:var(--border);margin-bottom:6px;}
+.sig-role{font-size:11px;color:var(--text-3);}
+
+/* ── Payment Status Cards ─────────────────────────────── */
+.status-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+.status-card{
+  border-radius:14px;padding:18px 16px;
+  display:flex;flex-direction:column;align-items:flex-start;
+  border:1px solid;
+}
+.status-card-paid{background:var(--green-bg);border-color:var(--green-border);}
+.status-card-pending{background:var(--amber-bg);border-color:var(--amber-border);}
+.status-card-overdue{background:var(--red-bg);border-color:var(--red-border);}
+.status-card-partial{background:var(--blue-bg);border-color:rgba(96,165,250,.18);}
+.status-card-refunded{background:rgba(255,255,255,.03);border-color:var(--border);}
+
+.sc-emoji{font-size:22px;margin-bottom:10px;}
+.sc-label{font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:6px;}
+.sc-val{font-size:20px;font-weight:800;letter-spacing:-.04em;margin-bottom:4px;}
+.sc-count{font-size:11px;opacity:.7;}
+.status-card-paid .sc-label,.status-card-paid .sc-val{color:var(--green);}
+.status-card-paid .sc-count{color:var(--green);}
+.status-card-pending .sc-label,.status-card-pending .sc-val{color:var(--amber);}
+.status-card-pending .sc-count{color:var(--amber);}
+.status-card-overdue .sc-label,.status-card-overdue .sc-val{color:var(--red);}
+.status-card-overdue .sc-count{color:var(--red);}
+.status-card-partial .sc-label,.status-card-partial .sc-val{color:var(--blue);}
+.status-card-partial .sc-count{color:var(--blue);}
+.status-card-refunded .sc-label,.status-card-refunded .sc-val{color:var(--text-2);}
+.status-card-refunded .sc-count{color:var(--text-3);}
+
+/* ── Section labels ───────────────────────────────────── */
+.section-label{
+  font-size:10px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--purple-light);
+  margin-bottom:8px;
+}
+.section-title{
+  font-size:18px;font-weight:800;letter-spacing:-.03em;
+  margin-bottom:20px;
+}
+
+/* ── Mobile bottom nav ────────────────────────────────── */
+.mobile-nav{display:none;}
+
+/* ── Scrollbar ────────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px;}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media(max-width:1200px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .status-grid{grid-template-columns:repeat(3,1fr);}
+  .charts-row{grid-template-columns:1fr;}
+}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);}
+  .main{margin-left:0;padding:20px;max-width:100vw;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .status-grid{grid-template-columns:repeat(2,1fr);}
+  .meta-grid{grid-template-columns:repeat(2,1fr);}
+  .bottom-grid{grid-template-columns:1fr;}
+  .bill-grid{grid-template-columns:1fr;}
+  .mobile-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;
+    background:var(--dark);border-top:1px solid var(--border);
+    padding:10px 0 14px;z-index:200;
+  }
+  .mn-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-size:10px;font-weight:600;color:var(--text-3);cursor:pointer;
+  }
+  .mn-item.active{color:var(--violet);}
+  .mn-icon{font-size:20px;}
+}
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .status-grid{grid-template-columns:1fr 1fr;}
+  .topbar{flex-direction:column;align-items:flex-start;gap:12px;}
+  .invoice-view-header{padding:24px 20px;}
+  .invoice-body{padding:24px 20px;}
+  .items-table th:nth-child(3),.items-table td:nth-child(3),
+  .items-table th:nth-child(4),.items-table td:nth-child(4){display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">M</div>
+      <div class="logo-name">MBN <span>DEV</span></div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⬛</span> Dashboard
+    </a>
+    <a class="nav-item active" href="#">
+      <span class="nav-icon">📄</span> Invoices
+      <span class="nav-badge">12</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">👥</span> Clients
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">💳</span> Payments
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📊</span> Analytics
+    </a>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px;">
+    <div class="nav-label">Manage</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🏗️</span> Projects
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📦</span> Products
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⚙️</span> Settings
+    </a>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">M</div>
+      <div class="user-info">
+        <div class="user-name">Mounir Banni</div>
+        <div class="user-role">Admin · MBN DEV</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ════════ MAIN ════════ -->
+<main class="main">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div>
+      <div class="page-title">Invoices</div>
+      <div class="page-sub">Manage billing, payments, and client invoices</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost">⬇ Export</button>
+      <button class="btn btn-primary">✚ &nbsp;New Invoice</button>
+    </div>
+  </div>
+
+  <!-- ── Stats ── -->
+  <div class="stats-grid">
+    <div class="stat-card purple">
+      <div class="stat-label">
+        Total Revenue
+        <div class="stat-icon purple">💜</div>
+      </div>
+      <div class="stat-value purple">$48,200</div>
+      <div class="stat-change">
+        <span class="stat-up">↑ 18.4%</span> vs last month
+      </div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">
+        Paid
+        <div class="stat-icon green">✅</div>
+      </div>
+      <div class="stat-value green">$36,800</div>
+      <div class="stat-change">
+        <span class="stat-up">↑ 24 invoices</span>
+      </div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-label">
+        Pending
+        <div class="stat-icon amber">⏳</div>
+      </div>
+      <div class="stat-value amber">$8,400</div>
+      <div class="stat-change">
+        <span style="color:var(--amber);font-weight:600;">6 invoices</span> awaiting
+      </div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">
+        Overdue
+        <div class="stat-icon red">⚠️</div>
+      </div>
+      <div class="stat-value red">$3,000</div>
+      <div class="stat-change">
+        <span class="stat-down">↓ 2 invoices</span> past due
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Charts Row ── -->
+  <div class="charts-row">
+
+    <!-- Revenue chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Revenue Overview</div>
+          <div class="chart-sub">Monthly breakdown · 2026</div>
+        </div>
+        <div>
+          <span class="chart-amount">$48,200</span>
+          <span class="chart-up">↑ 18.4%</span>
+        </div>
+      </div>
+
+      <svg class="bar-chart" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#7B2EFF"/>
+            <stop offset="100%" stop-color="#9D4DFF" stop-opacity=".4"/>
+          </linearGradient>
+          <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#9D4DFF"/>
+            <stop offset="100%" stop-color="#7B2EFF" stop-opacity=".6"/>
+          </linearGradient>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#7B2EFF"/>
+            <stop offset="100%" stop-color="#9D4DFF"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        <line x1="0" y1="25" x2="520" y2="25" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+        <line x1="0" y1="55" x2="520" y2="55" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+        <line x1="0" y1="85" x2="520" y2="85" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+        <!-- Bars -->
+        <rect class="bar" x="10"  y="80" width="32" height="30" rx="5"/>
+        <rect class="bar" x="56"  y="60" width="32" height="50" rx="5"/>
+        <rect class="bar" x="102" y="50" width="32" height="60" rx="5"/>
+        <rect class="bar" x="148" y="40" width="32" height="70" rx="5"/>
+        <rect class="bar" x="194" y="30" width="32" height="80" rx="5"/>
+        <rect class="bar" x="240" y="45" width="32" height="65" rx="5"/>
+        <rect class="bar" x="286" y="20" width="32" height="90" rx="5" fill="url(#barGrad2)"/><!-- current highlight -->
+        <rect class="bar" x="332" y="35" width="32" height="75" rx="5"/>
+        <rect class="bar" x="378" y="50" width="32" height="60" rx="5"/>
+        <rect class="bar" x="424" y="30" width="32" height="80" rx="5"/>
+        <rect class="bar" x="470" y="15" width="32" height="95" rx="5" fill="url(#barGrad2)"/>
+        <!-- Labels -->
+        <text class="bar-label" x="14"  y="115">Jan</text>
+        <text class="bar-label" x="60"  y="115">Feb</text>
+        <text class="bar-label" x="106" y="115">Mar</text>
+        <text class="bar-label" x="152" y="115">Apr</text>
+        <text class="bar-label" x="198" y="115">May</text>
+        <text class="bar-label" x="244" y="115">Jun</text>
+        <text class="bar-label" x="289" y="115" fill="#9D4DFF">Jul</text>
+        <text class="bar-label" x="336" y="115">Aug</text>
+        <text class="bar-label" x="382" y="115">Sep</text>
+        <text class="bar-label" x="427" y="115">Oct</text>
+        <text class="bar-label" x="473" y="115">Nov</text>
+      </svg>
+    </div>
+
+    <!-- Donut / Status breakdown -->
+    <div class="chart-card">
+      <div class="chart-header" style="margin-bottom:12px;">
+        <div>
+          <div class="chart-title">Payment Status</div>
+          <div class="chart-sub">All invoices</div>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <defs>
+            <linearGradient id="dg1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#7B2EFF"/>
+              <stop offset="100%" stop-color="#9D4DFF"/>
+            </linearGradient>
+          </defs>
+          <!-- Background circle -->
+          <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="18"/>
+          <!-- Paid — 76% -->
+          <circle cx="70" cy="70" r="54" fill="none" stroke="url(#dg1)" stroke-width="18"
+            stroke-dasharray="257 339" stroke-dashoffset="85" stroke-linecap="round"/>
+          <!-- Pending — 17% -->
+          <circle cx="70" cy="70" r="54" fill="none" stroke="#f59e0b" stroke-width="18"
+            stroke-dasharray="58 339" stroke-dashoffset="-172" stroke-linecap="round" opacity=".8"/>
+          <!-- Overdue — 7% -->
+          <circle cx="70" cy="70" r="54" fill="none" stroke="#f87171" stroke-width="18"
+            stroke-dasharray="23 339" stroke-dashoffset="-230" stroke-linecap="round" opacity=".7"/>
+          <!-- Center -->
+          <text x="70" y="66" text-anchor="middle" fill="#fff" font-size="20" font-weight="800"
+            font-family="-apple-system,sans-serif">76%</text>
+          <text x="70" y="82" text-anchor="middle" fill="#475569" font-size="10"
+            font-family="-apple-system,sans-serif">Paid</text>
+        </svg>
+
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#7B2EFF;"></div>
+            <div class="legend-label">Paid</div>
+            <div class="legend-val">$36,800</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f59e0b;"></div>
+            <div class="legend-label">Pending</div>
+            <div class="legend-val">$8,400</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f87171;"></div>
+            <div class="legend-label">Overdue</div>
+            <div class="legend-val">$3,000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Payment Status Cards ── -->
+  <div class="section-label">Payment Status</div>
+  <div class="status-grid">
+    <div class="status-card status-card-paid">
+      <div class="sc-emoji">✅</div>
+      <div class="sc-label">Paid</div>
+      <div class="sc-val">$36,800</div>
+      <div class="sc-count">24 invoices</div>
+    </div>
+    <div class="status-card status-card-pending">
+      <div class="sc-emoji">⏳</div>
+      <div class="sc-label">Pending</div>
+      <div class="sc-val">$8,400</div>
+      <div class="sc-count">6 invoices</div>
+    </div>
+    <div class="status-card status-card-overdue">
+      <div class="sc-emoji">⚠️</div>
+      <div class="sc-label">Overdue</div>
+      <div class="sc-val">$3,000</div>
+      <div class="sc-count">2 invoices</div>
+    </div>
+    <div class="status-card status-card-partial">
+      <div class="sc-emoji">🔵</div>
+      <div class="sc-label">Partial</div>
+      <div class="sc-val">$1,200</div>
+      <div class="sc-count">1 invoice</div>
+    </div>
+    <div class="status-card status-card-refunded">
+      <div class="sc-emoji">↩️</div>
+      <div class="sc-label">Refunded</div>
+      <div class="sc-val">$800</div>
+      <div class="sc-count">1 invoice</div>
+    </div>
+  </div>
+
+  <!-- ── Invoice Table ── -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">Recent Invoices</div>
+      <div class="table-actions">
+        <div class="search-box">
+          <span style="color:var(--text-4);font-size:13px;">🔍</span>
+          <input type="text" placeholder="Search invoices...">
+        </div>
+        <button class="filter-btn">Filter ▾</button>
+        <button class="filter-btn">Sort ▾</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Invoice</th>
+          <th>Client</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Due</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="invoice-id">#INV-2026-001</div></td>
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar">A</div>
+              <div>
+                <div class="client-name">Alex Johnson</div>
+                <div class="client-email">alex@techcorp.com</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="amount">$4,800</div></td>
+          <td><span class="status-badge status-paid">Paid</span></td>
+          <td><div class="date-cell">May 01, 2026</div></td>
+          <td><div class="date-cell">May 15, 2026</div></td>
+          <td><button class="action-btn">View →</button></td>
+        </tr>
+        <tr>
+          <td><div class="invoice-id">#INV-2026-002</div></td>
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar" style="background:linear-gradient(135deg,#10b981,#059669);">S</div>
+              <div>
+                <div class="client-name">Sara Mitchell</div>
+                <div class="client-email">sara@ventures.io</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="amount">$2,200</div></td>
+          <td><span class="status-badge status-pending">Pending</span></td>
+          <td><div class="date-cell">May 05, 2026</div></td>
+          <td><div class="date-cell" style="color:var(--amber);">May 20, 2026</div></td>
+          <td><button class="action-btn">View →</button></td>
+        </tr>
+        <tr>
+          <td><div class="invoice-id">#INV-2026-003</div></td>
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706);">R</div>
+              <div>
+                <div class="client-name">Rami Al-Hassan</div>
+                <div class="client-email">rami@startup.ae</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="amount">$6,500</div></td>
+          <td><span class="status-badge status-paid">Paid</span></td>
+          <td><div class="date-cell">May 10, 2026</div></td>
+          <td><div class="date-cell">May 25, 2026</div></td>
+          <td><button class="action-btn">View →</button></td>
+        </tr>
+        <tr>
+          <td><div class="invoice-id">#INV-2026-004</div></td>
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar" style="background:linear-gradient(135deg,#f87171,#ef4444);">K</div>
+              <div>
+                <div class="client-name">Karim Benali</div>
+                <div class="client-email">karim@creative.ma</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="amount">$1,800</div></td>
+          <td><span class="status-badge status-overdue">Overdue</span></td>
+          <td><div class="date-cell">Apr 20, 2026</div></td>
+          <td><div class="date-cell" style="color:var(--red);">May 05, 2026</div></td>
+          <td><button class="action-btn">View →</button></td>
+        </tr>
+        <tr>
+          <td><div class="invoice-id">#INV-2026-005</div></td>
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar" style="background:linear-gradient(135deg,#60a5fa,#3b82f6);">L</div>
+              <div>
+                <div class="client-name">Lina Dupont</div>
+                <div class="client-email">lina@agence.fr</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="amount">$3,200</div></td>
+          <td><span class="status-badge status-partial">Partial</span></td>
+          <td><div class="date-cell">May 15, 2026</div></td>
+          <td><div class="date-cell">May 30, 2026</div></td>
+          <td><button class="action-btn">View →</button></td>
+        </tr>
+        <tr>
+          <td><div class="invoice-id">#INV-2026-006</div></td>
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">N</div>
+              <div>
+                <div class="client-name">Nora Evans</div>
+                <div class="client-email">nora@fintech.uk</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="amount">$5,400</div></td>
+          <td><span class="status-badge status-paid">Paid</span></td>
+          <td><div class="date-cell">May 18, 2026</div></td>
+          <td><div class="date-cell">Jun 01, 2026</div></td>
+          <td><button class="action-btn">View →</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── INVOICE VIEW ── -->
+  <div class="section-label">Invoice Preview</div>
+  <div class="section-title">INV-2026-001 · Alex Johnson</div>
+
+  <div class="invoice-view" style="margin-bottom:40px;">
+
+    <!-- Header -->
+    <div class="invoice-view-header">
+      <div class="invoice-meta">
+        <!-- Brand -->
+        <div class="invoice-brand">
+          <div class="logo-mark" style="margin-bottom:16px;">
+            <div class="logo-icon">M</div>
+            <div class="logo-name">MBN <span>DEV</span></div>
+          </div>
+          <div style="color:var(--text-3);font-size:12px;line-height:1.8;">
+            hello@mbndev.ma &nbsp;·&nbsp; mbndev.ma<br>
+            Morocco &amp; Worldwide
+          </div>
+        </div>
+        <!-- Invoice info -->
+        <div style="text-align:right;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+            color:var(--text-4);margin-bottom:6px;">Invoice</div>
+          <div style="font-size:28px;font-weight:800;letter-spacing:-.04em;
+            font-family:var(--mono);color:#fff;margin-bottom:12px;">#INV-2026-001</div>
+          <span class="status-badge status-paid">✓ &nbsp;Paid</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="invoice-body">
+
+      <!-- Bill from/to -->
+      <div class="bill-grid">
+        <div class="bill-section">
+          <div class="bill-label">From</div>
+          <p class="bill-name">MBN DEV</p>
+          <p class="bill-detail">
+            hello@mbndev.ma<br>
+            mbndev.ma<br>
+            Morocco
+          </p>
+        </div>
+        <div class="bill-section">
+          <div class="bill-label">Billed To</div>
+          <p class="bill-name">Alex Johnson</p>
+          <p class="bill-detail">
+            alex@techcorp.com<br>
+            TechCorp Inc.<br>
+            United States
+          </p>
+        </div>
+      </div>
+
+      <!-- Meta info bar -->
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-item-label">Issue Date</div>
+          <div class="meta-item-value">May 01, 2026</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item-label">Due Date</div>
+          <div class="meta-item-value">May 15, 2026</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item-label">Paid On</div>
+          <div class="meta-item-value green">May 12, 2026</div>
+        </div>
+        <div class="meta-item" style="border-right:none;">
+          <div class="meta-item-label">Method</div>
+          <div class="meta-item-value">CIH Bank Transfer</div>
+        </div>
+      </div>
+
+      <!-- Line items -->
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th style="text-align:center;width:60px;">Qty</th>
+            <th style="text-align:right;width:110px;">Rate</th>
+            <th style="text-align:right;width:120px;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="item-name">E-Commerce Platform Development</div>
+              <div class="item-desc">Full-stack · Next.js 15 · Stripe payments · Admin dashboard</div>
+            </td>
+            <td class="item-qty">1</td>
+            <td class="item-rate">$3,800</td>
+            <td class="item-total">$3,800</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="item-name">UI/UX Design System</div>
+              <div class="item-desc">Custom component library · Figma handoff · Dark + light mode</div>
+            </td>
+            <td class="item-qty">1</td>
+            <td class="item-rate">$700</td>
+            <td class="item-total">$700</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="item-name">30-Day Post-Launch Support</div>
+              <div class="item-desc">Bug fixes · Performance tuning · Priority Slack access</div>
+            </td>
+            <td class="item-qty">1</td>
+            <td class="item-rate">$300</td>
+            <td class="item-total">$300</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Totals -->
+      <div class="totals-row">
+        <div class="totals-box">
+          <div class="totals-line">
+            <div class="totals-line-label">Subtotal</div>
+            <div class="totals-line-val">$4,800</div>
+          </div>
+          <div class="totals-line">
+            <div class="totals-line-label">Discount</div>
+            <div class="totals-line-val">—</div>
+          </div>
+          <div class="totals-line">
+            <div class="totals-line-label">Tax (0%)</div>
+            <div class="totals-line-val">$0</div>
+          </div>
+          <div class="totals-line totals-final">
+            <div class="totals-line-label">Total</div>
+            <div class="totals-line-val">$4,800</div>
+          </div>
+          <div style="margin-top:12px;background:var(--green-bg);border:1px solid var(--green-border);
+            border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;">
+            <span style="color:var(--green);font-size:13px;font-weight:600;">Amount Paid</span>
+            <span style="color:var(--green);font-size:13px;font-weight:800;">$4,800</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="invoice-cta">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(123,46,255,.12);
+          border:1px solid rgba(123,46,255,.2);display:flex;align-items:center;
+          justify-content:center;font-size:18px;flex-shrink:0;">📄</div>
+        <div class="invoice-cta-text">
+          <div class="invoice-cta-label">Invoice PDF Available</div>
+          <div class="invoice-cta-sub">Download or share a professional PDF copy of this invoice</div>
+        </div>
+        <button class="btn btn-ghost" style="flex-shrink:0;">⬇ Download PDF</button>
+        <button class="btn btn-primary" style="flex-shrink:0;">Share →</button>
+      </div>
+
+      <!-- QR + Signature -->
+      <div class="bottom-grid">
+        <!-- QR -->
+        <div class="qr-box">
+          <div class="qr-code">
+            <!-- Minimal QR SVG pattern -->
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:60px;height:60px;">
+              <!-- QR simulation -->
+              <rect width="60" height="60" fill="white"/>
+              <!-- TL finder -->
+              <rect x="2" y="2" width="18" height="18" rx="2" fill="black"/>
+              <rect x="5" y="5" width="12" height="12" rx="1" fill="white"/>
+              <rect x="8" y="8" width="6" height="6" rx="1" fill="black"/>
+              <!-- TR finder -->
+              <rect x="40" y="2" width="18" height="18" rx="2" fill="black"/>
+              <rect x="43" y="5" width="12" height="12" rx="1" fill="white"/>
+              <rect x="46" y="8" width="6" height="6" rx="1" fill="black"/>
+              <!-- BL finder -->
+              <rect x="2" y="40" width="18" height="18" rx="2" fill="black"/>
+              <rect x="5" y="43" width="12" height="12" rx="1" fill="white"/>
+              <rect x="8" y="46" width="6" height="6" rx="1" fill="black"/>
+              <!-- Data dots (simulated) -->
+              <rect x="24" y="2" width="4" height="4" fill="black"/>
+              <rect x="30" y="2" width="4" height="4" fill="black"/>
+              <rect x="24" y="8" width="4" height="4" fill="black"/>
+              <rect x="36" y="8" width="4" height="4" fill="black"/>
+              <rect x="2" y="24" width="4" height="4" fill="black"/>
+              <rect x="8" y="24" width="4" height="4" fill="black"/>
+              <rect x="14" y="30" width="4" height="4" fill="black"/>
+              <rect x="24" y="24" width="4" height="4" fill="black"/>
+              <rect x="30" y="30" width="4" height="4" fill="black"/>
+              <rect x="36" y="24" width="4" height="4" fill="black"/>
+              <rect x="42" y="24" width="4" height="4" fill="black"/>
+              <rect x="48" y="30" width="4" height="4" fill="black"/>
+              <rect x="54" y="24" width="4" height="4" fill="black"/>
+              <rect x="24" y="36" width="4" height="4" fill="black"/>
+              <rect x="36" y="42" width="4" height="4" fill="black"/>
+              <rect x="42" y="48" width="4" height="4" fill="black"/>
+              <rect x="54" y="42" width="4" height="4" fill="black"/>
+              <rect x="30" y="54" width="4" height="4" fill="black"/>
+              <rect x="42" y="54" width="4" height="4" fill="black"/>
+              <rect x="54" y="54" width="4" height="4" fill="black"/>
+            </svg>
+          </div>
+          <div class="qr-info">
+            <div class="qr-label">Scan to verify invoice</div>
+            <div class="qr-value">mbndev.ma/inv/001</div>
+            <div style="font-size:11px;color:var(--text-4);margin-top:4px;">Powered by MBN DEV</div>
+          </div>
+        </div>
+
+        <!-- Signature -->
+        <div class="sig-box">
+          <div class="sig-label">Authorized Signature</div>
+          <div class="sig-name">Mounir Banni</div>
+          <div class="sig-line"></div>
+          <div class="sig-role">Lead Developer · MBN DEV · hello@mbndev.ma</div>
+        </div>
+      </div>
+
+    </div><!-- /invoice-body -->
+  </div><!-- /invoice-view -->
+
+</main><!-- /main -->
+
+<!-- ════════ MOBILE NAV ════════ -->
+<nav class="mobile-nav">
+  <div class="mn-item">
+    <div class="mn-icon">⬛</div>
+    <div>Home</div>
+  </div>
+  <div class="mn-item active">
+    <div class="mn-icon">📄</div>
+    <div>Invoices</div>
+  </div>
+  <div class="mn-item">
+    <div class="mn-icon">👥</div>
+    <div>Clients</div>
+  </div>
+  <div class="mn-item">
+    <div class="mn-icon">💳</div>
+    <div>Pay</div>
+  </div>
+  <div class="mn-item">
+    <div class="mn-icon">⚙️</div>
+    <div>More</div>
+  </div>
+</nav>
+
+</div><!-- /app -->
+</body>
+</html>
