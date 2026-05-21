@@ -564,6 +564,148 @@ const templates = {
     };
   },
 
+  // ── Platform update announcement ──────────────────────────────────────────
+  platformUpdate: ({ user }) => {
+    const first   = (user?.name || 'there').split(' ')[0];
+    const dashUrl = `${APP_URL}/dashboard/client`;
+    return {
+      subject: `What's new on MBN DEV — May 2026 Platform Update`,
+      html: layout({
+        preheader: `Faster. Safer. Smarter. Here's everything we just shipped for you.`,
+        badgeHtml: badge('Platform Update — May 2026', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
+        heading:   `We just made MBN DEV significantly better, ${first}.`,
+        intro:     `Over the past weeks, we shipped a major round of improvements — across security, speed, reliability, and the overall experience. Here's what changed and what it means for you.`,
+        body: [
+
+          divider('28px 0 24px'),
+
+          // ── Security ────────────────────────────────────────────────────────
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};">Security</p>`,
+          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Your account is better protected than ever</h2>`,
+
+          notice(`<strong style="color:${T.purpleLight};">Instant session invalidation.</strong> If your password changes, every other device is signed out immediately — not eventually. Your account can't be accessed by stale sessions.`, { type: 'security' }),
+
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 0;">`,
+          `<tr>`,
+          // Card 1
+          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
+          `<div style="font-size:22px;margin-bottom:10px;">🛡️</div>`,
+          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">Brute-Force Lock</div>`,
+          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">After 5 wrong password attempts, accounts are locked for 15 minutes. You're protected even if you didn't notice.</div>`,
+          `</td>`,
+          `<td style="width:4%;"></td>`,
+          // Card 2
+          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
+          `<div style="font-size:22px;margin-bottom:10px;">✅</div>`,
+          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">Smarter Sign-Up</div>`,
+          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">Email and phone uniqueness is now checked live as you type — no more submitting a form only to get a duplicate error.</div>`,
+          `</td>`,
+          `</tr>`,
+          `</table>`,
+
+          divider('32px 0'),
+
+          // ── Performance ─────────────────────────────────────────────────────
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">Performance</p>`,
+          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Everything loads faster and recovers smarter</h2>`,
+
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">`,
+          ...[
+            ['⚡', 'Retries on network blips', 'Failed requests now silently retry up to twice with back-off. Most short outages go unnoticed.'],
+            ['📋', 'Paginated message history', 'Your project chat no longer loads every message at once. It fetches in batches — like WhatsApp — so it opens instantly.'],
+            ['🔄', 'Smart error recovery', 'If a dashboard section crashes, a friendly recovery screen appears instead of a blank page. One click reloads just that section.'],
+            ['⏱️', 'No more infinite loading', 'If the server takes too long, the app now times out gracefully and shows what it already has — instead of spinning forever.'],
+          ].map(([icon, title, desc]) =>
+            `<tr><td style="padding:0 0 12px;vertical-align:top;">` +
+            `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d0d15;border:1px solid ${T.border};border-radius:12px;">` +
+            `<tr><td style="padding:16px 18px;">` +
+            `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>` +
+            `<td style="font-size:18px;padding-right:14px;vertical-align:top;line-height:1.4;">${icon}</td>` +
+            `<td><div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:3px;">${title}</div>` +
+            `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">${desc}</div></td>` +
+            `</tr></table></td></tr></table></td></tr>`
+          ).join(''),
+          `</table>`,
+
+          divider('32px 0'),
+
+          // ── Reliability ─────────────────────────────────────────────────────
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.blue};font-family:${T.font};">Reliability</p>`,
+          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">The platform stays stable no matter what</h2>`,
+
+          notice(`<strong style="color:${T.blue};">Safari fix.</strong> iPhone and Mac users could not open the website due to a Service Worker error. This is fully resolved — MBN DEV now works correctly on all browsers.`, { type: 'info' }),
+
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 0;">`,
+          `<tr>`,
+          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
+          `<div style="font-size:22px;margin-bottom:10px;">📡</div>`,
+          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">Stable Live Updates</div>`,
+          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">Real-time notifications in your dashboard are more reliable, automatically reconnect on connection drops, and work cleanly across multiple tabs.</div>`,
+          `</td>`,
+          `<td style="width:4%;"></td>`,
+          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
+          `<div style="font-size:22px;margin-bottom:10px;">✈️</div>`,
+          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">Works Offline Too</div>`,
+          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">Lose your connection? Instead of a broken page, you'll see a clean "You're offline" screen. Everything resumes automatically when you're back.</div>`,
+          `</td>`,
+          `</tr>`,
+          `</table>`,
+
+          divider('32px 0'),
+
+          // ── Payment ─────────────────────────────────────────────────────────
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.amber};font-family:${T.font};">Payments</p>`,
+          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Payments are faster, safer, and fully traceable</h2>`,
+
+          notice(`Payments can no longer be approved twice by accident. The verification process is now atomic — only one action goes through, and you always get a receipt immediately after.`, { type: 'success' }),
+
+          divider('32px 0'),
+
+          // ── CTA ─────────────────────────────────────────────────────────────
+          `<div style="background:linear-gradient(135deg,${T.purpleBg},#0e0816);border:1px solid ${T.purpleBorder};border-radius:16px;padding:32px 28px;text-align:center;">`,
+          `<div style="font-size:28px;margin-bottom:12px;">🚀</div>`,
+          `<h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#fff;font-family:${T.font};letter-spacing:-0.02em;">Ready to see it all in action?</h3>`,
+          `<p style="margin:0 0 24px;font-size:14px;color:${T.textSecond};font-family:${T.font};line-height:1.7;">Your dashboard is faster, your account is safer, and your projects are tracked with more precision than before. Open your workspace and experience the difference.</p>`,
+          `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">`,
+          `<tr><td style="border-radius:12px;" bgcolor="${T.purple}">`,
+          `<!--[if !mso]><!-->`,
+          `<a href="${dashUrl}" style="background:linear-gradient(135deg,${T.purple},${T.purpleDark});display:inline-block;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:12px;font-family:${T.font};letter-spacing:-0.01em;">Open my dashboard →</a>`,
+          `<!--<![endif]-->`,
+          `</td></tr></table>`,
+          `</div>`,
+
+          divider('28px 0 4px'),
+          textBlock(`As always, if you have questions, feedback, or just want to say hi — reply to this email or <a href="${APP_URL}/dashboard/client/messages" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">message us in the app</a>. We read everything.`, { mt: '20', mb: '20' }),
+
+        ].join(''),
+        footer: `You're receiving this because you have an account on MBN DEV. This is a product update — not a promotional email.`,
+      }),
+    };
+  },
+
 };
 
-module.exports = { sendEmail, templates };
+// ─── Broadcast helper ─────────────────────────────────────────────────────────
+
+/**
+ * Send an email to a list of recipients, with a small delay between each send
+ * to avoid triggering rate-limits on the Brevo free tier (300/day, 9/min).
+ * Returns a summary: { sent, failed, skipped }
+ */
+async function sendBroadcast(recipients, templateFn, delayMs = 350) {
+  let sent = 0, failed = 0, skipped = 0;
+  for (const user of recipients) {
+    if (!user.email) { skipped++; continue; }
+    try {
+      const tpl = templateFn(user);
+      const result = await sendEmail({ to: user.email, subject: tpl.subject, html: tpl.html });
+      if (result.sent) sent++; else failed++;
+    } catch {
+      failed++;
+    }
+    if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+  }
+  return { sent, failed, skipped };
+}
+
+module.exports = { sendEmail, sendBroadcast, templates };

@@ -173,9 +173,10 @@ export const packageAPI = {
 };
 
 export const adminAPI = {
-  getClients:   ()           => api.get('/admin/clients'),
-  toggleClient: (id: string) => api.put(`/admin/clients/${id}/toggle`),
-  getAnalytics: ()           => api.get('/admin/analytics'),
+  getClients:   ()                         => api.get('/admin/clients'),
+  toggleClient: (id: string)               => api.put(`/admin/clients/${id}/toggle`),
+  getAnalytics: ()                         => api.get('/admin/analytics'),
+  broadcast:    (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
 };
 
 export default api;

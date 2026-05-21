@@ -4,6 +4,7 @@ const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { invalidateAdminCache } = require('../lib/notifications');
 const cache = require('../lib/cache');
+const { sendBroadcast, templates } = require('../lib/email');
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
 
@@ -265,6 +266,52 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
         currentMonth: month,
       },
     });
+  } catch (err) { next(err); }
+});
+
+// ─── Broadcast email to all active users ─────────────────────────────────────
+// POST /api/admin/broadcast
+// Body: { template: 'platformUpdate' }   (extend as needed)
+// Returns: { sent, failed, skipped, total }
+
+const BROADCAST_TEMPLATES = {
+  platformUpdate: (user) => templates.platformUpdate({ user }),
+};
+
+router.post('/broadcast', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const { template: tplKey = 'platformUpdate' } = req.body;
+
+    const templateFn = BROADCAST_TEMPLATES[tplKey];
+    if (!templateFn) {
+      return res.status(400).json({ success: false, message: `Unknown template "${tplKey}". Available: ${Object.keys(BROADCAST_TEMPLATES).join(', ')}` });
+    }
+
+    // Fetch all active users (clients + admins)
+    const users = await prisma.user.findMany({
+      where:  { isActive: true },
+      select: { id: true, name: true, email: true, role: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    if (users.length === 0) {
+      return res.json({ success: true, message: 'No active users found.', sent: 0, failed: 0, skipped: 0, total: 0 });
+    }
+
+    // Run async — respond immediately with accepted, let it send in background
+    res.json({
+      success: true,
+      message: `Broadcast started for ${users.length} user(s). Sending in the background.`,
+      total:   users.length,
+    });
+
+    // Fire-and-forget — don't block the HTTP response
+    sendBroadcast(users, templateFn).then(({ sent, failed, skipped }) => {
+      console.log(`[broadcast] template="${tplKey}" total=${users.length} sent=${sent} failed=${failed} skipped=${skipped}`);
+    }).catch((err) => {
+      console.error('[broadcast] unexpected error:', err.message);
+    });
+
   } catch (err) { next(err); }
 });
 
