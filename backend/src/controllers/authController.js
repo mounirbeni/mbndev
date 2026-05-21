@@ -5,10 +5,19 @@ const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { sendEmail, templates } = require('../lib/email');
 const { wa } = require('../lib/whatsapp');
+const {
+  normalizeEmail,
+  normalizePhone,
+  recordLoginAttempt,
+  checkLoginBruteForce,
+  clearLoginAttempts,
+  checkRegistrationRate,
+  recordRegistrationAttempt,
+} = require('../lib/authSecurity');
 
-const APP_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+const APP_URL           = process.env.CLIENT_URL || 'http://localhost:3000';
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
-const hashToken = (raw) => crypto.createHash('sha256').update(raw).digest('hex');
+const hashToken          = (raw) => crypto.createHash('sha256').update(raw).digest('hex');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '7d' });
@@ -16,28 +25,125 @@ const signToken = (id) =>
 const sendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
   const { password: _, ...safeUser } = user;
-  res.status(statusCode).json({
-    success: true,
-    token,
-    user: fmt(safeUser),
-  });
+  res.status(statusCode).json({ success: true, token, user: fmt(safeUser) });
 };
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Human-readable "X minutes Y seconds" from milliseconds */
+function formatMs(ms) {
+  const totalSec = Math.ceil(ms / 1000);
+  const min      = Math.floor(totalSec / 60);
+  const sec      = totalSec % 60;
+  if (min > 0 && sec > 0) return `${min}m ${sec}s`;
+  if (min > 0)             return `${min} minute${min > 1 ? 's' : ''}`;
+  return `${sec} second${sec !== 1 ? 's' : ''}`;
+}
+
+// ─── Register ────────────────────────────────────────────────────────────────
 
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, company } = req.body;
+    // ── Registration rate limit (per IP) ──
+    const rateCheck = await checkRegistrationRate(req);
+    if (rateCheck.limited) {
+      return res.status(429).json({
+        success: false,
+        message: `Too many registration attempts. Try again in ${formatMs(rateCheck.remainingMs)}.`,
+        code:    'RATE_LIMITED',
+      });
+    }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return res.status(400).json({ success: false, message: 'Email already registered' });
+    const {
+      name, email: rawEmail, password,
+      company, phone: rawPhone,
+    } = req.body;
+
+    const email = normalizeEmail(rawEmail);
+    const phone = normalizePhone(rawPhone);  // null if not provided or invalid
+
+    // ── Check phone validity if provided ──
+    if (rawPhone && rawPhone.trim() && !phone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number is invalid. Please use international format (e.g. +1234567890).',
+        field:   'phone',
+        code:    'INVALID_PHONE',
+      });
+    }
+
+    // ── Check for existing email (case-insensitive) ──
+    const emailExists = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
+      select: { id: true, isActive: true },
+    });
+    if (emailExists) {
+      await recordRegistrationAttempt(req);
+      if (!emailExists.isActive) {
+        return res.status(400).json({
+          success: false,
+          message: 'An account with this email exists but has been deactivated. Contact support to recover it.',
+          field:   'email',
+          code:    'ACCOUNT_DEACTIVATED',
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        message: 'This email is already registered. Sign in instead, or use a different email.',
+        field:   'email',
+        code:    'EMAIL_TAKEN',
+      });
+    }
+
+    // ── Check for existing phone ──
+    if (phone) {
+      const phoneExists = await prisma.user.findUnique({
+        where: { phone },
+        select: { id: true, isActive: true },
+      });
+      if (phoneExists) {
+        await recordRegistrationAttempt(req);
+        return res.status(400).json({
+          success: false,
+          message: 'This phone number is already linked to an account.',
+          field:   'phone',
+          code:    'PHONE_TAKEN',
+        });
+      }
     }
 
     const hashed = await bcrypt.hash(password, 12);
-    const user = await prisma.user.create({
-      data: { name, email, password: hashed, company: company || '' },
-    });
 
-    // Welcome email + WhatsApp — await so Vercel serverless doesn't kill the request before sending
+    // ── Atomic create — unique constraints catch any race condition ──
+    let user;
+    try {
+      user = await prisma.user.create({
+        data: {
+          name:    String(name).trim(),
+          email,                                  // already normalised
+          password: hashed,
+          company:  company ? String(company).trim() : '',
+          phone:    phone || null,
+        },
+      });
+    } catch (err) {
+      // P2002 = Prisma unique constraint violation
+      if (err.code === 'P2002') {
+        await recordRegistrationAttempt(req);
+        const field = err.meta?.target?.includes('phone') ? 'phone' : 'email';
+        return res.status(409).json({
+          success: false,
+          message: field === 'phone'
+            ? 'This phone number is already linked to an account.'
+            : 'This email is already registered. Sign in instead.',
+          field,
+          code: field === 'phone' ? 'PHONE_TAKEN' : 'EMAIL_TAKEN',
+        });
+      }
+      throw err;
+    }
+
+    // Welcome email + WhatsApp
     await sendEmail({ to: user.email, ...templates.welcome({ user }) }).catch(() => {});
     wa.welcome({ user }).catch(() => {});
 
@@ -47,18 +153,75 @@ exports.register = async (req, res, next) => {
   }
 };
 
+// ─── Login ────────────────────────────────────────────────────────────────────
+
 exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email: rawEmail, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password required' });
+    if (!rawEmail || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    const email = normalizeEmail(rawEmail);
+
+    // ── Brute-force gate ──
+    const bruteCheck = await checkLoginBruteForce(email);
+    if (bruteCheck.locked) {
+      return res.status(429).json({
+        success: false,
+        message: `Account temporarily locked after too many failed attempts. Try again in ${formatMs(bruteCheck.remainingMs)}.`,
+        code:    'ACCOUNT_LOCKED',
+        remainingMs: bruteCheck.remainingMs,
+      });
     }
+
+    // ── Lookup (case-insensitive) ──
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
+    });
+
+    const credentialsValid = user && await bcrypt.compare(password, user.password);
+
+    if (!credentialsValid) {
+      await recordLoginAttempt(email, req, false);
+
+      // Re-check how many attempts remain after recording
+      const afterCheck = await checkLoginBruteForce(email);
+      if (afterCheck.locked) {
+        return res.status(429).json({
+          success: false,
+          message: `Too many failed attempts. Account locked for ${formatMs(afterCheck.remainingMs)}.`,
+          code:    'ACCOUNT_LOCKED',
+          remainingMs: afterCheck.remainingMs,
+        });
+      }
+
+      const attemptsLeft = afterCheck.attemptsLeft;
+      const warn = attemptsLeft <= 2
+        ? ` ${attemptsLeft} attempt${attemptsLeft !== 1 ? 's' : ''} left before temporary lockout.`
+        : '';
+
+      return res.status(401).json({
+        success: false,
+        message: `Invalid email or password.${warn}`,
+        code:    'INVALID_CREDENTIALS',
+        attemptsLeft,
+      });
+    }
+
+    // ── Deactivated account ──
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been deactivated. Contact support at contact@mbndev.ma.',
+        code:    'ACCOUNT_DEACTIVATED',
+      });
+    }
+
+    // ── Success — clear failed attempts ──
+    await recordLoginAttempt(email, req, true);
+    clearLoginAttempts(email).catch(() => {}); // fire-and-forget cleanup
 
     sendToken(user, 200, res);
   } catch (err) {
@@ -66,31 +229,99 @@ exports.login = async (req, res, next) => {
   }
 };
 
+// ─── Real-time availability checks ───────────────────────────────────────────
+
+exports.checkEmail = async (req, res, next) => {
+  try {
+    const email = normalizeEmail(req.body.email || '');
+    if (!email) {
+      return res.status(400).json({ success: false, available: false, message: 'Email is required.' });
+    }
+
+    const exists = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
+      select: { id: true, isActive: true },
+    });
+
+    if (!exists) {
+      return res.json({ success: true, available: true });
+    }
+
+    if (!exists.isActive) {
+      return res.json({
+        success:   true,
+        available: false,
+        code:      'ACCOUNT_DEACTIVATED',
+        message:   'This email is linked to a deactivated account. Contact support.',
+      });
+    }
+
+    return res.json({
+      success:   true,
+      available: false,
+      code:      'EMAIL_TAKEN',
+      message:   'This email is already registered.',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.checkPhone = async (req, res, next) => {
+  try {
+    const rawPhone = req.body.phone || '';
+    const phone    = normalizePhone(rawPhone);
+
+    if (!rawPhone.trim()) {
+      return res.json({ success: true, available: true, valid: false });
+    }
+
+    if (!phone) {
+      return res.json({
+        success:   true,
+        available: false,
+        valid:     false,
+        message:   'Invalid phone number format.',
+      });
+    }
+
+    const exists = await prisma.user.findUnique({
+      where: { phone },
+      select: { id: true },
+    });
+
+    return res.json({
+      success:   true,
+      available: !exists,
+      valid:     true,
+      ...(exists ? { code: 'PHONE_TAKEN', message: 'This phone number is already linked to an account.' } : {}),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Get me ───────────────────────────────────────────────────────────────────
+
 exports.getMe = async (req, res) => {
   res.json({ success: true, user: fmt(req.user) });
 };
 
-// ─── Password reset flow ────────────────────────────────────────────────────
-// Two-step: client posts email → we email a one-time token (hashed in DB).
-// Then client posts (token, newPassword) and we update.
-//
-// Security:
-//   - Always respond 200 to /forgot-password to prevent email-enumeration.
-//   - Token is 32 random bytes (256-bit), hashed (sha256) at rest.
-//   - 1-hour expiry, single-use (usedAt gate).
+// ─── Password reset ───────────────────────────────────────────────────────────
 
 exports.forgotPassword = async (req, res, next) => {
   try {
-    const email = String(req.body.email || '').trim().toLowerCase();
+    const email = normalizeEmail(req.body.email || '');
     if (!email) {
       return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
+    });
 
-    // Always behave the same regardless of whether the user exists
     if (user && user.isActive) {
-      // Invalidate any existing unused tokens for this user
+      // Invalidate existing unused tokens
       await prisma.passwordResetToken.updateMany({
         where: { userId: user.id, usedAt: null },
         data:  { usedAt: new Date() },
@@ -124,25 +355,25 @@ exports.forgotPassword = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   try {
     const { token, newPassword } = req.body;
+
     if (!token || !newPassword) {
-      return res.status(400).json({ success: false, message: 'Token and new password are required' });
+      return res.status(400).json({ success: false, message: 'Token and new password are required.' });
     }
     if (typeof newPassword !== 'string' || newPassword.length < 8) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
+      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
     }
 
     const tokenHash = hashToken(String(token));
     const record = await prisma.passwordResetToken.findUnique({
-      where:  { tokenHash },
+      where:   { tokenHash },
       include: { user: true },
     });
 
     if (!record || record.usedAt || record.expiresAt < new Date()) {
-      return res.status(400).json({ success: false, message: 'Reset link is invalid or has expired' });
+      return res.status(400).json({ success: false, message: 'Reset link is invalid or has expired.' });
     }
-
     if (!record.user.isActive) {
-      return res.status(400).json({ success: false, message: 'Account is deactivated' });
+      return res.status(400).json({ success: false, message: 'Account is deactivated.' });
     }
 
     const hashed = await bcrypt.hash(newPassword, 12);
@@ -155,12 +386,14 @@ exports.resetPassword = async (req, res, next) => {
         where: { id: record.id },
         data:  { usedAt: new Date() },
       }),
-      // Invalidate all other unused tokens for this user
       prisma.passwordResetToken.updateMany({
         where: { userId: record.userId, usedAt: null, id: { not: record.id } },
         data:  { usedAt: new Date() },
       }),
     ]);
+
+    // Clear any login lockout after password reset
+    clearLoginAttempts(record.user.email).catch(() => {});
 
     return res.json({ success: true, message: 'Password updated. You can sign in now.' });
   } catch (err) {
@@ -168,39 +401,83 @@ exports.resetPassword = async (req, res, next) => {
   }
 };
 
+// ─── Update profile ───────────────────────────────────────────────────────────
+
 exports.updateProfile = async (req, res, next) => {
   try {
-    const { name, company, phone, currentPassword, newPassword } = req.body;
+    const { name, company, phone: rawPhone, currentPassword, newPassword } = req.body;
 
-    // ── Password change flow ──────────────────────────────────────────────
+    // ── Password change ──
     if (currentPassword && newPassword) {
       const full = await prisma.user.findUnique({ where: { id: req.user.id } });
       const valid = await bcrypt.compare(currentPassword, full.password);
       if (!valid) {
-        return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+        return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
       }
-      if (newPassword.length < 6) {
-        return res.status(400).json({ success: false, message: 'New password must be at least 6 characters' });
+      if (newPassword.length < 8) {
+        return res.status(400).json({ success: false, message: 'New password must be at least 8 characters.' });
       }
       const hashed = await bcrypt.hash(newPassword, 12);
       await prisma.user.update({ where: { id: req.user.id }, data: { password: hashed } });
-      return res.json({ success: true, message: 'Password updated successfully' });
+      return res.json({ success: true, message: 'Password updated successfully.' });
     }
 
-    // ── Profile update flow ───────────────────────────────────────────────
+    // ── Profile update ──
     const updateData = {};
-    if (name    !== undefined) updateData.name    = name;
-    if (company !== undefined) updateData.company = company;
-    if (phone   !== undefined) updateData.phone   = phone;
+    if (name    !== undefined) updateData.name    = String(name).trim();
+    if (company !== undefined) updateData.company = String(company).trim();
 
-    const user = await prisma.user.update({
-      where: { id: req.user.id },
-      data:  updateData,
-      select: {
-        id: true, name: true, email: true, role: true, plan: true,
-        avatar: true, company: true, phone: true, isActive: true,
-      },
-    });
+    if (rawPhone !== undefined) {
+      if (rawPhone === '' || rawPhone === null) {
+        updateData.phone = null;
+      } else {
+        const phone = normalizePhone(rawPhone);
+        if (!phone) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid phone number format.',
+            field:   'phone',
+          });
+        }
+        // Check uniqueness (exclude self)
+        const conflict = await prisma.user.findFirst({
+          where: { phone, id: { not: req.user.id } },
+          select: { id: true },
+        });
+        if (conflict) {
+          return res.status(400).json({
+            success: false,
+            message: 'This phone number is already linked to another account.',
+            field:   'phone',
+            code:    'PHONE_TAKEN',
+          });
+        }
+        updateData.phone = phone;
+      }
+    }
+
+    let user;
+    try {
+      user = await prisma.user.update({
+        where:  { id: req.user.id },
+        data:   updateData,
+        select: {
+          id: true, name: true, email: true, role: true, plan: true,
+          avatar: true, company: true, phone: true, isActive: true,
+        },
+      });
+    } catch (err) {
+      if (err.code === 'P2002') {
+        return res.status(409).json({
+          success: false,
+          message: 'This phone number is already linked to another account.',
+          field:   'phone',
+          code:    'PHONE_TAKEN',
+        });
+      }
+      throw err;
+    }
+
     res.json({ success: true, user: fmt(user) });
   } catch (err) {
     next(err);

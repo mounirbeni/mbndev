@@ -17,7 +17,7 @@ model User {
   plan      String   @default("custom")   // "starter" | "pro" | "premium" | "custom"
   avatar    String   @default("")
   company   String   @default("")
-  phone     String   @default("")
+  phone     String?  @unique                // nullable; unique enforced on non-null values
   locale    String   @default("en")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -224,6 +224,19 @@ model Notification {
   link      String?
   metadata  Json?
   createdAt DateTime @default(now())
+}
+
+// ─── Login Attempts (brute-force protection) ──────────────────────────────────
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String                          // normalised (lowercase)
+  ip        String?
+  success   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([ip, createdAt])
 }
 
 // ─── Activity Logs ────────────────────────────────────────────────────────────
