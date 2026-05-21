@@ -5,6 +5,7 @@ const {
   getProject,
   getAllProjects,
   updateProject,
+  deleteProject,
   uploadFile,
   getStats,
   generateShareToken,
@@ -27,6 +28,7 @@ router.get('/stats', protect, authorize('admin'), getStats);
 // Shared
 router.get('/:id', protect, getProject);
 router.put('/:id', protect, authorize('admin'), updateProject);
+router.delete('/:id', protect, authorize('admin'), deleteProject);
 router.post('/:id/upload', protect, upload.single('file'), uploadFile);
 
 // Admin: generate shareable link for a project

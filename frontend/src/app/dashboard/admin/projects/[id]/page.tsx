@@ -18,7 +18,7 @@ import {
   Send, Check, Clock, AlertCircle, Download, Upload, FileText,
   DollarSign, Edit2, Save, Users, Activity,
   RefreshCw, TrendingUp, Target, Package, Star, Edit3,
-  Share2, Copy, CheckCheck,
+  Share2, Copy, CheckCheck, Trash2,
 } from 'lucide-react';
 
 const TAB_DEFS = [
@@ -66,6 +66,8 @@ export default function AdminProjectWorkspace() {
   const [uploading, setUploading] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -166,6 +168,20 @@ export default function AdminProjectWorkspace() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteConfirm) { setDeleteConfirm(true); return; }
+    setDeleting(true);
+    try {
+      await projectAPI.delete(id);
+      toast.success('Project deleted successfully');
+      router.push('/dashboard/admin/projects');
+    } catch {
+      toast.error('Failed to delete project');
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
+  };
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -218,6 +234,34 @@ export default function AdminProjectWorkspace() {
             <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
               <Edit2 className="w-3.5 h-3.5" /> {t('common.edit')}
             </Button>
+            {deleteConfirm ? (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="inline-flex items-center px-2.5 py-1.5 text-xs font-semibold text-slate-400 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all disabled:opacity-50"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-500 border border-red-500/50 rounded-xl transition-all disabled:opacity-50"
+                >
+                  {deleting
+                    ? <><span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" /> Deleting…</>
+                    : <><Trash2 className="w-3.5 h-3.5" /> Confirm Delete</>
+                  }
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleDelete}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Delete
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex gap-2">

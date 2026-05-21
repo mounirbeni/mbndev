@@ -131,6 +131,7 @@ export const projectAPI = {
   getStats:        ()                                => api.get('/projects/stats'),
   generateShare:   (id: string)                      => api.post(`/projects/${id}/share`, {}),
   getByShareToken: (token: string)                   => api.get(`/projects/share/${token}`),
+  delete:          (id: string)                      => api.delete(`/projects/${id}`),
 };
 
 export const orderAPI = {

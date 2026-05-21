@@ -306,6 +306,53 @@ exports.getStats = async (req, res, next) => {
   }
 };
 
+// ─── Delete project (admin only) ─────────────────────────────────────────────
+// Cascades automatically via Prisma onDelete: Cascade to:
+//   ProjectFile, Message, Milestone, ActivityLog
+// Payments are kept (onDelete: SetNull) but lose their projectId reference.
+// Uploaded files on disk are also removed.
+exports.deleteProject = async (req, res, next) => {
+  try {
+    const project = await prisma.project.findUnique({
+      where:  { id: req.params.id },
+      include: { files: { select: { url: true } } },
+    });
+
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+
+    // Remove physical files from disk (fire-and-forget — don't block the delete)
+    if (project.files?.length) {
+      const path = require('path');
+      const uploadsRoot = path.join(__dirname, '..', '..', 'uploads');
+      for (const f of project.files) {
+        const filename = path.basename(f.url);
+        fs.unlink(path.join(uploadsRoot, filename), () => {});
+      }
+    }
+
+    // Prisma cascades: Messages, ProjectFiles, Milestones, ActivityLogs all deleted
+    await prisma.project.delete({ where: { id: req.params.id } });
+
+    // Notify client that the project was removed
+    notify(project.clientId, {
+      type:    'status_update',
+      title:   'Project Removed',
+      message: `Your project "${project.title}" has been removed by the admin.`,
+      link:    '/dashboard/client/projects',
+    }).catch(() => {});
+
+    // Realtime push to client and admins
+    realtime.publishToUser(project.clientId, 'project:deleted', { id: project.id });
+    realtime.publishToAdmins('project:deleted', { id: project.id });
+
+    res.json({ success: true, message: 'Project deleted successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ─── Share token (admin only) ─────────────────────────────────────────────────
 exports.generateShareToken = async (req, res, next) => {
   try {
