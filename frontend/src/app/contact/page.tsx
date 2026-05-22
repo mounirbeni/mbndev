@@ -23,7 +23,7 @@ export default function ContactPage() {
 
   const faqs = [
     { q: 'How long does a project take?',          a: 'Depending on scope: landing pages 3–7 days, full websites 2–4 weeks, SaaS applications 4–8 weeks.' },
-    { q: 'Do you work with international clients?', a: 'Yes! I work with clients globally. Communication is in English and French.' },
+    { q: 'Do you work with international clients?', a: 'Yes! I work with clients globally. Communication is in English and Arabic.' },
     { q: 'What payment methods do you accept?',    a: 'Stripe, PayPal, wire transfer, and local Moroccan bank transfer.' },
     { q: 'Do you offer revisions?',                a: 'Yes. All packages include revision rounds. The number depends on your selected package.' },
   ];

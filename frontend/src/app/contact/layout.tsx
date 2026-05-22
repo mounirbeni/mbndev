@@ -28,7 +28,7 @@ const contactSchema = {
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',
-      availableLanguage: ['English', 'French', 'Arabic'],
+      availableLanguage: ['English', 'Arabic'],
       email: 'contact@mbndev.ma',
     },
   },
@@ -51,7 +51,7 @@ const faqSchema = {
     {
       '@type': 'Question',
       name: 'Do you work with clients outside Morocco?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Yes — MBN DEV serves clients worldwide. We communicate in English, French, and Arabic.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Yes — MBN DEV serves clients worldwide. We communicate in English and Arabic.' },
     },
     {
       '@type': 'Question',

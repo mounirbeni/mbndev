@@ -949,7 +949,7 @@ const en: Dict = {
   'about.faq.q1':       'Where are you based?',
   'about.faq.a1':       "I'm based in Morocco and work remotely with clients worldwide. All communication happens through the platform or WhatsApp — time zone differences have never been a blocker.",
   'about.faq.q2':       'Do you work with international clients?',
-  'about.faq.a2':       "Absolutely. More than half of my clients are outside Morocco — from Europe to the Middle East and North America. I'm comfortable working in English, French, and Arabic.",
+  'about.faq.a2':       "Absolutely. More than half of my clients are outside Morocco — from Europe to the Middle East and North America. I'm comfortable working in English and Arabic.",
   'about.faq.q3':       'How long have you been building websites?',
   'about.faq.a3':       'Since 2019 — over 5 years of shipping production projects. Every year has included new technologies, more complex systems, and a growing client base.',
   'about.faq.q4':       'What makes you different from a freelancer or agency?',
