@@ -230,7 +230,7 @@ const en: Record<string, string> = {
   'auth.benefits.dashboard': 'Full dashboard access',
   'auth.welcomeMsg': 'Welcome back!',
   'auth.invalidCredentials': 'Invalid credentials',
-  'auth.accountCreated': 'Account created! Welcome aboard 🎉',
+  'auth.accountCreated': 'Account created! Welcome aboard.',
   'auth.registrationFailed': 'Registration failed',
   'auth.passwordMin': 'Password must be at least 6 characters',
   'auth.forgotPassword': 'Forgot Password',

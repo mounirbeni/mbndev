@@ -692,14 +692,14 @@ function RequestPageContent() {
                               <span className="text-green-500/70 flex items-center gap-1">
                                 <Check className="w-2.5 h-2.5" /> {t('request.unlimitedPages')}
                               </span>
-                              <span className="text-green-500/70 font-medium">{t('request.includedCheck')} ✓</span>
+                              <span className="text-green-500/70 font-medium">{t('request.includedCheck')}</span>
                             </div>
                           ) : (
                             <div className="flex justify-between text-xs">
                               <span className="text-green-500/70 flex items-center gap-1">
                                 <Check className="w-2.5 h-2.5" /> {t('request.upToPages').replace('{n}', String(pricing.includedPages))}
                               </span>
-                              <span className="text-green-500/70 font-medium">{t('request.includedCheck')} ✓</span>
+                              <span className="text-green-500/70 font-medium">{t('request.includedCheck')}</span>
                             </div>
                           )}
                           {pricing.includedFeats.map((fKey) => {
@@ -709,7 +709,7 @@ function RequestPageContent() {
                                 <span className="text-green-500/70 flex items-center gap-1">
                                   <Check className="w-2.5 h-2.5" /> {feat.label}
                                 </span>
-                                <span className="text-green-500/70 font-medium">{t('request.includedCheck')} ✓</span>
+                                <span className="text-green-500/70 font-medium">{t('request.includedCheck')}</span>
                               </div>
                             ) : null;
                           })}

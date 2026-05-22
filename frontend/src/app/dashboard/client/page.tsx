@@ -149,9 +149,6 @@ export default function ClientDashboard() {
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               {greeting}, {firstName}
             </h1>
-            <span className="text-xl">
-              {new Date().getHours() < 12 ? '☀️' : new Date().getHours() < 18 ? '🌤️' : '🌙'}
-            </span>
             {user?.plan && <PlanBadge plan={user.plan} size="md" />}
           </div>
           <p className="text-slate-400 text-sm">

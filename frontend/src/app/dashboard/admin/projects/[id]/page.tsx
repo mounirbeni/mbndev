@@ -462,12 +462,11 @@ export default function AdminProjectWorkspace() {
                   const isSystem = m.type === 'system';
                   const isMe = !isSystem && (m.sender?._id ?? m.sender?.id ?? m.senderId) === (user?._id ?? user?.id);
                   if (isSystem) {
-                    let icon = '🔔', title = '', body = '';
-                    try { const p = JSON.parse(m.content); icon = p.icon || icon; title = p.title || ''; body = p.body || ''; } catch { body = m.content; }
+                    let title = '', body = '';
+                    try { const p = JSON.parse(m.content); title = p.title || ''; body = p.body || ''; } catch { body = m.content; }
                     return (
                       <div key={m._id ?? m.id} className="flex justify-center py-1">
                         <div className="max-w-xs text-center bg-primary-500/8 border border-primary-500/20 rounded-2xl px-4 py-3">
-                          <div className="text-lg mb-1">{icon}</div>
                           {title && <div className="text-xs font-semibold text-primary-300 mb-1">{title}</div>}
                           {body && <div className="text-xs text-slate-400 leading-relaxed">{body}</div>}
                         </div>

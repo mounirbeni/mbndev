@@ -23,12 +23,10 @@ interface Props {
 type TimeAgoFn = (date: string) => string;
 
 function SystemMessage({ msg, timeAgo }: { msg: Message; timeAgo: TimeAgoFn }) {
-  let icon  = '🔔';
   let title = '';
   let body  = '';
   try {
     const p = JSON.parse(msg.content);
-    icon  = p.icon  || icon;
     title = p.title || '';
     body  = p.body  || '';
   } catch {
@@ -43,7 +41,6 @@ function SystemMessage({ msg, timeAgo }: { msg: Message; timeAgo: TimeAgoFn }) {
       className="flex justify-center py-1"
     >
       <div className="max-w-[340px] w-full mx-2 rounded-2xl border border-primary-500/20 bg-primary-500/6 px-4 py-3.5 text-center">
-        <div className="text-xl mb-1.5 leading-none">{icon}</div>
         {title && (
           <div className="text-xs font-semibold text-primary-300 mb-1 tracking-wide uppercase">
             {title}

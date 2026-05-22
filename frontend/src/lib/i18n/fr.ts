@@ -229,7 +229,7 @@ const fr: Record<string, string> = {
   'auth.benefits.dashboard': 'Accès complet au tableau de bord',
   'auth.welcomeMsg': 'Bon retour !',
   'auth.invalidCredentials': 'Identifiants invalides',
-  'auth.accountCreated': 'Compte créé ! Bienvenue 🎉',
+  'auth.accountCreated': 'Compte créé ! Bienvenue.',
   'auth.registrationFailed': 'L\'inscription a échoué',
   'auth.passwordMin': 'Le mot de passe doit contenir au moins 6 caractères',
   'auth.forgotPassword': 'Mot de passe oublié',

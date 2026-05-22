@@ -182,7 +182,7 @@ export default function PricingPage() {
                     </div>
                     {pkg.originalPrice && (
                       <p className="text-green-400 text-xs font-semibold mt-1.5">
-                        ✓ {t('pricing.youSaveLabel').replace('{amount}', formatCurrency(pkg.originalPrice - pkg.price))}
+                        {t('pricing.youSaveLabel').replace('{amount}', formatCurrency(pkg.originalPrice - pkg.price))}
                       </p>
                     )}
                   </div>

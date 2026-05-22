@@ -161,7 +161,7 @@ export default function Pricing() {
                         <p className={`text-[10px] font-semibold tracking-[0.22em] uppercase mb-1.5 ${
                           isFeatured ? 'text-violet-400' : 'text-slate-600'
                         }`}>
-                          {isFeatured ? '✦ Most Selected' : 'Package'}
+                          {isFeatured ? 'Most Selected' : 'Package'}
                         </p>
                         <h3 className="text-2xl font-bold text-white tracking-tight">{pkg.name}</h3>
                       </div>

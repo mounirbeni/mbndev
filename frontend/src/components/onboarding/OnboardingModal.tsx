@@ -128,7 +128,7 @@ function MessagesVisual() {
   const msgs = [
     { from: 'dev',    text: "Hey! I've reviewed your brief and have a few clarifying questions.",  delay: 0.1 },
     { from: 'client', text: 'Sure, happy to clarify. What would you like to know?',                delay: 0.3 },
-    { from: 'dev',    text: "Perfect. I'll get started right away 🚀",                            delay: 0.5 },
+    { from: 'dev',    text: "Perfect. I'll get started right away.",                               delay: 0.5 },
   ];
   return (
     <motion.div

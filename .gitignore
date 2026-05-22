@@ -56,3 +56,5 @@ next-env.d.ts
 .vercel
 .netlify
 *.pem
+
+.claude/settings.local.json
