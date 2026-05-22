@@ -123,10 +123,10 @@ export default function WhatsNewModal() {
                         className="flex items-start gap-3"
                       >
                         <div
-                          className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 mt-0.5"
-                          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                          style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.22)' }}
                         >
-                          {entry.icon}
+                          <entry.icon className="w-4 h-4 text-violet-400" strokeWidth={1.8} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5">
