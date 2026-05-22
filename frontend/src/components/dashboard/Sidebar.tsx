@@ -11,6 +11,7 @@ import Logo3D from '@/components/ui/Logo3D';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn, getInitials } from '@/lib/utils';
+import { APP_VERSION } from '@/lib/version';
 import toast from 'react-hot-toast';
 
 interface NavItem {
@@ -186,6 +187,16 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* ── Version badge ───────────────────────────────────────────────────── */}
+      <div className="px-5 pb-2 shrink-0">
+        <span
+          className="text-[10px] font-semibold tabular-nums"
+          style={{ color: 'rgba(124,58,237,0.55)' }}
+        >
+          v{APP_VERSION}
+        </span>
+      </div>
 
       {/* ── Sign out ────────────────────────────────────────────────────────── */}
       <div

@@ -8,6 +8,7 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import MobileNav from '@/components/mobile/MobileNav';
 import NotificationBell from '@/components/dashboard/NotificationBell';
 import FloatingSupport from '@/components/ui/FloatingSupport';
+import WhatsNewModal from '@/components/ui/WhatsNewModal';
 import Logo3D from '@/components/ui/Logo3D';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -196,6 +197,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ── Floating support button ──────────────────────────────── */}
       <FloatingSupport />
+
+      {/* ── What's New popup (once per version) ──────────────────── */}
+      <WhatsNewModal />
     </div>
   );
 }
