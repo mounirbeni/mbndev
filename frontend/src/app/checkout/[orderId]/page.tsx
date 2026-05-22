@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Zap, CreditCard, Shield, Clock, Check,
-  Loader2, AlertCircle, Copy, ExternalLink, CheckCircle2,
+  Loader2, AlertCircle, Copy, ExternalLink, CheckCircle2, BookmarkCheck,
 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -46,14 +46,15 @@ export default function CheckoutPage() {
   const router            = useRouter();
   const { user, loading: authLoading } = useAuth();
 
-  const [order,   setOrder]   = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [paying,  setPaying]  = useState(false);
-  const [error,   setError]   = useState('');
-  const [method,  setMethod]  = useState<PayMethod>('cih_bank');
+  const [order,      setOrder]      = useState<any>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [paying,     setPaying]     = useState(false);
+  const [error,      setError]      = useState('');
+  const [method,     setMethod]     = useState<PayMethod>('cih_bank');
   const [externalRef, setExternalRef] = useState('');
-  const [copied,  setCopied]  = useState('');
-  const [done,    setDone]    = useState(false);
+  const [copied,     setCopied]     = useState('');
+  const [done,       setDone]       = useState(false);
+  const [savedLater, setSavedLater] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -127,18 +128,41 @@ export default function CheckoutPage() {
           <CheckCircle2 className="w-10 h-10 text-green-400" />
         </div>
         <h1 className="text-2xl font-bold text-white mb-3">{t('checkout.done.title')}</h1>
-        <p className="text-slate-400 text-sm leading-relaxed mb-2">
-          {t('checkout.done.sub1')}
-        </p>
-        <p className="text-slate-500 text-sm leading-relaxed mb-8">
-          {t('checkout.done.sub2')}
-        </p>
+        <p className="text-slate-400 text-sm leading-relaxed mb-2">{t('checkout.done.sub1')}</p>
+        <p className="text-slate-500 text-sm leading-relaxed mb-8">{t('checkout.done.sub2')}</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/dashboard/client/orders">
-            <Button size="md">{t('checkout.done.viewOrders')}</Button>
-          </Link>
+          <Link href="/dashboard/client/orders"><Button size="md">{t('checkout.done.viewOrders')}</Button></Link>
           <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
             <Button size="md" variant="outline">{t('checkout.done.whatsApp')}</Button>
+          </a>
+        </div>
+      </motion.div>
+    </div>
+  );
+
+  if (savedLater) return (
+    <div className="min-h-screen bg-hero-gradient flex flex-col items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="text-center max-w-md"
+      >
+        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.35)' }}>
+          <BookmarkCheck className="w-10 h-10 text-violet-400" />
+        </div>
+        <h1 className="text-2xl font-bold text-white mb-3">Order Saved!</h1>
+        <p className="text-slate-400 text-sm leading-relaxed mb-2">
+          Your order <span className="text-white font-semibold">#{orderId.slice(-8).toUpperCase()}</span> has been saved.
+        </p>
+        <p className="text-slate-500 text-sm leading-relaxed mb-8">
+          You can complete payment anytime from your dashboard under <span className="text-slate-300">My Orders</span>. We'll keep it ready for you.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/dashboard/client/orders"><Button size="md">View My Orders</Button></Link>
+          <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
+            <Button size="md" variant="outline">Contact on WhatsApp</Button>
           </a>
         </div>
       </motion.div>
@@ -366,6 +390,24 @@ export default function CheckoutPage() {
               {method === 'paypal'     && t('checkout.paypalDone')}
               {method === 'taptapsend' && t('checkout.taptapDone')}
             </Button>
+
+            {/* Pay Later */}
+            <div className="flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-white/8" />
+              <span className="text-slate-600 text-xs font-medium">or</span>
+              <div className="flex-1 h-px bg-white/8" />
+            </div>
+
+            <button
+              onClick={() => { if (typeof window !== 'undefined') localStorage.removeItem('mbndev_request_draft'); setSavedLater(true); }}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold transition-all border"
+              style={{ background: 'rgba(124,58,237,0.08)', borderColor: 'rgba(124,58,237,0.25)', color: '#a78bfa' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.15)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.08)'; }}
+            >
+              <BookmarkCheck className="w-4 h-4" />
+              Save Order &amp; Pay Later
+            </button>
 
             <p className="text-xs text-slate-600 text-center mt-3">
               {t('checkout.terms')}{' '}
