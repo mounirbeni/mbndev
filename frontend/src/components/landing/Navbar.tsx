@@ -77,8 +77,16 @@ export default function Navbar() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-50 glass-nav transition-shadow duration-300"
-        style={{ boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.35)' : 'none' }}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        style={{
+          background: scrolled
+            ? 'rgba(8, 8, 11, 0.92)'
+            : 'transparent',
+          backdropFilter: scrolled ? 'blur(28px) saturate(1.6)' : 'none',
+          WebkitBackdropFilter: scrolled ? 'blur(28px) saturate(1.6)' : 'none',
+          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.065)' : '1px solid transparent',
+          boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.35)' : 'none',
+        }}
       >
         {/* Scroll progress bar */}
         <motion.div
