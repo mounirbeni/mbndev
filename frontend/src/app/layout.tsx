@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
+import SplashScreen from '@/components/mobile/SplashScreen';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -80,12 +81,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" dir="ltr" className="dark">
       <head>
+        {/* Icons */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.jpeg" />
+
+        {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://mbndev.ma" />
+
+        {/* ── PWA / native-app meta ─────────────────────────────── */}
+        {/* Tell iOS this is a full-screen app */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        {/* Black-translucent: status bar overlays the app (hero image shows behind it) */}
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* App name shown under the icon on the home screen */}
+        <meta name="apple-mobile-web-app-title" content="MBN DEV" />
+        {/* Prevent phone number detection styling */}
+        <meta name="format-detection" content="telephone=no" />
+        {/* Disable automatic translation prompt */}
+        <meta name="google" content="notranslate" />
+        {/* Android Chrome theme colour (tab bar, address bar) */}
+        <meta name="theme-color" content="#08080b" />
+
+        {/* ── iOS splash screens (portrait) ─────────────────────── */}
+        {/* iPhone 14 Pro Max */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/images/logo.jpeg" />
+        {/* iPhone 14 Pro */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="/images/logo.jpeg" />
+        {/* iPhone SE / 8 */}
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/images/logo.jpeg" />
       </head>
       <body suppressHydrationWarning>
         <LanguageProvider>
@@ -116,6 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </AuthProvider>
         </LanguageProvider>
+        <SplashScreen />
         <InstallPrompt />
         <ServiceWorkerRegistration />
       </body>

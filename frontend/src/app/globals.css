@@ -47,6 +47,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* Remove the gray flash on tap for every element on iOS */
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -64,6 +66,83 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  /* Prevent rubber-band overscroll when installed as PWA */
+  overscroll-behavior-y: none;
+}
+
+/* ── Native-app touch behaviour ───────────────────────────────────────────── */
+a, button, [role="button"], label, summary {
+  /* Removes the 300ms tap delay — makes taps feel instant */
+  touch-action: manipulation;
+  /* No selection highlight on interactive elements */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Allow selection inside inputs and text areas */
+input, textarea, p, h1, h2, h3, h4, h5, h6, span, li {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* ── Inertial scroll (iOS momentum) ─────────────────────────────────────── */
+.inertial-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ── PWA standalone mode — hide everything that looks "webby" ────────────── */
+@media (display-mode: standalone) {
+  /* Tighter nav — status bar is handled by safe-area, no need for extra space */
+  body {
+    /* Prevent any overscroll bounce at top (iOS) */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  #__next, main {
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── App splash screen ───────────────────────────────────────────────────── */
+.app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #08080b;
+  gap: 20px;
+}
+.app-splash-logo {
+  animation: splashPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.app-splash-bar {
+  width: 120px;
+  height: 2px;
+  border-radius: 99px;
+  background: rgba(124,58,237,0.15);
+  overflow: hidden;
+}
+.app-splash-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #7c3aed, #a855f7, #3b82f6);
+  animation: splashLoad 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes splashPop {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+@keyframes splashLoad {
+  from { width: 0%;   }
+  to   { width: 100%; }
 }
 
 /* ── Premium card system ──────────────────────────────────────────────────── */
