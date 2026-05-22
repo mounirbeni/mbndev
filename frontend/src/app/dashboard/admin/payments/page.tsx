@@ -188,7 +188,7 @@ export default function AdminPaymentsPage() {
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('admin.col.method')}</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.status')}</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('admin.col.date')}</th>
-                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('invoice.title')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('invoice.title')}</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.action')}</th>
                 </tr>
               </thead>
@@ -221,7 +221,7 @@ export default function AdminPaymentsPage() {
                       <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
                         {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
                       </td>
-                      <td className="p-4 hidden lg:table-cell">
+                      <td className="p-4 hidden sm:table-cell">
                         <Link
                           href={`/invoice/${pay._id}`}
                           className="inline-flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors"

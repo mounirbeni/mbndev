@@ -109,51 +109,91 @@ export default function ClientPaymentsPage() {
             <p className="text-slate-600 text-xs">Your payment history will appear here</p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/6">
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.project')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('admin.col.milestone')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.amount')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('admin.status')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('admin.col.date')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('invoice.title')}</th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Mobile: card list */}
+            <div className="divide-y divide-white/5 sm:hidden">
               {payments.map((pay, i) => {
                 const project = typeof pay.project === 'object' ? pay.project : null;
                 return (
-                  <motion.tr
+                  <motion.div
                     key={pay._id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.05 }}
-                    className="border-b border-white/5 hover:bg-white/2 transition-colors"
+                    className="p-4 flex items-center justify-between gap-3"
                   >
-                    <td className="p-4 text-sm text-white">{project?.title || '—'}</td>
-                    <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">{pay.milestoneTitle || '—'}</td>
-                    <td className="p-4 text-sm font-semibold text-white">{formatCurrency(pay.amount)}</td>
-                    <td className="p-4 hidden md:table-cell">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-white font-medium truncate">{project?.title || '—'}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
                       <StatusBadge status={pay.status} />
-                    </td>
-                    <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
-                      {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
-                    </td>
-                    <td className="p-4">
+                      <span className="text-sm font-semibold text-white tabular-nums">{formatCurrency(pay.amount)}</span>
                       <Link
                         href={`/invoice/${pay._id}`}
-                        className="inline-flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-violet-400 transition-colors"
+                        style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)' }}
                       >
                         <FileText className="w-3.5 h-3.5" />
-                        {t('invoice.title')}
+                        Invoice
                       </Link>
-                    </td>
-                  </motion.tr>
+                    </div>
+                  </motion.div>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Desktop: table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/6">
+                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.project')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('admin.col.milestone')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.amount')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('admin.status')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('admin.col.date')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('invoice.title')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((pay, i) => {
+                    const project = typeof pay.project === 'object' ? pay.project : null;
+                    return (
+                      <motion.tr
+                        key={pay._id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="border-b border-white/5 hover:bg-white/2 transition-colors"
+                      >
+                        <td className="p-4 text-sm text-white">{project?.title || '—'}</td>
+                        <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">{pay.milestoneTitle || '—'}</td>
+                        <td className="p-4 text-sm font-semibold text-white">{formatCurrency(pay.amount)}</td>
+                        <td className="p-4 hidden md:table-cell">
+                          <StatusBadge status={pay.status} />
+                        </td>
+                        <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
+                          {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
+                        </td>
+                        <td className="p-4">
+                          <Link
+                            href={`/invoice/${pay._id}`}
+                            className="inline-flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            {t('invoice.title')}
+                          </Link>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
