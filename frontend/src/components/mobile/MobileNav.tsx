@@ -11,7 +11,7 @@ import {
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
   Settings, LogOut, Users, Package, BarChart2, ShoppingBag,
-  X, ExternalLink, LayoutGrid,
+  FileText, X, ExternalLink, LayoutGrid,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -48,6 +48,7 @@ const adminSheetDef: NavItem[] = [
   { labelKey: 'dash.nav.clients',   href: '/dashboard/admin/clients',   icon: Users },
   { labelKey: 'dash.nav.packages',  href: '/dashboard/admin/packages',  icon: Package },
   { labelKey: 'dash.nav.payments',  href: '/dashboard/admin/payments',  icon: CreditCard },
+  { labelKey: 'dash.nav.invoices',  href: '/dashboard/admin/invoices',  icon: FileText },
   { labelKey: 'dash.nav.analytics', href: '/dashboard/admin/analytics', icon: BarChart2 },
 ];
 
@@ -74,6 +75,7 @@ const schemeMap = new Map<React.ElementType, Scheme>([
   [Settings,        { bg:'rgba(148,163,184,0.12)', text:'#94a3b8', glow:'rgba(148,163,184,0.2)', border:'rgba(148,163,184,0.18)',dot:'#64748b' }],
   [Users,           { bg:'rgba(236,72,153,0.16)',  text:'#f472b6', glow:'rgba(236,72,153,0.3)',  border:'rgba(236,72,153,0.28)', dot:'#ec4899' }],
   [Package,         { bg:'rgba(251,146,60,0.16)',  text:'#fb923c', glow:'rgba(251,146,60,0.3)',  border:'rgba(251,146,60,0.28)', dot:'#f97316' }],
+  [FileText,        { bg:'rgba(234,179,8,0.16)',   text:'#facc15', glow:'rgba(234,179,8,0.3)',   border:'rgba(234,179,8,0.28)',  dot:'#eab308' }],
   [BarChart2,       { bg:'rgba(99,102,241,0.16)',  text:'#818cf8', glow:'rgba(99,102,241,0.3)',  border:'rgba(99,102,241,0.28)', dot:'#6366f1' }],
 ]);
 const defaultScheme: Scheme = { bg:'rgba(124,58,237,0.16)', text:'#a78bfa', glow:'rgba(124,58,237,0.28)', border:'rgba(124,58,237,0.25)', dot:'#7c3aed' };
