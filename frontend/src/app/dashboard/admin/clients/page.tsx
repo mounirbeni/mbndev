@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { adminAPI } from '@/lib/api';
 import { User } from '@/types';
@@ -130,9 +131,9 @@ export default function AdminClientsPage() {
         </div>
       )}
 
-      {/* Delete confirmation modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
+      {/* Delete confirmation modal — rendered via portal to escape the motion.div transform context */}
+      {deleteTarget && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -148,9 +149,7 @@ export default function AdminClientsPage() {
               </button>
             </div>
             <h3 className="text-white font-bold text-base mb-1">Delete Client Account</h3>
-            <p className="text-slate-400 text-sm mb-1">
-              You are about to permanently delete:
-            </p>
+            <p className="text-slate-400 text-sm mb-1">You are about to permanently delete:</p>
             <div className="mb-4 px-3 py-2.5 rounded-xl bg-white/4 border border-white/8">
               <p className="text-white text-sm font-semibold">{deleteTarget.name}</p>
               <p className="text-slate-500 text-xs">{deleteTarget.email}</p>
@@ -177,7 +176,8 @@ export default function AdminClientsPage() {
               </button>
             </div>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Table */}
