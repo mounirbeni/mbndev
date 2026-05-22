@@ -8,12 +8,14 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import { getInitials } from '@/lib/utils';
-import { User, Lock, Shield, MessageCircle, ExternalLink } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { User, Lock, Shield, MessageCircle, ExternalLink, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
   const { user, logout, refresh } = useAuth();
   const { t } = useLanguage();
+  const router = useRouter();
 
   /* ── Profile form ───────────────────────────────────── */
   const [profile, setProfile] = useState({
@@ -54,6 +56,26 @@ export default function SettingsPage() {
       toast.error(err?.response?.data?.message || t('toast.error'));
     } finally {
       setSavingPwd(false);
+    }
+  };
+
+  /* ── Delete account ─────────────────────────────────── */
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) { toast.error(t('validation.required')); return; }
+    setDeletingAccount(true);
+    try {
+      await authAPI.deleteAccount(deletePassword);
+      toast.success('Account deleted successfully.');
+      logout();
+      router.push('/');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    } finally {
+      setDeletingAccount(false);
     }
   };
 
@@ -189,19 +211,66 @@ export default function SettingsPage() {
 
       {/* ── Danger zone ──────────────────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass rounded-2xl p-6 border border-red-500/15">
-        <h2 className="text-base font-semibold text-red-400 mb-1">{t('settings.dangerZone')}</h2>
+        <div className="flex items-center gap-2 mb-1">
+          <Trash2 className="w-4 h-4 text-red-400" />
+          <h2 className="text-base font-semibold text-red-400">{t('settings.dangerZone')}</h2>
+        </div>
         <p className="text-slate-500 text-sm mb-4">
-          {t('settings.dangerZoneSub')}
+          Permanently delete your account and all associated data. This action cannot be undone.
         </p>
-        <Button
-          variant="ghost"
-          className="text-red-400 border border-red-500/20 hover:bg-red-500/10"
-          onClick={() => {
-            if (confirm(t('settings.signOutConfirm'))) logout();
-          }}
-        >
-          {t('nav.logout')}
-        </Button>
+
+        <AnimatePresence mode="wait">
+          {!showDeleteConfirm ? (
+            <motion.div key="delete-btn" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <Button
+                variant="ghost"
+                className="text-red-400 border border-red-500/20 hover:bg-red-500/10"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete My Account
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="delete-confirm"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              className="space-y-4 p-4 rounded-xl border border-red-500/25 bg-red-500/5"
+            >
+              <p className="text-red-300 text-sm font-medium">
+                Enter your password to confirm account deletion:
+              </p>
+              <Input
+                type="password"
+                label="Password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Your current password"
+                onKeyDown={(e) => e.key === 'Enter' && handleDeleteAccount()}
+              />
+              <div className="flex gap-3">
+                <Button
+                  variant="ghost"
+                  className="text-slate-400 border border-white/10 hover:bg-white/5"
+                  onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-red-400 border border-red-500/30 hover:bg-red-500/15"
+                  onClick={handleDeleteAccount}
+                  loading={deletingAccount}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Yes, Delete My Account
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );

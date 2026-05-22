@@ -486,3 +486,29 @@ exports.updateProfile = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.deleteAccount = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ success: false, message: 'Password is required to delete your account.' });
+    }
+
+    const full = await prisma.user.findUnique({ where: { id: req.user.id } });
+    const valid = await bcrypt.compare(password, full.password);
+    if (!valid) {
+      return res.status(400).json({ success: false, message: 'Incorrect password.' });
+    }
+
+    // Prevent admin self-deletion
+    if (full.role === 'admin') {
+      return res.status(403).json({ success: false, message: 'Admin accounts cannot be deleted.' });
+    }
+
+    await prisma.user.delete({ where: { id: req.user.id } });
+
+    res.json({ success: true, message: 'Account deleted.' });
+  } catch (err) {
+    next(err);
+  }
+};

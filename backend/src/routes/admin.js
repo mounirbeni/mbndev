@@ -34,6 +34,18 @@ router.put('/clients/:id/toggle', protect, authorize('admin'), async (req, res, 
   } catch (err) { next(err); }
 });
 
+router.delete('/clients/:id', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (existing.role === 'admin') return res.status(403).json({ success: false, message: 'Admin accounts cannot be deleted.' });
+    // Prevent self-deletion
+    if (existing.id === req.user.id) return res.status(403).json({ success: false, message: 'You cannot delete your own account from here.' });
+    await prisma.user.delete({ where: { id: req.params.id } });
+    res.json({ success: true, message: 'Client account deleted.' });
+  } catch (err) { next(err); }
+});
+
 // ─── Real Analytics ───────────────────────────────────────────────────────────
 
 router.get('/analytics', protect, authorize('admin'), async (req, res, next) => {

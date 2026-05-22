@@ -9,13 +9,15 @@ import { formatDate, getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import PlanBadge from '@/components/ui/PlanBadge';
 import toast from 'react-hot-toast';
-import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX } from 'lucide-react';
+import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX, Trash2, X } from 'lucide-react';
 
 export default function AdminClientsPage() {
   const { t } = useLanguage();
   const [clients, setClients] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchClients = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -29,6 +31,21 @@ export default function AdminClientsPage() {
   }, []);
 
   useEffect(() => { fetchClients(); }, [fetchClients]);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await adminAPI.deleteClient(deleteTarget._id ?? deleteTarget.id ?? '');
+      setClients((prev) => prev.filter((c) => (c._id ?? c.id) !== (deleteTarget._id ?? deleteTarget.id)));
+      toast.success('Client account deleted.');
+      setDeleteTarget(null);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const toggleStatus = async (id: string) => {
     try {
@@ -113,6 +130,56 @@ export default function AdminClientsPage() {
         </div>
       )}
 
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-sm rounded-2xl border border-red-500/25 p-6"
+            style={{ background: 'rgba(8,8,11,0.97)', boxShadow: '0 0 60px rgba(239,68,68,0.12), 0 24px 64px rgba(0,0,0,0.8)' }}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-red-500/15 border border-red-500/25 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-red-400" />
+              </div>
+              <button onClick={() => setDeleteTarget(null)} className="text-slate-500 hover:text-white transition-colors p-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <h3 className="text-white font-bold text-base mb-1">Delete Client Account</h3>
+            <p className="text-slate-400 text-sm mb-1">
+              You are about to permanently delete:
+            </p>
+            <div className="mb-4 px-3 py-2.5 rounded-xl bg-white/4 border border-white/8">
+              <p className="text-white text-sm font-semibold">{deleteTarget.name}</p>
+              <p className="text-slate-500 text-xs">{deleteTarget.email}</p>
+            </div>
+            <p className="text-red-400/80 text-xs mb-5">This action is permanent and cannot be undone. All associated data will be removed.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-300 border border-white/10 hover:bg-white/5 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-500 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {deleting ? (
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+                Delete
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         {loading ? (
@@ -183,12 +250,21 @@ export default function AdminClientsPage() {
                     </Badge>
                   </td>
                   <td className="p-4">
-                    <button
-                      onClick={() => toggleStatus(c._id ?? c.id ?? '')}
-                      className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
-                    >
-                      {t('admin.toggle')}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleStatus(c._id ?? c.id ?? '')}
+                        className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
+                      >
+                        {t('admin.toggle')}
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(c)}
+                        className="text-xs text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
+                        title="Delete client"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               ))}
