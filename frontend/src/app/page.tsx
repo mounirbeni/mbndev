@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Navbar from '@/components/landing/Navbar';
+import LandingBottomNav from '@/components/landing/LandingBottomNav';
 import Hero from '@/components/landing/Hero';
 import Services from '@/components/landing/Services';
 import Portfolio from '@/components/landing/Portfolio';
@@ -100,7 +101,7 @@ export default function LandingPage() {
       <JsonLd data={websiteSchema} />
       <JsonLd data={serviceSchema} />
       <JsonLd data={localBusinessSchema} />
-      <main>
+      <main className="pb-[74px] lg:pb-0">
         <Navbar />
         <Hero />
         <Services />
@@ -111,6 +112,7 @@ export default function LandingPage() {
         <CTA />
         <Footer />
       </main>
+      <LandingBottomNav />
     </>
   );
 }
