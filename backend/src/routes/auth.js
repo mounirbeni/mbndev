@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const {
-  register, login, getMe, updateProfile, deleteAccount,
+  register, login, getMe, updateProfile, deleteAccount, cancelDeletionRequest,
   forgotPassword, resetPassword,
   checkEmail, checkPhone,
 } = require('../controllers/authController');
@@ -25,5 +25,6 @@ router.post('/check-phone',     checkPhoneRules,      checkPhone);
 router.get   ('/me',              protect,              getMe);
 router.put   ('/profile',         protect, updateProfileRules, updateProfile);
 router.delete('/account',         protect,              deleteAccount);
+router.delete('/account/cancel',  protect,              cancelDeletionRequest);
 
 module.exports = router;

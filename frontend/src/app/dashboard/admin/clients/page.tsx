@@ -48,6 +48,28 @@ export default function AdminClientsPage() {
     }
   };
 
+  const approveDeletion = async (id: string) => {
+    try {
+      await adminAPI.approveDeletion(id);
+      setClients((prev) => prev.filter((c) => (c._id ?? c.id) !== id));
+      toast.success('Account deleted.');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    }
+  };
+
+  const rejectDeletion = async (id: string) => {
+    try {
+      await adminAPI.rejectDeletion(id);
+      setClients((prev) => prev.map((c) =>
+        (c._id ?? c.id) === id ? { ...c, deletionRequestedAt: null } : c
+      ));
+      toast.success('Deletion request rejected.');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    }
+  };
+
   const toggleStatus = async (id: string) => {
     try {
       const { data } = await adminAPI.toggleClient(id);
@@ -217,24 +239,34 @@ export default function AdminClientsPage() {
               </tr>
             </thead>
             <tbody>
-              {clients.map((c, i) => (
+              {clients.map((c, i) => {
+                const hasPendingDeletion = !!c.deletionRequestedAt;
+                const clientId = c._id ?? c.id ?? '';
+                return (
                 <motion.tr
                   key={c._id || c.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.04 }}
-                  className="border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                  className={`border-b border-white/5 transition-colors ${hasPendingDeletion ? 'bg-orange-500/5 hover:bg-orange-500/8' : 'hover:bg-white/[0.02]'}`}
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                        style={{ background: 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
+                        style={{ background: hasPendingDeletion ? 'linear-gradient(135deg,#f97316,#ef4444)' : 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
                       >
                         {getInitials(c.name)}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-white text-sm font-medium truncate">{c.name}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm font-medium truncate">{c.name}</span>
+                          {hasPendingDeletion && (
+                            <span className="text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30 shrink-0">
+                              DELETE REQ
+                            </span>
+                          )}
+                        </div>
                         <div className="text-slate-500 text-xs truncate">{c.email}</div>
                       </div>
                     </div>
@@ -250,24 +282,42 @@ export default function AdminClientsPage() {
                     </Badge>
                   </td>
                   <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => toggleStatus(c._id ?? c.id ?? '')}
-                        className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
-                      >
-                        {t('admin.toggle')}
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(c)}
-                        className="text-xs text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
-                        title="Delete client"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    {hasPendingDeletion ? (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => approveDeletion(clientId)}
+                          className="text-xs text-red-400 hover:text-red-300 font-semibold transition-colors px-2.5 py-1.5 rounded-lg hover:bg-red-500/12 border border-red-500/25 hover:border-red-500/40"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => rejectDeletion(clientId)}
+                          className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleStatus(clientId)}
+                          className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
+                        >
+                          {t('admin.toggle')}
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(c)}
+                          className="text-xs text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
+                          title="Delete client"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </motion.tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         )}

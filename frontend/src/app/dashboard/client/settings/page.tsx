@@ -63,19 +63,36 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [cancellingDeletion, setCancellingDeletion] = useState(false);
+
+  const isPendingDeletion = !!user?.deletionRequestedAt;
 
   const handleDeleteAccount = async () => {
     if (!deletePassword) { toast.error(t('validation.required')); return; }
     setDeletingAccount(true);
     try {
       await authAPI.deleteAccount(deletePassword);
-      toast.success('Account deleted successfully.');
-      logout();
-      router.push('/');
+      toast.success('Deletion request submitted. An admin will confirm shortly.');
+      await refresh();
+      setShowDeleteConfirm(false);
+      setDeletePassword('');
     } catch (err: any) {
       toast.error(err?.response?.data?.message || t('toast.error'));
     } finally {
       setDeletingAccount(false);
+    }
+  };
+
+  const handleCancelDeletion = async () => {
+    setCancellingDeletion(true);
+    try {
+      await authAPI.cancelDeletionRequest();
+      toast.success('Deletion request cancelled.');
+      await refresh();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    } finally {
+      setCancellingDeletion(false);
     }
   };
 
@@ -210,17 +227,45 @@ export default function SettingsPage() {
       </motion.div>
 
       {/* ── Danger zone ──────────────────────────────────── */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass rounded-2xl p-6 border border-red-500/15">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className={`glass rounded-2xl p-6 border ${isPendingDeletion ? 'border-orange-500/30' : 'border-red-500/15'}`}
+      >
         <div className="flex items-center gap-2 mb-1">
-          <Trash2 className="w-4 h-4 text-red-400" />
-          <h2 className="text-base font-semibold text-red-400">{t('settings.dangerZone')}</h2>
+          <Trash2 className={`w-4 h-4 ${isPendingDeletion ? 'text-orange-400' : 'text-red-400'}`} />
+          <h2 className={`text-base font-semibold ${isPendingDeletion ? 'text-orange-400' : 'text-red-400'}`}>
+            {t('settings.dangerZone')}
+          </h2>
+          {isPendingDeletion && (
+            <span className="ml-1 text-[10px] font-black tracking-widest px-2 py-0.5 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30">
+              PENDING
+            </span>
+          )}
         </div>
         <p className="text-slate-500 text-sm mb-4">
-          Permanently delete your account and all associated data. This action cannot be undone.
+          {isPendingDeletion
+            ? 'Your deletion request is waiting for admin approval. You will be notified once it is reviewed.'
+            : 'Permanently delete your account and all associated data. Requires admin approval.'}
         </p>
 
         <AnimatePresence mode="wait">
-          {!showDeleteConfirm ? (
+          {isPendingDeletion ? (
+            <motion.div key="pending" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 space-y-3"
+            >
+              <p className="text-orange-300 text-sm">
+                Your account deletion request has been submitted and is pending admin review.
+              </p>
+              <Button
+                variant="ghost"
+                className="text-slate-400 border border-white/10 hover:bg-white/5"
+                onClick={handleCancelDeletion}
+                loading={cancellingDeletion}
+              >
+                Cancel Deletion Request
+              </Button>
+            </motion.div>
+          ) : !showDeleteConfirm ? (
             <motion.div key="delete-btn" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <Button
                 variant="ghost"
@@ -234,13 +279,11 @@ export default function SettingsPage() {
           ) : (
             <motion.div
               key="delete-confirm"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
               className="space-y-4 p-4 rounded-xl border border-red-500/25 bg-red-500/5"
             >
               <p className="text-red-300 text-sm font-medium">
-                Enter your password to confirm account deletion:
+                Enter your password to submit the deletion request:
               </p>
               <Input
                 type="password"
@@ -265,7 +308,7 @@ export default function SettingsPage() {
                   loading={deletingAccount}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Yes, Delete My Account
+                  Submit Request
                 </Button>
               </div>
             </motion.div>

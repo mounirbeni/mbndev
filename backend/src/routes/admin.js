@@ -39,10 +39,30 @@ router.delete('/clients/:id', protect, authorize('admin'), async (req, res, next
     const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     if (existing.role === 'admin') return res.status(403).json({ success: false, message: 'Admin accounts cannot be deleted.' });
-    // Prevent self-deletion
     if (existing.id === req.user.id) return res.status(403).json({ success: false, message: 'You cannot delete your own account from here.' });
     await prisma.user.delete({ where: { id: req.params.id } });
     res.json({ success: true, message: 'Client account deleted.' });
+  } catch (err) { next(err); }
+});
+
+// Approve a client's pending deletion request — actually deletes the account
+router.post('/clients/:id/approve-deletion', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (!existing.deletionRequestedAt) return res.status(400).json({ success: false, message: 'No pending deletion request for this user.' });
+    await prisma.user.delete({ where: { id: req.params.id } });
+    res.json({ success: true, message: 'Account deleted.' });
+  } catch (err) { next(err); }
+});
+
+// Reject a client's pending deletion request — clears the flag
+router.post('/clients/:id/reject-deletion', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
+    await prisma.user.update({ where: { id: req.params.id }, data: { deletionRequestedAt: null } });
+    res.json({ success: true, message: 'Deletion request rejected.' });
   } catch (err) { next(err); }
 });
 

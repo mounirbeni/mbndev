@@ -491,7 +491,7 @@ exports.deleteAccount = async (req, res, next) => {
   try {
     const { password } = req.body;
     if (!password) {
-      return res.status(400).json({ success: false, message: 'Password is required to delete your account.' });
+      return res.status(400).json({ success: false, message: 'Password is required.' });
     }
 
     const full = await prisma.user.findUnique({ where: { id: req.user.id } });
@@ -500,14 +500,33 @@ exports.deleteAccount = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Incorrect password.' });
     }
 
-    // Prevent admin self-deletion
     if (full.role === 'admin') {
       return res.status(403).json({ success: false, message: 'Admin accounts cannot be deleted.' });
     }
 
-    await prisma.user.delete({ where: { id: req.user.id } });
+    // Don't delete immediately — mark as pending admin approval
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data:  { deletionRequestedAt: new Date() },
+    });
 
-    res.json({ success: true, message: 'Account deleted.' });
+    res.json({
+      success: true,
+      pending: true,
+      message: 'Your deletion request has been submitted. An admin will review and confirm it shortly.',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.cancelDeletionRequest = async (req, res, next) => {
+  try {
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data:  { deletionRequestedAt: null },
+    });
+    res.json({ success: true, message: 'Deletion request cancelled.' });
   } catch (err) {
     next(err);
   }

@@ -111,7 +111,8 @@ export const authAPI = {
   login:         (data: any)                          => api.post('/auth/login', data),
   getMe:         ()                                   => api.get('/auth/me'),
   updateProfile:  (data: any)                          => api.put('/auth/profile', data),
-  deleteAccount:  (password: string)                   => api.delete('/auth/account', { data: { password } }),
+  deleteAccount:        (password: string) => api.delete('/auth/account', { data: { password } }),
+  cancelDeletionRequest: ()               => api.delete('/auth/account/cancel'),
   forgotPassword:(email: string)                      => api.post('/auth/forgot-password', { email }),
   resetPassword: (token: string, newPassword: string) => api.post('/auth/reset-password', { token, newPassword }),
   checkEmail:    (email: string)                      => api.post('/auth/check-email', { email }),
@@ -176,7 +177,9 @@ export const packageAPI = {
 export const adminAPI = {
   getClients:   ()                         => api.get('/admin/clients'),
   toggleClient: (id: string)               => api.put(`/admin/clients/${id}/toggle`),
-  deleteClient: (id: string)               => api.delete(`/admin/clients/${id}`),
+  deleteClient:    (id: string) => api.delete(`/admin/clients/${id}`),
+  approveDeletion: (id: string) => api.post(`/admin/clients/${id}/approve-deletion`),
+  rejectDeletion:  (id: string) => api.post(`/admin/clients/${id}/reject-deletion`),
   getAnalytics: ()                         => api.get('/admin/analytics'),
   broadcast:    (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
 };

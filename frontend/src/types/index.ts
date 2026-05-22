@@ -9,6 +9,7 @@ export interface User {
   company?: string;
   phone?: string;
   isActive?: boolean;
+  deletionRequestedAt?: string | null;
   createdAt?: string;
 }
 

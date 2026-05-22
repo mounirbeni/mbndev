@@ -19,8 +19,9 @@ model User {
   company   String   @default("")
   phone     String?  @unique                // nullable; unique enforced on non-null values
   locale    String   @default("en")
-  isActive           Boolean   @default(true)
-  passwordChangedAt  DateTime?                  // set on every password mutation — used to invalidate old JWTs
+  isActive              Boolean   @default(true)
+  deletionRequestedAt   DateTime?                  // set when client requests account deletion — pending admin approval
+  passwordChangedAt     DateTime?                  // set on every password mutation — used to invalidate old JWTs
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
