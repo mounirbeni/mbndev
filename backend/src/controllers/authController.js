@@ -5,6 +5,7 @@ const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { sendEmail, templates } = require('../lib/email');
 const { wa } = require('../lib/whatsapp');
+const { notifyAdmins } = require('../lib/notifications');
 const {
   normalizeEmail,
   normalizePhone,
@@ -509,6 +510,14 @@ exports.deleteAccount = async (req, res, next) => {
       where: { id: req.user.id },
       data:  { deletionRequestedAt: new Date() },
     });
+
+    // Notify all admins
+    notifyAdmins({
+      type:    'account_deletion_request',
+      title:   'Account Deletion Request',
+      message: `${full.name} (${full.email}) has requested to delete their account.`,
+      link:    '/dashboard/admin/clients',
+    }).catch(() => {});
 
     res.json({
       success: true,
