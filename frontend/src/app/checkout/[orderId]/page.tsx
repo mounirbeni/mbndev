@@ -27,7 +27,7 @@ const CIH_BANK = {
   bank:   'CIH Bank',
 };
 
-const PAYPAL_EMAIL = process.env.NEXT_PUBLIC_PAYPAL_ME || 'mounirbani46@gmail.com';
+const PAYPAL_EMAIL = process.env.NEXT_PUBLIC_PAYPAL_ME || 'mobanunir@gmail.com';
 const TAPTAP_PHONE = process.env.NEXT_PUBLIC_TAPTAP_PHONE || '+212705914424';
 
 type PayMethod = 'cih_bank' | 'paypal' | 'taptapsend';
