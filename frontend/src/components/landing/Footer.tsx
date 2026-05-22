@@ -1,19 +1,12 @@
 'use client';
 
 import {
-  Zap, MapPin, Mail, Facebook, Linkedin, Twitter, Github,
+  Zap, MapPin, Mail,
   ShieldCheck, MessageCircle, ArrowUpRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import Logo3D from '@/components/ui/Logo3D';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-const SOCIALS = [
-  { icon: Facebook, href: 'https://facebook.com',  label: 'Facebook' },
-  { icon: Linkedin, href: 'https://linkedin.com',  label: 'LinkedIn' },
-  { icon: Twitter,  href: 'https://twitter.com',   label: 'Twitter'  },
-  { icon: Github,   href: 'https://github.com',    label: 'GitHub'   },
-];
 
 /** Inline SVG brand-accurate payment method marks */
 function PayPalMark() {
@@ -126,19 +119,6 @@ export default function Footer() {
               A Moroccan development studio building production-grade digital
               products for businesses worldwide.
             </p>
-            {/* Socials */}
-            <div className="flex gap-2">
-              {SOCIALS.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-slate-500 hover:bg-primary-500/15 hover:text-primary-400 transition-all"
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Quick Links */}
