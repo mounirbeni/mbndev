@@ -145,6 +145,45 @@ exports.getOrder = async (req, res, next) => {
   }
 };
 
+// PUT /api/orders/:id — Update a pending order (client own only)
+exports.updateOrder = async (req, res, next) => {
+  try {
+    const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    if (order.clientId !== req.user.id) return res.status(403).json({ success: false, message: 'Not authorized' });
+    if (order.status !== 'pending') return res.status(400).json({ success: false, message: 'Only pending orders can be modified' });
+
+    const { description, notes, pages, features, addons } = req.body;
+
+    const newPages    = pages    !== undefined ? Number(pages)    : order.pages;
+    const newFeatures = features !== undefined ? features          : order.features;
+    const newAddons   = addons   !== undefined ? addons            : order.addons;
+
+    const { totalPrice, deliveryDays } = calculatePrice({
+      serviceType: order.serviceType,
+      pages:       newPages,
+      features:    newFeatures,
+      addons:      newAddons,
+      plan:        null,
+    });
+
+    const updated = await prisma.order.update({
+      where: { id: req.params.id },
+      data: {
+        description:  description  !== undefined ? String(description).trim()  : order.description,
+        notes:        notes        !== undefined ? String(notes).trim()        : order.notes,
+        pages:        newPages,
+        features:     newFeatures,
+        addons:       newAddons,
+        totalPrice,
+        deliveryDays,
+      },
+    });
+
+    res.json({ success: true, order: fmt(updated) });
+  } catch (err) { next(err); }
+};
+
 // PUT /api/orders/:id/cancel — Cancel pending order (client own, or admin)
 exports.cancelOrder = async (req, res, next) => {
   try {

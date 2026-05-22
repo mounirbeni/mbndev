@@ -5,6 +5,7 @@ const {
   mockPayment,
   submitManualPayment,
   approveManualPayment,
+  rejectManualPayment,
 } = require('../controllers/paymentController');
 const { protect, authorize } = require('../middleware/auth');
 const { submitManualRules } = require('../middleware/validate');
@@ -12,8 +13,9 @@ const { submitManualRules } = require('../middleware/validate');
 // Manual payment methods (CIH Bank / PayPal / TapTapSend)
 router.post('/manual', protect, submitManualRules, submitManualPayment);
 
-// Admin: approve a manual payment
+// Admin: approve or reject a manual payment
 router.put('/:id/approve', protect, authorize('admin'), approveManualPayment);
+router.put('/:id/reject',  protect, authorize('admin'), rejectManualPayment);
 
 // Mock payment for dev / demo
 router.post('/mock', protect, mockPayment);

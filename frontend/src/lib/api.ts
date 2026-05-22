@@ -137,11 +137,12 @@ export const projectAPI = {
 };
 
 export const orderAPI = {
-  create:    (data: any)    => api.post('/orders', data),
-  getAll:    (params?: any) => api.get('/orders', { params }),
-  getOne:    (id: string)   => api.get(`/orders/${id}`),
-  cancel:    (id: string)   => api.put(`/orders/${id}/cancel`),
-  getPrice:  (params: any)  => api.get('/orders/price', { params }),
+  create:    (data: any)             => api.post('/orders', data),
+  getAll:    (params?: any)          => api.get('/orders', { params }),
+  getOne:    (id: string)            => api.get(`/orders/${id}`),
+  update:    (id: string, data: any) => api.put(`/orders/${id}`, data),
+  cancel:    (id: string)            => api.put(`/orders/${id}/cancel`),
+  getPrice:  (params: any)           => api.get('/orders/price', { params }),
 };
 
 export const messageAPI = {
@@ -156,6 +157,7 @@ export const paymentAPI = {
   mock:          (data: any)  => api.post('/payments/mock', data),
   submitManual:  (data: any)  => api.post('/payments/manual', data),
   approveManual: (id: string) => api.put(`/payments/${id}/approve`, {}),
+  rejectManual:  (id: string) => api.put(`/payments/${id}/reject`, {}),
   getAll:        ()           => api.get('/payments'),
   getOne:        (id: string) => api.get(`/payments/${id}`),
 };

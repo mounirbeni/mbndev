@@ -354,3 +354,36 @@ exports.mockPayment = async (req, res, next) => {
     next(err);
   }
 };
+
+
+// ─── Admin: reject a manual payment ──────────────────────────────────────────
+
+exports.rejectManualPayment = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const payment = await prisma.payment.findUnique({
+      where:   { id },
+      include: { client: true, order: true },
+    });
+    if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+    if (payment.status !== 'pending_verification') {
+      return res.status(400).json({ success: false, message: 'Payment is not pending verification' });
+    }
+
+    await prisma.payment.update({
+      where: { id },
+      data:  { status: 'failed' },
+    });
+
+    // Notify client so they can try again
+    notify(payment.clientId, {
+      type:    'payment_failed',
+      title:   'Payment Not Received',
+      message: `Your payment for "${payment.order?.title || 'your order'}" was not received. Please try again from the checkout page.`,
+      link:    `/checkout/${payment.orderId}`,
+      metadata: { orderId: payment.orderId },
+    }).catch(() => {});
+
+    res.json({ success: true, message: 'Payment rejected. Client has been notified.' });
+  } catch (err) { next(err); }
+};

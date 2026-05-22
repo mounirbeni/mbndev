@@ -7,7 +7,7 @@ import { Payment } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { CreditCard, CheckCircle, Clock, FileText, AlertTriangle, RefreshCcw, TrendingUp, DollarSign } from 'lucide-react';
+import { CreditCard, CheckCircle, Clock, FileText, AlertTriangle, RefreshCcw, TrendingUp, DollarSign, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -25,6 +25,7 @@ export default function AdminPaymentsPage() {
   const [loading, setLoading]   = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [approving, setApproving] = useState<string | null>(null);
+  const [rejecting, setRejecting] = useState<string | null>(null);
 
   const fetchPayments = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -48,6 +49,19 @@ export default function AdminPaymentsPage() {
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
   }, [fetchPayments]);
+
+  const handleReject = async (id: string) => {
+    setRejecting(id);
+    try {
+      await paymentAPI.rejectManual(id);
+      toast.success('Payment rejected. Client notified.');
+      fetchPayments(true);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    } finally {
+      setRejecting(null);
+    }
+  };
 
   const handleApprove = async (id: string) => {
     setApproving(id);
@@ -232,23 +246,37 @@ export default function AdminPaymentsPage() {
                       </td>
                       <td className="p-4">
                         {isVerif ? (
-                          <Button
-                            size="sm"
-                            onClick={() => handleApprove(pay._id as string)}
-                            disabled={approving === pay._id}
-                          >
-                            {approving === pay._id ? (
-                              <span className="flex items-center gap-1.5">
-                                <span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
-                                {t('admin.approving')}
-                              </span>
-                            ) : (
-                              <span className="flex items-center gap-1.5">
-                                <CheckCircle className="w-3.5 h-3.5" />
-                                {t('admin.approve')}
-                              </span>
-                            )}
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleApprove(pay._id as string)}
+                              disabled={!!approving || !!rejecting}
+                            >
+                              {approving === pay._id ? (
+                                <span className="flex items-center gap-1.5">
+                                  <span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
+                                  {t('admin.approving')}
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-1.5">
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                  {t('admin.approve')}
+                                </span>
+                              )}
+                            </Button>
+                            <button
+                              onClick={() => handleReject(pay._id as string)}
+                              disabled={!!approving || !!rejecting}
+                              className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 px-2.5 py-1.5 rounded-lg border border-red-500/25 hover:bg-red-500/10 transition-all disabled:opacity-50"
+                            >
+                              {rejecting === pay._id ? (
+                                <span className="w-3 h-3 border border-red-400/40 border-t-red-400 rounded-full animate-spin" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5" />
+                              )}
+                              Not Received
+                            </button>
+                          </div>
                         ) : (
                           <span className="text-slate-700 text-xs">—</span>
                         )}

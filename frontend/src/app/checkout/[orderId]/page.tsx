@@ -7,10 +7,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Zap, CreditCard, Shield, Clock, Check,
   Loader2, AlertCircle, Copy, ExternalLink, CheckCircle2, BookmarkCheck,
+  Pencil, X, RotateCcw,
 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { orderAPI, paymentAPI } from '@/lib/api';
+import type { ChangeEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getProjectTypeLabel } from '@/lib/utils';
@@ -46,21 +48,29 @@ export default function CheckoutPage() {
   const router            = useRouter();
   const { user, loading: authLoading } = useAuth();
 
-  const [order,      setOrder]      = useState<any>(null);
-  const [loading,    setLoading]    = useState(true);
-  const [paying,     setPaying]     = useState(false);
-  const [error,      setError]      = useState('');
-  const [method,     setMethod]     = useState<PayMethod>('cih_bank');
-  const [externalRef, setExternalRef] = useState('');
-  const [copied,     setCopied]     = useState('');
-  const [done,       setDone]       = useState(false);
-  const [savedLater, setSavedLater] = useState(false);
+  const [order,        setOrder]      = useState<any>(null);
+  const [loading,      setLoading]    = useState(true);
+  const [paying,       setPaying]     = useState(false);
+  const [error,        setError]      = useState('');
+  const [method,       setMethod]     = useState<PayMethod>('cih_bank');
+  const [externalRef,  setExternalRef] = useState('');
+  const [copied,       setCopied]     = useState('');
+  const [done,         setDone]       = useState(false);
+  const [savedLater,   setSavedLater] = useState(false);
+
+  // Edit order state
+  const [editing,     setEditing]    = useState(false);
+  const [editFields,  setEditFields] = useState({ description: '', notes: '' });
+  const [savingEdit,  setSavingEdit] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) { router.push(`/login?next=/checkout/${orderId}`); return; }
     orderAPI.getOne(orderId)
-      .then(({ data }) => setOrder(data.order))
+      .then(({ data }) => {
+        setOrder(data.order);
+        setEditFields({ description: data.order.description || '', notes: data.order.notes || '' });
+      })
       .catch((err) => setError(err?.response?.data?.message || t('checkout.orderNotFound')))
       .finally(() => setLoading(false));
   }, [orderId, user, authLoading, router]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -88,6 +98,23 @@ export default function CheckoutPage() {
       setPaying(false);
     }
   };
+
+  const handleSaveEdit = async () => {
+    setSavingEdit(true);
+    try {
+      const { data } = await orderAPI.update(orderId, editFields);
+      setOrder(data.order);
+      setEditing(false);
+      toast.success('Order updated!');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  // Derive pending payment
+  const pendingPayment = order?.payments?.find((p: any) => p.status === 'pending_verification');
 
   // ── Loading / error states ──────────────────────────────────────────────────
   if (loading || authLoading) return (
@@ -221,14 +248,108 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-500 pt-3 border-t border-white/5">
-              <Clock className="w-3.5 h-3.5 text-primary-400" />
-              {t('checkout.estDelivery')}: <span className="text-slate-300">{order.deliveryDays} {t('checkout.businessDays')}</span>
+            <div className="flex items-center justify-between pt-3 border-t border-white/5">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <Clock className="w-3.5 h-3.5 text-primary-400" />
+                {t('checkout.estDelivery')}: <span className="text-slate-300">{order.deliveryDays} {t('checkout.businessDays')}</span>
+              </div>
+              {!pendingPayment && (
+                <button
+                  onClick={() => setEditing((v) => !v)}
+                  className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/10"
+                >
+                  <Pencil className="w-3 h-3" />
+                  Edit Order
+                </button>
+              )}
             </div>
+
+            {/* Inline edit form */}
+            <AnimatePresence>
+              {editing && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-4 pt-4 border-t border-white/8 space-y-3">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Modify Your Order</p>
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Description / Requirements</label>
+                      <textarea
+                        rows={3}
+                        value={editFields.description}
+                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setEditFields((f) => ({ ...f, description: e.target.value }))}
+                        placeholder="Describe what you need..."
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-primary-500/60 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Additional Notes</label>
+                      <textarea
+                        rows={2}
+                        value={editFields.notes}
+                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setEditFields((f) => ({ ...f, notes: e.target.value }))}
+                        placeholder="Any special requests or notes..."
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-primary-500/60 resize-none"
+                      />
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => { setEditing(false); setEditFields({ description: order.description || '', notes: order.notes || '' }); }}
+                        className="flex items-center gap-1.5 text-xs text-slate-400 px-3 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-all"
+                      >
+                        <X className="w-3 h-3" /> Cancel
+                      </button>
+                      <button
+                        onClick={handleSaveEdit}
+                        disabled={savingEdit}
+                        className="flex items-center gap-1.5 text-xs text-white px-3 py-2 rounded-lg transition-all disabled:opacity-60"
+                        style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}
+                      >
+                        {savingEdit ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
-          {/* Payment methods */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
+          {/* ── Pending payment waiting state ─────────────────────────────── */}
+          {pendingPayment && (
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+              className="glass rounded-2xl p-5 sm:p-6 border border-amber-500/25"
+              style={{ background: 'rgba(245,158,11,0.05)' }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center shrink-0">
+                  <Clock className="w-6 h-6 text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-white font-bold text-base mb-1">Payment Submitted — Awaiting Confirmation</h2>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-3">
+                    Your payment has been submitted via <span className="text-white font-semibold capitalize">{(pendingPayment.method || '').replace('_', ' ')}</span>. We're verifying it now — this usually takes a few hours.
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-amber-400/80">
+                    <span className="relative flex h-2 w-2 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+                    </span>
+                    Waiting for admin to confirm receipt
+                  </div>
+                  {pendingPayment.externalRef && (
+                    <p className="text-slate-500 text-xs mt-2">Reference: <span className="text-slate-300 font-mono">{pendingPayment.externalRef}</span></p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Payment methods — only show when no pending payment */}
+          {!pendingPayment && <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
             <h2 className="text-white font-semibold text-sm mb-4">{t('checkout.payMethod')}</h2>
 
             <div className="space-y-2 mb-5">
@@ -413,7 +534,8 @@ export default function CheckoutPage() {
               {t('checkout.terms')}{' '}
               <Link href="/terms" className="text-primary-500 hover:text-primary-400">{t('checkout.termsLink')}</Link>.
             </p>
-          </motion.div>
+          </motion.div>}
+
         </div>
       </div>
     </div>
