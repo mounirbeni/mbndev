@@ -414,63 +414,76 @@ export default function Hero() {
       className="relative min-h-dvh flex flex-col justify-center overflow-hidden"
       style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}
     >
-      {/* ── Cinematic background ──────────────────────────────────────────── */}
+      {/* ── Hero background image ─────────────────────────────────────────── */}
       <div
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.18) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59,130,246,0.10) 0%, transparent 60%), #07070d' }}
+        style={{
+          backgroundImage: 'url(/hero-bg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 40%',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+
+      {/* Dark overlay — keeps text readable, deepens atmosphere */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(4,3,10,0.55) 0%, rgba(4,3,10,0.30) 40%, rgba(4,3,10,0.70) 75%, rgba(4,3,10,0.97) 100%)',
+        }}
+      />
+
+      {/* Left vignette — content side stays dark */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(to right, rgba(4,3,10,0.65) 0%, rgba(4,3,10,0.15) 50%, transparent 100%)',
+        }}
+      />
+
+      {/* Subtle purple tint layer — ties image to brand */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 70% 50% at 60% 50%, rgba(124,58,237,0.08) 0%, transparent 70%)',
+        }}
       />
 
       {/* Film grain */}
       <div className="absolute inset-0 film-grain pointer-events-none z-0" />
 
-      {/* Dot grid */}
-      <div className="absolute inset-0 dot-grid opacity-20 pointer-events-none z-0" />
-
-      {/* Animated orbs */}
-      {orbs.map((orb, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            left: orb.x,
-            top:  orb.y,
-            width:  orb.size,
-            height: orb.size,
-            background: orb.color,
-            filter: `blur(${orb.blur}px)`,
-            x: i === 0 ? orb1X : i === 1 ? orb2X : undefined,
-            y: i === 0 ? orb1Y : i === 1 ? orb2Y : undefined,
-            translateX: '-50%',
-            translateY: '-50%',
-          }}
-          animate={{
-            scale: [1, 1.08, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: orb.dur,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: i * 2,
-          }}
-        />
-      ))}
-
-      {/* Sweep beam */}
-      <motion.div
-        className="absolute top-1/3 left-0 right-0 h-px pointer-events-none"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.4) 30%, rgba(168,85,247,0.6) 50%, rgba(59,130,246,0.4) 70%, transparent 100%)',
-          filter: 'blur(1px)',
-        }}
-        animate={{ opacity: [0, 1, 0], scaleX: [0.6, 1, 0.6] }}
-        transition={{ duration: 4, repeat: Infinity, repeatDelay: 8, ease: 'easeInOut' }}
-      />
-
       {/* Top edge glow */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px pointer-events-none"
         style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.6), rgba(168,85,247,0.8), rgba(59,130,246,0.6), transparent)' }}
+      />
+
+      {/* Mouse parallax subtle orbs */}
+      <motion.div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          left: '15%', top: '25%',
+          width: 500, height: 500,
+          background: 'rgba(124,58,237,0.06)',
+          filter: 'blur(120px)',
+          x: orb1X, y: orb1Y,
+          translateX: '-50%', translateY: '-50%',
+        }}
+        animate={{ scale: [1, 1.06, 1], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          left: '75%', top: '60%',
+          width: 380, height: 380,
+          background: 'rgba(59,130,246,0.05)',
+          filter: 'blur(100px)',
+          x: orb2X, y: orb2Y,
+          translateX: '-50%', translateY: '-50%',
+        }}
+        animate={{ scale: [1, 1.08, 1], opacity: [0.6, 0.9, 0.6] }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
       />
 
       {/* ── Main content (scrolls out) ───────────────────────────────────── */}
