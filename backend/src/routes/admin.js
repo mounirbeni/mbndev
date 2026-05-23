@@ -34,13 +34,33 @@ router.put('/clients/:id/toggle', protect, authorize('admin'), async (req, res, 
   } catch (err) { next(err); }
 });
 
+// Delete a user and all their related data (no cascade in schema)
+async function deleteUserCascade(userId) {
+  // 1. Nullify project references on payments/orders first (SetNull relations)
+  await prisma.payment.updateMany({ where: { clientId: userId }, data: { clientId: null } });
+  // 2. Delete orders (which may have payments linked via orderId — SetNull handles those)
+  await prisma.order.deleteMany({ where: { clientId: userId } });
+  // 3. Delete projects (cascades: messages, files, projectFiles, notifications via projectId)
+  const projects = await prisma.project.findMany({ where: { clientId: userId }, select: { id: true } });
+  for (const p of projects) {
+    await prisma.project.delete({ where: { id: p.id } });
+  }
+  // 4. Delete remaining user-level records without cascade
+  await prisma.messageReadReceipt.deleteMany({ where: { userId } });
+  await prisma.projectFile.deleteMany({ where: { userId } });
+  await prisma.notification.deleteMany({ where: { userId } });
+  await prisma.loginAttempt.deleteMany({ where: { userId } });
+  // 5. Delete the user
+  await prisma.user.delete({ where: { id: userId } });
+}
+
 router.delete('/clients/:id', protect, authorize('admin'), async (req, res, next) => {
   try {
     const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     if (existing.role === 'admin') return res.status(403).json({ success: false, message: 'Admin accounts cannot be deleted.' });
     if (existing.id === req.user.id) return res.status(403).json({ success: false, message: 'You cannot delete your own account from here.' });
-    await prisma.user.delete({ where: { id: req.params.id } });
+    await deleteUserCascade(req.params.id);
     res.json({ success: true, message: 'Client account deleted.' });
   } catch (err) { next(err); }
 });
@@ -51,7 +71,7 @@ router.post('/clients/:id/approve-deletion', protect, authorize('admin'), async 
     const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     if (!existing.deletionRequestedAt) return res.status(400).json({ success: false, message: 'No pending deletion request for this user.' });
-    await prisma.user.delete({ where: { id: req.params.id } });
+    await deleteUserCascade(req.params.id);
     res.json({ success: true, message: 'Account deleted.' });
   } catch (err) { next(err); }
 });
