@@ -293,7 +293,6 @@ export default function AdminOrdersPage() {
           </>
         )}
       </div>
-    </div>
 
       {/* Delete confirmation modal */}
       {deleteTarget && typeof document !== 'undefined' && createPortal(
