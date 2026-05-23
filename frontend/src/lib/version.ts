@@ -1,6 +1,6 @@
-import { Smartphone, FileText, Palette, Globe, type LucideIcon } from 'lucide-react';
+import { Pencil, BookmarkCheck, CreditCard, ShieldCheck, type LucideIcon } from 'lucide-react';
 
-export const APP_VERSION = '2.7.2';
+export const APP_VERSION = '2.7.4';
 
 export interface ChangeEntry {
   icon: LucideIcon;
@@ -11,27 +11,27 @@ export interface ChangeEntry {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
-    icon: Smartphone,
-    title: 'Invoices on Mobile',
-    desc: 'Invoice buttons now visible on all screen sizes. Added Invoices to the mobile navigation sheet.',
-    tag: 'fix',
-  },
-  {
-    icon: FileText,
-    title: 'Expanded About Page',
-    desc: 'New sections: My Story, Core Values, Why Work With Me, and an FAQ — fully translated.',
+    icon: Pencil,
+    title: 'Edit Order Before Paying',
+    desc: 'Update your order description and notes directly on the checkout page before submitting any payment.',
     tag: 'new',
   },
   {
-    icon: Palette,
-    title: 'UI Polish',
-    desc: 'Removed scroll indicators, cleaned up the navbar, and refined the premium purple design system.',
+    icon: BookmarkCheck,
+    title: 'Pay Later',
+    desc: 'Save your order and come back to pay when you\'re ready — no pressure to pay immediately.',
+    tag: 'new',
+  },
+  {
+    icon: CreditCard,
+    title: 'Payment Status Tracking',
+    desc: 'Once you submit a payment, the form is hidden and replaced with a status card until the admin reviews it.',
     tag: 'improved',
   },
   {
-    icon: Globe,
-    title: 'Language Cleanup',
-    desc: 'Platform now communicates in English and Arabic only. All French mentions removed.',
-    tag: 'improved',
+    icon: ShieldCheck,
+    title: 'Account Deletion Flow',
+    desc: 'Request account deletion safely — admin confirms before anything is permanently removed.',
+    tag: 'new',
   },
 ];
