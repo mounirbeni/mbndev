@@ -16,31 +16,14 @@ export default function Logo3D({ size = 'md', className = '' }: Props) {
   const box = CFG[size];
 
   return (
-    <div
+    <Image
+      src="/OFLG.svg"
+      alt="MBN DEV"
+      width={box}
+      height={box}
       className={className}
-      style={{
-        width:          box,
-        height:         box,
-        flexShrink:     0,
-        position:       'relative',
-        display:        'flex',
-        alignItems:     'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Image
-        src="/OFLG.jpeg"
-        alt="MBN DEV"
-        width={box}
-        height={box}
-        style={{
-          width:       box,
-          height:      box,
-          objectFit:   'contain',
-          mixBlendMode: 'multiply',
-        }}
-        priority
-      />
-    </div>
+      style={{ width: box, height: box, objectFit: 'contain', flexShrink: 0 }}
+      priority
+    />
   );
 }
