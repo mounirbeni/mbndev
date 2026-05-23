@@ -142,6 +142,7 @@ export const orderAPI = {
   getOne:    (id: string)            => api.get(`/orders/${id}`),
   update:    (id: string, data: any) => api.put(`/orders/${id}`, data),
   cancel:    (id: string)            => api.put(`/orders/${id}/cancel`),
+  delete:    (id: string)            => api.delete(`/orders/${id}`),
   getPrice:  (params: any)           => api.get('/orders/price', { params }),
 };
 

@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   ShoppingBag, Clock, CheckCircle2, XCircle, ArrowRight,
-  Search, Loader2, DollarSign, AlertTriangle, RefreshCcw,
+  Search, Loader2, DollarSign, AlertTriangle, RefreshCcw, Trash2,
 } from 'lucide-react';
 import { orderAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 const SERVICE_LABELS: Record<string, string> = {
   website: 'Website', ecommerce: 'E-Commerce', dashboard: 'SaaS Dashboard',
@@ -23,6 +25,8 @@ export default function AdminOrdersPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [search,  setSearch]  = useState('');
   const [filter,  setFilter]  = useState<string>('all');
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // STATUS_CONFIG inside component so labels re-evaluate on locale change
   const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
@@ -60,6 +64,21 @@ export default function AdminOrdersPage() {
     o.client?.name?.toLowerCase().includes(search.toLowerCase()) ||
     o.client?.email?.toLowerCase().includes(search.toLowerCase())
   );
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await orderAPI.delete(deleteTarget.id);
+      setOrders((prev) => prev.filter((o) => o.id !== deleteTarget.id));
+      toast.success('Order deleted');
+      setDeleteTarget(null);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to delete order');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const revenue = orders.filter((o) => o.status === 'paid').reduce((s, o) => s + o.totalPrice, 0);
   const pending = orders.filter((o) => o.status === 'pending').length;
@@ -205,16 +224,25 @@ export default function AdminOrdersPage() {
                           {formatDate(order.createdAt)}
                         </td>
                         <td className="p-4">
-                          {order.project ? (
-                            <Link
-                              href={`/dashboard/admin/projects/${order.project.id}`}
-                              className="text-xs text-primary-400 hover:text-primary-300 flex items-center gap-1 whitespace-nowrap"
+                          <div className="flex items-center gap-3">
+                            {order.project ? (
+                              <Link
+                                href={`/dashboard/admin/projects/${order.project.id}`}
+                                className="text-xs text-primary-400 hover:text-primary-300 flex items-center gap-1 whitespace-nowrap"
+                              >
+                                {t('common.view')} <ArrowRight className="w-3 h-3" />
+                              </Link>
+                            ) : (
+                              <span className="text-xs text-slate-600">—</span>
+                            )}
+                            <button
+                              onClick={() => setDeleteTarget(order)}
+                              className="text-slate-600 hover:text-red-400 transition-colors"
+                              title="Delete order"
                             >
-                              {t('common.view')} <ArrowRight className="w-3 h-3" />
-                            </Link>
-                          ) : (
-                            <span className="text-xs text-slate-600">—</span>
-                          )}
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </motion.tr>
                     );
@@ -243,12 +271,20 @@ export default function AdminOrdersPage() {
                       </div>
                       <div className="text-white font-bold text-sm shrink-0">{formatCurrency(order.totalPrice)}</div>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${cfg.color} ${cfg.bg}`}>
-                        <Icon className="w-3 h-3" /> {cfg.label}
-                      </span>
-                      <span className="text-slate-500 text-xs">{SERVICE_LABELS[order.serviceType]}</span>
-                      <span className="text-slate-500 text-xs">{formatDate(order.createdAt)}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${cfg.color} ${cfg.bg}`}>
+                          <Icon className="w-3 h-3" /> {cfg.label}
+                        </span>
+                        <span className="text-slate-500 text-xs">{SERVICE_LABELS[order.serviceType]}</span>
+                        <span className="text-slate-500 text-xs">{formatDate(order.createdAt)}</span>
+                      </div>
+                      <button
+                        onClick={() => setDeleteTarget(order)}
+                        className="text-slate-600 hover:text-red-400 transition-colors shrink-0"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </motion.div>
                 );
@@ -257,6 +293,48 @@ export default function AdminOrdersPage() {
           </>
         )}
       </div>
+    </div>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative z-10 w-full max-w-sm rounded-2xl border border-white/10 bg-[#0f0f1a] p-6 shadow-2xl"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-5 h-5 text-red-400" />
+            </div>
+            <h3 className="text-white font-bold text-center text-lg mb-1">Delete Order</h3>
+            <p className="text-slate-400 text-sm text-center mb-1">
+              <span className="text-white font-medium">{deleteTarget.title}</span>
+            </p>
+            <p className="text-slate-500 text-xs text-center mb-6">
+              {deleteTarget.client?.name} · {formatCurrency(deleteTarget.totalPrice)}
+            </p>
+            <p className="text-red-400 text-xs text-center mb-6">This action cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-300 text-sm font-medium hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-sm font-semibold hover:bg-red-500/30 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {deleting ? <span className="w-4 h-4 border border-red-400/40 border-t-red-400 rounded-full animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Delete
+              </button>
+            </div>
+          </motion.div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

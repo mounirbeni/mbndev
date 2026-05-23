@@ -208,6 +208,19 @@ exports.cancelOrder = async (req, res, next) => {
   }
 };
 
+// DELETE /api/orders/:id — Admin delete any order
+exports.deleteOrder = async (req, res, next) => {
+  try {
+    const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    await prisma.order.delete({ where: { id: req.params.id } });
+    res.json({ success: true, message: 'Order deleted' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // GET /api/orders/price — Calculate price without creating order
 exports.calculateOrderPrice = async (req, res, next) => {
   try {
