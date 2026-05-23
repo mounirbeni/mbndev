@@ -36,9 +36,9 @@ router.put('/clients/:id/toggle', protect, authorize('admin'), async (req, res, 
 
 // Delete a user and all their related data (no cascade in schema)
 async function deleteUserCascade(userId) {
-  // 1. Nullify project references on payments/orders first (SetNull relations)
-  await prisma.payment.updateMany({ where: { clientId: userId }, data: { clientId: null } });
-  // 2. Delete orders (which may have payments linked via orderId — SetNull handles those)
+  // 1. Delete payments (clientId is required — must go before orders/projects)
+  await prisma.payment.deleteMany({ where: { clientId: userId } });
+  // 2. Delete orders
   await prisma.order.deleteMany({ where: { clientId: userId } });
   // 3. Delete projects (cascades: messages, files, projectFiles, notifications via projectId)
   const projects = await prisma.project.findMany({ where: { clientId: userId }, select: { id: true } });
