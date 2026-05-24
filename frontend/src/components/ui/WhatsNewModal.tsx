@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles } from 'lucide-react';
+import { X, Sparkles, ArrowRight } from 'lucide-react';
 import { APP_VERSION, CHANGELOG } from '@/lib/version';
+import { useRouter } from 'next/navigation';
 
 const STORAGE_KEY = 'mbndev_seen_version';
 
@@ -15,6 +16,7 @@ const tagStyles = {
 
 export default function WhatsNewModal() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const seen = localStorage.getItem(STORAGE_KEY);
@@ -24,6 +26,11 @@ export default function WhatsNewModal() {
   const dismiss = () => {
     localStorage.setItem(STORAGE_KEY, APP_VERSION);
     setOpen(false);
+  };
+
+  const goTo = (href: string) => {
+    dismiss();
+    router.push(href);
   };
 
   return (
@@ -138,7 +145,18 @@ export default function WhatsNewModal() {
                               {style.label}
                             </span>
                           </div>
-                          <p className="text-slate-500 text-xs leading-relaxed">{entry.desc}</p>
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-slate-500 text-xs leading-relaxed">{entry.desc}</p>
+                            {entry.href && (
+                              <button
+                                onClick={() => goTo(entry.href!)}
+                                className="shrink-0 flex items-center gap-1 text-[11px] font-semibold text-violet-400 hover:text-violet-300 transition-colors group/link"
+                              >
+                                Try it
+                                <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform duration-150" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </motion.div>
                     );
