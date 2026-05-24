@@ -23,10 +23,12 @@ interface Props {
 type TimeAgoFn = (date: string) => string;
 
 function SystemMessage({ msg, timeAgo }: { msg: Message; timeAgo: TimeAgoFn }) {
+  let icon  = '⚡';
   let title = '';
   let body  = '';
   try {
     const p = JSON.parse(msg.content);
+    icon  = p.icon  || '⚡';
     title = p.title || '';
     body  = p.body  || '';
   } catch {
@@ -35,21 +37,49 @@ function SystemMessage({ msg, timeAgo }: { msg: Message; timeAgo: TimeAgoFn }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-      className="flex justify-center py-1"
+      initial={{ opacity: 0, scale: 0.96, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.25, type: 'spring', damping: 20, stiffness: 280 }}
+      className="flex justify-center py-2 px-2"
     >
-      <div className="max-w-[340px] w-full mx-2 rounded-2xl border border-primary-500/20 bg-primary-500/6 px-4 py-3.5 text-center">
-        {title && (
-          <div className="text-xs font-semibold text-primary-300 mb-1 tracking-wide uppercase">
-            {title}
+      <div
+        className="w-full max-w-[320px] rounded-2xl overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(59,130,246,0.08) 100%)',
+          border: '1px solid rgba(124,58,237,0.25)',
+          boxShadow: '0 4px 24px rgba(124,58,237,0.1)',
+        }}
+      >
+        {/* Top accent line */}
+        <div
+          className="h-[2px] w-full"
+          style={{ background: 'linear-gradient(90deg, rgba(124,58,237,0.8), rgba(59,130,246,0.4), transparent)' }}
+        />
+
+        <div className="px-4 py-3.5 flex items-start gap-3">
+          {/* Emoji icon badge */}
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 mt-0.5"
+            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)' }}
+          >
+            {icon}
           </div>
-        )}
-        {body && (
-          <div className="text-xs text-slate-400 leading-relaxed">{body}</div>
-        )}
-        <div className="text-[10px] text-slate-600 mt-2">{timeAgo(msg.createdAt)}</div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            {title && (
+              <p className="text-sm font-semibold text-white leading-snug mb-1">
+                {title}
+              </p>
+            )}
+            {body && (
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {body}
+              </p>
+            )}
+            <p className="text-[10px] text-slate-600 mt-1.5">{timeAgo(msg.createdAt)}</p>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
