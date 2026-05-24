@@ -82,8 +82,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" dir="ltr" className="dark">
       <head>
         {/* Icons */}
-        <link rel="icon" type="image/svg+xml" href="/logo-app.svg" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/logo-app.svg" />
+        <link rel="icon" href="/logo-app.jpeg" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/logo-app.jpeg" />
 
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -105,11 +105,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* ── iOS splash screens (portrait) ─────────────────────── */}
         {/* iPhone 14 Pro Max */}
-        <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/logo-app.svg" />
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/logo-app.jpeg" />
         {/* iPhone 14 Pro */}
-        <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="/logo-app.svg" />
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="/logo-app.jpeg" />
         {/* iPhone SE / 8 */}
-        <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/logo-app.svg" />
+        <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/logo-app.jpeg" />
       </head>
       <body suppressHydrationWarning>
         <LanguageProvider>

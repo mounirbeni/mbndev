@@ -17,12 +17,12 @@ export default function Logo3D({ size = 'md', className = '' }: Props) {
 
   return (
     <Image
-      src="/OFLG.svg"
+      src="/logo-app.jpeg"
       alt="MBN DEV"
       width={box}
       height={box}
       className={className}
-      style={{ width: box, height: box, objectFit: 'contain', flexShrink: 0 }}
+      style={{ width: box, height: box, objectFit: 'contain', flexShrink: 0, borderRadius: box * 0.22 }}
       priority
     />
   );

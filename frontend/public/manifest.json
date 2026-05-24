@@ -1,54 +1,17 @@
 {
   "name": "MBN DEV — Custom Websites",
   "short_name": "MBN DEV",
-  "description": "Premium web development platform by Mounir Banni. Track your projects, chat with your developer, and manage payments — all in one place.",
+  "description": "Premium web development platform by Mounir Banni.",
   "start_url": "/",
-  "id": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#08080b",
   "theme_color": "#08080b",
-  "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "en",
-  "categories": ["business", "productivity"],
   "icons": [
     {
-      "src": "/logo-app.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo-app.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "My Projects",
-      "short_name": "Projects",
-      "description": "View all your projects",
-      "url": "/dashboard/client/projects",
-      "icons": [{ "src": "/logo-app.svg", "sizes": "any" }]
-    },
-    {
-      "name": "Messages",
-      "short_name": "Messages",
-      "description": "Chat with your developer",
-      "url": "/dashboard/client/messages",
-      "icons": [{ "src": "/logo-app.svg", "sizes": "any" }]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/logo-app.svg",
-      "sizes": "390x844",
-      "type": "image/svg+xml",
-      "form_factor": "narrow",
-      "label": "MBN DEV Dashboard"
+      "src": "/logo-app.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }
