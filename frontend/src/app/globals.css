@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,9 +6,6 @@
 
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
-  /* Logo typography */
-  --font-logo: 'Space Grotesk', 'Arial Black', Arial, sans-serif;
-
   --color-bg:           #08080b;
   --color-surface:      #111115;
   --color-surface-2:    #17171c;
