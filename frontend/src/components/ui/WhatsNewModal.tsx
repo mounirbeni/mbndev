@@ -48,14 +48,16 @@ export default function WhatsNewModal() {
             style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
           />
 
-          {/* Modal */}
+          {/* Modal — narrow on mobile, wide 2-col on laptop */}
           <motion.div
             key="whats-new-modal"
             initial={{ opacity: 0, scale: 0.92, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 16 }}
             transition={{ type: 'spring', damping: 26, stiffness: 320, mass: 0.75 }}
-            className="fixed z-[9991] inset-x-4 bottom-[88px] sm:inset-auto sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-md"
+            className="fixed z-[9991] inset-x-4 bottom-[88px]
+                       sm:inset-auto sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2
+                       sm:w-full sm:max-w-lg lg:max-w-2xl"
           >
             {/* Outer glow ring */}
             <div
@@ -80,7 +82,7 @@ export default function WhatsNewModal() {
               {/* Shimmer */}
               <div className="absolute inset-0 premium-shimmer pointer-events-none" />
 
-              <div className="relative z-10 p-6">
+              <div className="relative z-10 p-6 lg:p-8">
 
                 {/* Header */}
                 <div className="flex items-start justify-between mb-5">
@@ -117,17 +119,21 @@ export default function WhatsNewModal() {
                   style={{ background: 'linear-gradient(90deg, rgba(124,58,237,0.4), transparent)' }}
                 />
 
-                {/* Changelog entries */}
-                <div className="space-y-3.5">
+                {/* Changelog entries — 1 col mobile, 2 col laptop */}
+                <div
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-3 overflow-y-auto pr-1"
+                  style={{ maxHeight: 'min(60vh, 420px)' }}
+                >
                   {CHANGELOG.map((entry, i) => {
                     const style = tagStyles[entry.tag];
                     return (
                       <motion.div
                         key={i}
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.08 + i * 0.07, duration: 0.4 }}
-                        className="flex items-start gap-3"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.06 + i * 0.05, duration: 0.35 }}
+                        className="flex items-start gap-3 p-3 rounded-2xl transition-colors"
+                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
                       >
                         <div
                           className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
@@ -136,7 +142,7 @@ export default function WhatsNewModal() {
                           <entry.icon className="w-4 h-4 text-violet-400" strokeWidth={1.8} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                             <span className="text-white text-sm font-semibold">{entry.title}</span>
                             <span
                               className="text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded-md"
@@ -145,18 +151,16 @@ export default function WhatsNewModal() {
                               {style.label}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-slate-500 text-xs leading-relaxed">{entry.desc}</p>
-                            {entry.href && (
-                              <button
-                                onClick={() => goTo(entry.href!)}
-                                className="shrink-0 flex items-center gap-1 text-[11px] font-semibold text-violet-400 hover:text-violet-300 transition-colors group/link"
-                              >
-                                Try it
-                                <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform duration-150" />
-                              </button>
-                            )}
-                          </div>
+                          <p className="text-slate-500 text-xs leading-relaxed mb-1.5">{entry.desc}</p>
+                          {entry.href && (
+                            <button
+                              onClick={() => goTo(entry.href!)}
+                              className="flex items-center gap-1 text-[11px] font-semibold text-violet-400 hover:text-violet-300 transition-colors group/link"
+                            >
+                              Try it
+                              <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform duration-150" />
+                            </button>
+                          )}
                         </div>
                       </motion.div>
                     );
@@ -164,7 +168,7 @@ export default function WhatsNewModal() {
                 </div>
 
                 {/* CTA */}
-                <div className="mt-6">
+                <div className="mt-5">
                   <button
                     onClick={dismiss}
                     className="w-full py-3 rounded-2xl text-sm font-semibold text-white transition-all duration-200"
