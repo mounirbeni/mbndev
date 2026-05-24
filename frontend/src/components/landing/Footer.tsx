@@ -111,9 +111,8 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <Logo3D size="md" />
-              <span className="text-white font-bold text-lg">MBN DEV</span>
+            <Link href="/" className="flex items-center mb-4">
+              <Logo3D variant="full" size="md" />
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed mb-5">
               A Moroccan development studio building production-grade digital

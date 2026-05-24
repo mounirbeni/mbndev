@@ -110,9 +110,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           }}
         >
           {/* Left: Logo + Brand */}
-          <Link href="/" className="flex items-center gap-2.5 select-none">
-            <Logo3D size="sm" />
-            <span className="text-white font-bold text-[14px] tracking-wide">MBN DEV</span>
+          <Link href="/" className="flex items-center select-none">
+            <Logo3D variant="full" size="sm" />
           </Link>
 
           {/* Right: Notification bell + Avatar (avatar tap → open NavSheet) */}

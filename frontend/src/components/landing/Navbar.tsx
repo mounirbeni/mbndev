@@ -58,12 +58,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <Logo3D size="md" className="group-active:scale-95 transition-transform" />
-            <div>
-              <div className="text-white font-bold text-[15px] leading-none">MBN DEV</div>
-              <div className="text-slate-500 text-[10px] leading-none mt-0.5">by Mounir Banni</div>
-            </div>
+          <Link href="/" className="flex items-center group shrink-0 group-active:scale-95 transition-transform">
+            <Logo3D variant="full" size="md" />
           </Link>
 
           {/* Desktop nav links */}
