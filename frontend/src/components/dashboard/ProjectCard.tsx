@@ -3,7 +3,7 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Calendar, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { Calendar, ArrowUpRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Project } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,6 +15,17 @@ interface ProjectCardProps {
   href: string;
   index?: number;
   compact?: boolean;
+}
+
+/* Deadline urgency — returns label + color classes */
+function deadlineUrgency(deadline: string | undefined) {
+  if (!deadline) return null;
+  const diff = Math.ceil((new Date(deadline).getTime() - Date.now()) / 86_400_000);
+  if (diff < 0)  return { label: `${Math.abs(diff)}d overdue`, color: 'text-red-400',    bg: 'bg-red-500/10',    icon: AlertCircle };
+  if (diff === 0) return { label: 'Due today',                  color: 'text-red-400',    bg: 'bg-red-500/10',    icon: AlertCircle };
+  if (diff <= 3)  return { label: `${diff}d left`,              color: 'text-orange-400', bg: 'bg-orange-500/10', icon: Calendar    };
+  if (diff <= 7)  return { label: `${diff}d left`,              color: 'text-yellow-400', bg: 'bg-yellow-500/10', icon: Calendar    };
+  return           { label: formatDate(deadline),               color: 'text-slate-500',  bg: 'transparent',      icon: Calendar    };
 }
 
 /* Progress color based on value */
@@ -121,13 +132,18 @@ const ProjectCard = memo(function ProjectCard({ project, href, index = 0, compac
                     <span className="text-slate-500 text-[11px] truncate">{client.name}</span>
                   </div>
                 )}
-                {/* Deadline */}
-                {project.deadline && !client && (
-                  <span className="flex items-center gap-1 text-[11px] text-slate-600">
-                    <Calendar className="w-3 h-3" />
-                    {formatDate(project.deadline)}
-                  </span>
-                )}
+                {/* Deadline urgency badge */}
+                {project.deadline && (() => {
+                  const d = deadlineUrgency(project.deadline);
+                  if (!d) return null;
+                  const Icon = d.icon;
+                  return (
+                    <span className={cn('flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded-md', d.color, d.bg)}>
+                      <Icon className="w-3 h-3 shrink-0" />
+                      {d.label}
+                    </span>
+                  );
+                })()}
               </div>
 
               {/* Milestones */}

@@ -178,13 +178,15 @@ export const packageAPI = {
 };
 
 export const adminAPI = {
-  getClients:   ()                         => api.get('/admin/clients'),
-  toggleClient: (id: string)               => api.put(`/admin/clients/${id}/toggle`),
-  deleteClient:    (id: string) => api.delete(`/admin/clients/${id}`),
-  approveDeletion: (id: string) => api.post(`/admin/clients/${id}/approve-deletion`),
-  rejectDeletion:  (id: string) => api.post(`/admin/clients/${id}/reject-deletion`),
-  getAnalytics: ()                         => api.get('/admin/analytics'),
-  broadcast:    (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
+  getClients:      ()                              => api.get('/admin/clients'),
+  toggleClient:    (id: string)                    => api.put(`/admin/clients/${id}/toggle`),
+  deleteClient:    (id: string)                    => api.delete(`/admin/clients/${id}`),
+  approveDeletion: (id: string)                    => api.post(`/admin/clients/${id}/approve-deletion`),
+  rejectDeletion:  (id: string)                    => api.post(`/admin/clients/${id}/reject-deletion`),
+  saveNotes:       (id: string, notes: string)     => api.put(`/admin/clients/${id}/notes`, { notes }),
+  broadcastCount:  ()                              => api.get('/admin/broadcast-count'),
+  getAnalytics:    ()                              => api.get('/admin/analytics'),
+  broadcast:       (template = 'platformUpdate')   => api.post('/admin/broadcast', { template }),
 };
 
 export default api;

@@ -71,6 +71,7 @@ export default function AdminDashboard() {
   const [broadcastDone,   setBroadcastDone]   = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('platformUpdate');
   const [showBroadcast,   setShowBroadcast]   = useState(false);
+  const [broadcastCount,  setBroadcastCount]  = useState<number | null>(null);
 
   const fetchAnalytics = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -102,6 +103,16 @@ export default function AdminDashboard() {
     { key: 'comingSoon',     label: 'Week 2 — What\'s coming next',  when: 'Week 2', color: 'amber'  },
     { key: 'specialOffer',   label: 'Week 2 — 10% discount offer',   when: 'Week 2', color: 'amber'  },
   ];
+
+  const openBroadcast = async () => {
+    setShowBroadcast(true);
+    if (broadcastCount === null) {
+      try {
+        const { data } = await adminAPI.broadcastCount();
+        setBroadcastCount(data.count);
+      } catch { /* silent */ }
+    }
+  };
 
   const sendBroadcast = async () => {
     if (broadcastDone) return;
@@ -184,9 +195,16 @@ export default function AdminDashboard() {
                 transition={{ duration: 0.15 }}
                 className="absolute top-10 right-0 z-50 w-72 bg-[#111118] border border-white/10 rounded-2xl shadow-2xl p-4"
               >
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">
-                  Send email to all users
-                </p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                    Send email to all users
+                  </p>
+                  {broadcastCount !== null && (
+                    <span className="text-[11px] text-violet-300 font-semibold bg-violet-500/15 px-2 py-0.5 rounded-md">
+                      {broadcastCount} recipients
+                    </span>
+                  )}
+                </div>
 
                 {/* Template selector */}
                 <div className="space-y-1.5 mb-4">

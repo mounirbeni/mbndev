@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { projectAPI } from '@/lib/api';
 import { Project, ProjectStatus } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,11 +10,101 @@ import { formatCurrency, formatDate, getProjectTypeLabel } from '@/lib/utils';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
-import { Search, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { Search, AlertTriangle, RefreshCcw, ChevronDown, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import PlanBadge from '@/components/ui/PlanBadge';
 
-const statusOptions: ProjectStatus[] = ['pending', 'in-progress', 'review', 'completed', 'cancelled'];
+const statusOptions: ProjectStatus[] = ['pending', 'in-progress', 'review', 'revision', 'completed', 'delivered', 'cancelled'];
+
+const STATUS_COLORS: Record<string, string> = {
+  'pending':     'text-slate-400',
+  'in-progress': 'text-blue-400',
+  'review':      'text-orange-400',
+  'revision':    'text-orange-300',
+  'completed':   'text-emerald-400',
+  'delivered':   'text-violet-400',
+  'cancelled':   'text-red-400',
+};
+
+/* Inline status picker that opens a floating dropdown */
+function InlineStatusPicker({
+  projectId,
+  current,
+  onSaved,
+}: {
+  projectId: string;
+  current: string;
+  onSaved: (id: string, status: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const pick = async (status: string) => {
+    if (status === current) { setOpen(false); return; }
+    setSaving(true);
+    setOpen(false);
+    try {
+      await projectAPI.update(projectId, { status });
+      onSaved(projectId, status);
+      toast.success('Status updated');
+    } catch {
+      toast.error('Failed to update status');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div ref={ref} className="relative inline-flex">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1.5 group"
+        disabled={saving}
+      >
+        <StatusBadge status={current as ProjectStatus} />
+        {saving ? (
+          <Loader2 className="w-3 h-3 text-slate-500 animate-spin" />
+        ) : (
+          <ChevronDown className={`w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-all duration-150 ${open ? 'rotate-180' : ''}`} />
+        )}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.96 }}
+            transition={{ duration: 0.12 }}
+            className="absolute top-full left-0 mt-1.5 z-50 min-w-[140px] glass rounded-xl border border-white/10 shadow-xl overflow-hidden"
+          >
+            {statusOptions.map((s) => (
+              <button
+                key={s}
+                onClick={() => pick(s)}
+                className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors hover:bg-white/8 ${
+                  s === current ? 'bg-white/6 ' + (STATUS_COLORS[s] ?? 'text-slate-300') : STATUS_COLORS[s] ?? 'text-slate-400'
+                }`}
+              >
+                {s === current && <span className="mr-1.5">•</span>}
+                {s.replace('-', ' ')}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function AdminProjectsPage() {
   const { t } = useLanguage();
@@ -56,6 +146,10 @@ export default function AdminProjectsPage() {
   const openEdit = (p: Project) => {
     setEditingProject(p);
     setEditForm({ status: p.status, progress: p.progress, notes: p.notes || '' });
+  };
+
+  const quickStatusSaved = (id: string, status: string) => {
+    setProjects((prev) => prev.map((p) => (p._id === id ? { ...p, status: status as ProjectStatus } : p)));
   };
 
   const saveEdit = async () => {
@@ -183,7 +277,13 @@ export default function AdminProjectsPage() {
                       <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">{client?.name || '—'}</td>
                       <td className="p-4 hidden md:table-cell"><PlanBadge plan={p.package} /></td>
                       <td className="p-4 text-sm font-medium text-white hidden md:table-cell">{formatCurrency(p.budget)}</td>
-                      <td className="p-4"><StatusBadge status={p.status} /></td>
+                      <td className="p-4">
+                        <InlineStatusPicker
+                          projectId={p._id ?? p.id ?? ''}
+                          current={p.status}
+                          onSaved={quickStatusSaved}
+                        />
+                      </td>
                       <td className="p-4 hidden lg:table-cell">
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-1.5 bg-white/10 rounded-full overflow-hidden">

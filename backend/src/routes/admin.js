@@ -12,7 +12,7 @@ router.get('/clients', protect, authorize('admin'), async (req, res, next) => {
   try {
     const clients = await prisma.user.findMany({
       where:   { role: 'client' },
-      select:  { id: true, name: true, email: true, company: true, phone: true, isActive: true, deletionRequestedAt: true, createdAt: true, role: true, plan: true },
+      select:  { id: true, name: true, email: true, company: true, phone: true, isActive: true, deletionRequestedAt: true, adminNotes: true, createdAt: true, role: true, plan: true },
       orderBy: { createdAt: 'desc' },
     });
     res.json({ success: true, clients: fmt(clients) });
@@ -83,6 +83,27 @@ router.post('/clients/:id/reject-deletion', protect, authorize('admin'), async (
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     await prisma.user.update({ where: { id: req.params.id }, data: { deletionRequestedAt: null } });
     res.json({ success: true, message: 'Deletion request rejected.' });
+  } catch (err) { next(err); }
+});
+
+// Save private admin notes on a client
+router.put('/clients/:id/notes', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const { notes } = req.body;
+    const user = await prisma.user.update({
+      where:  { id: req.params.id },
+      data:   { adminNotes: notes ?? null },
+      select: { id: true, adminNotes: true },
+    });
+    res.json({ success: true, user: fmt(user) });
+  } catch (err) { next(err); }
+});
+
+// Count of active clients (for broadcast preview)
+router.get('/broadcast-count', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const count = await prisma.user.count({ where: { role: 'client', isActive: true } });
+    res.json({ success: true, count });
   } catch (err) { next(err); }
 });
 

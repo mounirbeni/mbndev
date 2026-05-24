@@ -10,7 +10,7 @@ import { formatDate, getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import PlanBadge from '@/components/ui/PlanBadge';
 import toast from 'react-hot-toast';
-import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX, Trash2, X } from 'lucide-react';
+import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX, Trash2, X, StickyNote } from 'lucide-react';
 
 export default function AdminClientsPage() {
   const { t } = useLanguage();
@@ -19,6 +19,9 @@ export default function AdminClientsPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [notesTarget, setNotesTarget] = useState<User | null>(null);
+  const [notesText, setNotesText] = useState('');
+  const [savingNotes, setSavingNotes] = useState(false);
 
   const fetchClients = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -67,6 +70,29 @@ export default function AdminClientsPage() {
       toast.success('Deletion request rejected.');
     } catch (err: any) {
       toast.error(err?.response?.data?.message || t('toast.error'));
+    }
+  };
+
+  const openNotes = (c: User) => {
+    setNotesTarget(c);
+    setNotesText((c as any).adminNotes ?? '');
+  };
+
+  const saveNotes = async () => {
+    if (!notesTarget) return;
+    setSavingNotes(true);
+    try {
+      const id = notesTarget._id ?? notesTarget.id ?? '';
+      await adminAPI.saveNotes(id, notesText);
+      setClients((prev) => prev.map((c) =>
+        (c._id ?? c.id) === id ? { ...c, adminNotes: notesText } as any : c
+      ));
+      toast.success('Notes saved');
+      setNotesTarget(null);
+    } catch {
+      toast.error(t('toast.error'));
+    } finally {
+      setSavingNotes(false);
     }
   };
 
@@ -202,6 +228,55 @@ export default function AdminClientsPage() {
         document.body
       )}
 
+      {/* Admin Notes modal */}
+      {notesTarget && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)' }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-md rounded-2xl border border-yellow-500/20 p-6"
+            style={{ background: 'rgba(8,8,11,0.97)', boxShadow: '0 0 60px rgba(234,179,8,0.08), 0 24px 64px rgba(0,0,0,0.8)' }}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-yellow-500/12 border border-yellow-500/20 flex items-center justify-center">
+                  <StickyNote className="w-4 h-4 text-yellow-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-sm">Private Notes</h3>
+                  <p className="text-slate-500 text-xs">{notesTarget.name} · {notesTarget.email}</p>
+                </div>
+              </div>
+              <button onClick={() => setNotesTarget(null)} className="text-slate-500 hover:text-white transition-colors p-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <textarea
+              value={notesText}
+              onChange={(e) => setNotesText(e.target.value)}
+              placeholder="Add private notes about this client — visible only to you..."
+              rows={6}
+              className="w-full bg-white/4 border border-white/8 rounded-xl px-3.5 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-yellow-500/40 resize-none leading-relaxed"
+            />
+            <p className="text-slate-600 text-[11px] mt-2 mb-4">Notes are private and never shown to the client.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setNotesTarget(null)} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-300 border border-white/10 hover:bg-white/5 transition-all">
+                Cancel
+              </button>
+              <button
+                onClick={saveNotes}
+                disabled={savingNotes}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-yellow-600/80 hover:bg-yellow-500/80 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {savingNotes ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <StickyNote className="w-4 h-4" />}
+                Save Notes
+              </button>
+            </div>
+          </motion.div>
+        </div>,
+        document.body
+      )}
+
       {/* Table */}
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         {loading ? (
@@ -304,6 +379,13 @@ export default function AdminClientsPage() {
                           className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
                         >
                           {t('admin.toggle')}
+                        </button>
+                        <button
+                          onClick={() => openNotes(c)}
+                          className={`text-xs transition-colors p-1.5 rounded-lg border border-transparent hover:border-yellow-500/20 hover:bg-yellow-500/10 ${(c as any).adminNotes ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}`}
+                          title={(c as any).adminNotes ? 'Edit notes' : 'Add notes'}
+                        >
+                          <StickyNote className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(c)}

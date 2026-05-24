@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { projectAPI, messageAPI, paymentAPI } from '@/lib/api';
 import { Project, Message, Payment } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
+import ProjectStageTracker from '@/components/dashboard/ProjectStageTracker';
 import Button from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -240,29 +241,8 @@ export default function ClientProjectWorkspace() {
           </div>
         </div>
 
-        {/* Status pipeline (desktop) */}
-        <div className="hidden sm:flex items-center gap-1 mt-5 overflow-x-auto pb-1">
-          {STATUS_STEPS.map((s, i) => {
-            const done    = i < statusIdx;
-            const current = i === statusIdx;
-            return (
-              <div key={s.key} className="flex items-center gap-1 flex-shrink-0">
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                  current ? 'bg-primary-500/20 text-primary-300 border border-primary-500/40' :
-                  done    ? 'bg-green-500/10 text-green-400' :
-                            'bg-white/5 text-slate-600'
-                }`}>
-                  {done    && <Check className="w-3 h-3" />}
-                  {current && <div className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />}
-                  {s.label}
-                </div>
-                {i < STATUS_STEPS.length - 1 && (
-                  <div className={`w-4 h-px ${done ? 'bg-green-500/40' : 'bg-white/10'}`} />
-                )}
-              </div>
-            );
-          })}
-        </div>
+        {/* Stage tracker */}
+        <ProjectStageTracker status={project.status as any} className="mt-5" />
       </motion.div>
 
       {/* Tabs */}
