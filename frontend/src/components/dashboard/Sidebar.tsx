@@ -72,8 +72,8 @@ export default function Sidebar() {
         className="px-4 flex items-center justify-between border-b border-white/6 shrink-0"
         style={{ paddingTop: '18px', paddingBottom: '16px' }}
       >
-        <Link href="/" className="flex items-center group">
-          <Logo3D variant="full" size="sm" />
+        <Link href="/" className="flex items-center">
+          <Logo3D size="sm" />
         </Link>
 
         <Link

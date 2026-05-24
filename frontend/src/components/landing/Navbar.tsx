@@ -58,8 +58,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center group shrink-0 group-active:scale-95 transition-transform">
-            <Logo3D variant="full" size="md" />
+          <Link href="/" className="flex items-center shrink-0 active:scale-95 transition-transform">
+            <Logo3D size="md" />
           </Link>
 
           {/* Desktop nav links */}

@@ -111,7 +111,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         >
           {/* Left: Logo + Brand */}
           <Link href="/" className="flex items-center select-none">
-            <Logo3D variant="full" size="sm" />
+            <Logo3D size="sm" />
           </Link>
 
           {/* Right: Notification bell + Avatar (avatar tap → open NavSheet) */}
