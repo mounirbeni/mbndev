@@ -14,7 +14,7 @@ import { Search, AlertTriangle, RefreshCcw, ChevronDown, Loader2 } from 'lucide-
 import Link from 'next/link';
 import PlanBadge from '@/components/ui/PlanBadge';
 
-const statusOptions: ProjectStatus[] = ['pending', 'in-progress', 'review', 'revision', 'completed', 'delivered', 'cancelled'];
+const statusOptions: ProjectStatus[] = ['pending', 'in-progress', 'review', 'revision', 'completed', 'cancelled'];
 
 const STATUS_COLORS: Record<string, string> = {
   'pending':     'text-slate-400',
