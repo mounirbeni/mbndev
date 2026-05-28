@@ -47,7 +47,6 @@ export default function SplashScreen() {
           >
             <Logo3D size="xl" />
             <div className="text-center">
-              <div className="text-white font-bold text-xl tracking-wide">MBN DEV</div>
               <div className="text-slate-600 text-xs mt-0.5">by Mounir Banni</div>
             </div>
           </motion.div>

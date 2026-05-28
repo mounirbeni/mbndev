@@ -11,7 +11,6 @@ export function LegalPageNav() {
     <nav className="border-b border-white/5 px-4 sm:px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
       <Link href="/" className="flex items-center gap-2.5">
         <Logo3D size="sm" />
-        <span className="text-white font-bold">MBN DEV</span>
       </Link>
       <Link
         href="/"

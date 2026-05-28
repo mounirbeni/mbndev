@@ -57,7 +57,6 @@ export default function ResetPasswordPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <Logo3D size="lg" />
-            <span className="text-white font-bold text-xl">MBN DEV</span>
           </Link>
         </div>
 

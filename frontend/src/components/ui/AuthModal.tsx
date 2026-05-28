@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff, Check, Zap, Star, Crown, ArrowRight, Lock } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';
+import Logo3D from './Logo3D';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
@@ -146,10 +147,7 @@ export default function AuthModal({
                 <div className="relative z-10">
                   {/* Logo mark */}
                   <div className="flex items-center gap-2 mb-8">
-                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center">
-                      <Zap className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-white font-bold text-lg">MBN DEV</span>
+                    <Logo3D size="sm" />
                   </div>
 
                   {plan && (
@@ -214,10 +212,7 @@ export default function AuthModal({
                 {/* Mobile header */}
                 <div className="md:hidden mb-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center">
-                      <Lock className="w-3.5 h-3.5 text-white" />
-                    </div>
-                    <span className="text-white font-bold">MBN DEV</span>
+                    <Logo3D size="sm" />
                   </div>
                   {contextMessage && (
                     <p className="text-slate-400 text-sm">{contextMessage}</p>

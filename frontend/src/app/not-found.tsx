@@ -23,7 +23,6 @@ export default function NotFound() {
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-2.5 mb-12">
           <Logo3D size="md" />
-          <span className="text-white font-bold text-xl">MBN DEV</span>
         </Link>
 
         {/* 404 */}

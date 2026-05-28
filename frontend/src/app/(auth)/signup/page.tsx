@@ -351,7 +351,6 @@ export default function SignupPage() {
           <div className="text-center mb-7">
             <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
               <Logo3D size="xl" />
-              <span className="text-white font-bold text-xl tracking-tight">MBN DEV</span>
             </Link>
             <h1 className="text-3xl font-black text-white tracking-tight">{t('auth.signup.title')}</h1>
             <p className="text-slate-400 mt-2 text-sm leading-relaxed">{t('auth.signup.subtitle')}</p>

@@ -190,7 +190,6 @@ function LeftPanel() {
           className="flex items-center gap-3"
         >
           <Logo3D size="md" />
-          <span className="text-white font-bold text-lg tracking-tight">MBN DEV</span>
         </motion.div>
 
         {/* Center hero text */}
@@ -410,7 +409,6 @@ export default function LoginPage() {
             <div className="lg:hidden text-center mb-8">
               <Link href="/" className="inline-flex items-center gap-2.5 mb-5">
                 <Logo3D size="xl" />
-                <span className="text-white font-bold text-xl">MBN DEV</span>
               </Link>
             </div>
 
