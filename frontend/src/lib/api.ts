@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL:         '/api',
   headers:         { 'Content-Type': 'application/json' },
   timeout:         30_000,
-  withCredentials: true, // send httpOnly refresh cookie on every request
+  withCredentials: true,
 });
 
 // ─── Request interceptor — attach access token ────────────────────────────────
@@ -20,9 +20,6 @@ api.interceptors.request.use((config) => {
 });
 
 // ─── Refresh-token flow ───────────────────────────────────────────────────────
-// When a 401 arrives we attempt a silent refresh ONCE via the httpOnly cookie.
-// If that succeeds we retry the original request transparently.
-// If it fails (cookie expired / not present) we fall through to the 401 handler.
 
 let _refreshPromise: Promise<string | null> | null = null;
 
@@ -40,7 +37,6 @@ async function silentRefresh(): Promise<string | null> {
         localStorage.setItem('mbndev_token', data.token);
         if (data.user) {
           localStorage.setItem('mbndev_user', JSON.stringify(data.user));
-          // Update role cookie for Next.js middleware
           const maxAge = 60 * 60 * 24 * 7;
           document.cookie = `mbndev_auth=${data.user.role}; path=/; max-age=${maxAge}; samesite=lax`;
         }
@@ -61,7 +57,6 @@ async function silentRefresh(): Promise<string | null> {
 
 let _unauthorizedHandled = false;
 
-/** Re-arm after a successful login. */
 export function resetUnauthorizedFlag() {
   _unauthorizedHandled = false;
 }
@@ -114,7 +109,6 @@ api.interceptors.response.use(
     const url    = error.config?.url ?? '';
     const config = error.config as AxiosRequestConfig & { _retryCount?: number; _refreshed?: boolean };
 
-    // 401 → try silent refresh once, then retry original request
     if (status === 401 && typeof window !== 'undefined' && !config._refreshed) {
       const isAuthCall = url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/refresh');
       if (!isAuthCall) {
@@ -124,7 +118,6 @@ api.interceptors.response.use(
           config.headers = { ...(config.headers ?? {}), Authorization: `Bearer ${newToken}` };
           return api(config);
         }
-        // Refresh failed — clear session
         clearSessionAndRedirect(url);
         return Promise.reject(error);
       }
@@ -134,7 +127,6 @@ api.interceptors.response.use(
       clearSessionAndRedirect(url);
     }
 
-    // Retry transient 5xx / network errors
     const retryCount = config._retryCount ?? 0;
     if (shouldRetry(error, retryCount)) {
       config._retryCount = retryCount + 1;
@@ -182,13 +174,13 @@ export const projectAPI = {
 };
 
 export const orderAPI = {
-  create:    (data: any)             => api.post('/orders', data),
-  getAll:    (params?: any)          => api.get('/orders', { params }),
-  getOne:    (id: string)            => api.get(`/orders/${id}`),
-  update:    (id: string, data: any) => api.put(`/orders/${id}`, data),
-  cancel:    (id: string)            => api.put(`/orders/${id}/cancel`),
-  delete:    (id: string)            => api.delete(`/orders/${id}`),
-  getPrice:  (params: any)           => api.get('/orders/price', { params }),
+  create:   (data: any)             => api.post('/orders', data),
+  getAll:   (params?: any)          => api.get('/orders', { params }),
+  getOne:   (id: string)            => api.get(`/orders/${id}`),
+  update:   (id: string, data: any) => api.put(`/orders/${id}`, data),
+  cancel:   (id: string)            => api.put(`/orders/${id}/cancel`),
+  delete:   (id: string)            => api.delete(`/orders/${id}`),
+  getPrice: (params: any)           => api.get('/orders/price', { params }),
 };
 
 export const messageAPI = {
@@ -223,15 +215,15 @@ export const packageAPI = {
 };
 
 export const adminAPI = {
-  getClients:      ()                          => api.get('/admin/clients'),
-  toggleClient:    (id: string)                => api.put(`/admin/clients/${id}/toggle`),
-  deleteClient:    (id: string)                => api.delete(`/admin/clients/${id}`),
-  approveDeletion: (id: string)                => api.post(`/admin/clients/${id}/approve-deletion`),
-  rejectDeletion:  (id: string)                => api.post(`/admin/clients/${id}/reject-deletion`),
-  saveNotes:       (id: string, notes: string) => api.put(`/admin/clients/${id}/notes`, { notes }),
-  broadcastCount:  ()                          => api.get('/admin/broadcast-count'),
-  getAnalytics:    ()                          => api.get('/admin/analytics'),
-  broadcast:       (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
+  getClients:      ()                              => api.get('/admin/clients'),
+  toggleClient:    (id: string)                    => api.put(`/admin/clients/${id}/toggle`),
+  deleteClient:    (id: string)                    => api.delete(`/admin/clients/${id}`),
+  approveDeletion: (id: string)                    => api.post(`/admin/clients/${id}/approve-deletion`),
+  rejectDeletion:  (id: string)                    => api.post(`/admin/clients/${id}/reject-deletion`),
+  saveNotes:       (id: string, notes: string)     => api.put(`/admin/clients/${id}/notes`, { notes }),
+  broadcastCount:  ()                              => api.get('/admin/broadcast-count'),
+  getAnalytics:    ()                              => api.get('/admin/analytics'),
+  broadcast:       (template = 'platformUpdate')   => api.post('/admin/broadcast', { template }),
 };
 
 export const searchAPI = {
@@ -240,84 +232,3 @@ export const searchAPI = {
 };
 
 export default api;
-      (data: any)  => api.post('/payments/mock', data),
-  submitManual:  (data: any)  => api.post('/payments/manual', data),
-  approveManual: (id: string) => api.put(`/payments/${id}/approve`, {}),
-  rejectManual:  (id: string) => api.put(`/payments/${id}/reject`, {}),
-  getAll:        ()           => api.get('/payments'),
-  getOne:        (id: string) => api.get(`/payments/${id}`),
-};
-
-export const notificationAPI = {
-  getAll:      ()           => api.get('/notifications'),
-  getUnread:   ()           => api.get('/notifications/unread-count'),
-  markRead:    (id: string) => api.put(`/notifications/${id}/read`),
-  markAllRead: ()           => api.put('/notifications/read-all'),
-};
-
-export const packageAPI = {
-  getAll: ()                       => api.get('/packages'),
-  create: (data: any)              => api.post('/packages', data),
-  update: (id: string, data: any)  => api.put(`/packages/${id}`, data),
-  delete: (id: string)             => api.delete(`/packages/${id}`),
-};
-
-export const adminAPI = {
-  getClients:      ()                          => api.get('/admin/clients'),
-  toggleClient:    (id: string)                => api.put(`/admin/clients/${id}/toggle`),
-  deleteClient:    (id: string)                => api.delete(`/admin/clients/${id}`),
-  approveDeletion: (id: string)                => api.post(`/admin/clients/${id}/approve-deletion`),
-  rejectDeletion:  (id: string)                => api.post(`/admin/clients/${id}/reject-deletion`),
-  saveNotes:       (id: string, notes: string) => api.put(`/admin/clients/${id}/notes`, { notes }),
-  broadcastCount:  ()                          => api.get('/admin/broadcast-count'),
-  getAnalytics:    ()                          => api.get('/admin/analytics'),
-  broadcast:       (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
-};
-
-export const searchAPI = {
-  global:      (q: string)        => api.get('/search', { params: { q } }),
-  activity:    (params?: any)     => api.get('/search/activity', { params }),
-};
-
-export default api;
-(data: any)  => api.post('/payments/mock', data),
-  submitManual:  (data: any)  => api.post('/payments/manual', data),
-  approveManual: (id: string) => api.put(`/payments/${id}/approve`, {}),
-  rejectManual:  (id: string) => api.put(`/payments/${id}/reject`, {}),
-  getAll:        ()           => api.get('/payments'),
-  getOne:        (id: string) => api.get(`/payments/${id}`),
-};
-
-export const notificationAPI = {
-  getAll:      ()           => api.get('/notifications'),
-  getUnread:   ()           => api.get('/notifications/unread-count'),
-  markRead:    (id: string) => api.put(`/notifications/${id}/read`),
-  markAllRead: ()           => api.put('/notifications/read-all'),
-};
-
-export const packageAPI = {
-  getAll: ()                       => api.get('/packages'),
-  create: (data: any)              => api.post('/packages', data),
-  update: (id: string, data: any)  => api.put(`/packages/${id}`, data),
-  delete: (id: string)             => api.delete(`/packages/${id}`),
-};
-
-export const adminAPI = {
-  getClients:      ()                          => api.get('/admin/clients'),
-  toggleClient:    (id: string)                => api.put(`/admin/clients/${id}/toggle`),
-  deleteClient:    (id: string)                => api.delete(`/admin/clients/${id}`),
-  approveDeletion: (id: string)                => api.post(`/admin/clients/${id}/approve-deletion`),
-  rejectDeletion:  (id: string)                => api.post(`/admin/clients/${id}/reject-deletion`),
-  saveNotes:       (id: string, notes: string) => api.put(`/admin/clients/${id}/notes`, { notes }),
-  broadcastCount:  ()                          => api.get('/admin/broadcast-count'),
-  getAnalytics:    ()                          => api.get('/admin/analytics'),
-  broadcast:       (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
-};
-
-export const searchAPI = {
-  global:   (q: string)    => api.get('/search', { params: { q } }),
-  activity: (params?: any) => api.get('/search/activity', { params }),
-};
-
-export default api;
- api;
