@@ -84,16 +84,8 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-[62px]">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
+            <Link href="/" className="flex items-center shrink-0">
               <Logo3D size="md" />
-              <motion.span
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="hidden sm:block text-white font-bold text-[15px] tracking-tight group-hover:text-violet-300 transition-colors duration-200"
-              >
-                MBN DEV
-              </motion.span>
             </Link>
 
             {/* Desktop nav links */}
