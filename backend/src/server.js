@@ -225,6 +225,20 @@ app.use((err, req, res, _next) => {
   });
 });
 
+// ─── Background reconciler ────────────────────────────────────────────────────
+// In dev: runs every 10 min via setInterval.
+// In production (Vercel serverless): only runs via POST /api/payments/reconcile.
+// Also runs once on each cold-start to fix any leftover stuck payments quickly.
+const { startReconcilerLoop, runReconciliation } = require('./jobs/reconcile');
+if (process.env.NODE_ENV !== 'production') {
+  startReconcilerLoop();
+} else {
+  // Cold-start reconciliation: fire-and-forget, won't block the response
+  runReconciliation().catch((err) => {
+    console.error('[reconcile] Cold-start run failed:', err.message);
+  });
+}
+
 // ─── Server startup + graceful shutdown ──────────────────────────────────────
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;

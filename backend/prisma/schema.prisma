@@ -190,19 +190,73 @@ model Payment {
   client                User      @relation(fields: [clientId], references: [id])
   amount                Float
   currency              String    @default("usd")
-  status                String    @default("pending")  // pending | pending_verification | paid | failed | refunded
+  status                String    @default("pending")  // pending | pending_verification | processing | paid | failed | refunded
   milestoneTitle        String?
   description           String?
   method                String?   // cih_bank | paypal | taptapsend | mock
   // External transaction reference (PayPal txn ID, bank ref, etc) — proof of payment
   externalRef           String?
   rejectionReason       String?   // set by admin on reject — shown to client
+  // ── Hardening fields ─────────────────────────────────────────────────────
+  snapshotAmount        Float?    // amount locked at submission (tamper-proof copy of order.totalPrice)
+  expiresAt             DateTime? // pending_verification auto-expires at this time (72 h)
+  flaggedReason         String?   // set by fraud detection — admin sees this
+  riskScore             Int?      // 0–100 computed at submission; ≥ 60 = auto-flagged
+  ipAddress             String?   // submitter IP (forensic tracing)
+  idempotencyKey        String?   @unique  // client-generated key — prevents double-submit
   paidAt                DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  events                PaymentEvent[]
+
   @@index([clientId, status])
   @@index([status, createdAt])
+  @@index([externalRef])         // fast duplicate-ref look-up
+  @@index([idempotencyKey])
+  @@index([expiresAt])           // reconciliation queries
+}
+
+// ─── Payment Event Log (immutable append-only) ────────────────────────────────
+// Every status change is recorded here forever. Rows are never updated or deleted.
+
+model PaymentEvent {
+  id         String   @id @default(cuid())
+  paymentId  String
+  payment    Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  actorId    String?  // null = automated system action
+  actorRole  String?  // 'admin' | 'client' | 'system'
+  event      String   // created | submitted | approved | rejected | expired | rolled_back | flagged | refunded
+  fromStatus String?
+  toStatus   String
+  note       String?  // rejection reason, fraud flag reason, etc.
+  metadata   Json?    // extra forensic data (IP, userAgent, amount, method, riskScore, flags)
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([paymentId, createdAt])
+  @@index([event])
+  @@index([actorId])
+}
+
+// ─── Admin Audit Log ──────────────────────────────────────────────────────────
+// Every destructive or sensitive admin action is recorded immutably.
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String   // approve_payment | reject_payment | delete_client | toggle_client | mock_payment | reconcile
+  targetType String   // payment | order | project | user
+  targetId   String
+  before     Json?    // snapshot of key fields before the change
+  after      Json?    // snapshot after
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+  @@index([action, createdAt])
 }
 
 // ─── Packages (Pricing) ───────────────────────────────────────────────────────

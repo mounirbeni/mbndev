@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Zap, CreditCard, Shield, Clock, Check,
   Loader2, AlertCircle, Copy, ExternalLink, CheckCircle2, BookmarkCheck,
-  Pencil, X, RotateCcw,
+  Pencil, X, AlertTriangle,
 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -58,6 +58,18 @@ export default function CheckoutPage() {
   const [done,         setDone]       = useState(false);
   const [savedLater,   setSavedLater] = useState(false);
 
+  // Idempotency key — generated once per page load, prevents double-submit
+  // (survives re-renders but resets on full page navigation)
+  const [idempotencyKey] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    const storageKey = `idem_${orderId}`;
+    const stored = sessionStorage.getItem(storageKey);
+    if (stored) return stored;
+    const key = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    sessionStorage.setItem(storageKey, key);
+    return key;
+  });
+
   // Edit order state
   const [editing,     setEditing]    = useState(false);
   const [editFields,  setEditFields] = useState({ description: '', notes: '' });
@@ -83,17 +95,34 @@ export default function CheckoutPage() {
   };
 
   const handleSubmit = async () => {
+    if (paying) return; // hard guard against double-click
     setPaying(true);
     try {
-      await paymentAPI.submitManual({
+      const res = await paymentAPI.submitManual({
         orderId,
         method,
-        externalRef: externalRef.trim() || undefined,
+        externalRef:    externalRef.trim() || undefined,
+        idempotencyKey: idempotencyKey || undefined,
       });
+      // Clear the idempotency key from sessionStorage on success so a
+      // genuine retry (after rejection) gets a fresh key
+      if (!res.data?.idempotent && typeof window !== 'undefined') {
+        sessionStorage.removeItem(`idem_${orderId}`);
+        localStorage.removeItem('mbndev_request_draft');
+      }
       setDone(true);
-      if (typeof window !== 'undefined') localStorage.removeItem('mbndev_request_draft');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('share.paymentFail'));
+      const code = err?.response?.data?.code;
+      const msg  = err?.response?.data?.message;
+      if (code === 'DUPLICATE_SUBMISSION') {
+        // Payment already exists — treat as success so client sees the pending state
+        toast('Your payment is already under review.', { icon: '⏳' });
+        setDone(true);
+      } else if (code === 'SERIALIZATION_FAILURE') {
+        toast.error('Concurrent submission — please wait a moment and try again.');
+      } else {
+        toast.error(msg || t('share.paymentFail'));
+      }
     } finally {
       setPaying(false);
     }
@@ -113,8 +142,26 @@ export default function CheckoutPage() {
     }
   };
 
-  // Derive pending payment
-  const pendingPayment = order?.payments?.find((p: any) => p.status === 'pending_verification');
+  // Derive payment states
+  const pendingPayment  = order?.payments?.find((p: any) => p.status === 'pending_verification');
+  const rejectedPayment = order?.payments?.find((p: any) => p.status === 'failed' &&
+    order?.payments?.every((q: any) => q.status !== 'pending_verification'));
+
+  // Expiry countdown for pending payment (expiresAt from backend)
+  const [expiryLabel, setExpiryLabel] = useState('');
+  useEffect(() => {
+    if (!pendingPayment?.expiresAt) return;
+    const tick = () => {
+      const ms   = new Date(pendingPayment.expiresAt).getTime() - Date.now();
+      if (ms <= 0) { setExpiryLabel('expired'); return; }
+      const h    = Math.floor(ms / 3_600_000);
+      const m    = Math.floor((ms % 3_600_000) / 60_000);
+      setExpiryLabel(`${h}h ${m}m remaining`);
+    };
+    tick();
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, [pendingPayment]);
 
   // ── Loading / error states ──────────────────────────────────────────────────
   if (loading || authLoading) return (
@@ -318,6 +365,30 @@ export default function CheckoutPage() {
             </AnimatePresence>
           </motion.div>
 
+          {/* ── Rejected payment — client can resubmit ───────────────────── */}
+          {rejectedPayment && !pendingPayment && (
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
+              className="glass rounded-2xl p-5 border border-red-500/25"
+              style={{ background: 'rgba(239,68,68,0.05)' }}
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/20 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-5 h-5 text-red-400" />
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm mb-1">Previous Payment Not Confirmed</p>
+                  {rejectedPayment.rejectionReason
+                    ? <p className="text-slate-400 text-xs leading-relaxed mb-2">
+                        <span className="text-slate-300 font-medium">Reason: </span>{rejectedPayment.rejectionReason}
+                      </p>
+                    : <p className="text-slate-500 text-xs mb-2">Please check your payment details and resubmit below.</p>
+                  }
+                  <p className="text-slate-600 text-xs">Submit a new payment using the form below.</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* ── Pending payment waiting state ─────────────────────────────── */}
           {pendingPayment && (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
@@ -333,12 +404,23 @@ export default function CheckoutPage() {
                   <p className="text-slate-400 text-sm leading-relaxed mb-3">
                     Your payment has been submitted via <span className="text-white font-semibold capitalize">{(pendingPayment.method || '').replace('_', ' ')}</span>. We're verifying it now — this usually takes a few hours.
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-amber-400/80">
-                    <span className="relative flex h-2 w-2 shrink-0">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-                    </span>
-                    Waiting for admin to confirm receipt
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 text-xs text-amber-400/80">
+                      <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+                      </span>
+                      Waiting for admin to confirm receipt
+                    </div>
+                    {expiryLabel && expiryLabel !== 'expired' && (
+                      <span className="text-xs text-slate-500">
+                        <Clock className="w-3 h-3 inline mr-1" />
+                        {expiryLabel}
+                      </span>
+                    )}
+                    {expiryLabel === 'expired' && (
+                      <span className="text-xs text-red-400 font-medium">⏱ Expired — please resubmit</span>
+                    )}
                   </div>
                   {pendingPayment.externalRef && (
                     <p className="text-slate-500 text-xs mt-2">Reference: <span className="text-slate-300 font-mono">{pendingPayment.externalRef}</span></p>

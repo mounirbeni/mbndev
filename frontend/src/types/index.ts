@@ -127,15 +127,37 @@ export interface Payment {
   client: User | string;
   amount: number;
   currency: string;
-  status: 'pending' | 'pending_verification' | 'paid' | 'failed' | 'refunded';
+  status: 'pending' | 'pending_verification' | 'processing' | 'paid' | 'failed' | 'refunded';
   method?: string;
   milestoneTitle?: string;
   description?: string;
+  // Evidence & tracing
   externalRef?: string;        // bank ref / PayPal txn ID supplied by the client as proof
+  snapshotAmount?: number;     // amount locked at submission (tamper-proof)
+  expiresAt?: string;          // pending_verification auto-expires at this time (72 h)
+  ipAddress?: string;          // submitter IP (forensic)
+  // Fraud / risk
+  riskScore?: number;          // 0–100; ≥60 = flagged; ≥80 = high-risk
+  flaggedReason?: string;      // human-readable flags set by fraud engine
+  // Outcome
   rejectionReason?: string;    // set by admin when rejecting — shown to the client
   paidAt?: string;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface PaymentEvent {
+  id: string;
+  paymentId: string;
+  actorId?: string | null;
+  actorRole?: string | null;
+  event: string;
+  fromStatus?: string | null;
+  toStatus: string;
+  note?: string | null;
+  metadata?: Record<string, any> | null;
+  ip?: string | null;
+  createdAt: string;
 }
 
 export interface Order {
