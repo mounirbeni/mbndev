@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   ShoppingBag, Clock, CheckCircle2, XCircle,
-  ArrowRight, Plus, CreditCard, Loader2, AlertTriangle, RefreshCcw,
+  ArrowRight, Plus, CreditCard, Loader2, AlertTriangle, RefreshCcw, Eye,
 } from 'lucide-react';
 import { orderAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -25,9 +25,10 @@ export default function ClientOrdersPage() {
 
   // STATUS_CONFIG built inside component so labels re-evaluate on locale change
   const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
-    pending:   { label: t('orders.pendingPayment'), color: 'text-amber-400',  bg: 'bg-amber-500/10',  icon: Clock         },
-    paid:      { label: t('status.paid'),           color: 'text-green-400',  bg: 'bg-green-500/10',  icon: CheckCircle2  },
-    cancelled: { label: t('status.cancelled'),      color: 'text-red-400',    bg: 'bg-red-500/10',    icon: XCircle       },
+    pending:              { label: t('orders.pendingPayment'), color: 'text-amber-400',  bg: 'bg-amber-500/10',  icon: Clock         },
+    pending_verification: { label: 'Under Review',             color: 'text-blue-400',   bg: 'bg-blue-500/10',   icon: Eye           },
+    paid:                 { label: t('status.paid'),           color: 'text-green-400',  bg: 'bg-green-500/10',  icon: CheckCircle2  },
+    cancelled:            { label: t('status.cancelled'),      color: 'text-red-400',    bg: 'bg-red-500/10',    icon: XCircle       },
   };
 
   const fetchOrders = useCallback((silent = false) => {
@@ -118,7 +119,15 @@ export default function ClientOrdersPage() {
         ) : (
           <div className="divide-y divide-white/5">
             {orders.map((order, i) => {
-              const cfg  = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
+              // If order is still "pending" but has a payment awaiting verification,
+              // show "Under Review" so the client knows admin is checking it
+              const hasPaymentUnderReview =
+                order.status === 'pending' &&
+                Array.isArray(order.payments) &&
+                order.payments.some((p: any) => p.status === 'pending_verification');
+
+              const displayStatus = hasPaymentUnderReview ? 'pending_verification' : order.status;
+              const cfg  = STATUS_CONFIG[displayStatus] || STATUS_CONFIG.pending;
               const Icon = cfg.icon;
               return (
                 <motion.div
@@ -164,8 +173,8 @@ export default function ClientOrdersPage() {
                           </Link>
                         )}
 
-                        {/* Pay now button */}
-                        {order.status === 'pending' && (
+                        {/* Pay now button — hidden while payment is under review */}
+                        {order.status === 'pending' && !hasPaymentUnderReview && (
                           <Link href={`/checkout/${order.id}`} className="ml-auto">
                             <button
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-all active:scale-95"

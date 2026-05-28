@@ -34,24 +34,41 @@ router.put('/clients/:id/toggle', protect, authorize('admin'), async (req, res, 
   } catch (err) { next(err); }
 });
 
-// Delete a user and all their related data (no cascade in schema)
-async function deleteUserCascade(userId) {
-  // 1. Delete payments (clientId is required — must go before orders/projects)
-  await prisma.payment.deleteMany({ where: { clientId: userId } });
-  // 2. Delete orders
-  await prisma.order.deleteMany({ where: { clientId: userId } });
-  // 3. Delete projects (cascades: messages, files, projectFiles, notifications via projectId)
-  const projects = await prisma.project.findMany({ where: { clientId: userId }, select: { id: true } });
-  for (const p of projects) {
-    await prisma.project.delete({ where: { id: p.id } });
-  }
-  // 4. Delete remaining user-level records without cascade
-  await prisma.messageReadReceipt.deleteMany({ where: { userId } });
-  await prisma.projectFile.deleteMany({ where: { userId } });
-  await prisma.notification.deleteMany({ where: { userId } });
-  await prisma.loginAttempt.deleteMany({ where: { userId } });
-  // 5. Delete the user
-  await prisma.user.delete({ where: { id: userId } });
+// Delete a user and all their related data (no cascade in schema).
+// Wrapped in a serializable transaction so it's atomic — either all goes or none.
+async function deleteUserCascade(userId, email) {
+  await prisma.$transaction(async (tx) => {
+    // 1. Payments — clientId FK to User (no cascade)
+    await tx.payment.deleteMany({ where: { clientId: userId } });
+
+    // 2. Orders — clientId FK to User (no cascade)
+    await tx.order.deleteMany({ where: { clientId: userId } });
+
+    // 3. Activity logs where this user is the actor — cross-project logs won't be
+    //    covered by project cascade and would block user deletion
+    await tx.activityLog.deleteMany({ where: { userId } });
+
+    // 4. Delete projects one-by-one so Cascade kicks in for milestones, messages,
+    //    messageReads, projectFiles, and activityLogs linked to these projects
+    const projects = await tx.project.findMany({ where: { clientId: userId }, select: { id: true } });
+    for (const p of projects) {
+      await tx.project.delete({ where: { id: p.id } });
+    }
+
+    // 5. User-level records that survive project deletion
+    await tx.messageRead.deleteMany({ where: { userId } });           // MessageRead model
+    await tx.projectFile.deleteMany({ where: { uploadedById: userId } }); // uploaded cross-project
+    await tx.notification.deleteMany({ where: { userId } });
+    await tx.passwordResetToken.deleteMany({ where: { userId } });
+
+    // 6. LoginAttempt has no userId — match by email (best effort)
+    if (email) {
+      await tx.loginAttempt.deleteMany({ where: { email: email.toLowerCase() } });
+    }
+
+    // 7. Finally delete the user
+    await tx.user.delete({ where: { id: userId } });
+  }, { timeout: 30_000 });
 }
 
 router.delete('/clients/:id', protect, authorize('admin'), async (req, res, next) => {
@@ -60,7 +77,7 @@ router.delete('/clients/:id', protect, authorize('admin'), async (req, res, next
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     if (existing.role === 'admin') return res.status(403).json({ success: false, message: 'Admin accounts cannot be deleted.' });
     if (existing.id === req.user.id) return res.status(403).json({ success: false, message: 'You cannot delete your own account from here.' });
-    await deleteUserCascade(req.params.id);
+    await deleteUserCascade(req.params.id, existing.email);
     res.json({ success: true, message: 'Client account deleted.' });
   } catch (err) { next(err); }
 });
@@ -71,7 +88,7 @@ router.post('/clients/:id/approve-deletion', protect, authorize('admin'), async 
     const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     if (!existing.deletionRequestedAt) return res.status(400).json({ success: false, message: 'No pending deletion request for this user.' });
-    await deleteUserCascade(req.params.id);
+    await deleteUserCascade(req.params.id, existing.email);
     res.json({ success: true, message: 'Account deleted.' });
   } catch (err) { next(err); }
 });

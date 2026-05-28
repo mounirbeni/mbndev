@@ -11,8 +11,8 @@ const {
 const { protect, authorize } = require('../middleware/auth');
 const { createOrderRules, calculatePriceRules } = require('../middleware/validate');
 
-// Price calculator (public-ish, but auth helps logging)
-router.get('/price', calculatePriceRules, calculateOrderPrice);
+// Price calculator — protected so unauthenticated bots can't probe pricing freely
+router.get('/price', protect, calculatePriceRules, calculateOrderPrice);
 
 // Order CRUD
 router.post('/',          protect, createOrderRules, createOrder);

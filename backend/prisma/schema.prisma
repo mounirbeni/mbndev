@@ -196,6 +196,7 @@ model Payment {
   method                String?   // cih_bank | paypal | taptapsend | mock
   // External transaction reference (PayPal txn ID, bank ref, etc) — proof of payment
   externalRef           String?
+  rejectionReason       String?   // set by admin on reject — shown to client
   paidAt                DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt

@@ -192,12 +192,12 @@ export const messageAPI = {
 };
 
 export const paymentAPI = {
-  mock:          (data: any)  => api.post('/payments/mock', data),
-  submitManual:  (data: any)  => api.post('/payments/manual', data),
-  approveManual: (id: string) => api.put(`/payments/${id}/approve`, {}),
-  rejectManual:  (id: string) => api.put(`/payments/${id}/reject`, {}),
-  getAll:        ()           => api.get('/payments'),
-  getOne:        (id: string) => api.get(`/payments/${id}`),
+  mock:          (data: any)                          => api.post('/payments/mock', data),
+  submitManual:  (data: any)                          => api.post('/payments/manual', data),
+  approveManual: (id: string)                         => api.put(`/payments/${id}/approve`, {}),
+  rejectManual:  (id: string, reason?: string)        => api.put(`/payments/${id}/reject`, reason ? { reason } : {}),
+  getAll:        ()                                   => api.get('/payments'),
+  getOne:        (id: string)                         => api.get(`/payments/${id}`),
 };
 
 export const notificationAPI = {

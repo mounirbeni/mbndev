@@ -131,6 +131,8 @@ export interface Payment {
   method?: string;
   milestoneTitle?: string;
   description?: string;
+  externalRef?: string;        // bank ref / PayPal txn ID supplied by the client as proof
+  rejectionReason?: string;    // set by admin when rejecting — shown to the client
   paidAt?: string;
   createdAt: string;
   updatedAt?: string;

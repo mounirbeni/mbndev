@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { paymentAPI } from '@/lib/api';
 import { Payment } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { CreditCard, CheckCircle, Clock, FileText, AlertTriangle, RefreshCcw, TrendingUp, DollarSign, XCircle } from 'lucide-react';
+import {
+  CreditCard, CheckCircle, Clock, FileText, AlertTriangle,
+  RefreshCcw, TrendingUp, DollarSign, XCircle, Link2, X,
+} from 'lucide-react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
@@ -16,16 +20,199 @@ const METHOD_LABELS: Record<string, string> = {
   cih_bank:   'CIH Bank',
   paypal:     'PayPal',
   taptapsend: 'TapTapSend',
-  mock:       'Mock',
+  mock:       'Mock (Test)',
 };
+
+// ─── Confirmation portal modal ────────────────────────────────────────────────
+
+interface ConfirmModalProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: (reason?: string) => void;
+  loading: boolean;
+  mode: 'approve' | 'reject';
+  payment: Payment | null;
+}
+
+function ConfirmModal({ open, onClose, onConfirm, loading, mode, payment }: ConfirmModalProps) {
+  const [reason, setReason] = useState('');
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Reset reason when modal opens
+  useEffect(() => {
+    if (open) {
+      setReason('');
+      if (mode === 'reject') setTimeout(() => inputRef.current?.focus(), 80);
+    }
+  }, [open, mode]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open, onClose]);
+
+  if (typeof window === 'undefined') return null;
+
+  const isApprove = mode === 'approve';
+  const client  = typeof payment?.client  === 'object' ? payment?.client  : null;
+  const order   = typeof payment?.order   === 'object' ? payment?.order   : null;
+  const project = typeof payment?.project === 'object' ? payment?.project : null;
+
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            animate={{ opacity: 1, scale: 1,    y: 0  }}
+            exit={{ opacity: 0,   scale: 0.94, y: 12  }}
+            transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+            className="w-full max-w-md rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+            style={{ background: '#13111C' }}
+          >
+            {/* Top accent */}
+            <div className={`h-[3px] ${isApprove
+              ? 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400'
+              : 'bg-gradient-to-r from-red-700 via-red-500 to-rose-400'}`}
+            />
+
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3 mb-5">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    isApprove ? 'bg-emerald-500/15' : 'bg-red-500/15'
+                  }`}>
+                    {isApprove
+                      ? <CheckCircle className="w-5 h-5 text-emerald-400" strokeWidth={1.8} />
+                      : <XCircle    className="w-5 h-5 text-red-400"     strokeWidth={1.8} />}
+                  </div>
+                  <div>
+                    <h2 className="text-white font-bold text-base">
+                      {isApprove ? 'Approve Payment' : 'Reject Payment'}
+                    </h2>
+                    <p className="text-slate-500 text-xs mt-0.5">
+                      {isApprove
+                        ? 'This will create the project and notify the client.'
+                        : 'The client will be notified that payment was not received.'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="text-slate-600 hover:text-slate-400 transition-colors shrink-0 mt-0.5"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Payment summary */}
+              {payment && (
+                <div className="rounded-xl border border-white/6 p-4 mb-5 space-y-2"
+                     style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Client</span>
+                    <span className="text-white font-medium">{client?.name || '—'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Order / Project</span>
+                    <span className="text-slate-300">{order?.title || project?.title || '—'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Amount</span>
+                    <span className="text-white font-bold">{formatCurrency(payment.amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Method</span>
+                    <span className="text-slate-300">{payment.method ? METHOD_LABELS[payment.method] || payment.method : 'Manual'}</span>
+                  </div>
+                  {payment.externalRef && (
+                    <div className="flex items-start justify-between text-sm gap-3">
+                      <span className="text-slate-400 shrink-0">Ref / TxID</span>
+                      <span className="text-emerald-400 font-mono text-xs break-all text-right">{payment.externalRef}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Rejection reason input */}
+              {!isApprove && (
+                <div className="mb-5">
+                  <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                    Rejection reason <span className="text-slate-600">(optional — shown to client)</span>
+                  </label>
+                  <textarea
+                    ref={inputRef}
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    maxLength={500}
+                    rows={3}
+                    placeholder="e.g. Payment reference not found in our records. Please resubmit with the correct transaction ID."
+                    className="w-full rounded-xl border border-white/10 bg-white/4 text-white text-sm px-3.5 py-2.5 resize-none placeholder-slate-600 focus:outline-none focus:border-red-500/40 transition-colors"
+                  />
+                  <div className="text-right text-xs text-slate-600 mt-1">{reason.length}/500</div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={onClose}
+                  disabled={loading}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-white/10 hover:bg-white/4 hover:text-white transition-all disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => onConfirm(reason || undefined)}
+                  disabled={loading}
+                  className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
+                    isApprove
+                      ? 'bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-900/30'
+                      : 'bg-red-600 hover:bg-red-500 shadow-lg shadow-red-900/30'
+                  }`}
+                >
+                  {loading ? (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : isApprove ? (
+                    <><CheckCircle className="w-4 h-4" /> Approve & Create Project</>
+                  ) : (
+                    <><XCircle className="w-4 h-4" /> Reject Payment</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function AdminPaymentsPage() {
   const { t } = useLanguage();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading]   = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [approving, setApproving] = useState<string | null>(null);
-  const [rejecting, setRejecting] = useState<string | null>(null);
+
+  // Modal state
+  const [modalOpen,    setModalOpen]    = useState(false);
+  const [modalMode,    setModalMode]    = useState<'approve' | 'reject'>('approve');
+  const [modalPayment, setModalPayment] = useState<Payment | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
   const fetchPayments = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -40,6 +227,7 @@ export default function AdminPaymentsPage() {
 
   useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
+  // Poll every 15 s while tab is visible
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
     const start = () => { timer = setInterval(() => fetchPayments(true), 15_000); };
@@ -50,29 +238,30 @@ export default function AdminPaymentsPage() {
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
   }, [fetchPayments]);
 
-  const handleReject = async (id: string) => {
-    setRejecting(id);
-    try {
-      await paymentAPI.rejectManual(id);
-      toast.success('Payment rejected. Client notified.');
-      fetchPayments(true);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('toast.error'));
-    } finally {
-      setRejecting(null);
-    }
+  const openModal = (pay: Payment, mode: 'approve' | 'reject') => {
+    setModalPayment(pay);
+    setModalMode(mode);
+    setModalOpen(true);
   };
 
-  const handleApprove = async (id: string) => {
-    setApproving(id);
+  const handleConfirm = async (reason?: string) => {
+    if (!modalPayment) return;
+    setModalLoading(true);
     try {
-      await paymentAPI.approveManual(id);
-      toast.success(t('toast.saved'));
+      if (modalMode === 'approve') {
+        await paymentAPI.approveManual(modalPayment._id as string);
+        toast.success('Payment approved. Project created!');
+      } else {
+        await paymentAPI.rejectManual(modalPayment._id as string, reason);
+        toast.success('Payment rejected. Client notified.');
+      }
+      setModalOpen(false);
       fetchPayments(true);
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('toast.error'));
+      const msg = err?.response?.data?.message || t('toast.error');
+      toast.error(msg);
     } finally {
-      setApproving(null);
+      setModalLoading(false);
     }
   };
 
@@ -82,6 +271,15 @@ export default function AdminPaymentsPage() {
 
   return (
     <div className="space-y-6 max-w-6xl">
+      <ConfirmModal
+        open={modalOpen}
+        onClose={() => { if (!modalLoading) setModalOpen(false); }}
+        onConfirm={handleConfirm}
+        loading={modalLoading}
+        mode={modalMode}
+        payment={modalPayment}
+      />
+
       {fetchError && (
         <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm">
           <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
@@ -120,7 +318,6 @@ export default function AdminPaymentsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Total Revenue */}
         <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
           <div className="h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500" />
           <div className="p-5 flex items-center justify-between">
@@ -134,8 +331,6 @@ export default function AdminPaymentsPage() {
             </div>
           </div>
         </div>
-
-        {/* Pending */}
         <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
           <div className="h-[3px] bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500" />
           <div className="p-5 flex items-center justify-between">
@@ -149,8 +344,6 @@ export default function AdminPaymentsPage() {
             </div>
           </div>
         </div>
-
-        {/* Total Invoices */}
         <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
           <div className="h-[3px] bg-gradient-to-r from-primary-600 via-primary-500 to-violet-500" />
           <div className="p-5 flex items-center justify-between">
@@ -200,6 +393,7 @@ export default function AdminPaymentsPage() {
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('admin.col.orderProject')}</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.col.amount')}</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('admin.col.method')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">Proof / Ref</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.status')}</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('admin.col.date')}</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('invoice.title')}</th>
@@ -224,17 +418,36 @@ export default function AdminPaymentsPage() {
                       }`}
                     >
                       <td className="p-4 text-sm text-white font-medium">{client?.name || '—'}</td>
+
                       <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">
                         {order?.title || project?.title || '—'}
                       </td>
+
                       <td className="p-4 text-sm font-semibold text-white">{formatCurrency(pay.amount)}</td>
+
                       <td className="p-4 text-sm text-slate-400 hidden md:table-cell">
                         {pay.method ? METHOD_LABELS[pay.method] || pay.method : t('admin.col.manual')}
                       </td>
+
+                      {/* Proof of payment / external reference */}
+                      <td className="p-4 hidden lg:table-cell">
+                        {pay.externalRef ? (
+                          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-lg max-w-[160px] truncate"
+                                title={pay.externalRef}>
+                            <Link2 className="w-3 h-3 shrink-0" />
+                            {pay.externalRef}
+                          </span>
+                        ) : (
+                          <span className="text-slate-700 text-xs">—</span>
+                        )}
+                      </td>
+
                       <td className="p-4"><StatusBadge status={pay.status} /></td>
+
                       <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
                         {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
                       </td>
+
                       <td className="p-4 hidden sm:table-cell">
                         <Link
                           href={`/invoice/${pay._id}`}
@@ -244,36 +457,24 @@ export default function AdminPaymentsPage() {
                           {t('common.view')}
                         </Link>
                       </td>
+
                       <td className="p-4">
                         {isVerif ? (
                           <div className="flex items-center gap-2">
                             <Button
                               size="sm"
-                              onClick={() => handleApprove(pay._id as string)}
-                              disabled={!!approving || !!rejecting}
+                              onClick={() => openModal(pay, 'approve')}
+                              disabled={modalLoading}
                             >
-                              {approving === pay._id ? (
-                                <span className="flex items-center gap-1.5">
-                                  <span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
-                                  {t('admin.approving')}
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1.5">
-                                  <CheckCircle className="w-3.5 h-3.5" />
-                                  {t('admin.approve')}
-                                </span>
-                              )}
+                              <CheckCircle className="w-3.5 h-3.5" />
+                              {t('admin.approve')}
                             </Button>
                             <button
-                              onClick={() => handleReject(pay._id as string)}
-                              disabled={!!approving || !!rejecting}
+                              onClick={() => openModal(pay, 'reject')}
+                              disabled={modalLoading}
                               className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 px-2.5 py-1.5 rounded-lg border border-red-500/25 hover:bg-red-500/10 transition-all disabled:opacity-50"
                             >
-                              {rejecting === pay._id ? (
-                                <span className="w-3 h-3 border border-red-400/40 border-t-red-400 rounded-full animate-spin" />
-                              ) : (
-                                <XCircle className="w-3.5 h-3.5" />
-                              )}
+                              <XCircle className="w-3.5 h-3.5" />
                               Not Received
                             </button>
                           </div>
