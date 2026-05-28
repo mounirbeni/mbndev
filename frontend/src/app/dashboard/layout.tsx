@@ -13,6 +13,7 @@ import Logo3D from '@/components/ui/Logo3D';
 import { SkeletonDashboard } from '@/components/ui/Skeleton';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { getInitials } from '@/lib/utils';
+import CommandPalette from '@/components/ui/CommandPalette';
 import Link from 'next/link';
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -114,8 +115,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Logo3D size="sm" />
           </Link>
 
-          {/* Right: Notification bell + Avatar (avatar tap → open NavSheet) */}
+          {/* Right: Command palette + Notification bell + Avatar */}
           <div className="flex items-center gap-2">
+            <CommandPalette />
             <NotificationBell />
             <button
               onClick={() => document.dispatchEvent(new CustomEvent('open-nav-sheet'))}
@@ -144,8 +146,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="text-slate-500 text-xs font-medium">Dashboard</span>
           </div>
 
-          {/* Right: notification bell + divider + avatar */}
+          {/* Right: command palette + notification bell + divider + avatar */}
           <div className="flex items-center gap-3">
+            <CommandPalette />
             <NotificationBell />
             <div className="w-px h-6 bg-white/8" />
             <div className="flex items-center gap-2.5">

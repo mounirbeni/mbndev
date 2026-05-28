@@ -97,6 +97,23 @@ app.use('/api/auth',  express.urlencoded({ extended: false, limit: '32kb' }));
 app.use(express.json({ limit: '256kb' }));
 app.use(express.urlencoded({ extended: true, limit: '256kb' }));
 
+// ─── Cookie parser (needed for httpOnly refresh token) ───────────────────────
+// Lightweight inline parser — avoids adding a dependency.
+app.use((req, _res, next) => {
+  req.cookies = {};
+  const raw = req.headers.cookie;
+  if (raw) {
+    for (const pair of raw.split(';')) {
+      const idx = pair.indexOf('=');
+      if (idx < 0) continue;
+      const key = pair.slice(0, idx).trim();
+      const val = pair.slice(idx + 1).trim();
+      req.cookies[key] = decodeURIComponent(val);
+    }
+  }
+  next();
+});
+
 // ─── Sanitize req.body (strip HTML tags / null bytes) ────────────────────────
 app.use(sanitizeBody);
 
@@ -139,6 +156,7 @@ app.use('/api/packages',      require('./routes/packages'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));
+app.use('/api/search',        require('./routes/search'));
 
 // ─── Health check (verifies DB + realtime stats) ─────────────────────────────
 app.get('/api/health', async (req, res) => {

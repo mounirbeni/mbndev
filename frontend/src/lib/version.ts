@@ -1,6 +1,10 @@
-import { Pencil, BookmarkCheck, CreditCard, ShieldCheck, ListChecks, Clock, StickyNote, Zap, type LucideIcon } from 'lucide-react';
+import {
+  Pencil, BookmarkCheck, CreditCard, ShieldCheck, ListChecks,
+  Clock, StickyNote, Zap, Command, Activity, RefreshCw,
+  type LucideIcon,
+} from 'lucide-react';
 
-export const APP_VERSION = '2.7.5';
+export const APP_VERSION = '3.0.0';
 
 export interface ChangeEntry {
   icon: LucideIcon;
@@ -11,6 +15,32 @@ export interface ChangeEntry {
 }
 
 export const CHANGELOG: ChangeEntry[] = [
+  {
+    icon: Command,
+    title: 'Command Palette',
+    desc: 'Press ⌘K anywhere in the dashboard to search projects, clients, orders and navigate instantly.',
+    tag: 'new',
+    href: '/dashboard/admin',
+  },
+  {
+    icon: Activity,
+    title: 'Activity Log',
+    desc: 'A live feed of every action on the platform — status changes, payments, file uploads, and more.',
+    tag: 'new',
+    href: '/dashboard/admin/activity',
+  },
+  {
+    icon: RefreshCw,
+    title: 'Refresh Token Security',
+    desc: 'Sessions now use short-lived access tokens + a secure httpOnly refresh cookie. Logins last longer without compromising security.',
+    tag: 'improved',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Silent Token Refresh',
+    desc: 'Expired access tokens are silently renewed in the background — no more surprise logouts on active sessions.',
+    tag: 'improved',
+  },
   {
     icon: ListChecks,
     title: 'Project Stage Tracker',
@@ -49,7 +79,7 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     icon: BookmarkCheck,
     title: 'Pay Later',
-    desc: 'Save your order and come back to pay when you\'re ready — no pressure to pay immediately.',
+    desc: "Save your order and come back to pay when you\'re ready.",
     tag: 'new',
     href: '/dashboard/client/orders',
   },
@@ -59,12 +89,5 @@ export const CHANGELOG: ChangeEntry[] = [
     desc: 'Once you submit a payment, the form is hidden and replaced with a status card until the admin reviews it.',
     tag: 'improved',
     href: '/dashboard/client/payments',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Account Deletion Flow',
-    desc: 'Request account deletion safely — admin confirms before anything is permanently removed.',
-    tag: 'new',
-    href: '/dashboard/client/settings',
   },
 ];

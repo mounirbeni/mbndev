@@ -11,7 +11,7 @@ import {
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
   Settings, LogOut, Users, Package, BarChart2, ShoppingBag,
-  FileText, X, ExternalLink, LayoutGrid,
+  FileText, X, ExternalLink, LayoutGrid, Activity,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -50,6 +50,7 @@ const adminSheetDef: NavItem[] = [
   { labelKey: 'dash.nav.payments',  href: '/dashboard/admin/payments',  icon: CreditCard },
   { labelKey: 'dash.nav.invoices',  href: '/dashboard/admin/invoices',  icon: FileText },
   { labelKey: 'dash.nav.analytics', href: '/dashboard/admin/analytics', icon: BarChart2 },
+  { labelKey: 'dash.nav.activity',  href: '/dashboard/admin/activity',  icon: Activity },
 ];
 
 const clientSheetDef: NavItem[] = [

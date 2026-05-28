@@ -146,6 +146,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── logout ────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
+    // Tell the server to clear the httpOnly refresh cookie
+    authAPI.logout().catch(() => {});
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     clearAuthCookie();

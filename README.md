@@ -1,94 +1,72 @@
-# MBN DEV — SaaS Platform
+# MBN Dev Platform
 
-A full-stack SaaS platform for a freelance web developer by **Mounir Banni**.
+A full-stack project management and client portal platform built to streamline the delivery of digital services. It provides a centralized space for clients to request projects, make payments, track progress, and communicate with the administration in real-time.
 
-## Tech Stack
+## 🚀 Tech Stack
 
-| Layer | Tech |
-|---|---|
-| Frontend | Next.js 14, TypeScript, Tailwind CSS, Framer Motion |
-| Backend | Node.js, Express, MongoDB, Mongoose |
-| Auth | JWT (RS256-compatible) |
-| Payments | Stripe (checkout sessions) |
-| File Upload | Multer |
+### Frontend
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS, Framer Motion
+- **Data Fetching:** Axios
+- **Real-time:** Server-Sent Events (SSE) via custom hooks
+- **Internationalization (i18n):** English, French, Arabic (with RTL support)
 
----
+### Backend
+- **Framework:** Express.js (Node.js)
+- **Database:** PostgreSQL with Prisma ORM
+- **Authentication:** JWT (JSON Web Tokens)
+- **Real-time:** In-memory Server-Sent Events (SSE)
+- **Security:** Helmet, CORS, HPP, Rate Limiting
+- **Email:** Nodemailer
 
-## Quick Start
+## 🛠️ Local Development
 
-### 1. Backend
+### Prerequisites
+- Node.js (v18+)
+- PostgreSQL Database
+- npm or yarn
+
+### Environment Variables
+You need to set up `.env` files in both the `frontend/` and `backend/` directories. Refer to the respective `.env.example` files if available, or configure database connections, JWT secrets, and port configurations.
+
+### Running the Backend
 
 ```bash
 cd backend
-cp .env.example .env       # fill in MONGO_URI, JWT_SECRET
 npm install
-npm run seed               # creates admin + demo client + packages
-npm run dev                # http://localhost:5000
+npm run db:push      # Push Prisma schema to the database
+npm run db:generate  # Generate Prisma client
+npm run seed         # Seed database with initial admin/client data
+npm run dev          # Start the development server (default: port 5000)
 ```
 
-**Demo accounts (after seeding):**
-- Admin: `admin@mbndev.com` / `admin123`
-- Client: `client@demo.com` / `client123`
+**Demo Credentials (after seeding):**
+- **Admin:** `admin@mbndev.com` / `admin123`
+- **Client:** `client@demo.com` / `client123`
 
-### 2. Frontend
+### Running the Frontend
 
 ```bash
 cd frontend
 npm install
-npm run dev                # http://localhost:3000
+npm run dev          # Start the Next.js dev server (default: port 3000)
 ```
 
----
+## 🏗️ Architecture & Features
 
-## Project Structure
+- **Monorepo-style Deployment:** Deployed together on Vercel (`vercel.json`) where `/api/*` requests are routed to the Express backend and all other requests serve the Next.js frontend.
+- **Roles & Permissions:** System separates users into `admin` and `client` roles with restricted access to specific dashboards and capabilities.
+- **Real-time Capabilities:** Implements Server-Sent Events (SSE) to push live chat messages, project status updates, and notifications without requiring page reloads.
+- **Project Lifecycle:** Tracks orders from payment to project completion: `pending → paid → in-progress → review → revision → completed | cancelled`.
+- **Custom Payment Flow:** Supports manual payment verification flows via various methods (CIH Bank, PayPal, TapTapSend).
 
-```
-mbndev/
-├── backend/
-│   └── src/
-│       ├── config/        MongoDB connection
-│       ├── controllers/   auth, projects, messages, payments, packages
-│       ├── middleware/     JWT auth guard, role guard, multer upload
-│       ├── models/         User, Project, Message, Payment, Package
-│       └── routes/         /api/auth, /api/projects, /api/messages, ...
-└── frontend/
-    └── src/
-        ├── app/           Pages (landing, auth, dashboards, request)
-        ├── components/    UI, landing, dashboard components
-        ├── contexts/      AuthContext (JWT + roles)
-        └── lib/           API client, utils
-```
+## 📄 Important Files
+- `CLAUDE.md`: Contains advanced documentation and architecture guidelines.
+- `backend/prisma/schema.prisma`: The database schema definition.
 
----
-
-## Features
-
-- **Landing Page** — hero, services, portfolio, pricing, process, testimonials, CTA
-- **JWT Auth** — register/login, admin/client roles
-- **Client Dashboard** — projects overview, messaging, payments
-- **Admin Dashboard** — manage all projects, update status/progress, clients, packages, payments
-- **Multi-Step Project Request** — 5-step smart form
-- **Messaging** — per-project real-time-ready threaded chat
-- **Stripe-Ready Payments** — checkout sessions + webhook handler
-- **File Uploads** — deliverable uploads with Multer
-
----
-
-## Deployment
-
-| Service | Platform |
-|---|---|
-| Frontend | Vercel (`vercel deploy`) |
-| Backend | Railway / Render / Fly.io |
-| Database | MongoDB Atlas |
-| Files | Cloudinary (recommended upgrade from local Multer) |
-
----
-
-## Bonus — Scalability Ideas
-
-1. **AI Project Suggestions** — use Claude API to analyze client description and suggest features/budget
-2. **WebSocket Chat** — replace polling with Socket.io for real-time messaging
-3. **Cloudinary CDN** — replace Multer disk storage with Cloudinary for file uploads
-4. **Email Notifications** — Resend/SendGrid for project status updates
-5. **Multi-currency** — Stripe supports MAD, EUR, USD natively
+## 🤝 Contributing
+1. Create a feature branch (`git checkout -b feature/my-feature`)
+2. Commit your changes (`git commit -m 'Add some feature'`)
+3. Push to the branch (`git push origin feature/my-feature`)
+4. Open a Pull Request

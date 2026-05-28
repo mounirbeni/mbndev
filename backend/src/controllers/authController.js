@@ -20,11 +20,31 @@ const APP_URL           = process.env.CLIENT_URL || 'http://localhost:3000';
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 const hashToken          = (raw) => crypto.createHash('sha256').update(raw).digest('hex');
 
+// Access token: short-lived (15 min default, overridden by JWT_EXPIRE)
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '7d' });
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '15m' });
+
+// Refresh token: long-lived (30d), stored in httpOnly cookie
+const REFRESH_TOKEN_EXPIRE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const signRefreshToken = (id) =>
+  jwt.sign({ id, type: 'refresh' }, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+
+const setRefreshCookie = (res, refreshToken) => {
+  res.cookie('mbndev_refresh', refreshToken, {
+    httpOnly:  true,
+    secure:    process.env.NODE_ENV === 'production',
+    sameSite:  'lax',
+    maxAge:    REFRESH_TOKEN_EXPIRE_MS,
+    path:      '/api/auth',
+  });
+};
 
 const sendToken = (user, statusCode, res) => {
-  const token = signToken(user.id);
+  const token        = signToken(user.id);
+  const refreshToken = signRefreshToken(user.id);
+  setRefreshCookie(res, refreshToken);
   const { password: _, ...safeUser } = user;
   res.status(statusCode).json({ success: true, token, user: fmt(safeUser) });
 };
@@ -539,4 +559,70 @@ exports.cancelDeletionRequest = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+// ─── Refresh Token ────────────────────────────────────────────────────────────
+// POST /api/auth/refresh
+// Reads the httpOnly refresh cookie and issues a new short-lived access token.
+
+exports.refresh = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies?.mbndev_refresh;
+    if (!refreshToken) {
+      return res.status(401).json({ success: false, message: 'No refresh token.', code: 'NO_REFRESH_TOKEN' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+      );
+    } catch {
+      return res.status(401).json({ success: false, message: 'Refresh token invalid or expired.', code: 'REFRESH_EXPIRED' });
+    }
+
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({ success: false, message: 'Invalid token type.', code: 'INVALID_TOKEN_TYPE' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where:  { id: decoded.id },
+      select: {
+        id: true, name: true, email: true, role: true, plan: true,
+        avatar: true, company: true, phone: true,
+        isActive: true, passwordChangedAt: true, createdAt: true, updatedAt: true,
+      },
+    });
+
+    if (!user || !user.isActive) {
+      return res.status(401).json({ success: false, message: 'User not found or deactivated.', code: 'USER_INACTIVE' });
+    }
+
+    // Invalidate tokens issued before last password change
+    if (user.passwordChangedAt) {
+      const changedAtSec = Math.floor(user.passwordChangedAt.getTime() / 1000);
+      if (decoded.iat < changedAtSec) {
+        return res.status(401).json({ success: false, message: 'Session expired. Please sign in again.', code: 'SESSION_EXPIRED' });
+      }
+    }
+
+    // Issue a new access token (and rotate the refresh cookie)
+    const newToken        = signToken(user.id);
+    const newRefreshToken = signRefreshToken(user.id);
+    setRefreshCookie(res, newRefreshToken);
+
+    res.json({ success: true, token: newToken, user: fmt(user) });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Logout ───────────────────────────────────────────────────────────────────
+// POST /api/auth/logout
+// Clears the httpOnly refresh cookie. No auth required.
+
+exports.logout = (req, res) => {
+  res.clearCookie('mbndev_refresh', { path: '/api/auth', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+  res.json({ success: true, message: 'Logged out.' });
 };

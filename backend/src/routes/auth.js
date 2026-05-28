@@ -3,6 +3,7 @@ const {
   register, login, getMe, updateProfile, deleteAccount, cancelDeletionRequest,
   forgotPassword, resetPassword,
   checkEmail, checkPhone,
+  refresh, logout,
 } = require('../controllers/authController');
 const { protect }  = require('../middleware/auth');
 const {
@@ -16,6 +17,8 @@ router.post('/register',        registerRules,        register);
 router.post('/login',           loginRules,           login);
 router.post('/forgot-password', forgotPasswordRules,  forgotPassword);
 router.post('/reset-password',  resetPasswordRules,   resetPassword);
+router.post('/refresh',                               refresh);
+router.post('/logout',                                logout);
 
 // Real-time uniqueness checks (used by the signup form while the user types)
 router.post('/check-email',     checkEmailRules,      checkEmail);

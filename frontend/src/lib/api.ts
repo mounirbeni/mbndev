@@ -3,12 +3,13 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 // ─── Axios instance ───────────────────────────────────────────────────────────
 
 const api = axios.create({
-  baseURL: '/api',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 30_000, // 30 s — matches Vercel function timeout
+  baseURL:         '/api',
+  headers:         { 'Content-Type': 'application/json' },
+  timeout:         30_000,
+  withCredentials: true, // send httpOnly refresh cookie on every request
 });
 
-// ─── Request interceptor — attach JWT ────────────────────────────────────────
+// ─── Request interceptor — attach access token ────────────────────────────────
 
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
@@ -18,9 +19,45 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// ─── Refresh-token flow ───────────────────────────────────────────────────────
+// When a 401 arrives we attempt a silent refresh ONCE via the httpOnly cookie.
+// If that succeeds we retry the original request transparently.
+// If it fails (cookie expired / not present) we fall through to the 401 handler.
+
+let _refreshPromise: Promise<string | null> | null = null;
+
+async function silentRefresh(): Promise<string | null> {
+  if (_refreshPromise) return _refreshPromise;
+
+  _refreshPromise = (async () => {
+    try {
+      const { data } = await axios.post(
+        '/api/auth/refresh',
+        {},
+        { withCredentials: true, timeout: 10_000 },
+      );
+      if (data.success && data.token) {
+        localStorage.setItem('mbndev_token', data.token);
+        if (data.user) {
+          localStorage.setItem('mbndev_user', JSON.stringify(data.user));
+          // Update role cookie for Next.js middleware
+          const maxAge = 60 * 60 * 24 * 7;
+          document.cookie = `mbndev_auth=${data.user.role}; path=/; max-age=${maxAge}; samesite=lax`;
+        }
+        return data.token as string;
+      }
+      return null;
+    } catch {
+      return null;
+    } finally {
+      _refreshPromise = null;
+    }
+  })();
+
+  return _refreshPromise;
+}
+
 // ─── 401 guard ────────────────────────────────────────────────────────────────
-// Only redirect ONCE per session. Multiple in-flight calls that all 401
-// simultaneously would otherwise each trigger a redirect.
 
 let _unauthorizedHandled = false;
 
@@ -29,24 +66,20 @@ export function resetUnauthorizedFlag() {
   _unauthorizedHandled = false;
 }
 
-function handle401(url: string) {
+function clearSessionAndRedirect(url: string) {
   if (_unauthorizedHandled) return;
-  // Never redirect during auth establishment calls
-  const isAuthCall = url?.includes('/auth/login') || url?.includes('/auth/register');
+  const isAuthCall = url?.includes('/auth/login') || url?.includes('/auth/register') || url?.includes('/auth/refresh');
   if (isAuthCall) return;
 
   _unauthorizedHandled = true;
 
-  // Clear all auth state
   if (typeof window !== 'undefined') {
     localStorage.removeItem('mbndev_token');
     localStorage.removeItem('mbndev_user');
     document.cookie = 'mbndev_auth=; path=/; max-age=0; samesite=lax';
 
     const next = encodeURIComponent(window.location.pathname + window.location.search);
-    const isPublic = /^\/(login|signup|forgot-password|reset-password|$)/.test(
-      window.location.pathname,
-    );
+    const isPublic = /^\/(login|signup|forgot-password|reset-password|$)/.test(window.location.pathname);
     if (!isPublic) {
       window.location.href = `/login?next=${next}`;
     }
@@ -54,8 +87,6 @@ function handle401(url: string) {
 }
 
 // ─── Retry logic ─────────────────────────────────────────────────────────────
-// Retry on network errors and 5xx responses, with exponential back-off.
-// Only idempotent methods are retried automatically.
 
 const RETRYABLE_METHODS   = new Set(['get', 'head', 'options', 'put', 'delete']);
 const MAX_RETRIES         = 2;
@@ -65,9 +96,7 @@ function shouldRetry(error: AxiosError, retryCount: number): boolean {
   if (retryCount >= MAX_RETRIES) return false;
   const method = error.config?.method?.toLowerCase() ?? '';
   if (!RETRYABLE_METHODS.has(method)) return false;
-  // Retry network errors (no response at all)
   if (!error.response) return true;
-  // Retry server errors (502/503/504 — transient gateway/lambda issues)
   const status = error.response.status;
   return status === 502 || status === 503 || status === 504;
 }
@@ -83,16 +112,30 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const status = error.response?.status;
     const url    = error.config?.url ?? '';
+    const config = error.config as AxiosRequestConfig & { _retryCount?: number; _refreshed?: boolean };
 
-    // 401 → clear session + redirect
-    if (status === 401 && typeof window !== 'undefined') {
-      handle401(url);
+    // 401 → try silent refresh once, then retry original request
+    if (status === 401 && typeof window !== 'undefined' && !config._refreshed) {
+      const isAuthCall = url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/refresh');
+      if (!isAuthCall) {
+        config._refreshed = true;
+        const newToken = await silentRefresh();
+        if (newToken) {
+          config.headers = { ...(config.headers ?? {}), Authorization: `Bearer ${newToken}` };
+          return api(config);
+        }
+        // Refresh failed — clear session
+        clearSessionAndRedirect(url);
+        return Promise.reject(error);
+      }
     }
 
-    // Retry transient failures
-    const config = error.config as AxiosRequestConfig & { _retryCount?: number };
-    const retryCount = config._retryCount ?? 0;
+    if (status === 401 && typeof window !== 'undefined') {
+      clearSessionAndRedirect(url);
+    }
 
+    // Retry transient 5xx / network errors
+    const retryCount = config._retryCount ?? 0;
     if (shouldRetry(error, retryCount)) {
       config._retryCount = retryCount + 1;
       const backoff = RETRY_BASE_DELAY_MS * Math.pow(2, retryCount);
@@ -107,16 +150,18 @@ api.interceptors.response.use(
 // ─── API namespaces ───────────────────────────────────────────────────────────
 
 export const authAPI = {
-  register:      (data: any)                          => api.post('/auth/register', data),
-  login:         (data: any)                          => api.post('/auth/login', data),
-  getMe:         ()                                   => api.get('/auth/me'),
-  updateProfile:  (data: any)                          => api.put('/auth/profile', data),
-  deleteAccount:        (password: string) => api.delete('/auth/account', { data: { password } }),
-  cancelDeletionRequest: ()               => api.delete('/auth/account/cancel'),
-  forgotPassword:(email: string)                      => api.post('/auth/forgot-password', { email }),
-  resetPassword: (token: string, newPassword: string) => api.post('/auth/reset-password', { token, newPassword }),
-  checkEmail:    (email: string)                      => api.post('/auth/check-email', { email }),
-  checkPhone:    (phone: string)                      => api.post('/auth/check-phone', { phone }),
+  register:              (data: any)                          => api.post('/auth/register', data),
+  login:                 (data: any)                          => api.post('/auth/login', data),
+  logout:                ()                                   => api.post('/auth/logout'),
+  refresh:               ()                                   => api.post('/auth/refresh'),
+  getMe:                 ()                                   => api.get('/auth/me'),
+  updateProfile:         (data: any)                          => api.put('/auth/profile', data),
+  deleteAccount:         (password: string)                   => api.delete('/auth/account', { data: { password } }),
+  cancelDeletionRequest: ()                                   => api.delete('/auth/account/cancel'),
+  forgotPassword:        (email: string)                      => api.post('/auth/forgot-password', { email }),
+  resetPassword:         (token: string, newPassword: string) => api.post('/auth/reset-password', { token, newPassword }),
+  checkEmail:            (email: string)                      => api.post('/auth/check-email', { email }),
+  checkPhone:            (phone: string)                      => api.post('/auth/check-phone', { phone }),
 };
 
 export const projectAPI = {
@@ -128,7 +173,7 @@ export const projectAPI = {
   uploadFile:      (id: string, formData: FormData)  =>
     api.post(`/projects/${id}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 60_000, // file uploads get a longer timeout
+      timeout: 60_000,
     }),
   getStats:        ()                                => api.get('/projects/stats'),
   generateShare:   (id: string)                      => api.post(`/projects/${id}/share`, {}),
@@ -147,11 +192,11 @@ export const orderAPI = {
 };
 
 export const messageAPI = {
-  getThreads: ()                                         => api.get('/messages/threads'),
-  get:        (projectId: string, before?: string)       =>
+  getThreads: ()                                   => api.get('/messages/threads'),
+  get:        (projectId: string, before?: string) =>
     api.get(`/messages/${projectId}`, { params: before ? { before } : {} }),
-  send:       (projectId: string, data: any)             => api.post(`/messages/${projectId}`, data),
-  getUnread:  ()                                         => api.get('/messages/unread'),
+  send:       (projectId: string, data: any)       => api.post(`/messages/${projectId}`, data),
+  getUnread:  ()                                   => api.get('/messages/unread'),
 };
 
 export const paymentAPI = {
@@ -178,15 +223,101 @@ export const packageAPI = {
 };
 
 export const adminAPI = {
-  getClients:      ()                              => api.get('/admin/clients'),
-  toggleClient:    (id: string)                    => api.put(`/admin/clients/${id}/toggle`),
-  deleteClient:    (id: string)                    => api.delete(`/admin/clients/${id}`),
-  approveDeletion: (id: string)                    => api.post(`/admin/clients/${id}/approve-deletion`),
-  rejectDeletion:  (id: string)                    => api.post(`/admin/clients/${id}/reject-deletion`),
-  saveNotes:       (id: string, notes: string)     => api.put(`/admin/clients/${id}/notes`, { notes }),
-  broadcastCount:  ()                              => api.get('/admin/broadcast-count'),
-  getAnalytics:    ()                              => api.get('/admin/analytics'),
-  broadcast:       (template = 'platformUpdate')   => api.post('/admin/broadcast', { template }),
+  getClients:      ()                          => api.get('/admin/clients'),
+  toggleClient:    (id: string)                => api.put(`/admin/clients/${id}/toggle`),
+  deleteClient:    (id: string)                => api.delete(`/admin/clients/${id}`),
+  approveDeletion: (id: string)                => api.post(`/admin/clients/${id}/approve-deletion`),
+  rejectDeletion:  (id: string)                => api.post(`/admin/clients/${id}/reject-deletion`),
+  saveNotes:       (id: string, notes: string) => api.put(`/admin/clients/${id}/notes`, { notes }),
+  broadcastCount:  ()                          => api.get('/admin/broadcast-count'),
+  getAnalytics:    ()                          => api.get('/admin/analytics'),
+  broadcast:       (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
+};
+
+export const searchAPI = {
+  global:   (q: string)    => api.get('/search', { params: { q } }),
+  activity: (params?: any) => api.get('/search/activity', { params }),
 };
 
 export default api;
+      (data: any)  => api.post('/payments/mock', data),
+  submitManual:  (data: any)  => api.post('/payments/manual', data),
+  approveManual: (id: string) => api.put(`/payments/${id}/approve`, {}),
+  rejectManual:  (id: string) => api.put(`/payments/${id}/reject`, {}),
+  getAll:        ()           => api.get('/payments'),
+  getOne:        (id: string) => api.get(`/payments/${id}`),
+};
+
+export const notificationAPI = {
+  getAll:      ()           => api.get('/notifications'),
+  getUnread:   ()           => api.get('/notifications/unread-count'),
+  markRead:    (id: string) => api.put(`/notifications/${id}/read`),
+  markAllRead: ()           => api.put('/notifications/read-all'),
+};
+
+export const packageAPI = {
+  getAll: ()                       => api.get('/packages'),
+  create: (data: any)              => api.post('/packages', data),
+  update: (id: string, data: any)  => api.put(`/packages/${id}`, data),
+  delete: (id: string)             => api.delete(`/packages/${id}`),
+};
+
+export const adminAPI = {
+  getClients:      ()                          => api.get('/admin/clients'),
+  toggleClient:    (id: string)                => api.put(`/admin/clients/${id}/toggle`),
+  deleteClient:    (id: string)                => api.delete(`/admin/clients/${id}`),
+  approveDeletion: (id: string)                => api.post(`/admin/clients/${id}/approve-deletion`),
+  rejectDeletion:  (id: string)                => api.post(`/admin/clients/${id}/reject-deletion`),
+  saveNotes:       (id: string, notes: string) => api.put(`/admin/clients/${id}/notes`, { notes }),
+  broadcastCount:  ()                          => api.get('/admin/broadcast-count'),
+  getAnalytics:    ()                          => api.get('/admin/analytics'),
+  broadcast:       (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
+};
+
+export const searchAPI = {
+  global:      (q: string)        => api.get('/search', { params: { q } }),
+  activity:    (params?: any)     => api.get('/search/activity', { params }),
+};
+
+export default api;
+(data: any)  => api.post('/payments/mock', data),
+  submitManual:  (data: any)  => api.post('/payments/manual', data),
+  approveManual: (id: string) => api.put(`/payments/${id}/approve`, {}),
+  rejectManual:  (id: string) => api.put(`/payments/${id}/reject`, {}),
+  getAll:        ()           => api.get('/payments'),
+  getOne:        (id: string) => api.get(`/payments/${id}`),
+};
+
+export const notificationAPI = {
+  getAll:      ()           => api.get('/notifications'),
+  getUnread:   ()           => api.get('/notifications/unread-count'),
+  markRead:    (id: string) => api.put(`/notifications/${id}/read`),
+  markAllRead: ()           => api.put('/notifications/read-all'),
+};
+
+export const packageAPI = {
+  getAll: ()                       => api.get('/packages'),
+  create: (data: any)              => api.post('/packages', data),
+  update: (id: string, data: any)  => api.put(`/packages/${id}`, data),
+  delete: (id: string)             => api.delete(`/packages/${id}`),
+};
+
+export const adminAPI = {
+  getClients:      ()                          => api.get('/admin/clients'),
+  toggleClient:    (id: string)                => api.put(`/admin/clients/${id}/toggle`),
+  deleteClient:    (id: string)                => api.delete(`/admin/clients/${id}`),
+  approveDeletion: (id: string)                => api.post(`/admin/clients/${id}/approve-deletion`),
+  rejectDeletion:  (id: string)                => api.post(`/admin/clients/${id}/reject-deletion`),
+  saveNotes:       (id: string, notes: string) => api.put(`/admin/clients/${id}/notes`, { notes }),
+  broadcastCount:  ()                          => api.get('/admin/broadcast-count'),
+  getAnalytics:    ()                          => api.get('/admin/analytics'),
+  broadcast:       (template = 'platformUpdate') => api.post('/admin/broadcast', { template }),
+};
+
+export const searchAPI = {
+  global:   (q: string)    => api.get('/search', { params: { q } }),
+  activity: (params?: any) => api.get('/search/activity', { params }),
+};
+
+export default api;
+ api;

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
   Settings, LogOut, Users, Package, BarChart2,
-  ChevronRight, ShoppingBag, ExternalLink, Receipt,
+  ChevronRight, ShoppingBag, ExternalLink, Receipt, Activity,
 } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,6 +31,7 @@ const adminNavDef: NavItem[] = [
   { labelKey: 'dash.nav.payments',  href: '/dashboard/admin/payments',  icon: CreditCard },
   { labelKey: 'dash.nav.invoices',  href: '/dashboard/admin/invoices',  icon: Receipt },
   { labelKey: 'dash.nav.analytics', href: '/dashboard/admin/analytics', icon: BarChart2 },
+  { labelKey: 'dash.nav.activity',  href: '/dashboard/admin/activity',  icon: Activity },
 ];
 
 const clientNavDef: NavItem[] = [
