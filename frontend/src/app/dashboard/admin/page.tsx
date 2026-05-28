@@ -171,11 +171,20 @@ export default function AdminDashboard() {
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-        className="flex items-start justify-between gap-4"
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative rounded-2xl overflow-hidden p-5 sm:p-6"
+        style={{
+          background: 'linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(59,130,246,0.04) 50%, rgba(6,182,212,0.03) 100%)',
+          border: '1px solid rgba(124,58,237,0.12)',
+          boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
+        }}
       >
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.4), rgba(168,85,247,0.3), transparent)' }} />
+        <div className="absolute inset-0 ambient-grid opacity-20 pointer-events-none" />
+
+        <div className="relative flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
             {t('admin.dashboard')}
@@ -279,6 +288,7 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+        </div>{/* closes relative flex wrapper */}
       </motion.div>
 
       {/* ── Error banner ────────────────────────────────────────────────────── */}

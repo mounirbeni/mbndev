@@ -309,51 +309,56 @@ export default function SignupPage() {
 
   return (
     <div
-      className="min-h-dvh flex flex-col bg-hero-gradient relative overflow-hidden"
-      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)' }}
+      className="min-h-dvh flex flex-col relative overflow-hidden"
+      style={{
+        background: '#08080b',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
+      }}
     >
-      {/* Background glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-primary-500/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Cinematic background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 70% 50% at 30% 30%, rgba(124,58,237,0.12) 0%, transparent 60%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 40% at 80% 70%, rgba(59,130,246,0.07) 0%, transparent 55%)' }} />
+        <div className="absolute inset-0 film-grain" />
+        <div className="absolute inset-0 ambient-grid opacity-30" />
+      </div>
+
+      {/* Top edge glow */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px pointer-events-none z-10"
+        style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.4) 50%, transparent 100%)' }}
+      />
 
       {/* Back */}
-      <div className="px-4 pt-3 pb-1">
+      <div className="relative z-10 px-5 pt-4 pb-1">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors py-2 pr-3 -ml-1 touch-target"
+          className="cin-btn-ghost"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Back</span>
+          <span>Back</span>
         </Link>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center px-4 pb-6 relative z-10">
+      <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-4 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.42, ease: 'easeOut' }}
-          className="w-full max-w-sm mx-auto"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-md mx-auto"
         >
           {/* Logo + heading */}
           <div className="text-center mb-7">
             <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
               <Logo3D size="xl" />
-              <span className="text-white font-bold text-xl">MBN DEV</span>
+              <span className="text-white font-bold text-xl tracking-tight">MBN DEV</span>
             </Link>
-            <h1 className="text-2xl font-bold text-white">{t('auth.signup.title')}</h1>
-            <p className="text-slate-400 mt-1.5 text-sm">{t('auth.signup.subtitle')}</p>
+            <h1 className="text-3xl font-black text-white tracking-tight">{t('auth.signup.title')}</h1>
+            <p className="text-slate-400 mt-2 text-sm leading-relaxed">{t('auth.signup.subtitle')}</p>
           </div>
 
           {/* Form card */}
-          <div
-            className="rounded-3xl p-5 sm:p-6"
-            style={{
-              background:           'rgba(18, 18, 22, 0.95)',
-              backdropFilter:       'blur(28px)',
-              WebkitBackdropFilter: 'blur(28px)',
-              border:               '1px solid rgba(255,255,255,0.08)',
-              boxShadow:            '0 24px 64px rgba(0,0,0,0.35)',
-            }}
-          >
+          <div className="cin-card p-5 sm:p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
 
               {/* Name */}
@@ -494,27 +499,24 @@ export default function SignupPage() {
               </div>
 
               {/* Submit */}
-              <motion.button
+              <button
                 type="submit"
                 disabled={loading || emailState.status === 'checking' || emailState.status === 'error' || phoneState.status === 'error'}
-                whileTap={{ scale: 0.985 }}
-                className="w-full flex items-center justify-center gap-2 text-white font-bold py-4 rounded-2xl transition-all mt-1 disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{
-                  background: loading ? 'rgba(124,58,237,0.5)' : '#7c3aed',
-                  boxShadow:  loading ? 'none' : '0 8px 24px rgba(124,58,237,0.35)',
-                  fontSize:   '15px',
-                }}
+                className="cin-btn-primary mt-1"
                 onClick={() => !loading && haptic('medium')}
+                style={loading ? { background: 'rgba(124,58,237,0.5)', boxShadow: 'none', cursor: 'not-allowed' } : undefined}
               >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    {t('auth.signup.submit')}
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </motion.button>
+                <span className="flex items-center gap-2">
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      {t('auth.signup.submit')}
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </span>
+              </button>
             </form>
           </div>
 
@@ -522,7 +524,7 @@ export default function SignupPage() {
             {t('auth.signup.haveAccount')}{' '}
             <Link
               href="/login"
-              className="text-primary-400 hover:text-primary-300 font-semibold transition-colors"
+              className="text-violet-400 hover:text-violet-300 font-semibold transition-colors"
             >
               {t('auth.signup.signin')}
             </Link>

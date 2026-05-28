@@ -134,33 +134,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* ── Desktop top bar ──────────────────────────────────────── */}
         <header
-          className="hidden lg:flex shrink-0 items-center justify-between px-6 py-3.5"
+          className="hidden lg:flex shrink-0 items-center justify-between px-6 py-3"
           style={{
-            background:   'rgba(8, 8, 11, 0.98)',
-            borderBottom: '1px solid rgba(255,255,255,0.065)',
+            background:   'rgba(6, 6, 10, 0.99)',
+            borderBottom: '1px solid rgba(255,255,255,0.055)',
+            boxShadow:    '0 1px 0 rgba(124,58,237,0.04)',
           }}
         >
-          {/* Left: breadcrumb indicator */}
+          {/* Left: breadcrumb */}
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary-500" />
+            <div className="w-1.5 h-1.5 rounded-full bg-violet-500" style={{ boxShadow: '0 0 6px rgba(124,58,237,0.7)' }} />
             <span className="text-slate-500 text-xs font-medium">Dashboard</span>
+            <span className="text-slate-700 text-xs">/</span>
+            <span className="text-slate-400 text-xs capitalize">{user.role}</span>
           </div>
 
-          {/* Right: command palette + notification bell + divider + avatar */}
+          {/* Right: command palette + notification + avatar */}
           <div className="flex items-center gap-3">
             <CommandPalette />
             <NotificationBell />
-            <div className="w-px h-6 bg-white/8" />
-            <div className="flex items-center gap-2.5">
+            <div className="w-px h-5 bg-white/6" />
+            <div className="flex items-center gap-2.5 cursor-default">
               <div className="text-right">
                 <div className="text-white text-sm font-semibold leading-tight">{user.name}</div>
-                <div className="text-slate-500 text-[11px] capitalize mt-0.5">{user.role}</div>
+                <div className="text-slate-600 text-[10px] capitalize mt-0.5 tracking-wide">{user.role}</div>
               </div>
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center
-                           text-white font-bold text-xs shrink-0 cursor-default
-                           ring-2 ring-primary-500/20"
-                style={{ background: 'linear-gradient(135deg,#6d28d9,#3b82f6)' }}
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shrink-0"
+                style={{
+                  background: 'linear-gradient(135deg,#7c3aed,#4f46e5)',
+                  boxShadow:  '0 0 0 2px rgba(124,58,237,0.25), 0 0 12px rgba(124,58,237,0.15)',
+                }}
               >
                 {getInitials(user.name)}
               </div>

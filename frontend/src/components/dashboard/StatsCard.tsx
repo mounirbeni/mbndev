@@ -12,54 +12,66 @@ interface StatsCardProps {
   icon: LucideIcon;
   color?: 'purple' | 'blue' | 'green' | 'yellow' | 'red' | 'cyan';
   index?: number;
-  trend?: number;        // e.g. +12 means +12%
-  trendLabel?: string;   // e.g. "vs last month"
+  trend?: number;
+  trendLabel?: string;
   href?: string;
   onClick?: () => void;
 }
 
 const colorMap = {
   purple: {
-    icon:     'bg-purple-500/18 text-purple-400',
-    iconGlow: 'shadow-[0_0_12px_rgba(168,85,247,0.25)]',
-    accent:   'from-purple-600 via-purple-500 to-violet-500',
-    border:   'hover:border-purple-500/30',
-    bg:       'hover:bg-purple-500/5',
+    icon:      'text-violet-400',
+    iconBg:    'rgba(124,58,237,0.15)',
+    iconGlow:  '0 0 16px rgba(124,58,237,0.25), 0 0 32px rgba(124,58,237,0.08)',
+    accent:    'linear-gradient(90deg, #7c3aed, #a855f7, #8b5cf6)',
+    hoverGlow: '0 0 40px rgba(124,58,237,0.08), 0 20px 60px rgba(0,0,0,0.3)',
+    hoverBorder: 'rgba(124,58,237,0.25)',
+    topLine: 'linear-gradient(90deg, #7c3aed, #a855f7)',
   },
-  blue:   {
-    icon:     'bg-blue-500/18 text-blue-400',
-    iconGlow: 'shadow-[0_0_12px_rgba(59,130,246,0.25)]',
-    accent:   'from-blue-600 via-blue-500 to-cyan-500',
-    border:   'hover:border-blue-500/30',
-    bg:       'hover:bg-blue-500/5',
+  blue: {
+    icon:      'text-blue-400',
+    iconBg:    'rgba(59,130,246,0.15)',
+    iconGlow:  '0 0 16px rgba(59,130,246,0.25), 0 0 32px rgba(59,130,246,0.08)',
+    accent:    'linear-gradient(90deg, #1d4ed8, #3b82f6, #60a5fa)',
+    hoverGlow: '0 0 40px rgba(59,130,246,0.08), 0 20px 60px rgba(0,0,0,0.3)',
+    hoverBorder: 'rgba(59,130,246,0.25)',
+    topLine: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
   },
-  green:  {
-    icon:     'bg-green-500/18 text-green-400',
-    iconGlow: 'shadow-[0_0_12px_rgba(34,197,94,0.25)]',
-    accent:   'from-green-600 via-emerald-500 to-teal-500',
-    border:   'hover:border-green-500/30',
-    bg:       'hover:bg-green-500/5',
+  green: {
+    icon:      'text-emerald-400',
+    iconBg:    'rgba(16,185,129,0.12)',
+    iconGlow:  '0 0 16px rgba(16,185,129,0.2), 0 0 32px rgba(16,185,129,0.07)',
+    accent:    'linear-gradient(90deg, #059669, #10b981, #34d399)',
+    hoverGlow: '0 0 40px rgba(16,185,129,0.07), 0 20px 60px rgba(0,0,0,0.3)',
+    hoverBorder: 'rgba(16,185,129,0.25)',
+    topLine: 'linear-gradient(90deg, #10b981, #34d399)',
   },
   yellow: {
-    icon:     'bg-amber-500/18 text-amber-400',
-    iconGlow: 'shadow-[0_0_12px_rgba(245,158,11,0.25)]',
-    accent:   'from-amber-600 via-amber-500 to-yellow-500',
-    border:   'hover:border-amber-500/30',
-    bg:       'hover:bg-amber-500/5',
+    icon:      'text-amber-400',
+    iconBg:    'rgba(245,158,11,0.12)',
+    iconGlow:  '0 0 16px rgba(245,158,11,0.2), 0 0 32px rgba(245,158,11,0.07)',
+    accent:    'linear-gradient(90deg, #d97706, #f59e0b, #fbbf24)',
+    hoverGlow: '0 0 40px rgba(245,158,11,0.07), 0 20px 60px rgba(0,0,0,0.3)',
+    hoverBorder: 'rgba(245,158,11,0.25)',
+    topLine: 'linear-gradient(90deg, #f59e0b, #fbbf24)',
   },
-  red:    {
-    icon:     'bg-red-500/18 text-red-400',
-    iconGlow: 'shadow-[0_0_12px_rgba(239,68,68,0.25)]',
-    accent:   'from-red-600 via-red-500 to-rose-500',
-    border:   'hover:border-red-500/30',
-    bg:       'hover:bg-red-500/5',
+  red: {
+    icon:      'text-red-400',
+    iconBg:    'rgba(239,68,68,0.12)',
+    iconGlow:  '0 0 16px rgba(239,68,68,0.2), 0 0 32px rgba(239,68,68,0.07)',
+    accent:    'linear-gradient(90deg, #dc2626, #ef4444, #f87171)',
+    hoverGlow: '0 0 40px rgba(239,68,68,0.07), 0 20px 60px rgba(0,0,0,0.3)',
+    hoverBorder: 'rgba(239,68,68,0.25)',
+    topLine: 'linear-gradient(90deg, #ef4444, #f87171)',
   },
-  cyan:   {
-    icon:     'bg-cyan-500/18 text-cyan-400',
-    iconGlow: 'shadow-[0_0_12px_rgba(6,182,212,0.25)]',
-    accent:   'from-cyan-600 via-cyan-500 to-teal-500',
-    border:   'hover:border-cyan-500/30',
-    bg:       'hover:bg-cyan-500/5',
+  cyan: {
+    icon:      'text-cyan-400',
+    iconBg:    'rgba(6,182,212,0.12)',
+    iconGlow:  '0 0 16px rgba(6,182,212,0.2), 0 0 32px rgba(6,182,212,0.07)',
+    accent:    'linear-gradient(90deg, #0891b2, #06b6d4, #67e8f9)',
+    hoverGlow: '0 0 40px rgba(6,182,212,0.07), 0 20px 60px rgba(0,0,0,0.3)',
+    hoverBorder: 'rgba(6,182,212,0.25)',
+    topLine: 'linear-gradient(90deg, #06b6d4, #67e8f9)',
   },
 };
 
@@ -82,30 +94,57 @@ const StatsCard = memo(function StatsCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07, type: 'spring', stiffness: 260, damping: 24 }}
+      transition={{ delay: index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       onClick={onClick}
       className={cn(
-        'relative glass rounded-2xl border border-white/6 overflow-hidden',
-        'transition-all duration-200',
-        c.border, c.bg,
+        'relative overflow-hidden rounded-2xl cursor-default group',
         onClick && 'cursor-pointer press-scale',
       )}
+      style={{
+        background:   'rgba(10,10,16,0.92)',
+        border:       '1px solid rgba(255,255,255,0.065)',
+        backdropFilter: 'blur(24px)',
+        boxShadow:    '0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 50px rgba(0,0,0,0.35)',
+        transition:   'border-color 0.3s ease, box-shadow 0.3s ease',
+      }}
+      onMouseEnter={e => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = c.hoverBorder;
+        el.style.boxShadow   = c.hoverGlow;
+      }}
+      onMouseLeave={e => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = 'rgba(255,255,255,0.065)';
+        el.style.boxShadow   = '0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 50px rgba(0,0,0,0.35)';
+      }}
     >
-      {/* Colored accent top bar */}
-      <div className={cn('h-[3px] w-full bg-gradient-to-r', c.accent)} />
+      {/* Colored accent bar at top */}
+      <div
+        className="h-[2px] w-full"
+        style={{ background: c.accent }}
+      />
 
-      <div className="p-4 sm:p-5">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <p className="text-slate-400 text-xs sm:text-[13px] font-medium leading-tight">
+      {/* Subtle top-edge internal glow */}
+      <div
+        className="absolute top-0 left-0 right-0 h-16 pointer-events-none opacity-40"
+        style={{ background: `radial-gradient(ellipse 60% 100% at 50% 0%, ${c.iconBg.replace('0.15', '0.5').replace('0.12', '0.4')}, transparent)` }}
+      />
+
+      <div className="p-4 sm:p-5 relative z-10">
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <p className="text-slate-400 text-xs sm:text-[13px] font-medium leading-tight mt-0.5">
             {title}
           </p>
-          <div className={cn(
-            'w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0',
-            c.icon, c.iconGlow
-          )}>
-            <Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.8} />
+          <div
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105"
+            style={{
+              background: c.iconBg,
+              boxShadow:  c.iconGlow,
+            }}
+          >
+            <Icon className={cn('w-[18px] h-[18px] sm:w-5 sm:h-5', c.icon)} strokeWidth={1.8} />
           </div>
         </div>
 
@@ -115,25 +154,28 @@ const StatsCard = memo(function StatsCard({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-          className="text-2xl sm:text-[28px] font-black text-white leading-none mb-1.5 tabular-nums"
+          className="text-[26px] sm:text-[30px] font-black text-white leading-none mb-2 tabular-nums"
         >
           {value}
         </motion.p>
 
-        {/* Subtitle / trend */}
+        {/* Subtitle / trend row */}
         <div className="flex items-center justify-between gap-2">
           {subtitle && (
             <p className="text-slate-600 text-[11px] hidden sm:block truncate">{subtitle}</p>
           )}
           {trend !== undefined && (
             <div className={cn(
-              'flex items-center gap-1 text-[11px] font-semibold shrink-0',
-              trendNeutral  ? 'text-slate-500' :
-              trendPositive ? 'text-emerald-400' : 'text-red-400'
+              'flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0',
+              trendNeutral
+                ? 'text-slate-500 bg-white/4'
+                : trendPositive
+                ? 'text-emerald-400 bg-emerald-500/10'
+                : 'text-red-400 bg-red-500/10'
             )}>
               <TrendIcon className="w-3 h-3" />
               {!trendNeutral && `${trendPositive ? '+' : ''}${trend}%`}
-              {trendLabel && <span className="text-slate-600 font-normal ml-0.5">{trendLabel}</span>}
+              {trendLabel && <span className="text-slate-600 font-normal ml-0.5 hidden sm:inline">{trendLabel}</span>}
             </div>
           )}
         </div>

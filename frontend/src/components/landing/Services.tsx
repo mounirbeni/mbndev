@@ -138,8 +138,13 @@ export default function Services() {
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] rounded-full bg-violet-500/4 blur-[120px]" />
-        <div className="absolute inset-0 ambient-grid opacity-40" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full blur-[140px]"
+          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.07) 0%, transparent 70%)' }} />
+        <div className="absolute top-0 left-0 right-0 h-px"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.2) 30%, rgba(168,85,247,0.3) 50%, rgba(59,130,246,0.2) 70%, transparent)' }} />
+        <div className="absolute bottom-0 left-0 right-0 h-px"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.04) 50%, transparent)' }} />
+        <div className="absolute inset-0 ambient-grid opacity-30" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">

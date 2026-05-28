@@ -67,10 +67,13 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t border-white/5 bg-dark-200">
+    <footer className="relative overflow-hidden" style={{ background: 'rgba(4, 4, 8, 0.99)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      {/* Footer ambient glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-32 pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.07) 0%, transparent 70%)' }} />
+      <div className="absolute inset-0 ambient-grid opacity-15 pointer-events-none" />
 
       {/* ── Payment + trust row ──────────────────────────────────────────── */}
-      <div className="border-b border-white/5">
+      <div className="border-b border-white/4 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
 
@@ -106,7 +109,7 @@ export default function Footer() {
       </div>
 
       {/* ── Main grid ───────────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 relative z-10">
         <div className="grid lg:grid-cols-4 gap-10">
 
           {/* Brand */}
@@ -193,7 +196,9 @@ export default function Footer() {
       </div>
 
       {/* ── Bottom bar ──────────────────────────────────────────────────── */}
-      <div className="border-t border-white/5">
+      <div className="border-t border-white/4 relative z-10">
+        {/* Bottom glow line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.3) 50%, transparent)' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="text-slate-600 text-xs">
             © {new Date().getFullYear()} MBN DEV. {t('footer.rights')}

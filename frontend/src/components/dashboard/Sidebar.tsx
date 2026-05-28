@@ -61,13 +61,20 @@ export default function Sidebar() {
 
   return (
     <div
-      className="flex flex-col h-full select-none w-64 border-r border-white/6"
+      className="flex flex-col h-full select-none w-64 relative"
       style={{
-        background:          'rgba(8, 8, 11, 0.98)',
+        background:          'rgba(5, 5, 9, 0.99)',
         backdropFilter:      'blur(40px)',
         WebkitBackdropFilter:'blur(40px)',
+        borderRight:         '1px solid rgba(255,255,255,0.05)',
+        boxShadow:           '1px 0 0 rgba(124,58,237,0.04)',
       }}
     >
+      {/* Sidebar ambient glow */}
+      <div
+        className="absolute top-0 left-0 right-0 h-64 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 80% 100% at 50% 0%, rgba(124,58,237,0.07) 0%, transparent 70%)' }}
+      />
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div
         className="px-4 flex items-center justify-between border-b border-white/6 shrink-0"

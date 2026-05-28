@@ -139,47 +139,60 @@ export default function ClientDashboard() {
 
       {/* ── Header ────────────────────────────────────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-        className="flex flex-col sm:flex-row sm:items-start justify-between gap-4"
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative rounded-2xl overflow-hidden p-5 sm:p-6"
+        style={{
+          background: 'linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(59,130,246,0.04) 50%, rgba(6,182,212,0.03) 100%)',
+          border: '1px solid rgba(124,58,237,0.12)',
+          boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
+        }}
       >
-        <div>
-          <div className="flex items-center gap-2.5 mb-1 flex-wrap">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              {greeting}, {firstName}
-            </h1>
-            {user?.plan && <PlanBadge plan={user.plan} size="md" />}
-          </div>
-          <p className="text-slate-400 text-sm">
-            {projects.length === 0
-              ? 'Ready to build something great? Start your first project.'
-              : inProgress > 0
-                ? `You have ${inProgress} active project${inProgress > 1 ? 's' : ''} in progress.`
-                : 'All projects are up to date — great work!'}
-          </p>
-        </div>
+        {/* Subtle top beam */}
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.4), rgba(168,85,247,0.3), transparent)' }} />
+        {/* Background pattern */}
+        <div className="absolute inset-0 ambient-grid opacity-20 pointer-events-none" />
 
-        <div className="flex items-center gap-2 sm:shrink-0">
-          {unread > 0 && (
-            <Link href="/dashboard/client/messages">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-500/15 border border-primary-500/30
-                           text-primary-400 text-xs font-semibold hover:bg-primary-500/22 transition-colors"
-              >
-                <Bell className="w-3.5 h-3.5" />
-                {unread} new
-              </motion.div>
+        <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {greeting},{' '}
+                <span className="gradient-text-animated">{firstName}</span>
+              </h1>
+              {user?.plan && <PlanBadge plan={user.plan} size="md" />}
+            </div>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              {projects.length === 0
+                ? 'Ready to build something great? Start your first project.'
+                : inProgress > 0
+                  ? `You have ${inProgress} active project${inProgress > 1 ? 's' : ''} in progress.`
+                  : 'All projects are up to date — great work!'}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 sm:shrink-0">
+            {unread > 0 && (
+              <Link href="/dashboard/client/messages">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-500/15 border border-violet-500/30
+                             text-violet-300 text-xs font-semibold hover:bg-violet-500/22 transition-colors"
+                >
+                  <Bell className="w-3.5 h-3.5" />
+                  {unread} new
+                </motion.div>
+              </Link>
+            )}
+            <Link href="/request" className="hidden sm:block">
+              <Button size="md">
+                <Plus className="w-4 h-4" />
+                New Project
+              </Button>
             </Link>
-          )}
-          <Link href="/request" className="hidden sm:block">
-            <Button size="md">
-              <Plus className="w-4 h-4" />
-              New Project
-            </Button>
-          </Link>
+          </div>
         </div>
       </motion.div>
 

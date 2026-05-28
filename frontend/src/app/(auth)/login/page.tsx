@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Mail, Lock, ArrowRight, Eye, EyeOff, ChevronLeft,
-  AlertCircle, ShieldAlert, Loader2, XCircle,
+  AlertCircle, ShieldAlert, Loader2, XCircle, Sparkles,
+  CheckCircle2, Globe2, Zap, Shield,
 } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import toast from 'react-hot-toast';
@@ -116,6 +117,162 @@ function ErrorBanner({
   );
 }
 
+// ─── Left panel — cinematic visual story ─────────────────────────────────────
+
+function LeftPanel() {
+  const features = [
+    { icon: Zap,          label: 'Lightning Fast',    desc: 'Optimized for speed & performance' },
+    { icon: Shield,       label: 'Fully Secure',      desc: 'Enterprise-grade security protocols' },
+    { icon: Globe2,       label: 'Global Delivery',   desc: 'Deployed worldwide on edge network' },
+    { icon: CheckCircle2, label: '100% Satisfaction', desc: 'Guaranteed on every project' },
+  ];
+
+  return (
+    <div className="hidden lg:flex flex-col relative overflow-hidden bg-[#050508]">
+      {/* Deep background gradient */}
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 70% 60% at 30% 50%, rgba(124,58,237,0.18) 0%, transparent 65%)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 50% 40% at 80% 20%, rgba(59,130,246,0.1) 0%, transparent 55%)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 40% 30% at 70% 85%, rgba(6,182,212,0.07) 0%, transparent 50%)',
+          }}
+        />
+      </div>
+
+      {/* Ambient grid */}
+      <div className="absolute inset-0 ambient-grid opacity-40" />
+      {/* Film grain */}
+      <div className="absolute inset-0 film-grain" />
+
+      {/* Top glow line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(168,85,247,0.7), transparent)' }}
+      />
+
+      {/* Right edge vertical separator */}
+      <div className="absolute right-0 top-0 bottom-0 vertical-glow" />
+
+      {/* Floating orbs */}
+      <motion.div
+        className="absolute top-1/4 left-1/3 w-64 h-64 rounded-full pointer-events-none"
+        style={{ background: 'rgba(124,58,237,0.12)', filter: 'blur(80px)' }}
+        animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute bottom-1/3 right-1/4 w-48 h-48 rounded-full pointer-events-none"
+        style={{ background: 'rgba(59,130,246,0.09)', filter: 'blur(60px)' }}
+        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.9, 0.5] }}
+        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-col h-full px-12 py-16 justify-between">
+
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center gap-3"
+        >
+          <Logo3D size="md" />
+          <span className="text-white font-bold text-lg tracking-tight">MBN DEV</span>
+        </motion.div>
+
+        {/* Center hero text */}
+        <div className="flex flex-col gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="cin-chip mb-5">
+              <Sparkles className="w-3 h-3" />
+              Premium Web Studio
+            </div>
+            <h2 className="text-4xl xl:text-[2.8rem] font-black text-white leading-[1.1] tracking-tight mb-4">
+              Build the digital<br />
+              future with{' '}
+              <span className="gradient-text-animated">confidence</span>
+            </h2>
+            <p className="text-slate-400 text-base leading-relaxed max-w-sm">
+              Welcome back. Your projects, payments, and progress — all in one premium workspace.
+            </p>
+          </motion.div>
+
+          {/* Feature list */}
+          <div className="space-y-4">
+            {features.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <motion.div
+                  key={f.label}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex items-center gap-3.5 group"
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 icon-glow-purple transition-transform duration-200 group-hover:scale-105">
+                    <Icon className="w-4.5 h-4.5 text-violet-400" strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{f.label}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{f.desc}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Bottom stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center gap-8"
+        >
+          {[
+            { val: '34+', label: 'Clients' },
+            { val: '98%', label: 'On Time' },
+            { val: '5.0', label: 'Rating' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div className="text-xl font-black text-white tabular">{s.val}</div>
+              <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
+            </div>
+          ))}
+          <div className="w-px h-8 bg-white/8" />
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-green-500/10 border border-green-500/20 rounded-full px-2.5 py-1">
+              <span className="relative flex w-1.5 h-1.5">
+                <span className="live-badge-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-green-400" />
+              </span>
+              <span className="text-green-400 text-xs font-semibold">System Live</span>
+            </div>
+          </div>
+        </motion.div>
+
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
@@ -125,13 +282,11 @@ export default function LoginPage() {
   const [loading,      setLoading]      = useState(false);
   const [mounted,      setMounted]      = useState(false);
 
-  // Error state
   const [errorCode,    setErrorCode]    = useState<ErrorCode>(null);
   const [errorMsg,     setErrorMsg]     = useState('');
   const [attemptsLeft, setAttemptsLeft] = useState<number | undefined>();
   const [remainingMs,  setRemainingMs]  = useState<number | undefined>();
 
-  // Field-level errors
   const [emailErr,  setEmailErr]  = useState('');
   const [passErr,   setPassErr]   = useState('');
 
@@ -160,15 +315,9 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Client-side quick validation
     if (!email.trim()) { setEmailErr('Email is required.'); return; }
     if (!password)     { setPassErr('Password is required.'); return; }
-
-    if (isLocked) {
-      haptic('error');
-      return toast.error('Account is temporarily locked. Please wait.');
-    }
+    if (isLocked) { haptic('error'); return toast.error('Account is temporarily locked. Please wait.'); }
 
     clearErrors();
     setLoading(true);
@@ -185,7 +334,6 @@ export default function LoginPage() {
       const data = err?.response?.data;
       const code = (data?.code ?? null) as ErrorCode;
       const msg  = data?.message || t('toast.invalidCreds');
-
       setErrorCode(code);
       setErrorMsg(msg);
       setAttemptsLeft(data?.attemptsLeft);
@@ -195,183 +343,229 @@ export default function LoginPage() {
     }
   };
 
-  const fieldBorder = (hasErr: boolean) =>
-    hasErr ? 'rgba(239,68,68,0.6)' : 'rgba(255,255,255,0.08)';
+  const fieldStyle = (hasErr: boolean, focused = false) => ({
+    background:    focused ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
+    border:        `1.5px solid ${hasErr ? 'rgba(239,68,68,0.55)' : focused ? 'rgba(124,58,237,0.55)' : 'rgba(255,255,255,0.08)'}`,
+    borderRadius:  '14px',
+    outline:       'none',
+    color:         '#fff',
+    fontSize:      '15px',
+    boxShadow:     focused && !hasErr ? '0 0 0 3px rgba(124,58,237,0.1)' : 'none',
+    transition:    'border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+  });
+
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passFocused,  setPassFocused]  = useState(false);
 
   return (
     <div
-      className="min-h-dvh flex flex-col bg-hero-gradient relative overflow-hidden"
-      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)' }}
+      className="min-h-dvh flex overflow-hidden"
+      style={{
+        background: '#08080b',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
+      }}
     >
-      {/* Background glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-primary-500/10 rounded-full blur-[120px] pointer-events-none" />
-
-      {/* Back */}
-      <div className="px-4 pt-3 pb-1">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors py-2 pr-3 -ml-1 touch-target"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Back</span>
-        </Link>
+      {/* ── Left visual panel (desktop only) ──────────────────────────── */}
+      <div className="hidden lg:block w-[46%] shrink-0">
+        <div className="sticky top-0 h-dvh">
+          <LeftPanel />
+        </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center px-4 pb-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.42, ease: 'easeOut' }}
-          className="w-full max-w-sm mx-auto"
-        >
-          {/* Logo + heading */}
-          <div className="text-center mb-7">
-            <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
-              <Logo3D size="xl" />
-              <span className="text-white font-bold text-xl">MBN DEV</span>
-            </Link>
-            <h1 className="text-2xl font-bold text-white">{t('auth.login.title')}</h1>
-            <p className="text-slate-400 mt-1.5 text-sm">{t('auth.login.subtitleShort')}</p>
-          </div>
+      {/* ── Right form panel ─────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-h-dvh relative overflow-hidden">
 
-          {/* Form card */}
-          <div
-            className="rounded-3xl p-5 sm:p-6"
-            style={{
-              background:           'rgba(18, 18, 22, 0.95)',
-              backdropFilter:       'blur(28px)',
-              WebkitBackdropFilter: 'blur(28px)',
-              border:               '1px solid rgba(255,255,255,0.08)',
-              boxShadow:            '0 24px 64px rgba(0,0,0,0.35)',
-            }}
+        {/* Mobile background */}
+        <div className="lg:hidden absolute inset-0 pointer-events-none">
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 50% at 50% 20%, rgba(124,58,237,0.12) 0%, transparent 65%)' }} />
+          <div className="absolute inset-0 film-grain" />
+        </div>
+
+        {/* Top edge glow line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-px pointer-events-none z-10"
+          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.4) 50%, transparent 100%)' }}
+        />
+
+        {/* Back button */}
+        <div className="relative z-10 px-5 pt-4 pb-1">
+          <Link
+            href="/"
+            className="cin-btn-ghost"
           >
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <ChevronLeft className="w-4 h-4" />
+            <span>Back</span>
+          </Link>
+        </div>
 
-              {/* Inline error banner */}
-              {errorMsg && (
-                <ErrorBanner
-                  code={errorCode}
-                  message={errorMsg}
-                  attemptsLeft={attemptsLeft}
-                  remainingMs={remainingMs}
-                />
-              )}
+        {/* Form area */}
+        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-6 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-md mx-auto lg:mx-0 lg:max-w-sm"
+          >
+            {/* Mobile logo */}
+            <div className="lg:hidden text-center mb-8">
+              <Link href="/" className="inline-flex items-center gap-2.5 mb-5">
+                <Logo3D size="xl" />
+                <span className="text-white font-bold text-xl">MBN DEV</span>
+              </Link>
+            </div>
 
-              {/* Email */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
-                  {t('auth.field.email')}
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => { setEmail(e.target.value); clearErrors(); }}
-                    placeholder={t('auth.placeholder.email')}
-                    autoComplete="email"
-                    inputMode="email"
-                    required
-                    className="w-full rounded-2xl pl-11 pr-4 py-3.5 text-[15px] text-white placeholder:text-slate-600 transition-all"
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border:     `1.5px solid ${fieldBorder(!!emailErr)}`,
-                      outline:    'none',
-                    }}
-                    onFocus={e  => { e.currentTarget.style.borderColor = 'rgba(124,58,237,0.5)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
-                    onBlur={e   => { e.currentTarget.style.borderColor = fieldBorder(!!emailErr); e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            {/* Heading */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-black text-white tracking-tight mb-2">
+                {t('auth.login.title')}
+              </h1>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                {t('auth.login.subtitleShort')}
+              </p>
+            </div>
+
+            {/* Card */}
+            <div className="cin-card p-6 sm:p-7">
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+
+                {errorMsg && (
+                  <ErrorBanner
+                    code={errorCode}
+                    message={errorMsg}
+                    attemptsLeft={attemptsLeft}
+                    remainingMs={remainingMs}
                   />
-                </div>
-                {emailErr && (
-                  <p className="text-[11px] mt-1.5 font-medium text-red-400">{emailErr}</p>
                 )}
-              </div>
 
-              {/* Password */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
-                  {t('auth.field.password')}
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                  <input
-                    type={showPw ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => { setPassword(e.target.value); clearErrors(); }}
-                    placeholder={t('auth.placeholder.passwordDots')}
-                    autoComplete="current-password"
-                    required
-                    className="w-full rounded-2xl pl-11 pr-12 py-3.5 text-[15px] text-white placeholder:text-slate-600 transition-all"
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border:     `1.5px solid ${fieldBorder(!!passErr)}`,
-                      outline:    'none',
-                    }}
-                    onFocus={e  => { e.currentTarget.style.borderColor = 'rgba(124,58,237,0.5)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
-                    onBlur={e   => { e.currentTarget.style.borderColor = fieldBorder(!!passErr); e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-slate-300 transition-colors touch-target"
-                    aria-label={showPw ? 'Hide password' : 'Show password'}
-                  >
-                    {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+                {/* Email */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-widest">
+                    {t('auth.field.email')}
+                  </label>
+                  <div className="relative">
+                    <Mail
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors duration-200"
+                      style={{ color: emailFocused ? '#a855f7' : emailErr ? '#f87171' : '#64748b' }}
+                    />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); clearErrors(); }}
+                      placeholder={t('auth.placeholder.email')}
+                      autoComplete="email"
+                      inputMode="email"
+                      required
+                      className="w-full pl-11 pr-4 py-3.5"
+                      style={fieldStyle(!!emailErr, emailFocused)}
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={()  => setEmailFocused(false)}
+                    />
+                  </div>
+                  {emailErr && (
+                    <p className="text-[11px] mt-1.5 font-medium text-red-400 flex items-center gap-1">
+                      <XCircle className="w-3 h-3" />{emailErr}
+                    </p>
+                  )}
                 </div>
-                {passErr && (
-                  <p className="text-[11px] mt-1.5 font-medium text-red-400">{passErr}</p>
-                )}
-                <div className="flex justify-end mt-2">
-                  <Link
-                    href="/forgot-password"
-                    className="text-xs text-slate-500 hover:text-primary-400 transition-colors py-1"
-                  >
-                    {t('auth.login.forgot')}
-                  </Link>
-                </div>
-              </div>
 
-              {/* Submit */}
-              <motion.button
-                type="submit"
-                disabled={loading || isLocked}
-                whileTap={{ scale: 0.985 }}
-                className="w-full flex items-center justify-center gap-2 text-white font-bold py-4 rounded-2xl transition-all press-scale mt-1 disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{
-                  background: isLocked ? 'rgba(239,68,68,0.4)' : loading ? 'rgba(124,58,237,0.5)' : '#7c3aed',
-                  boxShadow:  loading || isLocked ? 'none' : '0 8px 24px rgba(124,58,237,0.35)',
-                  fontSize:   '15px',
-                }}
-                onClick={() => !loading && !isLocked && haptic('medium')}
+                {/* Password */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-widest">
+                    {t('auth.field.password')}
+                  </label>
+                  <div className="relative">
+                    <Lock
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors duration-200"
+                      style={{ color: passFocused ? '#a855f7' : passErr ? '#f87171' : '#64748b' }}
+                    />
+                    <input
+                      type={showPw ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); clearErrors(); }}
+                      placeholder={t('auth.placeholder.passwordDots')}
+                      autoComplete="current-password"
+                      required
+                      className="w-full pl-11 pr-12 py-3.5"
+                      style={fieldStyle(!!passErr, passFocused)}
+                      onFocus={() => setPassFocused(true)}
+                      onBlur={()  => setPassFocused(false)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPw(!showPw)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-slate-300 transition-colors touch-target"
+                      aria-label={showPw ? 'Hide password' : 'Show password'}
+                    >
+                      {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {passErr && (
+                    <p className="text-[11px] mt-1.5 font-medium text-red-400 flex items-center gap-1">
+                      <XCircle className="w-3 h-3" />{passErr}
+                    </p>
+                  )}
+                  <div className="flex justify-end mt-2.5">
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs text-slate-500 hover:text-violet-400 transition-colors py-1 font-medium"
+                    >
+                      {t('auth.login.forgot')}
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={loading || isLocked}
+                  onClick={() => !loading && !isLocked && haptic('medium')}
+                  className="cin-btn-primary mt-1"
+                  style={
+                    isLocked
+                      ? { background: 'rgba(239,68,68,0.4)', boxShadow: 'none' }
+                      : loading
+                      ? { background: 'rgba(124,58,237,0.5)', boxShadow: 'none', cursor: 'not-allowed' }
+                      : undefined
+                  }
+                >
+                  <span className="flex items-center gap-2">
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : isLocked ? (
+                      <>
+                        <ShieldAlert className="w-4 h-4" />
+                        Account Locked
+                      </>
+                    ) : (
+                      <>
+                        {t('auth.login.submit')}
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </span>
+                </button>
+              </form>
+            </div>
+
+            {/* Sign up link */}
+            <p className="text-center text-slate-500 text-sm mt-6">
+              {t('auth.login.noAccount')}{' '}
+              <Link
+                href="/signup"
+                className="text-violet-400 hover:text-violet-300 font-semibold transition-colors"
               >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : isLocked ? (
-                  <>
-                    <ShieldAlert className="w-4 h-4" />
-                    Account Locked
-                  </>
-                ) : (
-                  <>
-                    {t('auth.login.submit')}
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </motion.button>
-            </form>
-          </div>
+                {t('auth.login.signupFree')}
+              </Link>
+            </p>
 
-          <p className="text-center text-slate-500 text-sm mt-5">
-            {t('auth.login.noAccount')}{' '}
-            <Link
-              href="/signup"
-              className="text-primary-400 hover:text-primary-300 font-semibold transition-colors"
-            >
-              {t('auth.login.signupFree')}
-            </Link>
-          </p>
-        </motion.div>
+            {/* Security note */}
+            <div className="flex items-center justify-center gap-2 mt-5">
+              <Shield className="w-3 h-3 text-slate-600" />
+              <p className="text-xs text-slate-600">256-bit SSL encryption · Zero data sharing</p>
+            </div>
+
+          </motion.div>
+        </div>
       </div>
     </div>
   );
