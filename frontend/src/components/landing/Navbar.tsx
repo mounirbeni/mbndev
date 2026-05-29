@@ -5,10 +5,18 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo3D from '@/components/ui/Logo3D';
-import { Home, Briefcase, FolderOpen, DollarSign, Info, Mail, ArrowRight } from 'lucide-react';
-import Button from '@/components/ui/Button';
+import { ArrowUpRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+const navLinks = [
+  { label: 'Services',  href: '/services'  },
+  { label: 'Work',      href: '/portfolio'  },
+  { label: 'Process',   href: '/#process'   },
+  { label: 'About',     href: '/about'      },
+  { label: 'Pricing',   href: '/pricing'    },
+  { label: 'Insights',  href: '/insights'   },
+];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -16,27 +24,14 @@ export default function Navbar() {
   const [mounted,  setMounted]  = useState(false);
   const prevScrollY = useRef(0);
 
-  const { user }  = useAuth();
-  const { t }     = useLanguage();
-  const pathname  = usePathname();
+  const { user } = useAuth();
+  const pathname = usePathname();
   const { scrollY } = useScroll();
-
-  const navLinks = [
-    { label: t('nav.home'),      href: '/',          icon: Home },
-    { label: t('nav.services'),  href: '/services',  icon: Briefcase },
-    { label: t('nav.portfolio'), href: '/portfolio', icon: FolderOpen },
-    { label: t('nav.pricing'),   href: '/pricing',   icon: DollarSign },
-    { label: t('nav.about'),     href: '/about',     icon: Info },
-    { label: t('nav.contact'),   href: '/contact',   icon: Mail },
-  ];
 
   useEffect(() => { setMounted(true); }, []);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
-    const isScrolled = latest > 30;
-    setScrolled(isScrolled);
-
-    // Hide on scroll down, show on scroll up
+    setScrolled(latest > 30);
     if (latest > 80) {
       setHidden(latest > prevScrollY.current && latest > 160);
     } else {
@@ -46,7 +41,7 @@ export default function Navbar() {
   });
 
   const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+    href === '/' ? pathname === '/' : pathname.startsWith(href.replace('/#', '/'));
 
   return (
     <>
@@ -56,184 +51,118 @@ export default function Navbar() {
         transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
         className="fixed top-0 left-0 right-0 z-50"
         style={{
-          background:           scrolled ? 'rgba(6, 6, 10, 0.94)' : 'transparent',
+          background:           scrolled ? 'rgba(6,5,15,0.92)' : 'transparent',
           backdropFilter:       scrolled ? 'blur(32px) saturate(1.8)' : 'none',
           WebkitBackdropFilter: scrolled ? 'blur(32px) saturate(1.8)' : 'none',
           borderBottom:         scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
-          boxShadow:            scrolled ? '0 4px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.06)' : 'none',
         }}
       >
-        {/* Top glow line when scrolled */}
+        {/* Top glow when scrolled */}
         <AnimatePresence>
           {scrolled && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-              style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.35) 30%, rgba(168,85,247,0.5) 50%, rgba(59,130,246,0.35) 70%, transparent 100%)' }}
+              style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.4) 30%, rgba(168,85,247,0.6) 50%, rgba(59,130,246,0.4) 70%, transparent 100%)' }}
             />
           )}
         </AnimatePresence>
 
-        <div
-          className="max-w-7xl mx-auto px-4 sm:px-6"
-          style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}
-        >
-          <div className="flex items-center justify-between h-[62px]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10" style={{ paddingTop: 'max(env(safe-area-inset-top),0px)' }}>
+          <div className="flex items-center justify-between h-[64px]">
 
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0">
               <Logo3D size="md" />
             </Link>
 
-            {/* Desktop nav links */}
-            <div className="hidden lg:flex items-center gap-0.5">
-              {navLinks.map((link, i) => {
+            {/* Desktop nav — uppercase, spaced */}
+            <div className="hidden lg:flex items-center gap-8">
+              {navLinks.map((link) => {
                 const active = isActive(link.href);
                 return (
-                  <motion.div
+                  <Link
                     key={link.href}
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
+                    href={link.href}
+                    className="relative transition-colors duration-200"
+                    style={{
+                      fontSize:      '11px',
+                      fontWeight:    600,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color:         active ? '#fff' : 'rgba(148,163,184,0.7)',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                    onMouseLeave={e => (e.currentTarget.style.color = active ? '#fff' : 'rgba(148,163,184,0.7)')}
                   >
-                    <Link
-                      href={link.href}
-                      className={`relative px-4 py-2.5 text-[13.5px] rounded-xl transition-all duration-200 font-medium group flex items-center gap-1.5 ${
-                        active
-                          ? 'text-white'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                      style={{
-                        background: active ? 'rgba(124,58,237,0.1)' : 'transparent',
-                      }}
-                      onMouseEnter={e => {
-                        if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                      }}
-                      onMouseLeave={e => {
-                        if (!active) e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      {active && (
-                        <motion.div
-                          layoutId="nav-active-pill"
-                          className="absolute inset-0 rounded-xl"
-                          style={{
-                            background: 'rgba(124,58,237,0.1)',
-                            border: '1px solid rgba(124,58,237,0.18)',
-                          }}
-                          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                        />
-                      )}
-                      <span className="relative z-10">{link.label}</span>
-                      {active && (
-                        <motion.div
-                          layoutId="nav-active-dot"
-                          className="relative z-10 w-1 h-1 rounded-full bg-violet-400 shrink-0"
-                        />
-                      )}
-                    </Link>
-                  </motion.div>
+                    {link.label}
+                    {active && (
+                      <motion.div
+                        layoutId="nav-underline"
+                        className="absolute -bottom-1 left-0 right-0 h-px"
+                        style={{ background: 'rgba(124,58,237,0.7)' }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
+                  </Link>
                 );
               })}
             </div>
 
-            {/* Right side CTAs */}
-            <div className="flex items-center gap-2 lg:gap-3">
+            {/* Right CTA */}
+            <div className="flex items-center gap-3">
               {mounted && user ? (
                 <Link href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'}>
                   {/* Desktop */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: 0.3 }}
-                    className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white group cursor-pointer transition-all duration-200"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(124,58,237,0.9), rgba(109,40,217,0.9))',
-                      boxShadow:  '0 4px 20px rgba(124,58,237,0.35), 0 0 0 1px rgba(124,58,237,0.3)',
-                    }}
-                    onMouseEnter={e => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.boxShadow = '0 6px 28px rgba(124,58,237,0.5), 0 0 0 1px rgba(168,85,247,0.4)';
-                      el.style.transform = 'translateY(-1px)';
-                    }}
-                    onMouseLeave={e => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.boxShadow = '0 4px 20px rgba(124,58,237,0.35), 0 0 0 1px rgba(124,58,237,0.3)';
-                      el.style.transform = 'none';
-                    }}
-                  >
-                    Dashboard
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </motion.div>
-
-                  {/* Mobile */}
                   <div
-                    className="lg:hidden flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold text-white"
+                    className="hidden lg:flex items-center gap-2 px-5 py-2.5 rounded-lg text-white transition-all duration-200 cursor-pointer"
                     style={{
-                      background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                      boxShadow:  '0 4px 14px rgba(124,58,237,0.35)',
+                      fontSize:      '11px',
+                      fontWeight:    700,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      border:        '1px solid rgba(255,255,255,0.2)',
+                      background:    'rgba(255,255,255,0.05)',
                     }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.35)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)'; }}
                   >
+                    Dashboard <ArrowUpRight className="w-3.5 h-3.5" />
+                  </div>
+                  {/* Mobile */}
+                  <div className="lg:hidden flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold text-white"
+                    style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', boxShadow:'0 4px 14px rgba(124,58,237,0.35)' }}>
                     Dashboard
                   </div>
                 </Link>
               ) : (
                 <>
-                  {/* Desktop */}
-                  <Link href="/login" className="hidden lg:block">
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.35 }}
-                      className="flex items-center px-4 py-2.5 text-[13.5px] font-medium text-slate-400 hover:text-white rounded-xl transition-all duration-200 hover:bg-white/5 cursor-pointer"
-                    >
-                      {t('nav.login')}
-                    </motion.span>
-                  </Link>
-                  <Link href="/request" className="hidden lg:block">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.4, delay: 0.4 }}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13.5px] font-semibold text-white group cursor-pointer transition-all duration-200"
-                      style={{
-                        background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                        boxShadow:  '0 4px 20px rgba(124,58,237,0.35)',
-                      }}
-                      onMouseEnter={e => {
-                        const el = e.currentTarget as HTMLElement;
-                        el.style.boxShadow = '0 6px 28px rgba(124,58,237,0.5)';
-                        el.style.transform = 'translateY(-1px)';
-                      }}
-                      onMouseLeave={e => {
-                        const el = e.currentTarget as HTMLElement;
-                        el.style.boxShadow = '0 4px 20px rgba(124,58,237,0.35)';
-                        el.style.transform = 'none';
-                      }}
-                    >
-                      {t('nav.request')}
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                    </motion.div>
+                  {/* Desktop: BOOK A CALL */}
+                  <Link href="/request" className="hidden lg:flex items-center gap-2 transition-all duration-200"
+                    style={{
+                      padding:       '10px 22px',
+                      fontSize:      '11px',
+                      fontWeight:    700,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color:         '#fff',
+                      border:        '1px solid rgba(255,255,255,0.25)',
+                      borderRadius:  '8px',
+                      background:    'rgba(255,255,255,0.04)',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(124,58,237,0.15)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(124,58,237,0.5)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.25)'; }}
+                  >
+                    Book a Call <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
 
-                  {/* Mobile: two pills */}
-                  <Link
-                    href="/login"
-                    className="lg:hidden px-3.5 py-2 rounded-full text-sm font-medium text-slate-300 border border-white/10 active:scale-95 transition-transform"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
-                  >
-                    {t('nav.login')}
+                  {/* Mobile */}
+                  <Link href="/login" className="lg:hidden px-3.5 py-2 rounded-full text-sm font-medium text-slate-300 border border-white/10 active:scale-95 transition-transform"
+                    style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    Sign In
                   </Link>
-                  <Link
-                    href="/request"
-                    className="lg:hidden flex items-center px-3.5 py-2 rounded-full text-sm font-semibold text-white active:scale-95 transition-transform"
-                    style={{
-                      background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                      boxShadow:  '0 4px 14px rgba(124,58,237,0.3)',
-                    }}
-                  >
+                  <Link href="/request" className="lg:hidden flex items-center px-3.5 py-2 rounded-full text-sm font-semibold text-white active:scale-95 transition-transform"
+                    style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', boxShadow:'0 4px 14px rgba(124,58,237,0.3)' }}>
                     Start →
                   </Link>
                 </>
@@ -243,7 +172,6 @@ export default function Navbar() {
           </div>
         </div>
       </motion.nav>
-
     </>
   );
 }

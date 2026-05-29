@@ -1,267 +1,293 @@
 'use client';
 
-/**
- * Hero — Cinematic split composition
- *
- * The artwork dominates the right side of the viewport.
- * Content lives on the left, in the natural darkness of the image.
- * No hard edges. No borders. One continuous scene.
- *
- * Image path: /hero-artwork.jpg  (save the provided artwork there)
- */
-
-import { useRef } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { ArrowUpRight, Users, Rocket, TrendingUp, Shield, Play } from 'lucide-react';
+import { useRef } from 'react';
 
-/* ── Stats ────────────────────────────────────────────────────────────────── */
+/* ── Bottom stats — matching reference ───────────────────────────────────── */
 const STATS = [
-  { val: '34+', label: 'Clients'   },
-  { val: '98%', label: 'On Time'   },
-  { val: '5.0', label: 'Rating'    },
-  { val: '40+', label: 'Projects'  },
+  { icon: Users,      val: '50+',  label: 'Happy Clients'       },
+  { icon: Rocket,     val: '120+', label: 'Projects Delivered'  },
+  { icon: TrendingUp, val: '98%',  label: 'Client Satisfaction' },
+  { icon: Shield,     val: '5+',   label: 'Years of Experience' },
 ];
 
-/* ── Main component ─────────────────────────────────────────────────────────
-   Layout:  [  content 42%  |  artwork 58%  ]  on desktop
-            [  artwork 45vh  →  content  ]  on mobile
-──────────────────────────────────────────────────────────────────────────── */
 export default function Hero() {
-  const { t } = useLanguage();
-
-  /* Scroll-driven parallax — content drifts up, artwork retreats */
   const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target:  sectionRef,
-    offset: ['start start', 'end start'],
-  });
-  const contentY  = useTransform(scrollYProgress, [0, 1], ['0%',  '14%']);
-  const contentOp = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const artworkY  = useTransform(scrollYProgress, [0, 1], ['0%',  '6%']);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
+  const contentY  = useTransform(scrollYProgress, [0, 1], ['0%',  '12%']);
+  const contentOp = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
+  const imageY    = useTransform(scrollYProgress, [0, 1], ['0%',  '5%']);
 
   return (
     <section
       ref={sectionRef}
       id="home"
       className="relative overflow-hidden"
-      style={{
-        height:     '100dvh',
-        minHeight:  '600px',
-        background: '#060510',
-      }}
+      style={{ height: '100dvh', minHeight: '640px', background: '#07060f' }}
     >
 
-      {/* ── ARTWORK — right side, full height ─────────────────────────────
-          Positioned as an overlay that fills the right portion.
-          On mobile it covers the full top half.
-          Multiple gradient masks blend it seamlessly into the background.
-      ─────────────────────────────────────────────────────────────────── */}
-      <motion.div
-        style={{ y: artworkY }}
-        className="absolute inset-0 lg:left-[38%]"
-      >
+      {/* ── FULL-BLEED ARTWORK ────────────────────────────────────────────── */}
+      <motion.div style={{ y: imageY }} className="absolute inset-0">
         <Image
           src="/hero.png"
-          alt="MBN DEV — Premium digital craft"
+          alt="MBN DEV"
           fill
           priority
           quality={95}
-          sizes="(max-width: 1024px) 100vw, 62vw"
-          className="object-cover object-[68%_center] lg:object-[62%_center]"
+          sizes="100vw"
+          className="object-cover object-[60%_center]"
         />
 
-        {/* Left blend — the primary integration gradient
-            Fully opaque on left → fully transparent on right.
-            This is how the image "grows from" the dark background. */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(95deg, #060510 0%, rgba(6,5,16,0.92) 12%, rgba(6,5,16,0.55) 28%, rgba(6,5,16,0.15) 48%, transparent 65%)',
-          }}
-        />
+        {/* Left dark gradient — text lives here */}
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(100deg, rgba(7,6,15,0.97) 0%, rgba(7,6,15,0.88) 22%, rgba(7,6,15,0.6) 42%, rgba(7,6,15,0.2) 62%, transparent 78%)',
+        }} />
 
-        {/* Top vignette — grounds the sky */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(to bottom, rgba(6,5,16,0.75) 0%, rgba(6,5,16,0.2) 18%, transparent 40%)',
-          }}
-        />
+        {/* Top vignette */}
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(to bottom, rgba(7,6,15,0.55) 0%, transparent 22%)',
+        }} />
 
-        {/* Bottom vignette — connects to the next section */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(to top, #060510 0%, rgba(6,5,16,0.7) 12%, rgba(6,5,16,0.2) 28%, transparent 45%)',
-          }}
-        />
-
-        {/* Mobile-only: extra bottom fade so content is readable below */}
-        <div
-          className="absolute bottom-0 left-0 right-0 lg:hidden"
-          style={{ height: '55%', background: 'linear-gradient(to top, #060510 40%, transparent)' }}
-        />
+        {/* Bottom vignette — fades into stats bar */}
+        <div className="absolute bottom-0 left-0 right-0" style={{
+          height: '45%',
+          background: 'linear-gradient(to top, rgba(7,6,15,0.98) 0%, rgba(7,6,15,0.6) 35%, transparent 70%)',
+        }} />
       </motion.div>
 
-      {/* ── CONTENT — left zone, vertically centred ───────────────────────
-          Sits on top of the gradient-masked dark left portion of the artwork.
-          Feels like text floating inside the scene, not on top of an image.
-      ─────────────────────────────────────────────────────────────────── */}
+      {/* ── CONTENT ───────────────────────────────────────────────────────── */}
       <motion.div
-        style={{ y: contentY, opacity: contentOp }}
-        className="relative z-10 h-full flex items-center"
+        style={{ opacity: contentOp, y: contentY }}
+        className="absolute inset-0 z-10 flex flex-col"
       >
-        <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="pt-24 pb-16 lg:pt-0 lg:pb-0 max-w-[540px]">
+        {/* Main content area — grows to fill space above stats */}
+        <div className="flex-1 flex items-center px-6 sm:px-10 lg:px-14 xl:px-20">
+          <div className="max-w-[580px] w-full">
 
-            {/* Studio label */}
+            {/* Label */}
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-3 mb-9"
+              transition={{ duration: 0.7, delay: 0.05 }}
+              className="flex items-center gap-3 mb-8"
             >
-              <div style={{ width: 24, height: 1, background: 'rgba(168,85,247,0.6)' }} />
+              <div style={{ width: 28, height: 1, background: 'rgba(139,92,246,0.65)' }} />
               <span style={{
-                fontSize:      '10px',
-                fontWeight:    700,
-                letterSpacing: '0.26em',
-                textTransform: 'uppercase',
-                color:         'rgba(168,85,247,0.75)',
+                fontSize: '10.5px', fontWeight: 700,
+                letterSpacing: '0.2em', textTransform: 'uppercase',
+                color: 'rgba(139,92,246,0.85)',
               }}>
-                Premium Web Development
+                Premium Web Development Company
               </span>
             </motion.div>
 
-            {/* Headline */}
+            {/* Headline — 3 clean lines matching reference */}
             <motion.h1
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.95, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="text-white tracking-tight leading-[1.08] mb-7"
-              style={{ fontSize: 'clamp(2.4rem, 3.6vw, 3.75rem)', fontWeight: 900 }}
+              transition={{ duration: 0.9, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                fontSize: 'clamp(2.6rem, 4.2vw, 4.4rem)',
+                fontWeight: 900,
+                lineHeight: 1.04,
+                letterSpacing: '-0.02em',
+                marginBottom: 24,
+                color: '#fff',
+              }}
             >
-              {t('hero.title.line1')}{' '}
-              {t('hero.title.line2a')}{' '}
+              We build<br />
+              digital experiences<br />
+              that{' '}
               <span style={{
-                background:           'linear-gradient(135deg, #c084fc 0%, #9333ea 50%, #6366f1 100%)',
+                background: 'linear-gradient(135deg, #c084fc 0%, #9333ea 50%, #818cf8 100%)',
                 WebkitBackgroundClip: 'text',
-                WebkitTextFillColor:  'transparent',
-                backgroundClip:       'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
               }}>
-                {t('hero.title.elevate')}
-              </span>{' '}
-              {t('hero.title.line2b')}{' '}
-              <span style={{
-                background:           'linear-gradient(135deg, #c084fc 0%, #9333ea 50%, #6366f1 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor:  'transparent',
-                backgroundClip:       'text',
-              }}>
-                {t('hero.title.business')}
+                drive real impact.
               </span>
             </motion.h1>
 
-            {/* Subtitle — restrained, one breath */}
+            {/* Subtitle */}
             <motion.p
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.8, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                fontSize:   'clamp(0.95rem, 1.4vw, 1.05rem)',
+                fontSize: 'clamp(0.9rem, 1.3vw, 1rem)',
                 lineHeight: 1.75,
-                color:      'rgba(148,163,184,0.75)',
-                maxWidth:   420,
+                color: 'rgba(148,163,184,0.78)',
+                maxWidth: 480,
                 marginBottom: 40,
               }}
             >
-              {t('hero.subtitle')}
+              We design and develop high-performance websites, SaaS platforms
+              and digital products for ambitious brands and modern businesses.
             </motion.p>
 
-            {/* CTAs */}
+            {/* CTAs — matching reference buttons */}
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, delay: 0.46, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-5 mb-14"
+              transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-center gap-4 flex-wrap"
             >
+              {/* Primary: dark bordered solid */}
               <Link href="/request">
                 <button
-                  className="group inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-white transition-all duration-300"
+                  className="flex items-center gap-2.5 transition-all duration-200"
                   style={{
-                    fontSize:   '14px',
-                    background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                    boxShadow:  '0 6px 28px rgba(124,58,237,0.45), 0 1px 0 rgba(255,255,255,0.1) inset',
+                    padding:       '13px 28px',
+                    background:    'rgba(124,58,237,0.15)',
+                    border:        '1px solid rgba(124,58,237,0.55)',
+                    borderRadius:  '8px',
+                    color:         '#fff',
+                    fontSize:      '12px',
+                    fontWeight:    700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget as HTMLElement;
-                    el.style.boxShadow = '0 10px 40px rgba(124,58,237,0.65), 0 1px 0 rgba(255,255,255,0.14) inset';
-                    el.style.transform = 'translateY(-2px)';
+                    el.style.background   = 'rgba(124,58,237,0.28)';
+                    el.style.borderColor  = 'rgba(168,85,247,0.7)';
+                    el.style.transform    = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLElement;
-                    el.style.boxShadow = '0 6px 28px rgba(124,58,237,0.45), 0 1px 0 rgba(255,255,255,0.1) inset';
-                    el.style.transform = 'none';
+                    el.style.background  = 'rgba(124,58,237,0.15)';
+                    el.style.borderColor = 'rgba(124,58,237,0.55)';
+                    el.style.transform   = 'none';
                   }}
                 >
-                  {t('hero.cta.primary')}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  Start Your Project
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </button>
               </Link>
 
+              {/* Secondary: ghost with circle play icon */}
               <a
                 href="#portfolio"
-                style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(148,163,184,0.55)', transition: 'color 0.2s' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.9)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(148,163,184,0.55)')}
+                className="flex items-center gap-3 transition-all duration-200 group"
+                style={{
+                  padding:       '13px 24px',
+                  background:    'transparent',
+                  border:        '1px solid rgba(255,255,255,0.15)',
+                  borderRadius:  '8px',
+                  color:         'rgba(255,255,255,0.7)',
+                  fontSize:      '12px',
+                  fontWeight:    700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = 'rgba(255,255,255,0.35)';
+                  el.style.color       = '#fff';
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = 'rgba(255,255,255,0.15)';
+                  el.style.color       = 'rgba(255,255,255,0.7)';
+                }}
               >
-                {t('hero.cta.secondary')} →
-              </a>
-            </motion.div>
-
-            {/* Proof — four numbers, no cards */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.9, delay: 0.65 }}
-              className="flex items-center gap-8"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 22 }}
-            >
-              {STATS.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 + i * 0.06, duration: 0.5 }}
+                View Our Work
+                <span
+                  className="flex items-center justify-center rounded-full"
+                  style={{
+                    width: 26, height: 26,
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    transition: 'border-color 0.2s',
+                  }}
                 >
-                  <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                    {s.val}
-                  </div>
-                  <div style={{ fontSize: '11px', color: 'rgba(100,116,139,0.65)', marginTop: 5 }}>
-                    {s.label}
-                  </div>
-                </motion.div>
-              ))}
+                  <Play className="w-3 h-3 fill-current" />
+                </span>
+              </a>
             </motion.div>
 
           </div>
         </div>
+
+        {/* ── STATS BAR — bottom, full width ──────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="shrink-0 hidden lg:flex"
+          style={{
+            background:           'rgba(7,6,15,0.82)',
+            backdropFilter:       'blur(24px) saturate(1.6)',
+            WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
+            borderTop:            '1px solid rgba(255,255,255,0.07)',
+          }}
+        >
+          {STATS.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={s.label}
+                className="flex-1 flex items-center gap-4 py-6"
+                style={{
+                  padding:     '22px 0 22px',
+                  paddingLeft: i === 0 ? '5rem' : '2.5rem',
+                  borderRight: i < STATS.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
+                }}
+              >
+                <div
+                  className="flex items-center justify-center rounded-xl shrink-0"
+                  style={{
+                    width: 40, height: 40,
+                    background: 'rgba(124,58,237,0.12)',
+                    border:     '1px solid rgba(124,58,237,0.2)',
+                  }}
+                >
+                  <Icon className="w-4 h-4 text-violet-400" strokeWidth={1.8} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                    {s.val}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'rgba(148,163,184,0.6)', marginTop: 4 }}>
+                    {s.label}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
+
+        {/* Mobile stats — inline */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.65 }}
+          className="lg:hidden shrink-0 flex justify-around px-6 py-5"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(7,6,15,0.9)' }}
+        >
+          {STATS.map((s) => (
+            <div key={s.label} className="text-center">
+              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff' }}>{s.val}</div>
+              <div style={{ fontSize: '10px', color: 'rgba(148,163,184,0.6)', marginTop: 3 }}>{s.label}</div>
+            </div>
+          ))}
+        </motion.div>
+
       </motion.div>
 
-      {/* ── Scroll indicator ──────────────────────────────────────────────── */}
+      {/* Scroll hint */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.6, duration: 1 }}
-        className="absolute bottom-7 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2.5"
+        transition={{ delay: 1.5, duration: 0.8 }}
+        className="absolute bottom-[88px] lg:bottom-[100px] left-1/2 -translate-x-1/2 z-20 hidden lg:flex flex-col items-center gap-2"
       >
         <motion.div
-          animate={{ y: [0, 6, 0] }}
+          animate={{ y: [0, 5, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ width: 1, height: 40, background: 'linear-gradient(to bottom, rgba(124,58,237,0.7), transparent)' }}
+          style={{ width: 1, height: 32, background: 'linear-gradient(to bottom, rgba(124,58,237,0.6), transparent)' }}
         />
         <span style={{ fontSize: 8, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(100,116,139,0.5)' }}>
           Scroll
