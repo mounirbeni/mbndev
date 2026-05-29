@@ -106,7 +106,7 @@ export default function Pricing() {
             transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-slate-500 max-w-lg mx-auto text-lg leading-relaxed"
           >
-            {t('pricing.subtitle').replace('{pct}', '47%')}
+            {t('pricing.subtitle')}
           </motion.p>
         </div>
 

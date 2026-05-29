@@ -2,11 +2,16 @@
 
 import { useRef, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import {
   Globe, ShoppingCart, BarChart3, Layout, Smartphone, Settings,
   ArrowRight,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /* ── Spotlight card with mouse-tracking glow ────────────────────────────── */
 function SpotlightCard({
@@ -130,11 +135,24 @@ export default function Services() {
     },
   ];
 
-  const titleRef = useRef<HTMLDivElement>(null);
+  const titleRef    = useRef<HTMLDivElement>(null);
+  const sectionRef  = useRef<HTMLElement>(null);
   const titleInView = useInView(titleRef, { once: true, margin: '-80px' });
 
+  // GSAP: batch-stagger service cards as they scroll into view
+  useGSAP(() => {
+    ScrollTrigger.batch('.service-card', {
+      onEnter: (els) => gsap.fromTo(els,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power2.out', overwrite: true }
+      ),
+      start: 'top 88%',
+      once: true,
+    });
+  }, { scope: sectionRef });
+
   return (
-    <section id="services" className="py-28 relative overflow-hidden">
+    <section ref={sectionRef} id="services" className="py-28 relative overflow-hidden">
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -184,7 +202,8 @@ export default function Services() {
           {services.map((service, i) => {
             const Icon = service.icon;
             return (
-              <SpotlightCard key={service.label} delay={i * 0.08} glowColor={service.glow}>
+              <div key={service.label} className="service-card" style={{ opacity: 0 }}>
+              <SpotlightCard delay={0} glowColor={service.glow}>
                 {/* Number label */}
                 <div className="flex items-center justify-between mb-5">
                   <div
@@ -231,6 +250,7 @@ export default function Services() {
                   Learn more <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </SpotlightCard>
+              </div>
             );
           })}
         </div>

@@ -18,10 +18,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <Navbar />
         {/* Extra bottom padding on mobile so content isn't hidden behind bottom nav */}
         <main className="pb-[74px] lg:pb-0">{children}</main>
-        {/* Footer also needs mobile padding so it clears the bottom nav */}
-        <div className="pb-[74px] lg:pb-0">
-          <Footer />
-        </div>
+        <Footer />
       </div>
       {/* Bottom tab bar — mobile only */}
       <LandingBottomNav />

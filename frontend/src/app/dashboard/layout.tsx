@@ -209,6 +209,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           onScroll={onScroll}
           style={{
             paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 74px)',
+          // Note: 74px clears the mobile bottom nav — MobileNav hides itself at lg: breakpoints
           }}
         >
           <AnimatePresence mode="wait" initial={false}>

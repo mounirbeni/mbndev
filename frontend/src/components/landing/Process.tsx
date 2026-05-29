@@ -2,7 +2,12 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 function StepNumber({ n }: { n: string }) {
   return (
@@ -69,8 +74,27 @@ function Step({ step, index }: { step: { num: string; title: string; desc: strin
 
 export default function Process() {
   const { t } = useLanguage();
-  const headerRef = useRef<HTMLDivElement>(null);
+  const headerRef  = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' });
+
+  // GSAP: stagger-reveal each step card on scroll
+  useGSAP(() => {
+    gsap.fromTo('.process-step',
+      { opacity: 0, x: -24 },
+      {
+        opacity: 1, x: 0,
+        duration: 0.65,
+        stagger: 0.12,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.process-steps-grid',
+          start: 'top 85%',
+          once: true,
+        },
+      }
+    );
+  }, { scope: sectionRef });
 
   const steps = [
     { num: '01', title: t('process.s1.title'), desc: t('process.s1.desc') },
@@ -82,7 +106,7 @@ export default function Process() {
   ];
 
   return (
-    <section id="process" className="py-32 relative overflow-hidden">
+    <section ref={sectionRef} id="process" className="py-32 relative overflow-hidden">
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -127,9 +151,11 @@ export default function Process() {
         </div>
 
         {/* ── Steps grid ── */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+        <div className="process-steps-grid grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {steps.map((step, i) => (
-            <Step key={step.num} step={step} index={i} />
+            <div key={step.num} className="process-step" style={{ opacity: 0 }}>
+              <Step step={step} index={i} />
+            </div>
           ))}
         </div>
 

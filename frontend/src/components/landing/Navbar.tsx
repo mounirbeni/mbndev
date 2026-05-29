@@ -11,10 +11,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Navbar() {
-  const [scrolled,  setScrolled]  = useState(false);
-  const [hidden,    setHidden]    = useState(false);
-  const [mounted,   setMounted]   = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden,   setHidden]   = useState(false);
+  const [mounted,  setMounted]  = useState(false);
   const prevScrollY = useRef(0);
 
   const { user }  = useAuth();
@@ -245,19 +244,6 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Mobile menu overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 lg:hidden"
-            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
-            onClick={() => setMobileOpen(false)}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 }

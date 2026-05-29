@@ -5,6 +5,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
 import SplashScreen from '@/components/mobile/SplashScreen';
+import SmoothScroll from '@/components/ui/SmoothScroll';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -124,30 +125,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning>
         <LanguageProvider>
           <AuthProvider>
-            {children}
-            <Toaster
-              position="top-center"
-              gutter={8}
-              containerStyle={{ top: 'max(env(safe-area-inset-top, 0px) + 16px, 16px)' }}
-              toastOptions={{
-                duration: 3500,
-                style: {
-                  background:           'rgba(18, 18, 22, 0.96)',
-                  backdropFilter:       'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  color:                '#e2e8f0',
-                  border:               '1px solid rgba(124,58,237,0.25)',
-                  borderRadius:         '14px',
-                  fontSize:             '14px',
-                  fontWeight:           '500',
-                  padding:              '12px 16px',
-                  maxWidth:             '340px',
-                  boxShadow:            '0 8px 32px rgba(0,0,0,0.4)',
-                },
-                success: { iconTheme: { primary: '#7c3aed', secondary: '#e2e8f0' } },
-                error:   { iconTheme: { primary: '#ef4444', secondary: '#e2e8f0' } },
-              }}
-            />
+            <SmoothScroll>
+              {children}
+              <Toaster
+                position="top-center"
+                gutter={8}
+                containerStyle={{ top: 'max(env(safe-area-inset-top, 0px) + 16px, 16px)' }}
+                toastOptions={{
+                  duration: 3500,
+                  style: {
+                    background:           'rgba(18, 18, 22, 0.96)',
+                    backdropFilter:       'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    color:                '#e2e8f0',
+                    border:               '1px solid rgba(124,58,237,0.25)',
+                    borderRadius:         '14px',
+                    fontSize:             '14px',
+                    fontWeight:           '500',
+                    padding:              '12px 16px',
+                    maxWidth:             '340px',
+                    boxShadow:            '0 8px 32px rgba(0,0,0,0.4)',
+                  },
+                  success: { iconTheme: { primary: '#7c3aed', secondary: '#e2e8f0' } },
+                  error:   { iconTheme: { primary: '#ef4444', secondary: '#e2e8f0' } },
+                }}
+              />
+            </SmoothScroll>
           </AuthProvider>
         </LanguageProvider>
         <SplashScreen />

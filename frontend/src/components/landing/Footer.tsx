@@ -19,18 +19,10 @@ function PayPalMark() {
   );
 }
 
-function BankMark() {
+function PaymentBadge({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 h-5 px-2 rounded bg-white/5 border border-white/10 text-[10px] font-semibold text-slate-400 tracking-wide">
-      BANK TRANSFER
-    </span>
-  );
-}
-
-function TapTapMark() {
-  return (
-    <span className="inline-flex items-center gap-1.5 h-5 px-2 rounded bg-white/5 border border-white/10 text-[10px] font-semibold text-slate-400 tracking-wide">
-      TAPTAPSEND
+      {label}
     </span>
   );
 }
@@ -84,8 +76,8 @@ export default function Footer() {
               </span>
               <div className="flex items-center gap-3 flex-wrap justify-center">
                 <PayPalMark />
-                <BankMark />
-                <TapTapMark />
+                <PaymentBadge label="BANK TRANSFER" />
+                <PaymentBadge label="TAPTAPSEND" />
               </div>
             </div>
 

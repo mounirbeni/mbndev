@@ -97,7 +97,7 @@ export default function ContactPage() {
             className="lg:col-span-2 space-y-4"
           >
             {/* Contact details card */}
-            <div className="rounded-2xl p-6" style={cardStyle}>
+            <div className="rounded-2xl p-6 relative overflow-hidden" style={cardStyle}>
               {/* Top glow line */}
               <div className="absolute top-0 left-6 right-6 h-px rounded-full"
                 style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.4), transparent)' }} />

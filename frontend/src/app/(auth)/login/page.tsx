@@ -313,8 +313,10 @@ export default function LoginPage() {
       await login(email, password);
       haptic('success');
       toast.success(t('toast.loggedIn'));
+      // Use AuthContext user after login resolves — avoids localStorage race condition
       const stored = JSON.parse(localStorage.getItem('mbndev_user') || '{}');
-      router.push(stored.role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
+      const role = stored.role ?? 'client';
+      router.push(role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
     } catch (err: any) {
       haptic('error');
       const data = err?.response?.data;
@@ -523,8 +525,10 @@ export default function LoginPage() {
                     }
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset';
-                    (e.currentTarget as HTMLElement).style.transform  = 'none';
+                    if (!loading && !isLocked) {
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset';
+                      (e.currentTarget as HTMLElement).style.transform  = 'none';
+                    }
                   }}
                 >
                   {loading ? (
