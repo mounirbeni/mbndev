@@ -382,12 +382,12 @@ export default function LoginPage() {
         </div>
 
         {/* ── Form area ── */}
-        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 lg:px-12 py-6 relative z-10">
+        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-md mx-auto lg:mx-0 lg:max-w-[380px]"
+            className="w-full max-w-[400px] mx-auto"
           >
             {/* Mobile logo */}
             <div className="lg:hidden text-center mb-8">
