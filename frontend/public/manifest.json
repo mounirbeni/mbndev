@@ -5,12 +5,18 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#08080b",
-  "theme_color": "#08080b",
+  "theme_color": "#7c3aed",
   "icons": [
     {
-      "src": "/logo-app.jpeg",
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

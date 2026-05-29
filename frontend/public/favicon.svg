@@ -1,3 +1,120 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <image href="/logo-app.jpeg" width="512" height="512" clip-path="inset(0 round 113px)"/>
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0c0c14"/>
+      <stop offset="100%" stop-color="#06060a"/>
+    </linearGradient>
+
+    <!-- Purple glow radial -->
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#7c3aed" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Metallic text gradient (top → bottom: white to slate) -->
+    <linearGradient id="metal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#ffffff"/>
+      <stop offset="30%"  stop-color="#e2e8f0"/>
+      <stop offset="65%"  stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+
+    <!-- Purple bar gradient (left → right) -->
+    <linearGradient id="purpleBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#f0abfc"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+
+    <!-- Purple bar short gradient -->
+    <linearGradient id="purpleBarShort" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <!-- Drop shadow filter for text glow -->
+    <filter id="textGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Purple neon glow filter for E bars -->
+    <filter id="barGlow" x="-50%" y="-200%" width="200%" height="500%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Clip for rounded corner -->
+    <clipPath id="roundedClip">
+      <rect width="512" height="512" rx="108"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background ──────────────────────────────────────── -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+
+  <!-- Ambient purple centre glow -->
+  <rect width="512" height="512" rx="108" fill="url(#glow)"/>
+
+  <!-- Subtle border ring -->
+  <rect x="1.5" y="1.5" width="509" height="509" rx="107" fill="none"
+        stroke="rgba(124,58,237,0.22)" stroke-width="3"/>
+
+  <!-- Top highlight line -->
+  <line x1="108" y1="1.5" x2="404" y2="1.5"
+        stroke="url(#purpleBar)" stroke-width="2" opacity="0.5"/>
+
+  <!-- ── "MBN" row ───────────────────────────────────────── -->
+  <text
+    x="256" y="228"
+    text-anchor="middle"
+    font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
+    font-weight="900"
+    font-size="168"
+    letter-spacing="14"
+    fill="url(#metal)"
+    filter="url(#textGlow)"
+  >MBN</text>
+
+  <!-- ── "DEV" row — with custom neon E ─────────────────── -->
+  <!-- "D" -->
+  <text
+    x="94" y="368"
+    font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
+    font-weight="900"
+    font-size="168"
+    letter-spacing="0"
+    fill="url(#metal)"
+    filter="url(#textGlow)"
+  >D</text>
+
+  <!-- Custom neon "E" — three horizontal bars centred at x≈242 -->
+  <!-- Top bar — full width -->
+  <rect x="228" y="265" width="62" height="10" rx="2" fill="url(#purpleBar)"    filter="url(#barGlow)"/>
+  <!-- Middle bar — 70% width -->
+  <rect x="228" y="303" width="43" height="10" rx="2" fill="url(#purpleBarShort)" filter="url(#barGlow)"/>
+  <!-- Bottom bar — full width -->
+  <rect x="228" y="341" width="62" height="10" rx="2" fill="url(#purpleBar)"    filter="url(#barGlow)"/>
+
+  <!-- "V" -->
+  <text
+    x="302" y="368"
+    font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
+    font-weight="900"
+    font-size="168"
+    letter-spacing="0"
+    fill="url(#metal)"
+    filter="url(#textGlow)"
+  >V</text>
+
+  <!-- ── Bottom glow strip ──────────────────────────────── -->
+  <rect x="156" y="430" width="200" height="4" rx="2"
+        fill="url(#purpleBar)" opacity="0.35"/>
 </svg>

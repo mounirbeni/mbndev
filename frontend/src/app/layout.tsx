@@ -25,6 +25,16 @@ export const metadata: Metadata = {
   publisher:    'MBN DEV',
   metadataBase: new URL('https://mbndev.ma'),
   manifest:     '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.png', sizes: '512x512',  type: 'image/png' },
+    ],
+    apple: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.svg',
+  },
   robots: {
     index:  true,
     follow: true,
