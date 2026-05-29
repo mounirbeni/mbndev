@@ -86,12 +86,12 @@ export default function LandingBottomNav() {
               {/* Label */}
               <span
                 style={{
-                  fontSize:   9,
+                  fontSize:   10,
                   lineHeight: 1,
                   fontWeight: active ? 600 : 400,
-                  color:      active ? '#c4b5fd' : 'rgba(100,116,139,0.55)',
+                  color:      active ? '#c4b5fd' : 'rgba(100,116,139,0.65)',
                   transition: 'color 0.2s',
-                  letterSpacing: '0.02em',
+                  letterSpacing: '0.01em',
                 }}
               >
                 {tab.label}

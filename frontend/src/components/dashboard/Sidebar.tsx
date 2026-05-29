@@ -56,7 +56,11 @@ export default function Sidebar() {
     router.push('/');
   };
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => {
+    const home = isAdmin ? '/dashboard/admin' : '/dashboard/client';
+    if (href === home) return pathname === home;
+    return pathname === href || pathname.startsWith(href + '/');
+  };
   const roleLabel = isAdmin ? t('dash.role.admin') : t('dash.role.client');
 
   return (

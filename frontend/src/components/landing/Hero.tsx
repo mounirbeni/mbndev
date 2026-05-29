@@ -564,7 +564,7 @@ export default function Hero() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 1.0 }}
-                className="hidden sm:block mt-8 lg:mt-6"
+                className="mt-8 lg:mt-6"
               >
                 <p className="text-xs text-slate-600 mb-3 flex items-center gap-1.5 uppercase tracking-widest font-medium">
                   <Code2 className="w-3 h-3" />

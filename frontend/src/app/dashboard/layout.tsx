@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -46,6 +46,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (!loading && !user) router.push('/login');
   }, [user, loading, router]);
+
+  /* Dynamic breadcrumb from pathname */
+  const pageLabel = useMemo(() => {
+    const map: Record<string, string> = {
+      '/dashboard/admin':           'Overview',
+      '/dashboard/admin/projects':  'Projects',
+      '/dashboard/admin/orders':    'Orders',
+      '/dashboard/admin/clients':   'Clients',
+      '/dashboard/admin/messages':  'Messages',
+      '/dashboard/admin/payments':  'Payments',
+      '/dashboard/admin/packages':  'Packages',
+      '/dashboard/admin/invoices':  'Invoices',
+      '/dashboard/admin/analytics': 'Analytics',
+      '/dashboard/admin/activity':  'Activity',
+      '/dashboard/client':          'Overview',
+      '/dashboard/client/projects': 'My Projects',
+      '/dashboard/client/orders':   'My Orders',
+      '/dashboard/client/messages': 'Messages',
+      '/dashboard/client/payments': 'Payments',
+      '/dashboard/client/settings': 'Settings',
+    };
+    // Match exact first, then prefix match for detail pages
+    if (map[pathname]) return map[pathname];
+    for (const [key, label] of Object.entries(map)) {
+      if (pathname.startsWith(key + '/')) return label;
+    }
+    return 'Dashboard';
+  }, [pathname]);
 
   /* ── Loading / unauthenticated skeleton ─────────────────────────────── */
   if (loading || !user) {
@@ -146,7 +174,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-1.5 h-1.5 rounded-full bg-violet-500" style={{ boxShadow: '0 0 6px rgba(124,58,237,0.7)' }} />
             <span className="text-slate-500 text-xs font-medium">Dashboard</span>
             <span className="text-slate-700 text-xs">/</span>
-            <span className="text-slate-400 text-xs capitalize">{user.role}</span>
+            <span className="text-slate-500 text-xs capitalize">{user.role}</span>
+            <span className="text-slate-700 text-xs">/</span>
+            <span className="text-white text-xs font-semibold">{pageLabel}</span>
           </div>
 
           {/* Right: command palette + notification + avatar */}
