@@ -70,7 +70,7 @@ export default function Hero() {
           priority
           quality={95}
           sizes="(max-width: 1024px) 100vw, 62vw"
-          className="object-cover object-[center_center] lg:object-[right_center]"
+          className="object-cover object-[68%_center] lg:object-[62%_center]"
         />
 
         {/* Left blend — the primary integration gradient
@@ -115,7 +115,7 @@ export default function Hero() {
         className="relative z-10 h-full flex items-center"
       >
         <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="pt-24 pb-16 lg:pt-0 lg:pb-0 max-w-[500px]">
+          <div className="pt-24 pb-16 lg:pt-0 lg:pb-0 max-w-[540px]">
 
             {/* Studio label */}
             <motion.div
@@ -136,35 +136,32 @@ export default function Hero() {
               </span>
             </motion.div>
 
-            {/* Headline — the only large type on screen */}
+            {/* Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.95, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="text-white tracking-tight leading-[1.02] mb-7"
-              style={{ fontSize: 'clamp(2.8rem, 5.2vw, 5.2rem)', fontWeight: 900 }}
+              className="text-white tracking-tight leading-[1.08] mb-7"
+              style={{ fontSize: 'clamp(2.4rem, 3.6vw, 3.75rem)', fontWeight: 900 }}
             >
-              {t('hero.title.line1')}<br />
+              {t('hero.title.line1')}{' '}
               {t('hero.title.line2a')}{' '}
               <span style={{
-                background:           'linear-gradient(135deg, #c084fc 0%, #9333ea 45%, #6366f1 100%)',
+                background:           'linear-gradient(135deg, #c084fc 0%, #9333ea 50%, #6366f1 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor:  'transparent',
                 backgroundClip:       'text',
               }}>
                 {t('hero.title.elevate')}
-              </span>
-              <br />
-              <span style={{ color: 'rgba(255,255,255,0.82)' }}>
-                {t('hero.title.line2b')}{' '}
-                <span style={{
-                  background:           'linear-gradient(135deg, #c084fc 0%, #9333ea 45%, #6366f1 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor:  'transparent',
-                  backgroundClip:       'text',
-                }}>
-                  {t('hero.title.business')}
-                </span>
+              </span>{' '}
+              {t('hero.title.line2b')}{' '}
+              <span style={{
+                background:           'linear-gradient(135deg, #c084fc 0%, #9333ea 50%, #6366f1 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor:  'transparent',
+                backgroundClip:       'text',
+              }}>
+                {t('hero.title.business')}
               </span>
             </motion.h1>
 
