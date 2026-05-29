@@ -64,7 +64,7 @@ export default function Hero() {
         className="absolute inset-0 lg:left-[38%]"
       >
         <Image
-          src="/hero-artwork.jpg"
+          src="/hero.png"
           alt="MBN DEV — Premium digital craft"
           fill
           priority
