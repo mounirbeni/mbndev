@@ -8,18 +8,16 @@ import {
   useSpring,
   useScroll,
   useInView,
-  AnimatePresence,
 } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowRight, Code2, CheckCircle2, Circle,
-  BarChart2, TrendingUp, Zap, Shield, Headphones, Sparkles,
+  BarChart2, TrendingUp,
 } from 'lucide-react';
 import {
   SiNextdotjs, SiReact, SiTypescript, SiNodedotjs,
   SiTailwindcss, SiMongodb, SiDocker, SiStripe,
 } from 'react-icons/si';
-import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /* ── Stack icons ─────────────────────────────────────────────────────────── */
@@ -400,13 +398,6 @@ export default function Hero() {
     return () => window.removeEventListener('mousemove', handler);
   }, [mouseX, mouseY]);
 
-  const stats = [
-    { icon: Zap,        label: t('hero.stat.fast'),    desc: t('hero.stat.fast.desc') },
-    { icon: Shield,     label: t('hero.stat.secure'),  desc: t('hero.stat.secure.desc') },
-    { icon: Code2,      label: t('hero.stat.clean'),   desc: t('hero.stat.clean.desc') },
-    { icon: Headphones, label: t('hero.stat.support'), desc: t('hero.stat.support.desc') },
-  ];
-
   return (
     <section
       ref={sectionRef}
@@ -491,153 +482,129 @@ export default function Hero() {
         style={{ opacity: heroOpacity, y: heroY }}
         className="relative z-10 flex flex-col flex-1"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-8 w-full flex-1 flex flex-col justify-center">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        {/* ── Single-column editorial composition ── */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-20 w-full flex-1 flex flex-col justify-center">
 
-            {/* ── Left ────────────────────────────────────────────────── */}
-            <div className="flex flex-col justify-center">
+          {/* Availability signal — minimal, not a card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center gap-2.5 mb-10"
+          >
+            <span className="relative flex w-1.5 h-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
+              <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-violet-400" />
+            </span>
+            <span className="text-[11px] font-semibold tracking-[0.18em] uppercase"
+              style={{ color: 'rgba(168,85,247,0.8)' }}>
+              Premium Web Development — Available Now
+            </span>
+          </motion.div>
 
-              {/* Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 16, scale: 0.94 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-                className="mb-6"
+          {/* The headline — the scene */}
+          <CinematicTitle t={t} />
+
+          {/* Subtitle — restrained, beneath */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
+            className="text-slate-400 leading-relaxed mb-10 max-w-xl"
+            style={{ fontSize: 'clamp(1rem, 1.8vw, 1.125rem)' }}
+          >
+            {t('hero.subtitle')}
+          </motion.p>
+
+          {/* CTAs — one heavy, one light */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.88, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-16"
+          >
+            <Link href="/request">
+              <button
+                className="group inline-flex items-center gap-2.5 px-7 py-4 rounded-2xl
+                           text-[15px] font-bold text-white transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                  boxShadow:  '0 8px 28px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.boxShadow = '0 12px 36px rgba(124,58,237,0.55), 0 1px 0 rgba(255,255,255,0.12) inset';
+                  el.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.boxShadow = '0 8px 28px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset';
+                  el.style.transform = 'none';
+                }}
               >
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold text-violet-300 border border-violet-500/20 bg-violet-500/8 backdrop-blur-sm">
-                  <span className="relative flex w-1.5 h-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-violet-400" />
-                  </span>
-                  <Sparkles className="w-3 h-3" />
-                  Premium Web Development — Available Now
-                </span>
-              </motion.div>
+                {t('hero.cta.primary')}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </Link>
+            <a href="#portfolio"
+              className="text-[15px] font-semibold transition-colors duration-200 flex items-center gap-1.5"
+              style={{ color: 'rgba(148,163,184,0.7)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(148,163,184,0.7)')}
+            >
+              {t('hero.cta.secondary')}
+              <ArrowRight className="w-3.5 h-3.5 opacity-60" />
+            </a>
+          </motion.div>
 
-              {/* Title */}
-              <CinematicTitle t={t} />
-
-              {/* Subtitle */}
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
-                className="text-base sm:text-lg text-slate-400 mb-8 max-w-lg leading-relaxed"
-              >
-                {t('hero.subtitle')}
-              </motion.p>
-
-              {/* CTAs */}
+          {/* Proof numbers — inline, not cards */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.0 }}
+            className="flex flex-wrap items-center gap-8 pt-8"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            {[
+              { val: '34+',  label: 'Clients worldwide'    },
+              { val: '98%',  label: 'On-time delivery'     },
+              { val: '5.0',  label: 'Average rating'       },
+              { val: '40+',  label: 'Projects delivered'   },
+            ].map((s, i) => (
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col sm:flex-row gap-3 mb-10"
-              >
-                <Link href="/request" className="w-full sm:w-auto">
-                  <Button size="lg" className="group w-full sm:w-auto justify-center text-[15px] py-4 relative overflow-hidden">
-                    <span className="relative z-10 flex items-center gap-2">
-                      {t('hero.cta.primary')}
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
-                    </span>
-                    {/* Button sweep */}
-                    <span className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </Button>
-                </Link>
-                <a href="#portfolio" className="w-full sm:w-auto">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto justify-center text-[15px] py-4 relative overflow-hidden group"
-                  >
-                    <span className="relative z-10">{t('hero.cta.secondary')}</span>
-                    <span className="absolute inset-0 bg-white/4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  </Button>
-                </a>
-              </motion.div>
-
-              {/* Mobile mockup */}
-              <MobileMockup />
-
-              {/* Tech stack */}
-              <motion.div
+                key={s.label}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 1.0 }}
-                className="mt-8 lg:mt-6"
+                transition={{ delay: 1.05 + i * 0.07 }}
+                className="flex items-baseline gap-2"
               >
-                <p className="text-xs text-slate-600 mb-3 flex items-center gap-1.5 uppercase tracking-widest font-medium">
-                  <Code2 className="w-3 h-3" />
-                  {t('hero.stack.label')}
-                </p>
-                <div className="flex flex-wrap gap-2 items-center">
-                  {stack.map(({ label, Icon, hex }, i) => (
-                    <motion.div
-                      key={label}
-                      initial={{ opacity: 0, scale: 0.7 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 1.1 + i * 0.05, duration: 0.4, ease: 'easeOut' }}
-                      whileHover={{ scale: 1.15, y: -2 }}
-                      title={label}
-                      className="w-9 h-9 flex items-center justify-center rounded-xl cursor-default transition-all duration-200"
-                      style={{
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.07)',
-                      }}
-                    >
-                      <Icon style={{ color: hex }} className="w-4 h-4 shrink-0" />
-                    </motion.div>
-                  ))}
-                </div>
+                <span className="text-xl font-black text-white tabular-nums">{s.val}</span>
+                <span className="text-[12px]" style={{ color: 'rgba(100,116,139,0.7)' }}>{s.label}</span>
               </motion.div>
-            </div>
+            ))}
 
-            {/* ── Right — Desktop Mockup ──────────────────────────────── */}
-            <DashboardMockup t={t} />
-          </div>
+            {/* Tech stack — inline, compact */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.35 }}
+              className="hidden sm:flex items-center gap-2 ml-auto"
+            >
+              <span className="text-[10px] uppercase tracking-widest font-semibold"
+                style={{ color: 'rgba(100,116,139,0.5)' }}>
+                Built with
+              </span>
+              {stack.map(({ label, Icon, hex }) => (
+                <div key={label} title={label}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <Icon style={{ color: hex }} className="w-3.5 h-3.5 shrink-0" />
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+
         </div>
-
-        {/* ── Stats bar ─────────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 border-t border-white/5"
-          style={{ background: 'rgba(7,7,13,0.6)', backdropFilter: 'blur(20px)' }}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              {stats.map((s, i) => {
-                const Icon = s.icon;
-                return (
-                  <motion.div
-                    key={s.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.0 + i * 0.08, duration: 0.5 }}
-                    whileHover={{ y: -2, borderColor: 'rgba(124,58,237,0.3)' }}
-                    className="rounded-2xl p-3.5 sm:p-4 flex gap-3 items-start cursor-default transition-all duration-200"
-                    style={{
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.05)',
-                    }}
-                  >
-                    <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: 'rgba(124,58,237,0.15)' }}
-                    >
-                      <Icon className="w-4 h-4 text-violet-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-white text-xs sm:text-sm font-semibold leading-tight">{s.label}</div>
-                      <div className="text-slate-500 text-[11px] sm:text-xs mt-0.5 leading-relaxed hidden sm:block">{s.desc}</div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.div>
       </motion.div>
 
     </section>
