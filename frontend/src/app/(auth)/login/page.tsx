@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -34,7 +34,7 @@ function formatCountdown(ms: number): string {
   return `${sec}s`;
 }
 
-// ─── Inline error banner ──────────────────────────────────────────────────────
+// ─── Error banner ─────────────────────────────────────────────────────────────
 
 function ErrorBanner({
   code, message, attemptsLeft, remainingMs,
@@ -57,7 +57,7 @@ function ErrorBanner({
 
   if (!message) return null;
 
-  const isLocked = code === 'ACCOUNT_LOCKED' || code === 'RATE_LIMITED';
+  const isLocked      = code === 'ACCOUNT_LOCKED' || code === 'RATE_LIMITED';
   const isDeactivated = code === 'ACCOUNT_DEACTIVATED';
 
   return (
@@ -87,9 +87,7 @@ function ErrorBanner({
             <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
           )}
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-medium leading-snug ${
-              isDeactivated ? 'text-amber-300' : 'text-red-300'
-            }`}>
+            <p className={`text-sm font-medium leading-snug ${isDeactivated ? 'text-amber-300' : 'text-red-300'}`}>
               {message}
             </p>
             {isLocked && countdown > 0 && (
@@ -103,10 +101,8 @@ function ErrorBanner({
               </p>
             )}
             {isDeactivated && (
-              <a
-                href="mailto:contact@mbndev.ma"
-                className="text-xs text-amber-400 hover:text-amber-300 transition-colors mt-1 inline-block"
-              >
+              <a href="mailto:contact@mbndev.ma"
+                className="text-xs text-amber-400 hover:text-amber-300 transition-colors mt-1 inline-block">
                 Contact support →
               </a>
             )}
@@ -117,120 +113,119 @@ function ErrorBanner({
   );
 }
 
-// ─── Left panel — cinematic visual story ─────────────────────────────────────
+// ─── Left panel ───────────────────────────────────────────────────────────────
+
+const features = [
+  { icon: Zap,          label: 'Lightning Fast',    desc: 'Optimized for speed & performance' },
+  { icon: Shield,       label: 'Fully Secure',      desc: 'Enterprise-grade security protocols' },
+  { icon: Globe2,       label: 'Global Delivery',   desc: 'Deployed worldwide on edge network' },
+  { icon: CheckCircle2, label: '100% Satisfaction', desc: 'Guaranteed on every project' },
+];
+
+const stats = [
+  { val: '34+', label: 'Clients' },
+  { val: '98%', label: 'On Time' },
+  { val: '5.0', label: 'Rating'  },
+];
 
 function LeftPanel() {
-  const features = [
-    { icon: Zap,          label: 'Lightning Fast',    desc: 'Optimized for speed & performance' },
-    { icon: Shield,       label: 'Fully Secure',      desc: 'Enterprise-grade security protocols' },
-    { icon: Globe2,       label: 'Global Delivery',   desc: 'Deployed worldwide on edge network' },
-    { icon: CheckCircle2, label: '100% Satisfaction', desc: 'Guaranteed on every project' },
-  ];
-
   return (
-    <div className="hidden lg:flex flex-col relative overflow-hidden bg-[#050508]">
-      {/* Deep background gradient */}
-      <div className="absolute inset-0">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse 70% 60% at 30% 50%, rgba(124,58,237,0.18) 0%, transparent 65%)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse 50% 40% at 80% 20%, rgba(59,130,246,0.1) 0%, transparent 55%)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse 40% 30% at 70% 85%, rgba(6,182,212,0.07) 0%, transparent 50%)',
-          }}
-        />
-      </div>
+    <div className="hidden lg:flex flex-col relative overflow-hidden h-full"
+      style={{ background: '#07070d' }}>
+
+      {/* ── Backgrounds ── */}
+      {/* Primary large purple orb — centred left */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 80% 70% at 35% 55%, rgba(124,58,237,0.28) 0%, transparent 65%)',
+      }} />
+      {/* Secondary blue orb — top right */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 60% 50% at 85% 15%, rgba(59,130,246,0.15) 0%, transparent 55%)',
+      }} />
+      {/* Tertiary cyan — bottom */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 50% 35% at 65% 92%, rgba(6,182,212,0.1) 0%, transparent 55%)',
+      }} />
 
       {/* Ambient grid */}
-      <div className="absolute inset-0 ambient-grid opacity-40" />
+      <div className="absolute inset-0 ambient-grid opacity-35 pointer-events-none" />
       {/* Film grain */}
-      <div className="absolute inset-0 film-grain" />
+      <div className="absolute inset-0 film-grain pointer-events-none" />
 
-      {/* Top glow line */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(168,85,247,0.7), transparent)' }}
-      />
+      {/* Animated floating orbs */}
+      <motion.div className="absolute top-[22%] left-[28%] w-72 h-72 rounded-full pointer-events-none"
+        style={{ background: 'rgba(124,58,237,0.18)', filter: 'blur(70px)' }}
+        animate={{ scale: [1, 1.18, 1], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }} />
+      <motion.div className="absolute bottom-[28%] right-[18%] w-52 h-52 rounded-full pointer-events-none"
+        style={{ background: 'rgba(59,130,246,0.12)', filter: 'blur(55px)' }}
+        animate={{ scale: [1, 1.22, 1], opacity: [0.5, 0.85, 0.5] }}
+        transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut', delay: 2 }} />
 
-      {/* Right edge vertical separator */}
-      <div className="absolute right-0 top-0 bottom-0 vertical-glow" />
+      {/* Top gradient line */}
+      <div className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.6), rgba(168,85,247,0.8), rgba(59,130,246,0.5), transparent)' }} />
+      {/* Right separator */}
+      <div className="absolute right-0 top-[10%] bottom-[10%] w-px vertical-glow pointer-events-none" />
 
-      {/* Floating orbs */}
-      <motion.div
-        className="absolute top-1/4 left-1/3 w-64 h-64 rounded-full pointer-events-none"
-        style={{ background: 'rgba(124,58,237,0.12)', filter: 'blur(80px)' }}
-        animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="absolute bottom-1/3 right-1/4 w-48 h-48 rounded-full pointer-events-none"
-        style={{ background: 'rgba(59,130,246,0.09)', filter: 'blur(60px)' }}
-        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.9, 0.5] }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-      />
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col h-full px-12 py-16 justify-between">
+      {/* ── Content ── */}
+      <div className="relative z-10 flex flex-col h-full px-10 xl:px-14 py-12 justify-between">
 
         {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center gap-3"
         >
           <Logo3D size="md" />
         </motion.div>
 
-        {/* Center hero text */}
-        <div className="flex flex-col gap-8">
+        {/* Hero block */}
+        <div className="space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.75, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="cin-chip mb-5">
+            <span className="cin-chip mb-6 inline-flex">
               <Sparkles className="w-3 h-3" />
               Premium Web Studio
-            </div>
-            <h2 className="text-4xl xl:text-[2.8rem] font-black text-white leading-[1.1] tracking-tight mb-4">
+            </span>
+            <h2 className="text-3xl xl:text-[2.6rem] font-black text-white leading-[1.08] tracking-tight mb-4 mt-3">
               Build the digital<br />
               future with{' '}
               <span className="gradient-text-animated">confidence</span>
             </h2>
-            <p className="text-slate-400 text-base leading-relaxed max-w-sm">
+            <p className="text-slate-400 text-[15px] leading-relaxed max-w-xs">
               Welcome back. Your projects, payments, and progress — all in one premium workspace.
             </p>
           </motion.div>
 
           {/* Feature list */}
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {features.map((f, i) => {
               const Icon = f.icon;
               return (
                 <motion.div
                   key={f.label}
-                  initial={{ opacity: 0, x: -16 }}
+                  initial={{ opacity: 0, x: -18 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.55, delay: 0.28 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                   className="flex items-center gap-3.5 group"
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 icon-glow-purple transition-transform duration-200 group-hover:scale-105">
-                    <Icon className="w-4.5 h-4.5 text-violet-400" strokeWidth={1.8} />
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                    style={{
+                      background: 'rgba(124,58,237,0.15)',
+                      border:     '1px solid rgba(124,58,237,0.28)',
+                      boxShadow:  '0 0 14px rgba(124,58,237,0.12) inset',
+                    }}
+                  >
+                    <Icon className="w-4 h-4 text-violet-400" strokeWidth={1.8} />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">{f.label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{f.desc}</p>
+                    <p className="text-[13px] font-semibold text-white leading-tight">{f.label}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">{f.desc}</p>
                   </div>
                 </motion.div>
               );
@@ -238,35 +233,29 @@ function LeftPanel() {
           </div>
         </div>
 
-        {/* Bottom stats */}
+        {/* Stats + live badge */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center gap-8"
+          transition={{ duration: 0.6, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center gap-6 flex-wrap"
         >
-          {[
-            { val: '34+', label: 'Clients' },
-            { val: '98%', label: 'On Time' },
-            { val: '5.0', label: 'Rating' },
-          ].map((s) => (
+          {stats.map((s) => (
             <div key={s.label}>
-              <div className="text-xl font-black text-white tabular">{s.val}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
+              <div className="text-xl font-black text-white tabular-nums">{s.val}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">{s.label}</div>
             </div>
           ))}
-          <div className="w-px h-8 bg-white/8" />
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 bg-green-500/10 border border-green-500/20 rounded-full px-2.5 py-1">
-              <span className="relative flex w-1.5 h-1.5">
-                <span className="live-badge-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-green-400" />
-              </span>
-              <span className="text-green-400 text-xs font-semibold">System Live</span>
-            </div>
+          <div className="w-px h-8 bg-white/8 shrink-0" />
+          <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
+            style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}>
+            <span className="relative flex w-1.5 h-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-green-400" />
+            </span>
+            <span className="text-green-400 text-[11px] font-semibold">System Live</span>
           </div>
         </motion.div>
-
       </div>
     </div>
   );
@@ -280,19 +269,20 @@ export default function LoginPage() {
   const [showPw,       setShowPw]       = useState(false);
   const [loading,      setLoading]      = useState(false);
   const [mounted,      setMounted]      = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passFocused,  setPassFocused]  = useState(false);
 
   const [errorCode,    setErrorCode]    = useState<ErrorCode>(null);
   const [errorMsg,     setErrorMsg]     = useState('');
   const [attemptsLeft, setAttemptsLeft] = useState<number | undefined>();
   const [remainingMs,  setRemainingMs]  = useState<number | undefined>();
-
-  const [emailErr,  setEmailErr]  = useState('');
-  const [passErr,   setPassErr]   = useState('');
+  const [emailErr,     setEmailErr]     = useState('');
+  const [passErr,      setPassErr]      = useState('');
 
   const { login, user } = useAuth();
-  const { t }   = useLanguage();
-  const router  = useRouter();
-  const haptic  = useHaptic();
+  const { t }           = useLanguage();
+  const router          = useRouter();
+  const haptic          = useHaptic();
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
@@ -302,12 +292,9 @@ export default function LoginPage() {
   }, [mounted, user, router]);
 
   const clearErrors = useCallback(() => {
-    setErrorCode(null);
-    setErrorMsg('');
-    setAttemptsLeft(undefined);
-    setRemainingMs(undefined);
-    setEmailErr('');
-    setPassErr('');
+    setErrorCode(null); setErrorMsg('');
+    setAttemptsLeft(undefined); setRemainingMs(undefined);
+    setEmailErr(''); setPassErr('');
   }, []);
 
   const isLocked = errorCode === 'ACCOUNT_LOCKED' || errorCode === 'RATE_LIMITED';
@@ -316,7 +303,7 @@ export default function LoginPage() {
     e.preventDefault();
     if (!email.trim()) { setEmailErr('Email is required.'); return; }
     if (!password)     { setPassErr('Password is required.'); return; }
-    if (isLocked) { haptic('error'); return toast.error('Account is temporarily locked. Please wait.'); }
+    if (isLocked)      { haptic('error'); return void toast.error('Account is temporarily locked. Please wait.'); }
 
     clearErrors();
     setLoading(true);
@@ -332,9 +319,8 @@ export default function LoginPage() {
       haptic('error');
       const data = err?.response?.data;
       const code = (data?.code ?? null) as ErrorCode;
-      const msg  = data?.message || t('toast.invalidCreds');
       setErrorCode(code);
-      setErrorMsg(msg);
+      setErrorMsg(data?.message || t('toast.invalidCreds'));
       setAttemptsLeft(data?.attemptsLeft);
       setRemainingMs(data?.remainingMs);
     } finally {
@@ -342,109 +328,115 @@ export default function LoginPage() {
     }
   };
 
-  const fieldStyle = (hasErr: boolean, focused = false) => ({
-    background:    focused ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
-    border:        `1.5px solid ${hasErr ? 'rgba(239,68,68,0.55)' : focused ? 'rgba(124,58,237,0.55)' : 'rgba(255,255,255,0.08)'}`,
-    borderRadius:  '14px',
-    outline:       'none',
-    color:         '#fff',
-    fontSize:      '15px',
-    boxShadow:     focused && !hasErr ? '0 0 0 3px rgba(124,58,237,0.1)' : 'none',
-    transition:    'border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+  const fieldStyle = (hasErr: boolean, focused: boolean) => ({
+    background:   focused ? 'rgba(124,58,237,0.06)' : 'rgba(255,255,255,0.04)',
+    border:       `1.5px solid ${hasErr ? 'rgba(239,68,68,0.55)' : focused ? 'rgba(124,58,237,0.55)' : 'rgba(255,255,255,0.1)'}`,
+    borderRadius: '14px',
+    outline:      'none',
+    color:        '#fff',
+    fontSize:     '15px',
+    boxShadow:    focused && !hasErr ? '0 0 0 3px rgba(124,58,237,0.1)' : 'none',
+    transition:   'border-color 0.2s, background 0.2s, box-shadow 0.2s',
   });
 
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passFocused,  setPassFocused]  = useState(false);
-
   return (
-    <div
-      className="min-h-dvh flex overflow-hidden"
-      style={{
-        background: '#08080b',
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
-      }}
-    >
-      {/* ── Left visual panel (desktop only) ──────────────────────────── */}
+    <div className="min-h-dvh flex overflow-hidden"
+      style={{ background: '#08080b', paddingTop: 'max(env(safe-area-inset-top,0px),0px)' }}>
+
+      {/* ── Left visual panel (lg+) ─────────────────────────────────── */}
       <div className="hidden lg:block w-[46%] shrink-0">
         <div className="sticky top-0 h-dvh">
           <LeftPanel />
         </div>
       </div>
 
-      {/* ── Right form panel ─────────────────────────────────────────── */}
+      {/* ── Right form panel ────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-h-dvh relative overflow-hidden">
 
-        {/* Mobile background */}
+        {/* Mobile-only background */}
         <div className="lg:hidden absolute inset-0 pointer-events-none">
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 50% at 50% 20%, rgba(124,58,237,0.12) 0%, transparent 65%)' }} />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'radial-gradient(ellipse 90% 55% at 50% 18%, rgba(124,58,237,0.14) 0%, transparent 65%)',
+          }} />
+          <div className="absolute inset-0 ambient-grid opacity-25" />
           <div className="absolute inset-0 film-grain" />
         </div>
 
-        {/* Top edge glow line */}
-        <div
-          className="absolute top-0 left-0 right-0 h-px pointer-events-none z-10"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.4) 50%, transparent 100%)' }}
-        />
+        {/* Subtle right-panel background (desktop) */}
+        <div className="hidden lg:block absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 70% 60% at 70% 40%, rgba(124,58,237,0.04) 0%, transparent 70%)',
+        }} />
 
-        {/* Back button */}
-        <div className="relative z-10 px-5 pt-4 pb-1">
-          <Link
-            href="/"
-            className="cin-btn-ghost"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Back</span>
+        {/* Top glow line */}
+        <div className="absolute top-0 left-0 right-0 h-px z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.35), transparent)' }} />
+
+        {/* ── Back button ── */}
+        <div className="relative z-10 flex items-center px-5 sm:px-8 pt-5 pb-1">
+          <Link href="/"
+            className="inline-flex items-center gap-1.5 text-slate-500 hover:text-white text-sm font-medium transition-colors group">
+            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            Back
           </Link>
         </div>
 
-        {/* Form area */}
-        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-6 relative z-10">
+        {/* ── Form area ── */}
+        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 lg:px-12 py-6 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 28 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-md mx-auto lg:mx-0 lg:max-w-sm"
+            className="w-full max-w-md mx-auto lg:mx-0 lg:max-w-[380px]"
           >
             {/* Mobile logo */}
             <div className="lg:hidden text-center mb-8">
-              <Link href="/" className="inline-flex items-center gap-2.5 mb-5">
+              <Link href="/" className="inline-flex items-center justify-center mb-5">
                 <Logo3D size="xl" />
               </Link>
             </div>
 
             {/* Heading */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-black text-white tracking-tight mb-2">
+            <div className="mb-7">
+              <h1 className="text-[1.85rem] sm:text-3xl font-black text-white tracking-tight mb-1.5">
                 {t('auth.login.title')}
               </h1>
-              <p className="text-slate-400 text-sm leading-relaxed">
+              <p className="text-slate-500 text-sm leading-relaxed">
                 {t('auth.login.subtitleShort')}
               </p>
             </div>
 
             {/* Card */}
-            <div className="cin-card p-6 sm:p-7">
+            <div
+              className="p-6 sm:p-7 relative overflow-hidden"
+              style={{
+                background:           'rgba(13,13,20,0.95)',
+                border:               '1px solid rgba(255,255,255,0.09)',
+                borderRadius:         '22px',
+                backdropFilter:       'blur(32px) saturate(1.6)',
+                WebkitBackdropFilter: 'blur(32px) saturate(1.6)',
+                boxShadow:            '0 1px 0 rgba(255,255,255,0.07) inset, 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.06)',
+              }}
+            >
+              {/* Top accent line */}
+              <div className="absolute top-0 left-8 right-8 h-px"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(168,85,247,0.6), transparent)' }} />
+
               <form onSubmit={handleSubmit} className="space-y-5" noValidate>
 
                 {errorMsg && (
-                  <ErrorBanner
-                    code={errorCode}
-                    message={errorMsg}
-                    attemptsLeft={attemptsLeft}
-                    remainingMs={remainingMs}
-                  />
+                  <ErrorBanner code={errorCode} message={errorMsg}
+                    attemptsLeft={attemptsLeft} remainingMs={remainingMs} />
                 )}
 
-                {/* Email */}
+                {/* Email field */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-widest">
+                  <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
                     {t('auth.field.email')}
                   </label>
                   <div className="relative">
-                    <Mail
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors duration-200"
-                      style={{ color: emailFocused ? '#a855f7' : emailErr ? '#f87171' : '#64748b' }}
-                    />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors duration-200"
+                      style={{ color: emailFocused ? '#a855f7' : emailErr ? '#f87171' : '#475569' }} />
                     <input
                       type="email"
                       value={email}
@@ -466,16 +458,14 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* Password */}
+                {/* Password field */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-widest">
+                  <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
                     {t('auth.field.password')}
                   </label>
                   <div className="relative">
-                    <Lock
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors duration-200"
-                      style={{ color: passFocused ? '#a855f7' : passErr ? '#f87171' : '#64748b' }}
-                    />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors duration-200"
+                      style={{ color: passFocused ? '#a855f7' : passErr ? '#f87171' : '#475569' }} />
                     <input
                       type={showPw ? 'text' : 'password'}
                       value={password}
@@ -491,7 +481,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-slate-300 transition-colors touch-target"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-slate-300 transition-colors"
                       aria-label={showPw ? 'Hide password' : 'Show password'}
                     >
                       {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -503,10 +493,8 @@ export default function LoginPage() {
                     </p>
                   )}
                   <div className="flex justify-end mt-2.5">
-                    <Link
-                      href="/forgot-password"
-                      className="text-xs text-slate-500 hover:text-violet-400 transition-colors py-1 font-medium"
-                    >
+                    <Link href="/forgot-password"
+                      className="text-xs text-slate-500 hover:text-violet-400 transition-colors font-medium py-1">
                       {t('auth.login.forgot')}
                     </Link>
                   </div>
@@ -517,49 +505,53 @@ export default function LoginPage() {
                   type="submit"
                   disabled={loading || isLocked}
                   onClick={() => !loading && !isLocked && haptic('medium')}
-                  className="cin-btn-primary mt-1"
+                  className="w-full rounded-[14px] py-3.5 text-sm font-bold text-white transition-all duration-200 flex items-center justify-center gap-2"
                   style={
                     isLocked
-                      ? { background: 'rgba(239,68,68,0.4)', boxShadow: 'none' }
+                      ? { background: 'rgba(239,68,68,0.4)', cursor: 'not-allowed' }
                       : loading
-                      ? { background: 'rgba(124,58,237,0.5)', boxShadow: 'none', cursor: 'not-allowed' }
-                      : undefined
+                      ? { background: 'rgba(124,58,237,0.5)', cursor: 'not-allowed' }
+                      : {
+                          background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                          boxShadow:  '0 6px 24px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset',
+                        }
                   }
+                  onMouseEnter={e => {
+                    if (!loading && !isLocked) {
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 32px rgba(124,58,237,0.55), 0 1px 0 rgba(255,255,255,0.12) inset';
+                      (e.currentTarget as HTMLElement).style.transform  = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset';
+                    (e.currentTarget as HTMLElement).style.transform  = 'none';
+                  }}
                 >
-                  <span className="flex items-center gap-2">
-                    {loading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : isLocked ? (
-                      <>
-                        <ShieldAlert className="w-4 h-4" />
-                        Account Locked
-                      </>
-                    ) : (
-                      <>
-                        {t('auth.login.submit')}
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </span>
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : isLocked ? (
+                    <><ShieldAlert className="w-4 h-4" /> Account Locked</>
+                  ) : (
+                    <>{t('auth.login.submit')} <ArrowRight className="w-4 h-4" /></>
+                  )}
                 </button>
+
               </form>
             </div>
 
             {/* Sign up link */}
             <p className="text-center text-slate-500 text-sm mt-6">
               {t('auth.login.noAccount')}{' '}
-              <Link
-                href="/signup"
-                className="text-violet-400 hover:text-violet-300 font-semibold transition-colors"
-              >
+              <Link href="/signup"
+                className="text-violet-400 hover:text-violet-300 font-semibold transition-colors">
                 {t('auth.login.signupFree')}
               </Link>
             </p>
 
             {/* Security note */}
-            <div className="flex items-center justify-center gap-2 mt-5">
-              <Shield className="w-3 h-3 text-slate-600" />
-              <p className="text-xs text-slate-600">256-bit SSL encryption · Zero data sharing</p>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <Shield className="w-3 h-3 text-slate-700" />
+              <p className="text-[11px] text-slate-700">256-bit SSL encryption · Zero data sharing</p>
             </div>
 
           </motion.div>
