@@ -10,12 +10,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const navLinks = [
-  { label: 'Services',  href: '/#services'    },
-  { label: 'Work',      href: '/#portfolio'   },
-  { label: 'Pricing',   href: '/#pricing'     },
-  { label: 'Process',   href: '/#process'     },
-  { label: 'About',     href: '/#commitments' },
-  { label: 'Contact',   href: '/#contact'     },
+  { label: 'Services',  href: '/services'  },
+  { label: 'Work',      href: '/portfolio' },
+  { label: 'Pricing',   href: '/pricing'   },
+  { label: 'About',     href: '/about'     },
+  { label: 'Contact',   href: '/contact'   },
+  { label: 'Insights',  href: '/insights'  },
 ];
 
 export default function Navbar() {
@@ -40,11 +40,8 @@ export default function Navbar() {
     prevScrollY.current = latest;
   });
 
-  const isActive = (href: string) => {
-    if (pathname !== '/') return false;
-    if (href === '/#home') return true;
-    return false;
-  };
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
     <>

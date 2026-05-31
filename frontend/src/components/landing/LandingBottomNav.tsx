@@ -3,25 +3,23 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Briefcase, FolderOpen, DollarSign, MessageCircle } from 'lucide-react';
+import { Home, Briefcase, FolderOpen, DollarSign, BookOpen } from 'lucide-react';
 import { useHaptic } from '@/hooks/useHaptic';
 
 const tabs = [
-  { href: '/#home',      icon: Home,       label: 'Home'      },
-  { href: '/#services',  icon: Briefcase,  label: 'Services'  },
-  { href: '/#portfolio', icon: FolderOpen, label: 'Work'      },
-  { href: '/#pricing',   icon: DollarSign, label: 'Pricing'   },
-  { href: '/#contact',   icon: MessageCircle, label: 'Contact'   },
+  { href: '/',          icon: Home,       label: 'Home'      },
+  { href: '/services',  icon: Briefcase,  label: 'Services'  },
+  { href: '/portfolio', icon: FolderOpen, label: 'Portfolio' },
+  { href: '/pricing',   icon: DollarSign, label: 'Pricing'   },
+  { href: '/insights',  icon: BookOpen,   label: 'Insights'  },
 ];
 
 export default function LandingBottomNav() {
   const pathname = usePathname();
   const haptic   = useHaptic();
 
-  const isActive = (href: string) => {
-    if (pathname !== '/') return false;
-    return href === '/#home';
-  };
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
     <nav
