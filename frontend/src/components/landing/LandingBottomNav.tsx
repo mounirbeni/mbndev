@@ -7,19 +7,21 @@ import { Home, Briefcase, FolderOpen, DollarSign, BookOpen } from 'lucide-react'
 import { useHaptic } from '@/hooks/useHaptic';
 
 const tabs = [
-  { href: '/',          icon: Home,       label: 'Home'      },
-  { href: '/services',  icon: Briefcase,  label: 'Services'  },
-  { href: '/portfolio', icon: FolderOpen, label: 'Portfolio' },
-  { href: '/pricing',   icon: DollarSign, label: 'Pricing'   },
-  { href: '/insights',  icon: BookOpen,   label: 'Insights'  },
+  { href: '/#home',      icon: Home,       label: 'Home'      },
+  { href: '/#services',  icon: Briefcase,  label: 'Services'  },
+  { href: '/#portfolio', icon: FolderOpen, label: 'Work'      },
+  { href: '/#pricing',   icon: DollarSign, label: 'Pricing'   },
+  { href: '/#contact',   icon: BookOpen,   label: 'Contact'   },
 ];
 
 export default function LandingBottomNav() {
   const pathname = usePathname();
   const haptic   = useHaptic();
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (pathname !== '/') return false;
+    return href === '/#home';
+  };
 
   return (
     <nav

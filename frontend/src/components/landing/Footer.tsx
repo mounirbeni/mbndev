@@ -31,20 +31,20 @@ export default function Footer() {
   const { t } = useLanguage();
 
   const quickLinks = [
-    { label: t('nav.home'),      href: '/' },
-    { label: t('nav.services'),  href: '/services' },
-    { label: t('nav.portfolio'), href: '/portfolio' },
-    { label: t('nav.pricing'),   href: '/pricing' },
-    { label: t('nav.about'),     href: '/about' },
-    { label: t('nav.contact'),   href: '/contact' },
+    { label: t('nav.home'),      href: '/#home'        },
+    { label: t('nav.services'),  href: '/#services'    },
+    { label: t('nav.portfolio'), href: '/#portfolio'   },
+    { label: t('nav.pricing'),   href: '/#pricing'     },
+    { label: t('nav.about'),     href: '/#commitments' },
+    { label: t('nav.contact'),   href: '/#contact'     },
   ];
 
   const serviceLinks = [
-    { label: 'Custom Websites',       href: '/services/custom-websites' },
-    { label: 'E-Commerce Stores',     href: '/services/ecommerce' },
-    { label: 'Web Applications',      href: '/services/web-applications' },
-    { label: 'Landing Pages',         href: '/services/landing-pages' },
-    { label: 'Maintenance & Support', href: '/services/maintenance' },
+    { label: 'Custom Websites',       href: '/#services' },
+    { label: 'E-Commerce Stores',     href: '/#services' },
+    { label: 'Web Applications',      href: '/#services' },
+    { label: 'Landing Pages',         href: '/#services' },
+    { label: 'Maintenance & Support', href: '/#services' },
   ];
 
   const legalLinks = [
@@ -176,7 +176,7 @@ export default function Footer() {
                 <ArrowUpRight className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
               </a>
               <Link
-                href="/contact"
+                href="/#contact"
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-primary-500/8 border border-primary-500/15 text-primary-400 text-xs font-semibold hover:bg-primary-500/15 transition-all"
               >
                 <Mail className="w-3.5 h-3.5" />
