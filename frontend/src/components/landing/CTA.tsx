@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
-import { ArrowRight, MapPin, Zap, Clock, Sparkles } from 'lucide-react';
+import { ArrowRight, MapPin, Zap, Clock, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function CTA() {
@@ -15,10 +15,12 @@ export default function CTA() {
   return (
     <section id="contact" className="py-32 relative overflow-hidden">
 
-      {/* Background atmosphere */}
+      {/* Animated gradient background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-violet-500/10 blur-[130px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[200px] rounded-full bg-blue-500/6 blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full animate-float-a"
+          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.12) 0%, transparent 60%)', filter: 'blur(60px)' }} />
+        <div className="absolute top-1/3 left-1/3 w-[400px] h-[300px] rounded-full animate-float-b"
+          style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 60%)', filter: 'blur(60px)' }} />
         <div className="absolute inset-0 ambient-grid opacity-30" />
       </div>
 
@@ -29,10 +31,13 @@ export default function CTA() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={inView ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="flex justify-center mb-6"
+          className="flex justify-center mb-8"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold text-violet-300 border border-violet-500/25 bg-violet-500/8">
-            <Sparkles className="w-3 h-3" />
+          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold text-violet-300 border border-violet-500/25 bg-violet-500/8">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-400" />
+            </span>
             {t('cta.badge')}
           </span>
         </motion.div>
@@ -70,7 +75,7 @@ export default function CTA() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.36, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row gap-3 justify-center mb-12"
+          className="flex flex-col sm:flex-row gap-3 justify-center mb-14"
         >
           <Link href="/request">
             <Button size="lg" className="group relative overflow-hidden glow-button">
@@ -88,7 +93,7 @@ export default function CTA() {
           </a>
         </motion.div>
 
-        {/* The main cinematic card */}
+        {/* Info card */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -101,18 +106,16 @@ export default function CTA() {
             boxShadow: '0 0 80px rgba(124,58,237,0.1), 0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
           }}
         >
-          {/* Top beam */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-violet-500/70 to-transparent" />
-
-          {/* Inner glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-32 bg-violet-500/8 blur-2xl pointer-events-none" />
 
           <div className="relative z-10 py-10 px-6 sm:px-12">
             <div className="flex flex-wrap justify-center gap-8 text-sm">
               {[
-                { icon: MapPin, text: t('cta.location'),  color: 'text-violet-400' },
-                { icon: Clock,  text: t('cta.response'),  color: 'text-blue-400' },
-                { icon: Zap,    text: t('cta.nocommit'),  color: 'text-emerald-400' },
+                { icon: MapPin,       text: t('cta.location'),  color: 'text-violet-400' },
+                { icon: Clock,        text: t('cta.response'),  color: 'text-blue-400' },
+                { icon: Zap,          text: t('cta.nocommit'),  color: 'text-emerald-400' },
+                { icon: CheckCircle2, text: 'Free consultation', color: 'text-amber-400' },
               ].map(({ icon: Icon, text, color }) => (
                 <motion.span
                   key={text}
@@ -128,10 +131,8 @@ export default function CTA() {
             </div>
           </div>
 
-          {/* Bottom beam */}
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
         </motion.div>
-
       </div>
     </section>
   );

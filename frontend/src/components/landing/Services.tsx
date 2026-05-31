@@ -2,29 +2,22 @@
 
 import { useRef, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
 import {
   Globe, ShoppingCart, BarChart3, Layout, Smartphone, Settings,
   ArrowRight,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-/* ── Spotlight card with mouse-tracking glow ────────────────────────────── */
 function SpotlightCard({
   children,
-  delay,
   glowColor,
+  className = '',
 }: {
   children: React.ReactNode;
-  delay: number;
   glowColor: string;
+  className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
 
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
@@ -39,11 +32,9 @@ function SpotlightCard({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
       onMouseMove={onMouseMove}
-      className="group relative rounded-2xl p-6 cursor-default overflow-hidden spotlight-card"
+      whileHover={{ y: -4, borderColor: `${glowColor}40` }}
+      className={`group relative rounded-2xl cursor-default overflow-hidden spotlight-card ${className}`}
       style={{
         background: 'rgba(10,10,16,0.9)',
         border: '1px solid rgba(255,255,255,0.065)',
@@ -52,31 +43,27 @@ function SpotlightCard({
         '--mx': '50%',
         '--my': '50%',
       } as React.CSSProperties}
-      whileHover={{ y: -4, borderColor: `${glowColor}40` }}
     >
-      {/* Spotlight overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
           background: `radial-gradient(500px circle at var(--mx) var(--my), ${glowColor}12, transparent 55%)`,
         }}
       />
-
-      {/* Top line glow on hover */}
       <div
         className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: `linear-gradient(90deg, transparent, ${glowColor}80, transparent)` }}
       />
-
       {children}
     </motion.div>
   );
 }
 
-/* ════════════════════════════════════════════════════════════════════════ */
-
 export default function Services() {
   const { t } = useLanguage();
+  const titleRef    = useRef<HTMLDivElement>(null);
+  const sectionRef  = useRef<HTMLElement>(null);
+  const titleInView = useInView(titleRef, { once: true, margin: '-80px' });
 
   const services = [
     {
@@ -135,21 +122,8 @@ export default function Services() {
     },
   ];
 
-  const titleRef    = useRef<HTMLDivElement>(null);
-  const sectionRef  = useRef<HTMLElement>(null);
-  const titleInView = useInView(titleRef, { once: true, margin: '-80px' });
-
-  // GSAP: batch-stagger service cards as they scroll into view
-  useGSAP(() => {
-    ScrollTrigger.batch('.service-card', {
-      onEnter: (els) => gsap.fromTo(els,
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power2.out', overwrite: true }
-      ),
-      start: 'top 88%',
-      once: true,
-    });
-  }, { scope: sectionRef });
+  const [featured, ...rest] = services;
+  const FeaturedIcon = featured.icon;
 
   return (
     <section ref={sectionRef} id="services" className="py-28 relative overflow-hidden">
@@ -167,7 +141,7 @@ export default function Services() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
 
-        {/* ── Section header ──────────────────────────────────────────── */}
+        {/* Section header */}
         <div ref={titleRef} className="text-center mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -197,65 +171,129 @@ export default function Services() {
           </motion.p>
         </div>
 
-        {/* ── Service cards ────────────────────────────────────────────── */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {services.map((service, i) => {
-            const Icon = service.icon;
-            return (
-              <div key={service.label} className="service-card" style={{ opacity: 0 }}>
-              <SpotlightCard delay={0} glowColor={service.glow}>
-                {/* Number label */}
-                <div className="flex items-center justify-between mb-5">
-                  <div
-                    className={`w-11 h-11 rounded-xl bg-gradient-to-br ${service.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
-                    style={{ boxShadow: `0 8px 24px ${service.glow}30` }}
-                  >
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <span
-                    className="text-xs font-bold tabular"
-                    style={{ color: `${service.glow}60` }}
-                  >
-                    {service.label}
-                  </span>
+        {/* ── Bento Grid ───────────────────────────────────────────────── */}
+
+        {/* Featured card — full width */}
+        <motion.div
+          initial={{ opacity: 0, y: 36 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-5"
+        >
+          <SpotlightCard glowColor={featured.glow}>
+            <div className="flex flex-col md:flex-row p-8 lg:p-10 gap-8">
+              {/* Left: icon + visual */}
+              <div className="relative md:w-2/5 flex flex-col justify-center">
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${featured.iconBg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
+                  style={{ boxShadow: `0 12px 32px ${featured.glow}40` }}
+                >
+                  <FeaturedIcon className="w-7 h-7 text-white" />
                 </div>
-
-                <h3 className="text-white font-bold text-lg mb-2 leading-snug group-hover:text-violet-100 transition-colors duration-200">
-                  {service.title}
+                <span className="absolute top-6 right-6 md:top-0 md:right-0 font-black text-8xl leading-none select-none tabular-nums"
+                  style={{
+                    background: `linear-gradient(135deg, ${featured.glow}18, transparent)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  {featured.label}
+                </span>
+                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-3 leading-snug tracking-tight group-hover:text-violet-100 transition-colors">
+                  {featured.title}
                 </h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-5">{service.desc}</p>
+                <p className="text-slate-500 text-sm leading-relaxed">{featured.desc}</p>
+              </div>
 
-                {/* Feature pills */}
-                <div className="flex flex-wrap gap-1.5 mb-5">
-                  {service.features.map((f) => (
-                    <span
+              {/* Right: features */}
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {featured.features.map((f) => (
+                    <div
                       key={f}
-                      className="text-[11px] px-2.5 py-1 rounded-full font-medium"
+                      className="rounded-xl p-4"
                       style={{
-                        background: `${service.glow}10`,
-                        border: `1px solid ${service.glow}20`,
-                        color: `${service.glow}cc`,
+                        background: `${featured.glow}08`,
+                        border: `1px solid ${featured.glow}15`,
                       }}
                     >
-                      {f}
-                    </span>
+                      <span className="text-sm font-medium" style={{ color: `${featured.glow}cc` }}>{f}</span>
+                    </div>
                   ))}
                 </div>
-
-                {/* Arrow */}
                 <div
-                  className="flex items-center gap-1.5 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-0 group-hover:translate-x-1"
-                  style={{ color: service.glow }}
+                  className="flex items-center gap-1.5 text-sm font-semibold mt-6 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-0 group-hover:translate-x-1"
+                  style={{ color: featured.glow }}
                 >
-                  Learn more <ArrowRight className="w-3.5 h-3.5" />
+                  Learn more <ArrowRight className="w-4 h-4" />
                 </div>
-              </SpotlightCard>
               </div>
+            </div>
+          </SpotlightCard>
+        </motion.div>
+
+        {/* Remaining cards — grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {rest.map((service, i) => {
+            const Icon = service.icon;
+            return (
+              <motion.div
+                key={service.label}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.7, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <SpotlightCard glowColor={service.glow}>
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-5">
+                      <div
+                        className={`w-11 h-11 rounded-xl bg-gradient-to-br ${service.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                        style={{ boxShadow: `0 8px 24px ${service.glow}30` }}
+                      >
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-xs font-bold tabular" style={{ color: `${service.glow}60` }}>
+                        {service.label}
+                      </span>
+                    </div>
+
+                    <h3 className="text-white font-bold text-lg mb-2 leading-snug group-hover:text-violet-100 transition-colors duration-200">
+                      {service.title}
+                    </h3>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-5">{service.desc}</p>
+
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      {service.features.map((f) => (
+                        <span
+                          key={f}
+                          className="text-[11px] px-2.5 py-1 rounded-full font-medium"
+                          style={{
+                            background: `${service.glow}10`,
+                            border: `1px solid ${service.glow}20`,
+                            color: `${service.glow}cc`,
+                          }}
+                        >
+                          {f}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div
+                      className="flex items-center gap-1.5 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-0 group-hover:translate-x-1"
+                      style={{ color: service.glow }}
+                    >
+                      Learn more <ArrowRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </SpotlightCard>
+              </motion.div>
             );
           })}
         </div>
 
-        {/* ── Bottom CTA ───────────────────────────────────────────────── */}
+        {/* Bottom CTA */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -266,11 +304,10 @@ export default function Services() {
           <p className="text-slate-500 text-sm">
             Not sure which service fits?{' '}
             <a href="#contact" className="text-violet-400 hover:text-violet-300 font-medium transition-colors">
-              Let's talk →
+              Let&apos;s talk →
             </a>
           </p>
         </motion.div>
-
       </div>
     </section>
   );

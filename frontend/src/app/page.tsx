@@ -9,6 +9,7 @@ import Process from '@/components/landing/Process';
 import Testimonials from '@/components/landing/Testimonials';
 import CTA from '@/components/landing/CTA';
 import Footer from '@/components/landing/Footer';
+import TechMarquee from '@/components/landing/TechMarquee';
 import JsonLd from '@/components/JsonLd';
 
 const organizationSchema = {
@@ -104,6 +105,7 @@ export default function LandingPage() {
       <main className="pb-[74px] lg:pb-0">
         <Navbar />
         <Hero />
+        <TechMarquee />
         <Services />
         <Portfolio />
         <Pricing />

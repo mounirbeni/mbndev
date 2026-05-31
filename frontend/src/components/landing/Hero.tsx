@@ -1,18 +1,95 @@
 'use client';
 
 import Image from 'next/image';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowUpRight, Users, Rocket, TrendingUp, Shield, Play } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
-/* ── Bottom stats — matching reference ───────────────────────────────────── */
 const STATS = [
-  { icon: Users,      val: '50+',  label: 'Happy Clients'       },
-  { icon: Rocket,     val: '120+', label: 'Projects Delivered'  },
-  { icon: TrendingUp, val: '98%',  label: 'Client Satisfaction' },
-  { icon: Shield,     val: '5+',   label: 'Years of Experience' },
+  { icon: Users,      val: 50,   suffix: '+', label: 'Happy Clients'       },
+  { icon: Rocket,     val: 120,  suffix: '+', label: 'Projects Delivered'  },
+  { icon: TrendingUp, val: 98,   suffix: '%', label: 'Client Satisfaction' },
+  { icon: Shield,     val: 5,    suffix: '+', label: 'Years of Experience' },
 ];
+
+const ROTATING_PHRASES = [
+  'drive real impact.',
+  'convert more visitors.',
+  'scale your business.',
+  'stand out online.',
+];
+
+function AnimatedCounter({ val, suffix }: { val: number; suffix: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current) {
+        started.current = true;
+        const duration = 1800;
+        const steps = 60;
+        const increment = val / steps;
+        let current = 0;
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= val) {
+            setCount(val);
+            clearInterval(timer);
+          } else {
+            setCount(Math.floor(current));
+          }
+        }, duration / steps);
+      }
+    }, { threshold: 0.3 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [val]);
+
+  return <div ref={ref}>{count}{suffix}</div>;
+}
+
+function RotatingText() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % ROTATING_PHRASES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span className="relative inline-block">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={index}
+          initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, y: -20, filter: 'blur(4px)' }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            background: 'linear-gradient(135deg, #c084fc 0%, #9333ea 40%, #818cf8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            display: 'inline-block',
+          }}
+        >
+          {ROTATING_PHRASES[index]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
+function FloatingOrb({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return <div className={`absolute rounded-full pointer-events-none ${className}`} style={style} />;
+}
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -29,6 +106,38 @@ export default function Hero() {
       style={{ height: '100dvh', minHeight: '640px', background: '#07060f' }}
     >
 
+      {/* ── ANIMATED GRADIENT ORBS ─────────────────────────────────────────── */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <FloatingOrb
+          className="animate-float-a"
+          style={{
+            width: 600, height: 600,
+            top: '-10%', left: '-5%',
+            background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+          }}
+        />
+        <FloatingOrb
+          className="animate-float-b"
+          style={{
+            width: 500, height: 500,
+            top: '20%', right: '-10%',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+          }}
+        />
+        <FloatingOrb
+          className="animate-float-a"
+          style={{
+            width: 400, height: 400,
+            bottom: '5%', left: '30%',
+            background: 'radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+            animationDelay: '-3s',
+          }}
+        />
+      </div>
+
       {/* ── FULL-BLEED ARTWORK ────────────────────────────────────────────── */}
       <motion.div style={{ y: imageY }} className="absolute inset-0">
         <Image
@@ -41,74 +150,72 @@ export default function Hero() {
           className="object-cover object-[60%_center]"
         />
 
-        {/* Left dark gradient — text lives here */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(100deg, rgba(7,6,15,0.97) 0%, rgba(7,6,15,0.88) 22%, rgba(7,6,15,0.6) 42%, rgba(7,6,15,0.2) 62%, transparent 78%)',
         }} />
 
-        {/* Top vignette */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(to bottom, rgba(7,6,15,0.55) 0%, transparent 22%)',
         }} />
 
-        {/* Bottom vignette — fades into stats bar */}
         <div className="absolute bottom-0 left-0 right-0" style={{
           height: '45%',
           background: 'linear-gradient(to top, rgba(7,6,15,0.98) 0%, rgba(7,6,15,0.6) 35%, transparent 70%)',
         }} />
       </motion.div>
 
+      {/* ── AMBIENT GRID ──────────────────────────────────────────────────── */}
+      <div className="absolute inset-0 ambient-grid opacity-[0.03] pointer-events-none" />
+
       {/* ── CONTENT ───────────────────────────────────────────────────────── */}
       <motion.div
         style={{ opacity: contentOp, y: contentY }}
         className="absolute inset-0 z-10 flex flex-col"
       >
-        {/* Main content area — grows to fill space above stats */}
         <div className="flex-1 flex items-center px-6 sm:px-10 lg:px-14 xl:px-20">
-          <div className="max-w-[580px] w-full">
+          <div className="max-w-[620px] w-full">
 
-            {/* Label */}
+            {/* Availability badge */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.05 }}
               className="flex items-center gap-3 mb-8"
             >
-              <div style={{ width: 28, height: 1, background: 'rgba(139,92,246,0.65)' }} />
-              <span style={{
-                fontSize: '10.5px', fontWeight: 700,
-                letterSpacing: '0.2em', textTransform: 'uppercase',
-                color: 'rgba(139,92,246,0.85)',
-              }}>
-                Premium Web Development Company
+              <span className="relative flex items-center gap-2.5 px-4 py-2 rounded-full text-[11px] font-semibold"
+                style={{
+                  background: 'rgba(124,58,237,0.08)',
+                  border: '1px solid rgba(124,58,237,0.2)',
+                  color: 'rgba(168,85,247,0.95)',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75 animate-ping" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-400" />
+                </span>
+                Available for new projects
               </span>
             </motion.div>
 
-            {/* Headline — 3 clean lines matching reference */}
+            {/* Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                fontSize: 'clamp(2.6rem, 4.2vw, 4.4rem)',
+                fontSize: 'clamp(2.4rem, 4.2vw, 4.2rem)',
                 fontWeight: 900,
-                lineHeight: 1.04,
-                letterSpacing: '-0.02em',
+                lineHeight: 1.06,
+                letterSpacing: '-0.025em',
                 marginBottom: 24,
                 color: '#fff',
               }}
             >
               We build<br />
               digital experiences<br />
-              that{' '}
-              <span style={{
-                background: 'linear-gradient(135deg, #c084fc 0%, #9333ea 50%, #818cf8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
-                drive real impact.
-              </span>
+              that <RotatingText />
             </motion.h1>
 
             {/* Subtitle */}
@@ -117,10 +224,10 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                fontSize: 'clamp(0.9rem, 1.3vw, 1rem)',
+                fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)',
                 lineHeight: 1.75,
                 color: 'rgba(148,163,184,0.78)',
-                maxWidth: 480,
+                maxWidth: 500,
                 marginBottom: 40,
               }}
             >
@@ -128,90 +235,81 @@ export default function Hero() {
               and digital products for ambitious brands and modern businesses.
             </motion.p>
 
-            {/* CTAs — matching reference buttons */}
+            {/* CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center gap-4 flex-wrap"
             >
-              {/* Primary: dark bordered solid */}
               <Link href="/request">
-                <button
-                  className="flex items-center gap-2.5 transition-all duration-200"
+                <motion.button
+                  whileHover={{ scale: 1.03, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="relative flex items-center gap-2.5 overflow-hidden group"
                   style={{
-                    padding:       '13px 28px',
-                    background:    'rgba(124,58,237,0.15)',
-                    border:        '1px solid rgba(124,58,237,0.55)',
-                    borderRadius:  '8px',
+                    padding:       '14px 32px',
+                    background:    'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                    borderRadius:  '12px',
                     color:         '#fff',
-                    fontSize:      '12px',
+                    fontSize:      '13px',
                     fontWeight:    700,
-                    letterSpacing: '0.1em',
+                    letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background   = 'rgba(124,58,237,0.28)';
-                    el.style.borderColor  = 'rgba(168,85,247,0.7)';
-                    el.style.transform    = 'translateY(-1px)';
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background  = 'rgba(124,58,237,0.15)';
-                    el.style.borderColor = 'rgba(124,58,237,0.55)';
-                    el.style.transform   = 'none';
+                    boxShadow:     '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
                   }}
                 >
-                  Start Your Project
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </button>
+                  <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative z-10 flex items-center gap-2.5">
+                    Start Your Project
+                    <ArrowUpRight className="w-4 h-4" />
+                  </span>
+                </motion.button>
               </Link>
 
-              {/* Secondary: ghost with circle play icon */}
-              <a
+              <motion.a
                 href="#portfolio"
-                className="flex items-center gap-3 transition-all duration-200 group"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-3 group"
                 style={{
-                  padding:       '13px 24px',
-                  background:    'transparent',
-                  border:        '1px solid rgba(255,255,255,0.15)',
-                  borderRadius:  '8px',
+                  padding:       '14px 28px',
+                  background:    'rgba(255,255,255,0.04)',
+                  border:        '1px solid rgba(255,255,255,0.12)',
+                  borderRadius:  '12px',
                   color:         'rgba(255,255,255,0.7)',
-                  fontSize:      '12px',
+                  fontSize:      '13px',
                   fontWeight:    700,
-                  letterSpacing: '0.1em',
+                  letterSpacing: '0.08em',
                   textTransform: 'uppercase',
+                  transition:    'border-color 0.2s, color 0.2s, background 0.2s',
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLElement;
-                  el.style.borderColor = 'rgba(255,255,255,0.35)';
+                  el.style.borderColor = 'rgba(255,255,255,0.25)';
                   el.style.color       = '#fff';
+                  el.style.background  = 'rgba(255,255,255,0.07)';
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLElement;
-                  el.style.borderColor = 'rgba(255,255,255,0.15)';
+                  el.style.borderColor = 'rgba(255,255,255,0.12)';
                   el.style.color       = 'rgba(255,255,255,0.7)';
+                  el.style.background  = 'rgba(255,255,255,0.04)';
                 }}
               >
                 View Our Work
                 <span
-                  className="flex items-center justify-center rounded-full"
-                  style={{
-                    width: 26, height: 26,
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    transition: 'border-color 0.2s',
-                  }}
+                  className="flex items-center justify-center rounded-full transition-colors duration-200 group-hover:bg-white/10"
+                  style={{ width: 28, height: 28, border: '1px solid rgba(255,255,255,0.2)' }}
                 >
                   <Play className="w-3 h-3 fill-current" />
                 </span>
-              </a>
+              </motion.a>
             </motion.div>
-
           </div>
         </div>
 
-        {/* ── STATS BAR — bottom, full width ──────────────────────────────── */}
+        {/* ── STATS BAR — desktop ─────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -248,7 +346,7 @@ export default function Hero() {
                 </div>
                 <div>
                   <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                    {s.val}
+                    <AnimatedCounter val={s.val} suffix={s.suffix} />
                   </div>
                   <div style={{ fontSize: '12px', color: 'rgba(148,163,184,0.6)', marginTop: 4 }}>
                     {s.label}
@@ -259,7 +357,7 @@ export default function Hero() {
           })}
         </motion.div>
 
-        {/* Mobile stats — inline */}
+        {/* Mobile stats */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -269,12 +367,13 @@ export default function Hero() {
         >
           {STATS.map((s) => (
             <div key={s.label} className="text-center">
-              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff' }}>{s.val}</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff' }}>
+                <AnimatedCounter val={s.val} suffix={s.suffix} />
+              </div>
               <div style={{ fontSize: '10px', color: 'rgba(148,163,184,0.6)', marginTop: 3 }}>{s.label}</div>
             </div>
           ))}
         </motion.div>
-
       </motion.div>
 
       {/* Scroll hint */}
@@ -293,7 +392,6 @@ export default function Hero() {
           Scroll
         </span>
       </motion.div>
-
     </section>
   );
 }
