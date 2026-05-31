@@ -12,8 +12,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const navLinks = [
   { label: 'Services',  href: '/#services'    },
   { label: 'Work',      href: '/#portfolio'   },
-  { label: 'Process',   href: '/#process'     },
   { label: 'Pricing',   href: '/#pricing'     },
+  { label: 'Process',   href: '/#process'     },
   { label: 'About',     href: '/#commitments' },
   { label: 'Contact',   href: '/#contact'     },
 ];
