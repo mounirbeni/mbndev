@@ -172,7 +172,7 @@ export default function Hero() {
         style={{ opacity: contentOp, y: contentY }}
         className="absolute inset-0 z-10 flex flex-col"
       >
-        <div className="flex-1 flex items-center px-6 sm:px-10 lg:px-14 xl:px-20">
+        <div className="flex-1 flex items-center px-6 sm:px-10 lg:px-14 xl:px-20 pt-20 lg:pt-24">
           <div className="max-w-[620px] w-full">
 
             {/* Headline */}
