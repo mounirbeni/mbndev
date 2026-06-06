@@ -2,10 +2,12 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import LandingBottomNav from './LandingBottomNav';
 import FloatingSupport from '@/components/ui/FloatingSupport';
+import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen text-white" style={{ background: '#06060a' }}>
+      <ScrollProgressBar />
       {/* Page-wide cinematic depth gradient */}
       <div
         className="fixed inset-0 pointer-events-none"

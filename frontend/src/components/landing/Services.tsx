@@ -7,6 +7,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import WordReveal from '@/components/ui/WordReveal';
 
 function SpotlightCard({
   children,
@@ -152,14 +153,11 @@ export default function Services() {
             <span className="section-label">What We Build</span>
           </motion.div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 24 }}
-            animate={titleInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          <WordReveal
+            text="Our Services"
             className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight"
-          >
-            Our <span className="gradient-text">Services</span>
-          </motion.h2>
+            delay={0.1}
+          />
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}

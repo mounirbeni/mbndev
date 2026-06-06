@@ -94,9 +94,16 @@ function FloatingOrb({ className, style }: { className?: string; style?: React.C
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
-  const contentY  = useTransform(scrollYProgress, [0, 1], ['0%',  '12%']);
-  const contentOp = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
-  const imageY    = useTransform(scrollYProgress, [0, 1], ['0%',  '5%']);
+
+  // Multi-layer parallax at different rates for depth
+  const contentY    = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
+  const contentOp   = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const imageY      = useTransform(scrollYProgress, [0, 1], ['0%', '8%']);
+  const orbTopY     = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);  // fast
+  const orbRightY   = useTransform(scrollYProgress, [0, 1], ['0%', '15%']); // medium
+  const orbBottomY  = useTransform(scrollYProgress, [0, 1], ['0%', '-10%']); // reverse
+  const statsOp     = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const statsY      = useTransform(scrollYProgress, [0, 0.2], ['0%', '40%']);
 
   return (
     <section
@@ -106,36 +113,32 @@ export default function Hero() {
       style={{ height: '100dvh', minHeight: '640px', background: '#07060f' }}
     >
 
-      {/* ── ANIMATED GRADIENT ORBS ─────────────────────────────────────────── */}
+      {/* ── ANIMATED GRADIENT ORBS — each on its own parallax layer ──────── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <FloatingOrb
-          className="animate-float-a"
-          style={{
-            width: 600, height: 600,
-            top: '-10%', left: '-5%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+        <motion.div style={{ y: orbTopY, position: 'absolute', top: '-10%', left: '-5%' }} className="animate-float-a">
+          <div style={{
+            width: 600, height: 600, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%)',
             filter: 'blur(80px)',
-          }}
-        />
-        <FloatingOrb
-          className="animate-float-b"
-          style={{
-            width: 500, height: 500,
-            top: '20%', right: '-10%',
-            background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)',
+          }} />
+        </motion.div>
+
+        <motion.div style={{ y: orbRightY, position: 'absolute', top: '20%', right: '-10%' }} className="animate-float-b">
+          <div style={{
+            width: 500, height: 500, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
             filter: 'blur(80px)',
-          }}
-        />
-        <FloatingOrb
-          className="animate-float-a"
-          style={{
-            width: 400, height: 400,
-            bottom: '5%', left: '30%',
-            background: 'radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%)',
+          }} />
+        </motion.div>
+
+        <motion.div style={{ y: orbBottomY, position: 'absolute', bottom: '5%', left: '30%' }} className="animate-float-a" aria-hidden="true">
+          <div style={{
+            width: 400, height: 400, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%)',
             filter: 'blur(80px)',
             animationDelay: '-3s',
-          }}
-        />
+          }} />
+        </motion.div>
       </div>
 
       {/* ── FULL-BLEED ARTWORK ────────────────────────────────────────────── */}
@@ -290,13 +293,15 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="shrink-0 hidden lg:flex"
           style={{
+            opacity: statsOp,
+            y: statsY,
             background:           'rgba(7,6,15,0.82)',
             backdropFilter:       'blur(24px) saturate(1.6)',
             WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
             borderTop:            '1px solid rgba(255,255,255,0.07)',
           }}
+          className="shrink-0 hidden lg:flex"
         >
           {STATS.map((s, i) => {
             const Icon = s.icon;

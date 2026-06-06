@@ -6,6 +6,7 @@ import {
   MessageSquare, Palette, Code2, Eye, Wrench, Rocket,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import WordReveal from '@/components/ui/WordReveal';
 
 const STEP_ICONS = [MessageSquare, Palette, Code2, Eye, Wrench, Rocket];
 const STEP_COLORS = ['#7c3aed', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
@@ -222,15 +223,11 @@ export default function Process() {
             <span className="section-label">{t('process.eyebrow')}</span>
           </motion.div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 28 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          <WordReveal
+            text={`${t('process.title')} ${t('process.title.bold')}`}
             className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-5 tracking-tight leading-[1.04]"
-          >
-            {t('process.title')}{' '}
-            <span className="gradient-text">{t('process.title.bold')}</span>
-          </motion.h2>
+            delay={0.1}
+          />
 
           <motion.p
             initial={{ opacity: 0, y: 16 }}
