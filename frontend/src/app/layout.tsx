@@ -6,6 +6,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
 import SplashScreen from '@/components/mobile/SplashScreen';
 import SmoothScroll from '@/components/ui/SmoothScroll';
+import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -125,6 +126,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning>
         <LanguageProvider>
           <AuthProvider>
+            <ScrollProgressBar />
             <SmoothScroll>
               {children}
               <Toaster
