@@ -175,30 +175,6 @@ export default function Hero() {
         <div className="flex-1 flex items-center px-6 sm:px-10 lg:px-14 xl:px-20">
           <div className="max-w-[620px] w-full">
 
-            {/* Availability badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.05 }}
-              className="flex items-center gap-3 mb-8"
-            >
-              <span className="relative flex items-center gap-2.5 px-4 py-2 rounded-full text-[11px] font-semibold"
-                style={{
-                  background: 'rgba(124,58,237,0.08)',
-                  border: '1px solid rgba(124,58,237,0.2)',
-                  color: 'rgba(168,85,247,0.95)',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75 animate-ping" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-400" />
-                </span>
-                Available for new projects
-              </span>
-            </motion.div>
-
             {/* Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
