@@ -153,7 +153,7 @@ export default function Navbar() {
                     onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(124,58,237,0.15)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(124,58,237,0.5)'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.25)'; }}
                   >
-                    Book a Call <ArrowUpRight className="w-3.5 h-3.5" />
+                    Start New Project <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
 
                   {/* Mobile */}
