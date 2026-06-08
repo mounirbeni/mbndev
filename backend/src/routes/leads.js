@@ -117,15 +117,21 @@ router.get('/', protect, authorize('admin'), async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// ─── POST /api/leads/import — seed default leads (only if none exist) ─────────
+// ─── POST /api/leads/import — upsert: adds missing leads, skips existing ──────
 router.post('/import', protect, authorize('admin'), async (req, res, next) => {
   try {
-    const count = await prisma.lead.count();
-    if (count > 0) {
-      return res.json({ success: true, message: `Leads already imported (${count} exist).`, count });
+    const existing = await prisma.lead.findMany({ select: { name: true } });
+    const existingNames = new Set(existing.map(l => l.name));
+    const missing = DEFAULT_LEADS.filter(l => !existingNames.has(l.name));
+
+    if (missing.length === 0) {
+      const total = await prisma.lead.count();
+      return res.json({ success: true, message: `All ${total} leads already imported.`, count: total });
     }
-    await prisma.lead.createMany({ data: DEFAULT_LEADS });
-    res.json({ success: true, message: `Imported ${DEFAULT_LEADS.length} leads across Morocco! 🇲🇦`, count: DEFAULT_LEADS.length });
+
+    await prisma.lead.createMany({ data: missing });
+    const total = await prisma.lead.count();
+    res.json({ success: true, message: `Added ${missing.length} new leads. Total: ${total}.`, count: total });
   } catch (err) { next(err); }
 });
 
