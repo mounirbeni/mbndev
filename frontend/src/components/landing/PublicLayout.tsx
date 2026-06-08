@@ -2,9 +2,11 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import LandingBottomNav from './LandingBottomNav';
 import FloatingSupport from '@/components/ui/FloatingSupport';
+import SmoothScroll from '@/components/ui/SmoothScroll';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
+    <SmoothScroll>
     <div className="min-h-screen text-white" style={{ background: '#06060a' }}>
       {/* Page-wide cinematic depth gradient */}
       <div
@@ -24,5 +26,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <LandingBottomNav />
       <FloatingSupport />
     </div>
+    </SmoothScroll>
   );
 }

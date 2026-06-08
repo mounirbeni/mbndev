@@ -5,7 +5,6 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
 import SplashScreen from '@/components/mobile/SplashScreen';
-import SmoothScroll from '@/components/ui/SmoothScroll';
 import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 import './globals.css';
 
@@ -127,9 +126,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LanguageProvider>
           <AuthProvider>
             <ScrollProgressBar />
-            <SmoothScroll>
-              {children}
-              <Toaster
+            {children}
+            <Toaster
                 position="top-center"
                 gutter={8}
                 containerStyle={{ top: 'max(env(safe-area-inset-top, 0px) + 16px, 16px)' }}
@@ -152,7 +150,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   error:   { iconTheme: { primary: '#ef4444', secondary: '#e2e8f0' } },
                 }}
               />
-            </SmoothScroll>
           </AuthProvider>
         </LanguageProvider>
         <SplashScreen />

@@ -11,6 +11,7 @@ import CTA from '@/components/landing/CTA';
 import Footer from '@/components/landing/Footer';
 import TechMarquee from '@/components/landing/TechMarquee';
 import ScrollingBanner from '@/components/ui/ScrollingBanner';
+import SmoothScroll from '@/components/ui/SmoothScroll';
 import JsonLd from '@/components/JsonLd';
 
 const organizationSchema = {
@@ -98,7 +99,7 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <>
+    <SmoothScroll>
       <JsonLd data={organizationSchema} />
       <JsonLd data={websiteSchema} />
       <JsonLd data={serviceSchema} />
@@ -117,6 +118,6 @@ export default function LandingPage() {
         <Footer />
       </main>
       <LandingBottomNav />
-    </>
+    </SmoothScroll>
   );
 }
