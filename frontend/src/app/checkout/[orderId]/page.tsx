@@ -116,7 +116,7 @@ export default function CheckoutPage() {
       const msg  = err?.response?.data?.message;
       if (code === 'DUPLICATE_SUBMISSION') {
         // Payment already exists — treat as success so client sees the pending state
-        toast('Your payment is already under review.', { icon: '⏳' });
+        toast('Your payment is already under review.');
         setDone(true);
       } else if (code === 'SERIALIZATION_FAILURE') {
         toast.error('Concurrent submission — please wait a moment and try again.');

@@ -8,7 +8,8 @@ import toast from 'react-hot-toast';
 import {
   Target, Mail, Phone, Instagram, Globe, Download, Plus,
   Flame, Star, X, Send, Copy, ExternalLink, Trash2, RefreshCcw,
-  ChevronDown, MessageCircle, Check,
+  ChevronDown, MessageCircle, Check, Building2, Utensils, ShoppingBag,
+  Map, Zap, type LucideIcon,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -31,24 +32,24 @@ interface Lead {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  new:            { label: 'New',           color: '#6366f1' },
-  emailed:        { label: 'Emailed',       color: '#f59e0b' },
-  dm_sent:        { label: 'DM Sent',       color: '#8b5cf6' },
-  replied:        { label: 'Replied',       color: '#06b6d4' },
-  converted:      { label: 'Converted ✓',  color: '#10b981' },
-  not_interested: { label: 'Not interested',color: '#6b7280' },
+  new:            { label: 'New',            color: '#6366f1' },
+  emailed:        { label: 'Emailed',        color: '#f59e0b' },
+  dm_sent:        { label: 'DM Sent',        color: '#8b5cf6' },
+  replied:        { label: 'Replied',        color: '#06b6d4' },
+  converted:      { label: 'Converted',      color: '#10b981' },
+  not_interested: { label: 'Not interested', color: '#6b7280' },
 };
 
-const TYPE_ICONS: Record<string, string> = {
-  riad:       '🏰',
-  restaurant: '🍽️',
-  boutique:   '🛍️',
-  tour_guide: '🧭',
+const TYPE_ICONS: Record<string, LucideIcon> = {
+  riad:       Building2,
+  restaurant: Utensils,
+  boutique:   ShoppingBag,
+  tour_guide: Map,
 };
 
 const DM_TEMPLATE = (name: string, type: string) => {
   const portfolioRef = type === 'riad' ? 'RiadConnect' : type === 'boutique' ? 'TyyMaroc' : 'Emll';
-  return `Bonjour ${name} ! 👋
+  return `Bonjour ${name},
 
 Je suis Mounir, développeur web spécialisé dans les entreprises marocaines. J'ai vu votre page Instagram et j'ai adoré votre travail.
 
@@ -58,7 +59,7 @@ J'ai récemment créé ${portfolioRef} pour un client similaire et les résultat
 
 Je vous propose un site professionnel à partir de **799$/mois** — devis gratuit en 24h. Intéressé(e) ?
 
-👉 mbndev.ma`;
+mbndev.ma`;
 };
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -257,7 +258,7 @@ export default function AdminLeadsPage() {
               style={filterType === v
                 ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
                 : { color: '#94a3b8', border: '1px solid transparent' }}>
-              {v === 'all' ? 'All types' : `${TYPE_ICONS[v]} ${v.replace('_',' ')}`}
+              {v === 'all' ? 'All types' : (() => { const I = TYPE_ICONS[v]; return <span className="flex items-center gap-1.5">{I && <I className="w-3.5 h-3.5" />}{v.replace('_',' ')}</span>; })()}
             </button>
           ))}
         </div>
@@ -285,7 +286,7 @@ export default function AdminLeadsPage() {
           <button onClick={handleImport} disabled={importing}
             className="mt-4 px-5 py-2.5 rounded-xl text-white text-sm font-medium"
             style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)' }}>
-            {importing ? 'Importing…' : '⚡ Import 22 Leads'}
+            {importing ? 'Importing…' : <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" />Import 22 Leads</span>}
           </button>
         </div>
       )}
@@ -317,7 +318,7 @@ export default function AdminLeadsPage() {
                     {/* Lead name + priority + angle */}
                     <td className="px-4 py-3 min-w-[200px]">
                       <div className="flex items-center gap-2">
-                        <span className="text-base">{TYPE_ICONS[lead.type] ?? '🏢'}</span>
+                        {(() => { const I = TYPE_ICONS[lead.type] ?? Building2; return <I className="w-4 h-4 text-slate-400 shrink-0" />; })()}
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-white font-medium leading-tight">{lead.name}</span>

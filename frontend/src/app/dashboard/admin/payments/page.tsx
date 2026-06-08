@@ -12,6 +12,7 @@ import {
   CreditCard, CheckCircle, Clock, FileText, AlertTriangle,
   RefreshCcw, TrendingUp, DollarSign, XCircle, Link2, X,
   ShieldAlert, History, ChevronRight, RotateCcw, Activity,
+  Upload, Timer, Plus, type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
@@ -24,15 +25,15 @@ const METHOD_LABELS: Record<string, string> = {
   mock:       'Mock (Test)',
 };
 
-const EVENT_ICONS: Record<string, { icon: string; color: string }> = {
-  submitted:   { icon: '📤', color: 'text-blue-400'   },
-  approved:    { icon: '✅', color: 'text-emerald-400' },
-  rejected:    { icon: '❌', color: 'text-red-400'     },
-  expired:     { icon: '⏱',  color: 'text-amber-400'  },
-  flagged:     { icon: '⚠️', color: 'text-yellow-400'  },
-  rolled_back: { icon: '↩️', color: 'text-slate-400'   },
-  created:     { icon: '🆕', color: 'text-slate-400'   },
-  refunded:    { icon: '↩',  color: 'text-violet-400'  },
+const EVENT_ICONS: Record<string, { icon: LucideIcon; color: string }> = {
+  submitted:   { icon: Upload,        color: 'text-blue-400'   },
+  approved:    { icon: CheckCircle,   color: 'text-emerald-400' },
+  rejected:    { icon: XCircle,       color: 'text-red-400'     },
+  expired:     { icon: Timer,         color: 'text-amber-400'  },
+  flagged:     { icon: AlertTriangle, color: 'text-yellow-400'  },
+  rolled_back: { icon: RotateCcw,     color: 'text-slate-400'   },
+  created:     { icon: Plus,          color: 'text-slate-400'   },
+  refunded:    { icon: RefreshCcw,    color: 'text-violet-400'  },
 };
 
 // ─── Confirm / reject modal (portal) ─────────────────────────────────────────
@@ -276,14 +277,14 @@ function EventDrawer({ paymentId, onClose }: EventDrawerProps) {
                   <div className="absolute left-4 top-2 bottom-2 w-px bg-white/6" />
                   <div className="space-y-5">
                     {events.map((ev, i) => {
-                      const meta = EVENT_ICONS[ev.event] || { icon: '•', color: 'text-slate-400' };
+                      const meta = EVENT_ICONS[ev.event] || { icon: Activity, color: 'text-slate-400' };
                       return (
                         <div key={ev.id} className="flex gap-3 relative">
                           {/* Dot */}
                           <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-sm shrink-0 z-10 ${
                             i === events.length - 1 ? 'bg-primary-500/15' : 'bg-white/4'
                           }`}>
-                            {meta.icon}
+                            <meta.icon className="w-4 h-4" />
                           </div>
                           <div className="flex-1 min-w-0 pb-1">
                             <div className="flex items-center gap-2 flex-wrap">

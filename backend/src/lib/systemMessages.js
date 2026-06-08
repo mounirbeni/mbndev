@@ -53,7 +53,7 @@ const SM = {
 
   paymentVerified: (projectId) =>
     createSystemMessage(projectId, {
-      icon:  '✅',
+      icon:  'CheckCircle',
       title: 'Payment verified — project is now live',
       body:  'Your payment has been confirmed and work begins immediately. You\'ll receive updates here as each milestone is completed.',
     }),
@@ -61,43 +61,43 @@ const SM = {
   statusChanged: (projectId, { toStatus }) => {
     const map = {
       paid: {
-        icon:  '💳',
+        icon:  'CreditCard',
         title: 'Payment received',
         body:  'Payment has been recorded. Your project will be activated once verified.',
       },
       'in-progress': {
-        icon:  '⚙️',
+        icon:  'Settings',
         title: 'Work in progress',
         body:  'Development is underway. Expect regular progress updates as milestones are completed.',
       },
       review: {
-        icon:  '👀',
+        icon:  'Eye',
         title: 'Ready for your review',
         body:  'A deliverable is ready. Please review it and share your feedback below — we\'ll act on it promptly.',
       },
       revision: {
-        icon:  '✏️',
+        icon:  'Edit',
         title: 'Revision in progress',
         body:  'Revision request received and we\'re working on it. We\'ll notify you here as soon as it\'s ready.',
       },
       delivered: {
-        icon:  '📦',
+        icon:  'Package',
         title: 'Project delivered',
         body:  'Everything is packaged and ready. All source files and deliverables are now available in your project dashboard.',
       },
       completed: {
-        icon:  '🎉',
+        icon:  'CheckCheck',
         title: 'Project complete',
         body:  'Your project is officially complete. All files have been handed over. Thank you for working with us — it was a pleasure.',
       },
       cancelled: {
-        icon:  '⚫',
+        icon:  'XCircle',
         title: 'Project cancelled',
         body:  'This project has been cancelled. If you have questions or want to start fresh, feel free to reach out anytime.',
       },
     };
     const tmpl = map[toStatus] || {
-      icon:  '🔄',
+      icon:  'RefreshCw',
       title: 'Status update',
       body:  `Project status has been updated to "${toStatus}".`,
     };
@@ -106,21 +106,21 @@ const SM = {
 
   fileUploaded: (projectId, { fileName, uploaderName }) =>
     createSystemMessage(projectId, {
-      icon:  '📎',
+      icon:  'Paperclip',
       title: 'File uploaded',
       body:  `${uploaderName} added a new file: "${fileName}". Open your project dashboard to view and download it.`,
     }),
 
   milestoneUpdated: (projectId, { title, status }) =>
     createSystemMessage(projectId, {
-      icon:  status === 'paid' ? '✓' : '📌',
+      icon:  status === 'paid' ? 'CheckCircle2' : 'MapPin',
       title: status === 'paid' ? 'Milestone complete' : 'Milestone updated',
       body:  `"${title}" has been marked as ${status === 'paid' ? 'complete' : status}.`,
     }),
 
   revisionRequested: (projectId) =>
     createSystemMessage(projectId, {
-      icon:  '🔁',
+      icon:  'RotateCcw',
       title: 'Revision requested',
       body:  'A revision has been logged on this project. We\'ll begin working on it and update you here.',
     }),

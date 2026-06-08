@@ -182,11 +182,11 @@ function steps(items) {
 
 function notice(text, { type = 'info' } = {}) {
   const map = {
-    info:     { bg: T.blueBg,   border: T.blueBorder,   color: T.blue,        icon: 'ℹ' },
-    warning:  { bg: T.amberBg,  border: T.amberBorder,  color: T.amber,       icon: '⚠' },
-    success:  { bg: T.greenBg,  border: T.greenBorder,  color: T.green,       icon: '✓' },
-    security: { bg: T.purpleBg, border: T.purpleBorder, color: T.purpleLight, icon: '🔒' },
-    danger:   { bg: T.redBg,    border: T.redBorder,    color: T.red,         icon: '⚠' },
+    info:     { bg: T.blueBg,   border: T.blueBorder,   color: T.blue,        icon: 'i' },
+    warning:  { bg: T.amberBg,  border: T.amberBorder,  color: T.amber,       icon: '!' },
+    success:  { bg: T.greenBg,  border: T.greenBorder,  color: T.green,       icon: '&#10003;' },
+    security: { bg: T.purpleBg, border: T.purpleBorder, color: T.purpleLight, icon: '#' },
+    danger:   { bg: T.redBg,    border: T.redBorder,    color: T.red,         icon: '!' },
   };
   const c = map[type] || map.info;
   return `

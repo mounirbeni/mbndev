@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const prisma = require('./lib/prisma');
 
 async function seed() {
-  console.log('🌱  Seeding Neon database...');
+  console.log('[seed] Seeding Neon database...');
 
   // Wipe existing data (order matters for FK constraints)
   await prisma.activityLog?.deleteMany().catch(() => {});
@@ -76,9 +76,8 @@ async function seed() {
     ],
   });
 
-  console.log('✅  Seed complete!');
-  console.log('   Admin → admin@mbndev.com / admin123');
-  console.log('   ℹ️   No demo client or demo project seeded — real data only.');
+  console.log('[seed] Done. Admin -> admin@mbndev.com / admin123');
+  console.log('[seed] No demo client or project seeded — real data only.');
 }
 
 seed()

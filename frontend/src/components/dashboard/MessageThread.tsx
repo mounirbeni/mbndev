@@ -2,7 +2,17 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2 } from 'lucide-react';
+import {
+  Send, Loader2,
+  CheckCircle, CheckCircle2, CheckCheck, CreditCard, Settings, Eye,
+  Edit, Package, XCircle, RefreshCw, Paperclip, MapPin, RotateCcw, Zap,
+  type LucideIcon,
+} from 'lucide-react';
+
+const SYSTEM_ICONS: Record<string, LucideIcon> = {
+  CheckCircle, CheckCircle2, CheckCheck, CreditCard, Settings, Eye,
+  Edit, Package, XCircle, RefreshCw, Paperclip, MapPin, RotateCcw, Zap,
+};
 import { Message } from '@/types';
 import { messageAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,17 +33,18 @@ interface Props {
 type TimeAgoFn = (date: string) => string;
 
 function SystemMessage({ msg, timeAgo }: { msg: Message; timeAgo: TimeAgoFn }) {
-  let icon  = '⚡';
-  let title = '';
-  let body  = '';
+  let iconName = 'Zap';
+  let title    = '';
+  let body     = '';
   try {
     const p = JSON.parse(msg.content);
-    icon  = p.icon  || '⚡';
-    title = p.title || '';
-    body  = p.body  || '';
+    iconName = p.icon  || 'Zap';
+    title    = p.title || '';
+    body     = p.body  || '';
   } catch {
     body = msg.content;
   }
+  const IconComponent = SYSTEM_ICONS[iconName] ?? Zap;
 
   return (
     <motion.div
@@ -57,12 +68,12 @@ function SystemMessage({ msg, timeAgo }: { msg: Message; timeAgo: TimeAgoFn }) {
         />
 
         <div className="px-4 py-3.5 flex items-start gap-3">
-          {/* Emoji icon badge */}
+          {/* Icon badge */}
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 mt-0.5"
+            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
             style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)' }}
           >
-            {icon}
+            <IconComponent className="w-4 h-4 text-violet-400" />
           </div>
 
           {/* Content */}
