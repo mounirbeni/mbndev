@@ -209,14 +209,12 @@ export default function AdminLeadsPage() {
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <RefreshCcw className="w-3.5 h-3.5" /> Refresh
           </button>
-          {leads.length === 0 && (
-            <button onClick={handleImport} disabled={importing}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', boxShadow: '0 0 16px rgba(124,58,237,0.35)' }}>
-              <Download className="w-3.5 h-3.5" />
-              {importing ? 'Importing…' : 'Import 22 Leads'}
-            </button>
-          )}
+          <button onClick={handleImport} disabled={importing}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', boxShadow: '0 0 16px rgba(124,58,237,0.35)' }}>
+            <Download className="w-3.5 h-3.5" />
+            {importing ? 'Importing…' : 'Import Leads'}
+          </button>
         </div>
       </div>
 
@@ -390,6 +388,30 @@ export default function AdminLeadsPage() {
                     {/* Actions */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
+
+                        {/* ⚡ Quick Send — WhatsApp with pre-filled message (priority) or Email modal */}
+                        {(lead.phone || lead.email) && (
+                          lead.phone ? (
+                            <a
+                              href={`https://wa.me/${lead.phone.replace(/\s+/g,'').replace('+','')}?text=${encodeURIComponent(DM_TEMPLATE(lead.name, lead.type))}`}
+                              target="_blank" rel="noreferrer"
+                              onClick={() => updateStatus(lead.id, 'emailed')}
+                              title="⚡ Quick Send via WhatsApp"
+                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+                              style={{ background: 'linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.2))', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' }}>
+                              <Zap className="w-3 h-3" /> WhatsApp
+                            </a>
+                          ) : (
+                            <button onClick={() => openEmail(lead)}
+                              title="⚡ Quick Send via Email"
+                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+                              style={{ background: 'linear-gradient(135deg,rgba(99,102,241,0.25),rgba(79,70,229,0.2))', border: '1px solid rgba(99,102,241,0.4)', color: '#818cf8' }}>
+                              <Zap className="w-3 h-3" /> Email
+                            </button>
+                          )
+                        )}
+
+                        {/* Email icon — always shown if has email */}
                         {lead.email && (
                           <button onClick={() => openEmail(lead)}
                             title="Send email"
@@ -398,18 +420,12 @@ export default function AdminLeadsPage() {
                             <Mail className="w-3.5 h-3.5 text-indigo-400" />
                           </button>
                         )}
-                        {lead.instagram && (
-                          <button onClick={() => { setDmTarget(lead); copyDm(lead); }}
-                            title="Copy Instagram DM template"
-                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-105"
-                            style={{ background: 'rgba(236,72,153,0.12)', border: '1px solid rgba(236,72,153,0.22)' }}>
-                            <MessageCircle className="w-3.5 h-3.5 text-pink-400" />
-                          </button>
-                        )}
+
+                        {/* WhatsApp icon — always shown if has phone */}
                         {lead.phone && (
                           <a href={`https://wa.me/${lead.phone.replace(/\s+/g,'').replace('+','')}`}
                             target="_blank" rel="noreferrer"
-                            title="WhatsApp"
+                            title="WhatsApp (no pre-fill)"
                             className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-105"
                             style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.22)' }}>
                             <Phone className="w-3.5 h-3.5 text-emerald-400" />
