@@ -75,6 +75,7 @@ export default function AdminLeadsPage() {
   const [emailBody,   setEmailBody]   = useState('');
   const [sending,     setSending]     = useState(false);
   const [importing,   setImporting]   = useState(false);
+  const [syncing,     setSyncing]     = useState(false);
   const [copied,      setCopied]      = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
@@ -99,6 +100,20 @@ export default function AdminLeadsPage() {
       toast.error(err?.response?.data?.message || 'Import failed.');
     } finally {
       setImporting(false);
+    }
+  };
+
+  // ── Sync contacts from DEFAULT_LEADS ─────────────────────────────────────
+  const handleSyncContacts = async () => {
+    setSyncing(true);
+    try {
+      const { data } = await leadsAPI.syncContacts();
+      toast.success(data.message || 'Contacts synced!');
+      fetchLeads(true);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Sync failed.');
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -208,6 +223,12 @@ export default function AdminLeadsPage() {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-400 hover:text-white text-sm transition-colors"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <RefreshCcw className="w-3.5 h-3.5" /> Refresh
+          </button>
+          <button onClick={handleSyncContacts} disabled={syncing}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
+            style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#34d399' }}>
+            <Phone className="w-3.5 h-3.5" />
+            {syncing ? 'Syncing…' : 'Sync Contacts'}
           </button>
           <button onClick={handleImport} disabled={importing}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all disabled:opacity-60"

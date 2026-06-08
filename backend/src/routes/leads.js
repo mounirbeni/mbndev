@@ -3,7 +3,7 @@ const { protect, authorize } = require('../middleware/auth');
 const prisma   = require('../lib/prisma');
 const { sendEmail, templates } = require('../lib/email');
 
-// ─── Default leads seed (82 prospects found in Morocco) ──────────────────────
+// ─── Default leads seed (89 prospects found in Morocco) ──────────────────────
 const DEFAULT_LEADS = [
   // ═══ ORIGINAL 22 LEADS ═══════════════════════════════════════════════════
   // ── HOT: no website + has contact info ───────────────────────────────────
@@ -43,28 +43,32 @@ const DEFAULT_LEADS = [
   { name: 'Riad Tawargit',              type: 'riad',       city: 'Marrakech',   phone: '+212 524 378 078',  email: 'riad.tawargit@gmail.com',       website: 'basic', priority: 'warm', outreachAngle: 'Gmail + phone. Dated site — strong pitch for modern booking dashboard.',            source: 'riadtawargit.com' },
   { name: 'Riad Merzouga Kech',         type: 'riad',       city: 'Marrakech',   phone: '+212 524 390 273',  email: 'Riadmerzougakech@gmail.com',    instagram: '@riad_merzouga_marrakech', website: 'basic', priority: 'warm', outreachAngle: 'Gmail + Instagram + phone. Old site — redesign with integrated Stripe booking.', source: 'riadmerzouga.com' },
   { name: 'Riad Kasbah Marrakech',      type: 'riad',       city: 'Marrakech',   phone: '+212 524 389 770',  email: 'reservation.riadkasbah@gmail.com', website: 'basic', priority: 'warm', outreachAngle: 'Reservation Gmail + phone. Old site. Pitch Pro package with Stripe checkout.',  source: 'riadkasbahmarrakech.com' },
+  // ── Marrakech Riads — Google Maps verified no website ────────────────────
+  { name: 'Riad Al Amine Marrakech',   type: 'riad',       city: 'Marrakech',   phone: '+212 524 38 46 58',                                             website: 'none',  priority: 'hot',  outreachAngle: 'Verified no website on Google Maps. 87 reviews, 4.9 stars. Medina guest house losing bookings to OTAs.', source: 'Google Maps' },
+  { name: 'Riad habib allah',          type: 'riad',       city: 'Marrakech',   phone: '+33 6 22 64 31 92',                                             website: 'none',  priority: 'hot',  outreachAngle: '100m from Jemaa el-Fnaa. Verified no website — Google Maps shows "Add website". 14 reviews, 4.9 stars.', source: 'Google Maps' },
+  { name: 'Riad YallaHabibi',          type: 'riad',       city: 'Marrakech',   phone: '+212 635 20 35 03',                                             website: 'none',  priority: 'hot',  outreachAngle: 'Only Booking.com page — no dedicated website. 79 reviews, 3-star. Direct booking site = cut OTA fees.', source: 'Google Maps' },
 
   // ── Chefchaouen Riads — New/No Website (HOT) ─────────────────────────────
   { name: 'Dar Lella Chama',            type: 'riad',       city: 'Chefchaouen', phone: '+212 663 421 980',  instagram: '@riad_dar_chama_chefchaouen', website: 'none', priority: 'hot', outreachAngle: 'Newly opened riad Instagram-only. Perfect timing — offer launch website deal.',  source: 'Instagram / Google Maps' },
   { name: 'EL PALACIO SPA Riad',        type: 'riad',       city: 'Chefchaouen', phone: '+212 660 411 522',  email: 'Riad.elpalaciospa@gmail.com',   instagram: '@riad_elpalacio_spa', website: 'none', priority: 'hot', outreachAngle: 'Luxury spa riad with email + phone but no website. High-ticket client potential.', source: 'Instagram / Google Maps' },
-  { name: 'DAR MUKTAB',                 type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Spacious 8-room guesthouse — OTA-only bookings. Pitch direct booking site to save 15% commission.', source: 'Google Maps / Booking.com' },
+  { name: 'DAR MUKTAB',                 type: 'riad',       city: 'Chefchaouen', phone: '+212 682 788 441',  email: 'darmuktab@gmail.com',           instagram: '@darmuktab',                website: 'none',  priority: 'hot',  outreachAngle: 'Has email + WhatsApp but zero website. 8-room guesthouse losing 15% per booking to OTAs.', source: 'darmuktab.com' },
   { name: 'Dar Kisania',                type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Recently renovated 8-room riad. No own website. Perfect candidate for Pro package.', source: 'Google Maps' },
-  { name: 'Riad ALHAMBRA Chefchaouen',  type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Opened July 2024 — new riad no website yet. Catch them early before competitors do.', source: 'Google Maps' },
-  { name: 'Dar terrae plus',            type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Opened May 2025 — brand new riad no website. Perfect timing to offer launch site.',   source: 'Google Maps' },
+  { name: 'Riad ALHAMBRA Chefchaouen',  type: 'riad',       city: 'Chefchaouen', phone: '+212 623 246 723',  email: 'info@alhambrariad.com',          instagram: '@riad_alhambra',             website: 'none',  priority: 'hot',  outreachAngle: 'Opened July 2024 — has email + WhatsApp but no booking website yet. Catch them early.', source: 'alhambrariad.com' },
+  { name: 'Dar terrae plus',            type: 'riad',       city: 'Chefchaouen', instagram: '@darterraeplus',                                        website: 'none',  priority: 'hot',  outreachAngle: 'Opened May 2025 — Instagram-only brand new riad. Perfect timing to offer launch site.', source: 'Google Maps / Instagram' },
   { name: 'Dar MD',                     type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Opened April 2024 — recently launched riad no website. Early outreach advantage.',    source: 'Google Maps' },
-  { name: 'Riad Bin Souaki',            type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Instagram-only 4-room riad. Starter package perfect fit.',                           source: 'Google Maps' },
+  { name: 'Riad Bin Souaki',            type: 'riad',       city: 'Chefchaouen', instagram: '@riadbinsouaki',                                        website: 'none',  priority: 'hot',  outreachAngle: 'Instagram-only 4-room riad. Starter package perfect fit.',                           source: 'Instagram / riadbinsouaki.com' },
   { name: 'RIAD CHENGLI',               type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Opened Dec 2023. Chinese-Moroccan concept riad no website. Unique niche = premium site.', source: 'Google Maps' },
   { name: 'Dar Larbi',                  type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Opened October 2025 — brand new. Reach them before they build a site themselves.',     source: 'Google Maps' },
   { name: 'Dar Qaysar',                 type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: '4-room boutique apartment-riad no website. Exclusive feel = pitch premium Starter.',   source: 'Google Maps' },
   { name: 'RIAD LA SANTA',              type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'hot',  outreachAngle: 'Recently renovated OTA-only. No own site. Pitch direct booking savings + brand story.', source: 'Google Maps' },
-  { name: 'Dar Dadicilef',              type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'warm', outreachAngle: 'Oldest Andalusian house in Chefchaouen. Heritage angle = premium storytelling website.', source: 'Google Maps' },
-  { name: 'Riad Tassili Chaouen',       type: 'riad',       city: 'Chefchaouen',                                                                    website: 'basic', priority: 'warm', outreachAngle: 'On booking platforms. Basic/old site — offer modern upgrade with direct reservations.', source: 'Google Maps' },
-  { name: 'DAR BLANCA Chefchaouen',     type: 'riad',       city: 'Chefchaouen',                                                                    website: 'basic', priority: 'warm', outreachAngle: 'Pool + garden + family rooms. Nice property needs modern website to stand out.',         source: 'Google Maps' },
-  { name: 'Lina Ryad & Spa',            type: 'riad',       city: 'Chefchaouen',                                                                    website: 'basic', priority: 'warm', outreachAngle: 'Spa + pool riad. Existing site outdated. Offer premium redesign with spa booking.',       source: 'Google Maps' },
-  { name: 'Ryad A&B Sarai',             type: 'riad',       city: 'Chefchaouen',                                                                    website: 'basic', priority: 'warm', outreachAngle: 'Indoor pool riad. Pitch premium design with bike tour & spa booking integrations.',       source: 'Google Maps' },
+  { name: 'Dar Dadicilef',              type: 'riad',       city: 'Chefchaouen', phone: '+212 664 491 500',  email: 'dadicilef17@hotmail.com',        instagram: '@dardadicilef',              website: 'none',  priority: 'warm', outreachAngle: 'Oldest Andalusian house in Chefchaouen. Heritage angle = premium storytelling website.', source: 'Instagram / Google Maps' },
+  { name: 'Riad Tassili Chaouen',       type: 'riad',       city: 'Chefchaouen', phone: '+212 765 148 716',  email: 'riadtassilichaouen@gmail.com',   website: 'basic', priority: 'warm', outreachAngle: 'Has email + phone. Basic/old site — offer modern upgrade with direct reservations.',  source: 'grouptassili.net' },
+  { name: 'DAR BLANCA Chefchaouen',     type: 'riad',       city: 'Chefchaouen', email: 'infodarblanca@gmail.com',                                   instagram: '@darblanca_',               website: 'basic', priority: 'warm', outreachAngle: 'Has email + Instagram. Pool + garden riad. Offer modern redesign to stand out.',      source: 'darblanca.ma' },
+  { name: 'Lina Ryad & Spa',            type: 'riad',       city: 'Chefchaouen', phone: '+212 660 239 906',  email: 'linaryadetspa@gmail.com',        website: 'basic', priority: 'warm', outreachAngle: 'Spa + pool riad with email + phone. Existing site outdated — premium redesign pitch.',  source: 'linaryad.com' },
+  { name: 'Ryad A&B Sarai',             type: 'riad',       city: 'Chefchaouen', phone: '+212 666 283 486',  instagram: '@ryad_a.b_chaouen',          website: 'basic', priority: 'warm', outreachAngle: 'Has phone + Instagram. Indoor pool riad — pitch bike tour & spa booking integration.',  source: 'Instagram / Google Maps' },
   { name: 'Riad Cherifa',               type: 'riad',       city: 'Chefchaouen', phone: '+212 539 987 402',  email: 'reservations@riadcherifa.com',  instagram: '@riad.cherifa', website: 'basic', priority: 'warm', outreachAngle: 'Has all contacts + basic site. Upgrade to modern booking with direct payment.', source: 'Instagram / Google Maps' },
   { name: 'Riad Tassili Restaurant',    type: 'restaurant', city: 'Chefchaouen',                                                                    website: 'none',  priority: 'warm', outreachAngle: 'Riad + African/Moroccan restaurant no website. Menu + reservation site is quick win.', source: 'Google Maps' },
-  { name: 'Dar Elrio',                  type: 'riad',       city: 'Chefchaouen',                                                                    website: 'none',  priority: 'warm', outreachAngle: 'Rooftop terrace B&B with mountain views. No website — Instagram-bookable only.',        source: 'Google Maps' },
+  { name: 'Dar Elrio',                  type: 'riad',       city: 'Chefchaouen', phone: '+212 663 485 608',  instagram: '@dar.elrio',               website: 'none',  priority: 'warm', outreachAngle: 'Has phone + Instagram. Rooftop terrace B&B no website — direct booking opportunity.',  source: 'Instagram / Google Maps' },
   { name: 'Dar Echchaouen',             type: 'riad',       city: 'Chefchaouen',                                                                    website: 'basic', priority: 'warm', outreachAngle: 'Has basic contact page only. Offer full website with galleries and booking system.',      source: 'darechchaouen.com' },
 
   // ── Fes Riads ─────────────────────────────────────────────────────────────
@@ -76,7 +80,12 @@ const DEFAULT_LEADS = [
   { name: "R'Mila Medina Fez",          type: 'riad',       city: 'Fes',                                                                            website: 'none',  priority: 'hot',  outreachAngle: 'On Booking.com with no own site. Losing 15–20% per booking to OTA commissions.',     source: 'Booking.com' },
   { name: 'Riad Fes Center',            type: 'riad',       city: 'Fes',                                                                            website: 'basic', priority: 'warm', outreachAngle: 'Fes medina riad with basic online presence. Offer modern redesign.',                    source: 'Google Maps' },
   { name: 'Riad Safir Medina Fes',      type: 'riad',       city: 'Fes',                                                                            website: 'basic', priority: 'warm', outreachAngle: 'On Booking.com with minimal own site. Pitch direct booking system to cut OTA fees.',   source: 'Booking.com' },
-  { name: 'Riad El Amine Fes',          type: 'riad',       city: 'Fes',                                                                            website: 'yes',   priority: 'warm', outreachAngle: 'Historic Hotels Worldwide member. Premium positioning = pitch luxury redesign.',       source: 'Booking.com' },
+  { name: 'Riad El Amine Fes',          type: 'riad',       city: 'Fes',         phone: '+212 535 740 750',  email: 'contact@riadelaminefes.com',    instagram: '@riadelaminefes',           website: 'yes',   priority: 'warm', outreachAngle: 'Has phone + email + Instagram. Historic Hotels member. Pitch luxury website redesign.', source: 'riadelaminefes.com' },
+  // ── Fes Riads — Google Maps verified ─────────────────────────────────────
+  { name: 'Riad Fes Unique',           type: 'riad',       city: 'Fes',         phone: '+212 535 74 12 06',                                             website: 'none',  priority: 'hot',  outreachAngle: 'Verified no website — Google Maps "Add website". 155 reviews, 4.1 stars. Rue Talaa Kebira medina.', source: 'Google Maps' },
+  { name: 'Dar dahab Fes',             type: 'riad',       city: 'Fes',         phone: '+212 661 51 35 03',                                             website: 'none',  priority: 'hot',  outreachAngle: 'Confirmed no website. 16 reviews, 4.9 stars. Rue Talaa Kebira. Small high-rated guesthouse.', source: 'Google Maps' },
+  { name: 'Dar Saida Fes',             type: 'riad',       city: 'Fes',         phone: '+212 666 10 02 21',                                             website: 'basic', priority: 'warm', outreachAngle: 'Uses Xtadia booking template (dersaida.xtadia.com) — not a real website. Upgrade to custom site.', source: 'Google Maps' },
+  { name: 'Dar Mehdi Fes',             type: 'riad',       city: 'Fes',         phone: '+212 535 74 14 99',                                             website: 'basic', priority: 'warm', outreachAngle: 'Free .morocco-ma.website domain — looks unprofessional. 64 reviews, 4.7 stars. Easy upgrade sell.', source: 'Google Maps' },
 
   // ── Essaouira Riads ───────────────────────────────────────────────────────
   { name: 'Riad Emotion Essaouira',     type: 'riad',       city: 'Essaouira',   phone: '+212 524 472 309',  email: 'contact@riademotion.com',       website: 'yes',   priority: 'warm', outreachAngle: 'Email + phone. Has website but dated — offer redesign with surf/yoga booking.',    source: 'riademotion.com' },
@@ -132,6 +141,27 @@ router.post('/import', protect, authorize('admin'), async (req, res, next) => {
     await prisma.lead.createMany({ data: missing });
     const total = await prisma.lead.count();
     res.json({ success: true, message: `Added ${missing.length} new leads. Total: ${total}.`, count: total });
+  } catch (err) { next(err); }
+});
+
+// ─── POST /api/leads/sync-contacts — push DEFAULT_LEADS contacts into DB ─────
+router.post('/sync-contacts', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    let updated = 0;
+    for (const lead of DEFAULT_LEADS) {
+      if (!lead.phone && !lead.email && !lead.instagram) continue;
+      const existing = await prisma.lead.findFirst({ where: { name: lead.name } });
+      if (!existing) continue;
+      const patch = {};
+      if (lead.phone     && !existing.phone)     patch.phone     = lead.phone;
+      if (lead.email     && !existing.email)     patch.email     = lead.email;
+      if (lead.instagram && !existing.instagram) patch.instagram = lead.instagram;
+      if (Object.keys(patch).length > 0) {
+        await prisma.lead.update({ where: { id: existing.id }, data: patch });
+        updated++;
+      }
+    }
+    res.json({ success: true, message: `Updated contact info for ${updated} leads.`, updated });
   } catch (err) { next(err); }
 });
 

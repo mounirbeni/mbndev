@@ -236,6 +236,7 @@ export const leadsAPI = {
   delete:          (id: string)                            => api.delete(`/leads/${id}`),
   sendEmail:       (id: string, data: { subject: string; body: string }) => api.post(`/leads/${id}/email`, data),
   importDefaults:  ()                                      => api.post('/leads/import'),
+  syncContacts:    ()                                      => api.post('/leads/sync-contacts'),
   getTemplate:     (type: string, name: string)            => api.get('/leads/templates', { params: { type, name } }),
 };
 
