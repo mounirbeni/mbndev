@@ -157,6 +157,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));
 app.use('/api/search',        require('./routes/search'));
+app.use('/api/leads',         require('./routes/leads'));
 
 // ─── Health check (verifies DB + realtime stats) ─────────────────────────────
 app.get('/api/health', async (req, res) => {

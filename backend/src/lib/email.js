@@ -793,6 +793,45 @@ const templates = {
     };
   },
 
+  // ── Outreach — cold email to a prospect ──────────────────────────────────────
+  outreach: ({ name, type = 'riad', customBody = null }) => {
+    const APP_URL_LOCAL = process.env.CLIENT_URL || 'https://mbndev.ma';
+    const PORTFOLIO_LINKS = {
+      riad:       { label: 'RiadConnect',  url: 'https://www.riadconnect.com/', desc: 'Commission-free booking platform for Moroccan Riads' },
+      restaurant: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'Tour & experience booking in Marrakech' },
+      boutique:   { label: 'TyyMaroc',     url: 'https://tyymaroc.vercel.app/', desc: 'Moroccan wellness e-commerce platform' },
+      tour_guide: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'Guided tour booking in Marrakech' },
+    };
+    const ref = PORTFOLIO_LINKS[type] || PORTFOLIO_LINKS.riad;
+    const firstName = name.split(' ')[0];
+
+    const defaultBody = `
+${textBlock(`Bonjour,`)}
+${divider('12px 0')}
+${textBlock(`Je suis <strong style="color:${T.textPrimary};">Mounir</strong>, développeur web basé au Maroc. J'ai découvert votre activité et je souhaitais vous contacter directement.`)}
+${textBlock(`J'ai récemment développé <strong style="color:${T.purpleLight};">${ref.label}</strong> — ${ref.desc}. Le résultat : un site rapide, professionnel, et optimisé pour convertir les visiteurs en clients.`)}
+${infoBox([
+  ['Ce que je propose', 'Un site web professionnel sur mesure'],
+  ['Délai de livraison', '14 jours'],
+  ['Prix de départ', '$799 (tout inclus)'],
+  ['Garantie', 'Révisions incluses • Code source livré'],
+])}
+${notice(`Pas de frais cachés, pas d'engagement après livraison — vous êtes propriétaire du code. J'offre une <strong style="color:${T.green};">consultation gratuite de 15 min</strong> pour répondre à toutes vos questions.`, { type: 'success' })}
+${ctaButton('Voir mon portfolio →', APP_URL_LOCAL + '/portfolio')}
+${textBlock(`Ou répondez directement à cet email — je lis tout et je réponds dans les 24 heures.`)}`;
+
+    return {
+      subject: `Site web professionnel pour ${name} — devis en 24h`,
+      html: layout({
+        preheader: `Bonjour — je développe des sites web professionnels pour les entreprises marocaines. Devis gratuit en 24h.`,
+        badgeHtml: badge('MBN DEV — Développement Web', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
+        heading:   `Bonjour ${firstName},`,
+        body:      customBody || defaultBody,
+        footer:    `Vous recevez cet email car votre activité correspond à nos services. Pour ne plus recevoir de messages, répondez "Non merci". — Mounir Banni, MBN DEV, contact@mbndev.ma`,
+      }),
+    };
+  },
+
   // ── Week 2: limited-time offer ────────────────────────────────────────────────
   specialOffer: ({ user }) => {
     const first      = (user?.name || 'there').split(' ')[0];

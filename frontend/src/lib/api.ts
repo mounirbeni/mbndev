@@ -229,6 +229,16 @@ export const adminAPI = {
   broadcast:       (template = 'platformUpdate')   => api.post('/admin/broadcast', { template }),
 };
 
+export const leadsAPI = {
+  getAll:          (params?: any)                          => api.get('/leads', { params }),
+  create:          (data: any)                             => api.post('/leads', data),
+  update:          (id: string, data: any)                 => api.put(`/leads/${id}`, data),
+  delete:          (id: string)                            => api.delete(`/leads/${id}`),
+  sendEmail:       (id: string, data: { subject: string; body: string }) => api.post(`/leads/${id}/email`, data),
+  importDefaults:  ()                                      => api.post('/leads/import'),
+  getTemplate:     (type: string, name: string)            => api.get('/leads/templates', { params: { type, name } }),
+};
+
 export const searchAPI = {
   global:   (q: string)    => api.get('/search', { params: { q } }),
   activity: (params?: any) => api.get('/search/activity', { params }),

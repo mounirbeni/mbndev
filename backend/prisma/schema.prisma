@@ -307,6 +307,30 @@ model LoginAttempt {
   @@index([ip, createdAt])
 }
 
+// ─── Leads (outreach CRM) ────────────────────────────────────────────────────
+
+model Lead {
+  id             String    @id @default(cuid())
+  name           String
+  type           String                              // riad | restaurant | boutique | tour_guide
+  city           String
+  phone          String?
+  email          String?
+  instagram      String?
+  website        String?                             // none | basic | yes
+  priority       String    @default("warm")          // hot | warm
+  outreachAngle  String?
+  source         String?
+  status         String    @default("new")           // new | emailed | dm_sent | replied | converted | not_interested
+  notes          String?
+  emailSentAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status, priority])
+  @@index([type])
+}
+
 // ─── Activity Logs ────────────────────────────────────────────────────────────
 
 model ActivityLog {
