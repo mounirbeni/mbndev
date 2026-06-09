@@ -63,6 +63,7 @@ function useStaticItems(isAdmin: boolean, router: ReturnType<typeof useRouter>, 
     { type: 'nav', id: 'admin-analytics',label: 'Analytics',    icon: BarChart2,       href: '/dashboard/admin/analytics',  group: 'Admin Navigation' },
     { type: 'nav', id: 'admin-activity', label: 'Activity Log', icon: Activity,        href: '/dashboard/admin/activity',   group: 'Admin Navigation' },
     { type: 'nav', id: 'admin-leads',    label: 'Leads',        icon: Target,          href: '/dashboard/admin/leads',      group: 'Admin Navigation' },
+    { type: 'nav', id: 'admin-settings', label: 'Settings',     icon: Settings,        href: '/dashboard/admin/settings',   group: 'Admin Navigation' },
   ];
 
   const clientNav: NavAction[] = [

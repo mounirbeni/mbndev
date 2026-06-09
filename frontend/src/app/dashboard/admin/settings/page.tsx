@@ -1,0 +1,191 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { authAPI } from '@/lib/api';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import toast from 'react-hot-toast';
+import { getInitials } from '@/lib/utils';
+import { APP_VERSION } from '@/lib/version';
+import { User, Lock, ShieldCheck, Activity, ArrowUpRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export default function AdminSettingsPage() {
+  const { user, refresh } = useAuth();
+  const { t } = useLanguage();
+
+  /* ── Profile form ───────────────────────────────────── */
+  const [profile, setProfile] = useState({
+    name:    user?.name    || '',
+    company: user?.company || '',
+    phone:   user?.phone   || '',
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  const handleSaveProfile = async () => {
+    if (!profile.name.trim()) { toast.error(t('validation.required')); return; }
+    setSavingProfile(true);
+    try {
+      await authAPI.updateProfile(profile);
+      await refresh();
+      toast.success(t('toast.saved'));
+    } catch {
+      toast.error(t('toast.error'));
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  /* ── Password form ──────────────────────────────────── */
+  const [pwd, setPwd] = useState({ current: '', next: '', confirm: '' });
+  const [savingPwd, setSavingPwd] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!pwd.current || !pwd.next || !pwd.confirm) { toast.error(t('validation.required')); return; }
+    if (pwd.next.length < 8) { toast.error('New password must be at least 8 characters.'); return; }
+    if (pwd.next !== pwd.confirm) { toast.error(t('validation.passwordMatch')); return; }
+    setSavingPwd(true);
+    try {
+      await authAPI.updateProfile({ currentPassword: pwd.current, newPassword: pwd.next });
+      toast.success(t('toast.passwordReset'));
+      setPwd({ current: '', next: '', confirm: '' });
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    } finally {
+      setSavingPwd(false);
+    }
+  };
+
+  const cardClass = 'glass rounded-2xl p-6 border border-white/5';
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="text-2xl font-bold text-white">{t('dash.nav.settings')}</h1>
+        <p className="text-slate-400 text-sm mt-1">Manage your admin account and security.</p>
+      </motion.div>
+
+      {/* ── Profile ──────────────────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className={cardClass}>
+        <div className="flex items-center gap-2 mb-5">
+          <User className="w-4 h-4 text-primary-400" />
+          <h2 className="text-base font-semibold text-white">{t('auth.field.name')}</h2>
+        </div>
+
+        {/* Avatar row */}
+        <div className="flex items-center gap-4 mb-6 p-4 bg-white/3 rounded-xl border border-white/5">
+          <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-blue-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold shrink-0">
+            {user ? getInitials(user.name) : '?'}
+          </div>
+          <div>
+            <p className="text-white font-semibold">{user?.name}</p>
+            <p className="text-slate-400 text-sm">{user?.email}</p>
+            <span className="inline-block mt-1 text-xs text-primary-400 bg-primary-500/10 border border-primary-500/20 rounded-full px-2 py-0.5 capitalize">
+              {user?.role}
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Input
+            label={t('auth.field.name')}
+            value={profile.name}
+            onChange={(e) => setProfile((f) => ({ ...f, name: e.target.value }))}
+            placeholder={t('auth.signup.namePlaceholder')}
+          />
+          <Input
+            label={t('auth.field.email')}
+            value={user?.email || ''}
+            disabled
+            className="opacity-50 cursor-not-allowed"
+          />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Input
+              label={t('auth.signup.company')}
+              value={profile.company}
+              onChange={(e) => setProfile((f) => ({ ...f, company: e.target.value }))}
+              placeholder={t('auth.signup.companyPlaceholder')}
+            />
+            <Input
+              label={t('auth.field.phone')}
+              value={profile.phone}
+              onChange={(e) => setProfile((f) => ({ ...f, phone: e.target.value }))}
+              placeholder="+212 6 xx xx xx xx"
+            />
+          </div>
+          <div className="flex justify-end pt-1">
+            <Button onClick={handleSaveProfile} loading={savingProfile}>{t('common.save')}</Button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Password ─────────────────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={cardClass}>
+        <div className="flex items-center gap-2 mb-5">
+          <Lock className="w-4 h-4 text-yellow-400" />
+          <h2 className="text-base font-semibold text-white">{t('auth.reset.title')}</h2>
+        </div>
+        <div className="space-y-4">
+          <Input
+            label={t('settings.currentPassword')}
+            type="password"
+            value={pwd.current}
+            onChange={(e) => setPwd((f) => ({ ...f, current: e.target.value }))}
+            placeholder={t('settings.currentPasswordPh')}
+          />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Input
+              label={t('auth.reset.newPassword')}
+              type="password"
+              value={pwd.next}
+              onChange={(e) => setPwd((f) => ({ ...f, next: e.target.value }))}
+              placeholder="Min. 8 characters"
+            />
+            <Input
+              label={t('auth.reset.confirmPassword')}
+              type="password"
+              value={pwd.confirm}
+              onChange={(e) => setPwd((f) => ({ ...f, confirm: e.target.value }))}
+              placeholder={t('settings.repeatPasswordPh')}
+            />
+          </div>
+          <p className="text-slate-500 text-xs">
+            Changing your password signs out every other session using this account.
+          </p>
+          <div className="flex justify-end pt-1">
+            <Button onClick={handleChangePassword} loading={savingPwd} variant="outline">
+              {t('settings.updatePassword')}
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Security & system ───────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className={cardClass}>
+        <div className="flex items-center gap-2 mb-4">
+          <ShieldCheck className="w-4 h-4 text-green-400" />
+          <h2 className="text-base font-semibold text-white">Security & System</h2>
+        </div>
+        <p className="text-slate-400 text-sm mb-4">
+          Review what has been happening on the platform — every status change, payment and upload is logged.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/dashboard/admin/activity"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500/10 border border-primary-500/25 text-primary-300 text-sm font-semibold hover:bg-primary-500/20 transition-all"
+          >
+            <Activity className="w-4 h-4" />
+            Activity Log
+            <ArrowUpRight className="w-3 h-3 opacity-60" />
+          </Link>
+          <span className="text-slate-600 text-xs font-semibold tabular-nums ml-auto">
+            MBN DEV · v{APP_VERSION}
+          </span>
+        </div>
+      </motion.div>
+    </div>
+  );
+}

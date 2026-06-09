@@ -1,5 +1,5 @@
 import {
-  Target, Send, Sparkles, Smartphone, Accessibility, Command,
+  Target, Send, Sparkles, Smartphone, Accessibility, Command, Settings,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -14,6 +14,13 @@ export interface ChangeEntry {
 }
 
 export const CHANGELOG: ChangeEntry[] = [
+  {
+    icon: Settings,
+    title: 'Admin Settings',
+    desc: 'Admins finally get their own Settings page — update your name, company and phone, and change your password without leaving the dashboard.',
+    tag: 'new',
+    href: '/dashboard/admin/settings',
+  },
   {
     icon: Target,
     title: 'Leads Manager',

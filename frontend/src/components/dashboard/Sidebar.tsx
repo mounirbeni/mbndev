@@ -33,6 +33,7 @@ const adminNavDef: NavItem[] = [
   { labelKey: 'dash.nav.analytics', href: '/dashboard/admin/analytics', icon: BarChart2 },
   { labelKey: 'dash.nav.activity',  href: '/dashboard/admin/activity',  icon: Activity },
   { labelKey: 'dash.nav.leads',     href: '/dashboard/admin/leads',     icon: Target },
+  { labelKey: 'dash.nav.settings',  href: '/dashboard/admin/settings',  icon: Settings },
 ];
 
 const clientNavDef: NavItem[] = [
