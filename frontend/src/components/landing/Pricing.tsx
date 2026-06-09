@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, animate } from 'framer-motion';
 import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AuthModal from '@/components/ui/AuthModal';
@@ -33,6 +33,24 @@ const defaultPackages: Package[] = [
 
 function discountPct(original: number, current: number) {
   return Math.round((1 - current / original) * 100);
+}
+
+function AnimatedPrice({ value }: { value: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-40px' });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(0, value, {
+      duration: 1.4,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [inView, value]);
+
+  return <span ref={ref}>${display.toLocaleString()}</span>;
 }
 
 export default function Pricing() {
@@ -124,14 +142,17 @@ export default function Pricing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ duration: 0.75, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: isFeatured ? -8 : -4 }}
                 className="relative flex flex-col"
               >
-                {/* Featured outer glow ring */}
+                {/* Featured outer glow ring — slow animated beam */}
                 {isFeatured && (
                   <div
                     className="absolute -inset-px rounded-[28px] pointer-events-none"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(124,58,237,0.5) 0%, rgba(168,85,247,0.2) 50%, rgba(59,130,246,0.3) 100%)',
+                      background: 'linear-gradient(135deg, rgba(124,58,237,0.5) 0%, rgba(168,85,247,0.2) 35%, rgba(59,130,246,0.4) 65%, rgba(124,58,237,0.5) 100%)',
+                      backgroundSize: '300% 300%',
+                      animation: 'borderBeam 6s ease infinite',
                     }}
                   />
                 )}
@@ -191,7 +212,7 @@ export default function Pricing() {
                         <span className={`text-6xl lg:text-7xl font-black leading-none tracking-tight tabular-nums ${
                           isFeatured ? 'text-white' : 'text-white'
                         }`}>
-                          ${pkg.price.toLocaleString()}
+                          <AnimatedPrice value={pkg.price} />
                         </span>
                       </div>
                       <p className="text-slate-600 text-[11px] tracking-widest uppercase mt-2">per project</p>

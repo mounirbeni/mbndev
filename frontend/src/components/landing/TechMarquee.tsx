@@ -16,10 +16,13 @@ function MarqueeRow({ items, reverse = false, speed = 30 }: { items: string[]; r
   const doubled = [...items, ...items];
   return (
     <div className="relative overflow-hidden" style={{ maskImage: 'linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%)' }}>
-      <motion.div
-        className="flex gap-4 w-max"
-        animate={{ x: reverse ? ['0%', '-50%'] : ['-50%', '0%'] }}
-        transition={{ duration: speed, repeat: Infinity, ease: 'linear' }}
+      {/* CSS-driven so it pauses on hover (see .marquee-track in globals.css) */}
+      <div
+        className="flex gap-4 w-max marquee-track"
+        style={{
+          '--marquee-speed': `${speed}s`,
+          animationDirection: reverse ? 'reverse' : 'normal',
+        } as React.CSSProperties}
       >
         {doubled.map((tech, i) => (
           <span
@@ -47,7 +50,7 @@ function MarqueeRow({ items, reverse = false, speed = 30 }: { items: string[]; r
             {tech}
           </span>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }

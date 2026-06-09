@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent, useSpring } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo3D from '@/components/ui/Logo3D';
@@ -26,7 +26,8 @@ export default function Navbar() {
 
   const { user } = useAuth();
   const pathname = usePathname();
-  const { scrollY } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
+  const readProgress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, restDelta: 0.001 });
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -57,6 +58,18 @@ export default function Navbar() {
           borderBottom:         scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
         }}
       >
+        {/* Reading progress along the bottom edge */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none"
+          style={{
+            scaleX: readProgress,
+            transformOrigin: '0% 50%',
+            background: 'linear-gradient(90deg, #7c3aed, #a855f7, #3b82f6, #06b6d4)',
+            opacity: scrolled ? 1 : 0,
+            transition: 'opacity 0.3s ease',
+          }}
+        />
+
         {/* Top glow when scrolled */}
         <AnimatePresence>
           {scrolled && (

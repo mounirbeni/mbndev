@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useInView, useReducedMotion, animate, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowUpRight, Users, Rocket, TrendingUp, Shield, Play } from 'lucide-react';
 import { useRef, useState, useEffect, useCallback } from 'react';
+import Magnetic from '@/components/ui/Magnetic';
 
 const STATS = [
   { icon: Users,      val: 50,   suffix: '+', label: 'Happy Clients'       },
@@ -23,32 +24,17 @@ const ROTATING_PHRASES = [
 function AnimatedCounter({ val, suffix }: { val: number; suffix: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
-  const started = useRef(false);
+  const inView = useInView(ref, { once: true, amount: 0.3 });
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !started.current) {
-        started.current = true;
-        const duration = 1800;
-        const steps = 60;
-        const increment = val / steps;
-        let current = 0;
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= val) {
-            setCount(val);
-            clearInterval(timer);
-          } else {
-            setCount(Math.floor(current));
-          }
-        }, duration / steps);
-      }
-    }, { threshold: 0.3 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [val]);
+    if (!inView) return;
+    const controls = animate(0, val, {
+      duration: 1.8,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setCount(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [inView, val]);
 
   return <div ref={ref}>{count}{suffix}</div>;
 }
@@ -93,6 +79,7 @@ function FloatingOrb({ className, style }: { className?: string; style?: React.C
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const reducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
 
   // Multi-layer parallax at different rates for depth
@@ -105,17 +92,31 @@ export default function Hero() {
   const statsOp     = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const statsY      = useTransform(scrollYProgress, [0, 0.2], ['0%', '40%']);
 
+  // Cursor parallax — orbs drift horizontally toward/away from the pointer
+  const mouseX = useMotionValue(0);
+  const smoothMouseX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const orbTopX    = useTransform(smoothMouseX, (v) => v * -44);
+  const orbRightX  = useTransform(smoothMouseX, (v) => v * 36);
+  const orbBottomX = useTransform(smoothMouseX, (v) => v * -24);
+  const headlineX  = useTransform(smoothMouseX, (v) => v * 8);
+
+  const onSectionMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    if (reducedMotion) return;
+    mouseX.set(e.clientX / window.innerWidth - 0.5);
+  }, [mouseX, reducedMotion]);
+
   return (
     <section
       ref={sectionRef}
       id="home"
+      onMouseMove={onSectionMouseMove}
       className="relative overflow-hidden"
       style={{ height: '100dvh', minHeight: '640px', background: '#07060f' }}
     >
 
       {/* ── ANIMATED GRADIENT ORBS — each on its own parallax layer ──────── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div style={{ y: orbTopY, position: 'absolute', top: '-10%', left: '-5%' }} className="animate-float-a">
+        <motion.div style={{ y: orbTopY, x: orbTopX, position: 'absolute', top: '-10%', left: '-5%' }} className="animate-float-a">
           <div style={{
             width: 600, height: 600, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%)',
@@ -123,7 +124,7 @@ export default function Hero() {
           }} />
         </motion.div>
 
-        <motion.div style={{ y: orbRightY, position: 'absolute', top: '20%', right: '-10%' }} className="animate-float-b">
+        <motion.div style={{ y: orbRightY, x: orbRightX, position: 'absolute', top: '20%', right: '-10%' }} className="animate-float-b">
           <div style={{
             width: 500, height: 500, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
@@ -131,7 +132,7 @@ export default function Hero() {
           }} />
         </motion.div>
 
-        <motion.div style={{ y: orbBottomY, position: 'absolute', bottom: '5%', left: '30%' }} className="animate-float-a" aria-hidden="true">
+        <motion.div style={{ y: orbBottomY, x: orbBottomX, position: 'absolute', bottom: '5%', left: '30%' }} className="animate-float-a" aria-hidden="true">
           <div style={{
             width: 400, height: 400, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%)',
@@ -176,12 +177,12 @@ export default function Hero() {
         className="absolute inset-0 z-10 flex flex-col"
       >
         <div className="flex-1 flex items-center px-6 sm:px-10 lg:px-14 xl:px-20 pt-20 lg:pt-24">
-          <div className="max-w-[620px] w-full">
+          <motion.div className="max-w-[620px] w-full" style={{ x: headlineX }}>
 
             {/* Headline */}
             <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               transition={{ duration: 0.9, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 fontSize: 'clamp(2.4rem, 4.2vw, 4.2rem)',
@@ -221,30 +222,32 @@ export default function Hero() {
               transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center gap-4 flex-wrap"
             >
-              <Link href="/request">
-                <motion.button
-                  whileHover={{ scale: 1.03, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="relative flex items-center gap-2.5 overflow-hidden group"
-                  style={{
-                    padding:       '14px 32px',
-                    background:    'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                    borderRadius:  '12px',
-                    color:         '#fff',
-                    fontSize:      '13px',
-                    fontWeight:    700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    boxShadow:     '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-                  }}
-                >
-                  <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative z-10 flex items-center gap-2.5">
-                    Start Your Project
-                    <ArrowUpRight className="w-4 h-4" />
-                  </span>
-                </motion.button>
-              </Link>
+              <Magnetic>
+                <Link href="/request">
+                  <motion.button
+                    whileHover={{ scale: 1.03, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="relative flex items-center gap-2.5 overflow-hidden group btn-shimmer"
+                    style={{
+                      padding:       '14px 32px',
+                      background:    'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                      borderRadius:  '12px',
+                      color:         '#fff',
+                      fontSize:      '13px',
+                      fontWeight:    700,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      boxShadow:     '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                    }}
+                  >
+                    <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <span className="relative z-10 flex items-center gap-2.5">
+                      Start Your Project
+                      <ArrowUpRight className="w-4 h-4" />
+                    </span>
+                  </motion.button>
+                </Link>
+              </Magnetic>
 
               <motion.a
                 href="#portfolio"
@@ -285,7 +288,7 @@ export default function Hero() {
                 </span>
               </motion.a>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
 
         {/* ── STATS BAR — desktop ─────────────────────────────────────────── */}
@@ -364,11 +367,16 @@ export default function Hero() {
         transition={{ delay: 1.5, duration: 0.8 }}
         className="absolute bottom-[88px] lg:bottom-[100px] left-1/2 -translate-x-1/2 z-20 hidden lg:flex flex-col items-center gap-2"
       >
-        <motion.div
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ width: 1, height: 32, background: 'linear-gradient(to bottom, rgba(124,58,237,0.6), transparent)' }}
-        />
+        <div
+          className="flex justify-center pt-1.5"
+          style={{ width: 22, height: 34, borderRadius: 12, border: '1.5px solid rgba(148,163,184,0.3)' }}
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0], opacity: [1, 0.15, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ width: 3, height: 7, borderRadius: 99, background: 'rgba(168,85,247,0.85)', boxShadow: '0 0 8px rgba(168,85,247,0.6)' }}
+          />
+        </div>
         <span style={{ fontSize: 8, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(100,116,139,0.5)' }}>
           Scroll
         </span>

@@ -40,20 +40,36 @@ const TESTIMONIALS = [
   },
 ];
 
+const slideVariants = {
+  enter: (dir: number) => ({ opacity: 0, x: dir * 48, filter: 'blur(4px)' }),
+  center: { opacity: 1, x: 0, filter: 'blur(0px)' },
+  exit: (dir: number) => ({ opacity: 0, x: dir * -48, filter: 'blur(4px)' }),
+};
+
 function TestimonialCarousel() {
-  const [active, setActive] = useState(0);
+  const [[active, direction], setSlide] = useState<[number, number]>([0, 1]);
+  const [paused, setPaused] = useState(false);
+
+  const paginate = (dir: number) =>
+    setSlide(([prev]) => [(prev + dir + TESTIMONIALS.length) % TESTIMONIALS.length, dir]);
+
+  const goTo = (i: number) =>
+    setSlide(([prev]) => [i, i > prev ? 1 : -1]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActive((prev) => (prev + 1) % TESTIMONIALS.length);
-    }, 5000);
+    if (paused) return;
+    const timer = setInterval(() => paginate(1), 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [paused, active]);
 
   const t = TESTIMONIALS[active];
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <div
         className="rounded-3xl p-8 lg:p-12 relative overflow-hidden min-h-[280px] flex flex-col justify-between"
         style={{
@@ -79,15 +95,24 @@ function TestimonialCarousel() {
           ))}
         </div>
 
-        {/* Quote text */}
-        <AnimatePresence mode="wait">
+        {/* Quote text — swipeable */}
+        <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={active}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex-1"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.18}
+            onDragEnd={(_, info) => {
+              if (info.offset.x < -60 || info.velocity.x < -400) paginate(1);
+              else if (info.offset.x > 60 || info.velocity.x > 400) paginate(-1);
+            }}
+            className="flex-1 cursor-grab active:cursor-grabbing"
           >
             <p className="text-white text-lg lg:text-xl leading-relaxed mb-8 font-medium">
               &ldquo;{t.quote}&rdquo;
@@ -108,22 +133,36 @@ function TestimonialCarousel() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation dots */}
+        {/* Navigation dots with autoplay progress */}
         <div className="flex items-center gap-2 mt-8">
           {TESTIMONIALS.map((_, i) => (
             <button
               key={i}
-              onClick={() => setActive(i)}
-              className="transition-all duration-300"
+              onClick={() => goTo(i)}
+              aria-label={`Show testimonial ${i + 1}`}
+              className="relative overflow-hidden transition-all duration-300"
               style={{
                 width: i === active ? 32 : 8,
                 height: 8,
                 borderRadius: 99,
-                background: i === active
-                  ? 'linear-gradient(90deg, #7c3aed, #a855f7)'
-                  : 'rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.1)',
               }}
-            />
+            >
+              {i === active && (
+                <motion.span
+                  key={`${active}-${paused}`}
+                  className="absolute inset-0 block"
+                  style={{
+                    borderRadius: 99,
+                    background: 'linear-gradient(90deg, #7c3aed, #a855f7)',
+                    transformOrigin: '0% 50%',
+                  }}
+                  initial={{ scaleX: paused ? 1 : 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: paused ? 0.2 : 5, ease: 'linear' }}
+                />
+              )}
+            </button>
           ))}
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
+import Magnetic from '@/components/ui/Magnetic';
 import { ArrowRight, MapPin, Zap, Clock, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -77,14 +78,16 @@ export default function CTA() {
           transition={{ duration: 0.7, delay: 0.36, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col sm:flex-row gap-3 justify-center mb-14"
         >
-          <Link href="/request">
-            <Button size="lg" className="group relative overflow-hidden glow-button">
-              <span className="relative z-10 flex items-center gap-2">
-                {t('cta.start')}
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </Button>
-          </Link>
+          <Magnetic>
+            <Link href="/request">
+              <Button size="lg" className="group relative overflow-hidden glow-button btn-shimmer">
+                <span className="relative z-10 flex items-center gap-2">
+                  {t('cta.start')}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Button>
+            </Link>
+          </Magnetic>
           <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
             <Button size="lg" variant="outline" className="group relative overflow-hidden">
               <span className="relative z-10">{t('cta.whatsapp')}</span>

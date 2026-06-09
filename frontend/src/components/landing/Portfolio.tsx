@@ -104,6 +104,7 @@ export default function Portfolio() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          whileHover={{ y: -4 }}
           className="mb-5 group"
         >
           <a
@@ -122,7 +123,7 @@ export default function Portfolio() {
               <div className={`relative md:w-5/12 h-60 md:h-80 bg-gradient-to-br ${featured.gradient} overflow-hidden shrink-0`}>
                 {/* Giant initial watermark */}
                 <div
-                  className="absolute inset-0 flex items-center justify-center font-black select-none"
+                  className="absolute inset-0 flex items-center justify-center font-black select-none transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2"
                   style={{
                     fontSize: 'clamp(90px, 18vw, 200px)',
                     color: 'rgba(124,58,237,0.07)',
@@ -195,7 +196,7 @@ export default function Portfolio() {
               {/* Preview */}
               <div className={`h-36 bg-gradient-to-br ${p.gradient} relative overflow-hidden`}>
                 <div
-                  className="absolute inset-0 flex items-center justify-center font-black select-none"
+                  className="absolute inset-0 flex items-center justify-center font-black select-none transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2"
                   style={{ fontSize: '72px', color: 'rgba(124,58,237,0.08)' }}
                 >
                   {p.initial}

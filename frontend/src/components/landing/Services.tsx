@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
 import {
   Globe, ShoppingCart, BarChart3, Layout, Smartphone, Settings,
   ArrowRight,
@@ -19,6 +19,13 @@ function SpotlightCard({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  // Subtle 3D tilt that follows the cursor, spring-damped
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const springRotateX = useSpring(rotateX, { stiffness: 180, damping: 22, mass: 0.5 });
+  const springRotateY = useSpring(rotateY, { stiffness: 180, damping: 22, mass: 0.5 });
 
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
@@ -28,15 +35,28 @@ function SpotlightCard({
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     el.style.setProperty('--mx', `${x}%`);
     el.style.setProperty('--my', `${y}%`);
-  }, []);
+    if (!reducedMotion) {
+      rotateY.set((x / 100 - 0.5) * 5);
+      rotateX.set(-(y / 100 - 0.5) * 5);
+    }
+  }, [reducedMotion, rotateX, rotateY]);
+
+  const onMouseLeave = useCallback(() => {
+    rotateX.set(0);
+    rotateY.set(0);
+  }, [rotateX, rotateY]);
 
   return (
     <motion.div
       ref={ref}
       onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
       whileHover={{ y: -4, borderColor: `${glowColor}40` }}
       className={`group relative rounded-2xl cursor-default overflow-hidden spotlight-card ${className}`}
       style={{
+        rotateX: springRotateX,
+        rotateY: springRotateY,
+        transformPerspective: 1000,
         background: 'rgba(10,10,16,0.9)',
         border: '1px solid rgba(255,255,255,0.065)',
         backdropFilter: 'blur(20px)',
