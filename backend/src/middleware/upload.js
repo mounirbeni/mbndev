@@ -2,6 +2,7 @@ const multer = require('multer');
 const path   = require('path');
 const fs     = require('fs');
 const crypto = require('crypto');
+const os     = require('os');
 
 // SVG is intentionally excluded: browsers execute JS inside SVG — stored XSS risk.
 const ALLOWED_MIMES = new Set([
@@ -18,11 +19,16 @@ const ALLOWED_EXTS = new Set([
   '.pdf', '.zip', '.doc', '.docx', '.txt',
 ]);
 
+// On Vercel (and any read-only Lambda filesystem) the bundle directory is
+// immutable. Write to /tmp instead, which is always writable at runtime.
+const UPLOAD_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'mbndev-uploads')
+  : path.join(__dirname, '../../uploads');
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../../uploads');
-    if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath);
+    if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     // Random unguessable name — preserves original extension only
@@ -54,3 +60,4 @@ const upload = multer({
 });
 
 module.exports = upload;
+module.exports.UPLOAD_DIR = UPLOAD_DIR;

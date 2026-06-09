@@ -8,6 +8,7 @@ import Logo3D from '@/components/ui/Logo3D';
 import { ArrowUpRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const navLinks = [
   { label: 'Services',  href: '/services'  },
@@ -111,6 +112,7 @@ export default function Navbar() {
 
             {/* Right CTA */}
             <div className="flex items-center gap-3">
+              <LanguageSwitcher />
               {mounted && user ? (
                 <Link href={user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'}>
                   {/* Desktop */}

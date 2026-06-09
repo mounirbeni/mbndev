@@ -40,4 +40,5 @@ const ar: Record<string, string> = {
   'status.pending':'قيد الانتظار','status.paid':'مدفوع','status.inProgress':'قيد التنفيذ','status.review':'مراجعة','status.revision':'تعديل','status.delivered':'تم التسليم','status.completed':'مكتمل','status.cancelled':'ملغي','status.active':'نشط','status.live':'مباشر',
 };
 
+export { ar };
 export default ar;

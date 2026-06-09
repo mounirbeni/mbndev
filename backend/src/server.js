@@ -141,7 +141,9 @@ app.use('/api/auth/reset-password',  authLimiter);
 app.use('/api',                      apiLimiter);
 
 // ─── Static uploads ──────────────────────────────────────────────────────────
-app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+// UPLOAD_DIR is /tmp/mbndev-uploads on Vercel, backend/uploads locally.
+const { UPLOAD_DIR } = require('./middleware/upload');
+app.use('/uploads', express.static(UPLOAD_DIR, {
   maxAge: '7d',
   setHeaders: (res) => res.setHeader('X-Content-Type-Options', 'nosniff'),
 }));
