@@ -243,14 +243,17 @@ export default function AdminLeadsPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Total Leads',  value: leads.length,  color: '#6366f1' },
-          { label: '🔥 Hot',       value: hotCount,      color: '#ef4444' },
-          { label: '📬 Contacted', value: leads.filter(l => ['emailed','dm_sent'].includes(l.status)).length, color: '#f59e0b' },
-          { label: '✅ Converted', value: convCount,     color: '#10b981' },
+          { label: 'Hot',       icon: Flame,  value: hotCount,      color: '#ef4444' },
+          { label: 'Contacted', icon: Mail,   value: leads.filter(l => ['emailed','dm_sent'].includes(l.status)).length, color: '#f59e0b' },
+          { label: 'Converted', icon: Check,  value: convCount,     color: '#10b981' },
         ].map(s => (
           <div key={s.label} className="rounded-2xl p-4"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <div className="text-2xl font-bold tabular-nums" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-slate-500 text-xs mt-0.5">{s.label}</div>
+            <div className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">
+              {s.icon && <s.icon className="w-3 h-3" style={{ color: s.color }} />}
+              {s.label}
+            </div>
           </div>
         ))}
       </div>
@@ -265,7 +268,12 @@ export default function AdminLeadsPage() {
               style={filterPri === v
                 ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
                 : { color: '#94a3b8', border: '1px solid transparent' }}>
-              {v === 'all' ? 'All priorities' : v === 'hot' ? '🔥 Hot' : '⭐ Warm'}
+              {v === 'all' ? 'All priorities' : (
+                <span className="flex items-center gap-1">
+                  {v === 'hot' ? <Flame className="w-3 h-3" /> : <Star className="w-3 h-3" />}
+                  {v === 'hot' ? 'Hot' : 'Warm'}
+                </span>
+              )}
             </button>
           ))}
         </div>

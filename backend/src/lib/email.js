@@ -797,37 +797,44 @@ const templates = {
   outreach: ({ name, type = 'riad', customBody = null }) => {
     const APP_URL_LOCAL = process.env.CLIENT_URL || 'https://mbndev.ma';
     const PORTFOLIO_LINKS = {
-      riad:       { label: 'RiadConnect',  url: 'https://www.riadconnect.com/', desc: 'Commission-free booking platform for Moroccan Riads' },
-      restaurant: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'Tour & experience booking in Marrakech' },
-      boutique:   { label: 'TyyMaroc',     url: 'https://tyymaroc.vercel.app/', desc: 'Moroccan wellness e-commerce platform' },
-      tour_guide: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'Guided tour booking in Marrakech' },
+      riad:       { label: 'RiadConnect',  url: 'https://www.riadconnect.com/', desc: 'A commission-free direct booking platform built for Moroccan riads — helping owners cut OTA fees and own their guest relationships.' },
+      restaurant: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'A tour and dining experience booking platform built for Marrakech hospitality businesses.' },
+      boutique:   { label: 'TyyMaroc',     url: 'https://tyymaroc.vercel.app/', desc: 'A Moroccan wellness and artisan e-commerce platform with multilingual support.' },
+      tour_guide: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'A guided tour booking platform helping local guides in Marrakech capture direct bookings.' },
     };
     const ref = PORTFOLIO_LINKS[type] || PORTFOLIO_LINKS.riad;
     const firstName = name.split(' ')[0];
 
     const defaultBody = `
-${textBlock(`Bonjour,`)}
-${divider('12px 0')}
-${textBlock(`Je suis <strong style="color:${T.textPrimary};">Mounir</strong>, développeur web basé au Maroc. J'ai découvert votre activité et je souhaitais vous contacter directement.`)}
-${textBlock(`J'ai récemment développé <strong style="color:${T.purpleLight};">${ref.label}</strong> — ${ref.desc}. Le résultat : un site rapide, professionnel, et optimisé pour convertir les visiteurs en clients.`)}
+${textBlock(`My name is <strong style="color:${T.textPrimary};">Mounir</strong>, a professional web developer based in Morocco. I came across <strong style="color:${T.textPrimary};">${name}</strong> and wanted to reach out directly.`)}
+${divider('16px 0')}
+${textBlock(`I recently built <strong style="color:${T.purpleLight};">${ref.label}</strong> — ${ref.desc}`)}
+${textBlock(`Here is what I can do for you:`)}
 ${infoBox([
-  ['Ce que je propose', 'Un site web professionnel sur mesure'],
-  ['Délai de livraison', '14 jours'],
-  ['Prix de départ', '$799 (tout inclus)'],
-  ['Garantie', 'Révisions incluses • Code source livré'],
+  ['Website Audit',     'I review your current online presence and identify exactly what is hurting your bookings'],
+  ['Fix Issues',        'I correct technical problems, broken pages, slow load times, and poor mobile experience'],
+  ['Redesign',          'I rebuild your existing site with a modern, conversion-focused design'],
+  ['New Website',       'I design and develop a full professional website from scratch — tailored to your property'],
 ])}
-${notice(`Pas de frais cachés, pas d'engagement après livraison — vous êtes propriétaire du code. J'offre une <strong style="color:${T.green};">consultation gratuite de 15 min</strong> pour répondre à toutes vos questions.`, { type: 'success' })}
-${ctaButton('Voir mon portfolio →', APP_URL_LOCAL + '/portfolio')}
-${textBlock(`Ou répondez directement à cet email — je lis tout et je réponds dans les 24 heures.`)}`;
+${divider('16px 0')}
+${infoBox([
+  ['Delivery',          '14 days from project start'],
+  ['Starting price',    '$799 — all-inclusive'],
+  ['You own the code',  'Full source code delivered to you'],
+  ['Revisions',         'Included until you are satisfied'],
+])}
+${notice(`No hidden fees. No lock-in. After delivery, the website is yours — you are free to host it anywhere. I offer a <strong style="color:${T.green};">free 15-minute consultation</strong> to review your current situation and answer any questions.`, { type: 'success' })}
+${ctaButton('View my portfolio', APP_URL_LOCAL + '/portfolio')}
+${textBlock(`Or simply reply to this email — I read everything and respond within 24 hours.`)}`;
 
     return {
-      subject: `Site web professionnel pour ${name} — devis en 24h`,
+      subject: `Professional website for ${name} — free audit included`,
       html: layout({
-        preheader: `Bonjour — je développe des sites web professionnels pour les entreprises marocaines. Devis gratuit en 24h.`,
-        badgeHtml: badge('MBN DEV — Développement Web', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
-        heading:   `Bonjour ${firstName},`,
+        preheader: `Professional web development for Moroccan riads — site audit, fixes, redesign, or new build. Free consultation included.`,
+        badgeHtml: badge('MBN DEV — Web Development', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
+        heading:   `Hello ${firstName},`,
         body:      customBody || defaultBody,
-        footer:    `Vous recevez cet email car votre activité correspond à nos services. Pour ne plus recevoir de messages, répondez "Non merci". — Mounir Banni, MBN DEV, contact@mbndev.ma`,
+        footer:    `You are receiving this email because your business matches our services. To unsubscribe, reply with "Unsubscribe". — Mounir Banni, MBN DEV, contact@mbndev.ma`,
       }),
     };
   },
