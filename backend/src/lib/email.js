@@ -796,19 +796,11 @@ const templates = {
   // ── Outreach — cold email to a prospect ──────────────────────────────────────
   outreach: ({ name, type = 'riad', customBody = null }) => {
     const APP_URL_LOCAL = process.env.CLIENT_URL || 'https://mbndev.ma';
-    const PORTFOLIO_LINKS = {
-      riad:       { label: 'RiadConnect',  url: 'https://www.riadconnect.com/', desc: 'A commission-free direct booking platform built for Moroccan riads — helping owners cut OTA fees and own their guest relationships.' },
-      restaurant: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'A tour and dining experience booking platform built for Marrakech hospitality businesses.' },
-      boutique:   { label: 'TyyMaroc',     url: 'https://tyymaroc.vercel.app/', desc: 'A Moroccan wellness and artisan e-commerce platform with multilingual support.' },
-      tour_guide: { label: 'Emll',         url: 'https://emll.vercel.app/',     desc: 'A guided tour booking platform helping local guides in Marrakech capture direct bookings.' },
-    };
-    const ref = PORTFOLIO_LINKS[type] || PORTFOLIO_LINKS.riad;
     const firstName = name.split(' ')[0];
 
     const defaultBody = `
 ${textBlock(`My name is <strong style="color:${T.textPrimary};">Mounir</strong>, a professional web developer based in Morocco. I came across <strong style="color:${T.textPrimary};">${name}</strong> and wanted to reach out directly.`)}
 ${divider('16px 0')}
-${textBlock(`I recently built <strong style="color:${T.purpleLight};">${ref.label}</strong> — ${ref.desc}`)}
 ${textBlock(`Here is what I can do for you:`)}
 ${infoBox([
   ['Website Audit',     'I review your current online presence and identify exactly what is hurting your bookings'],
