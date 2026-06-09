@@ -140,10 +140,11 @@ app.use('/api/auth/forgot-password', authLimiter);
 app.use('/api/auth/reset-password',  authLimiter);
 app.use('/api',                      apiLimiter);
 
-// ─── Static uploads ──────────────────────────────────────────────────────────
-// UPLOAD_DIR is /tmp/mbndev-uploads on Vercel, backend/uploads locally.
-const { UPLOAD_DIR } = require('./middleware/upload');
-app.use('/uploads', express.static(UPLOAD_DIR, {
+// ─── Static uploads (local-dev fallback) ─────────────────────────────────────
+// In production files live in Vercel Blob (absolute URLs); this mount only
+// serves files saved locally when no BLOB_READ_WRITE_TOKEN is configured.
+const { LOCAL_DIR } = require('./lib/storage');
+app.use('/uploads', express.static(LOCAL_DIR, {
   maxAge: '7d',
   setHeaders: (res) => res.setHeader('X-Content-Type-Options', 'nosniff'),
 }));

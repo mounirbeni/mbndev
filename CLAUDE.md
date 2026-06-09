@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run dev          # Start dev server with nodemon on :5000
 npm start            # Production start
 npm run seed         # Seed DB with admin + demo client + packages
+npm test             # Node built-in test runner (tests/*.test.js) — no DB needed
 npm run db:push      # Push Prisma schema changes to DB (no migration file)
 npm run db:generate  # Regenerate Prisma client after schema edit
 npm run db:studio    # Open Prisma Studio GUI
@@ -41,7 +42,8 @@ Both apps are deployed together on **Vercel** via `vercel.json` at the repo root
 
 - `server.js` — Entry point. Registers middleware (helmet, CORS, HPP, rate limiting, pino logger), mounts all routes, global error handler. In production (Vercel serverless) the `app.listen()` block is skipped; the module export is the handler.
 - `lib/prisma.js` — Singleton Prisma client.
-- `lib/realtime.js` — **Server-Sent Events** bus. One in-process `Map<userId, res[]>` with a special `__admin__` broadcast key. `publishToUser`, `publishToAdmins`, `publishToUserAndAdmins`. Max 5 connections per user (oldest evicted). **Not horizontally scalable** — swap for Redis pub/sub to scale.
+- `lib/realtime.js` — **Server-Sent Events** bus. In-process `Map<userId, res[]>` with a special `__admin__` broadcast key. `publishToUser`, `publishToAdmins`, `publishToUserAndAdmins`. Max 5 connections per user (oldest evicted). When `REDIS_URL` is set, every publish is also fanned out via Redis pub/sub (ioredis) so events reach SSE connections on other serverless instances; without it delivery is in-process only.
+- `lib/storage.js` — File storage abstraction. With `BLOB_READ_WRITE_TOKEN` set (production), uploads go to **Vercel Blob** and the DB stores absolute blob URLs. Without it (local dev), files are written to `backend/uploads` and served from `/uploads`. `saveUpload(file)` / `deleteStoredFiles(urls)`. Upload middleware uses multer **memoryStorage**.
 - `lib/systemMessages.js` — Creates system chat messages (stored as `type='system'`, content is `JSON.stringify({icon, title, body})`). Auto-pushes via SSE. The `SM` object has named templates: `paymentVerified`, `statusChanged`, `fileUploaded`, `milestoneUpdated`, `revisionRequested`.
 - `lib/notifications.js` — Persists `Notification` rows and pushes `notification:new` via SSE.
 - `lib/email.js` — Nodemailer wrapper.
@@ -88,7 +90,7 @@ All HTTP calls go through `lib/api.ts` (Axios instance at `baseURL: '/api'`). In
 The dashboard layout wraps content in a `motion.div` with a CSS transform. This creates a new containing block for `position: fixed` elements inside it. Any modal that must appear above the layout (confirmations, notes panels) must use `ReactDOM.createPortal(modal, document.body)` to escape the transform hierarchy.
 
 #### i18n
-Three locales: `en`, `fr`, `ar`. Translation keys defined in `lib/i18n/en.ts` (canonical). `LanguageContext` provides `t(key)`. Arabic enables RTL.
+**English-only.** The translation dictionary lives in `lib/i18n/translations.ts`; `LanguageContext` provides `t(key)` (a thin wrapper, kept so component code stays unchanged). There is no language switcher and no fr/ar locale files — do not reintroduce them.
 
 ### Data model highlights (Prisma)
 

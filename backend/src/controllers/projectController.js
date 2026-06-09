@@ -2,7 +2,7 @@
 
 const prisma   = require('../lib/prisma');
 const jwt      = require('jsonwebtoken');
-const fs       = require('fs');
+const { saveUpload, deleteStoredFiles } = require('../lib/storage');
 const { fmt }  = require('../lib/format');
 const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
 const { SM }   = require('../lib/systemMessages');
@@ -244,14 +244,6 @@ exports.updateProject = async (req, res, next) => {
 
 // ─── Upload file to project ───────────────────────────────────────────────────
 exports.uploadFile = async (req, res, next) => {
-  // Helper: delete uploaded file and return error
-  const denyAndClean = (status, message) => {
-    if (req.file?.path) {
-      fs.unlink(req.file.path, () => {});
-    }
-    return res.status(status).json({ success: false, message });
-  };
-
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
@@ -262,12 +254,16 @@ exports.uploadFile = async (req, res, next) => {
       select: { id: true, clientId: true },
     });
 
-    if (!project) return denyAndClean(404, 'Project not found');
+    // Authorization happens before the file is persisted — with memory
+    // storage a denied request leaves nothing behind to clean up.
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
     if (req.user.role !== 'admin' && project.clientId !== req.user.id) {
-      return denyAndClean(403, 'Not authorized to upload to this project');
+      return res.status(403).json({ success: false, message: 'Not authorized to upload to this project' });
     }
 
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const fileUrl = await saveUpload(req.file);
 
     const file = await prisma.projectFile.create({
       data: {
@@ -285,8 +281,6 @@ exports.uploadFile = async (req, res, next) => {
 
     res.json({ success: true, file: fmt(file) });
   } catch (err) {
-    // Clean up orphaned file on unexpected error
-    if (req.file?.path) fs.unlink(req.file.path, () => {});
     next(err);
   }
 };
@@ -322,14 +316,9 @@ exports.deleteProject = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
-    // Remove physical files from disk (fire-and-forget — don't block the delete)
+    // Remove stored files — Vercel Blob or local disk (fire-and-forget)
     if (project.files?.length) {
-      const path = require('path');
-      const uploadsRoot = path.join(__dirname, '..', '..', 'uploads');
-      for (const f of project.files) {
-        const filename = path.basename(f.url);
-        fs.unlink(path.join(uploadsRoot, filename), () => {});
-      }
+      deleteStoredFiles(project.files.map((f) => f.url)).catch(() => {});
     }
 
     // Prisma cascades: Messages, ProjectFiles, Milestones, ActivityLogs all deleted

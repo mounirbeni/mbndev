@@ -5,6 +5,7 @@ const { fmt } = require('../lib/format');
 const { invalidateAdminCache } = require('../lib/notifications');
 const cache = require('../lib/cache');
 const { sendBroadcast, templates } = require('../lib/email');
+const { deleteStoredFiles } = require('../lib/storage');
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
 
@@ -37,6 +38,17 @@ router.put('/clients/:id/toggle', protect, authorize('admin'), async (req, res, 
 // Delete a user and all their related data (no cascade in schema).
 // Wrapped in a serializable transaction so it's atomic — either all goes or none.
 async function deleteUserCascade(userId, email) {
+  // Collect stored file URLs first — cleaned up after the transaction commits
+  const fileRows = await prisma.projectFile.findMany({
+    where: {
+      OR: [
+        { uploadedById: userId },
+        { project: { clientId: userId } },
+      ],
+    },
+    select: { url: true },
+  });
+
   await prisma.$transaction(async (tx) => {
     // 1. Payments — clientId FK to User (no cascade)
     await tx.payment.deleteMany({ where: { clientId: userId } });
@@ -69,6 +81,11 @@ async function deleteUserCascade(userId, email) {
     // 7. Finally delete the user
     await tx.user.delete({ where: { id: userId } });
   }, { timeout: 30_000 });
+
+  // Blob/disk cleanup — best effort, after the DB delete is committed
+  if (fileRows.length) {
+    deleteStoredFiles(fileRows.map((f) => f.url)).catch(() => {});
+  }
 }
 
 router.delete('/clients/:id', protect, authorize('admin'), async (req, res, next) => {
