@@ -499,5 +499,4 @@ const fr: Record<string, string> = {
   'status.live': 'En ligne',
 };
 
-export { fr };
 export default fr;

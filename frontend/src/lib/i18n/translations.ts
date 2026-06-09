@@ -1,7 +1,4 @@
-import { fr } from './fr';
-import { ar } from './ar';
-
-export type Locale = 'en' | 'fr' | 'ar';
+export type Locale = 'en';
 
 type Dict = Record<string, string>;
 
@@ -1261,10 +1258,7 @@ const en: Dict = {
   'legal.footer.terms':         'Terms of Service',
 };
 
-const dicts: Record<string, Dict> = { en, fr, ar };
-
-export const translations = { en, fr, ar };
-export function t(locale: string, key: string, fallback?: string): string {
-  const dict = dicts[locale] ?? en;
-  return dict[key] ?? en[key] ?? fallback ?? key;
+export const translations = { en };
+export function t(_locale: string, key: string, fallback?: string): string {
+  return en[key] ?? fallback ?? key;
 }
