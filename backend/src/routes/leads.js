@@ -512,6 +512,50 @@ router.delete('/:id', protect, authorize('admin'), async (req, res, next) => {
 });
 
 // ─── POST /api/leads/:id/email — send outreach email ─────────────────────────
+// ─── POST /api/leads/bulk-email — send outreach email to all new leads with email ─
+router.post('/bulk-email', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const leads = await prisma.lead.findMany({
+      where: { status: 'new', email: { not: null } },
+      orderBy: { priority: 'asc' },
+    });
+
+    if (leads.length === 0) {
+      return res.json({ success: true, sent: 0, failed: 0, message: 'No eligible leads to email (all already contacted or no email address).' });
+    }
+
+    let sent = 0, failed = 0;
+    const errors = [];
+
+    for (const lead of leads) {
+      try {
+        const tpl = templates.outreach({ name: lead.name, type: lead.type || 'riad' });
+        const result = await sendEmail({ to: lead.email, subject: tpl.subject, html: tpl.html });
+
+        if (result.sent) {
+          await prisma.lead.update({
+            where: { id: lead.id },
+            data:  { status: 'emailed', emailSentAt: new Date() },
+          });
+          sent++;
+        } else {
+          failed++;
+          errors.push({ name: lead.name, email: lead.email, error: result.error || 'Unknown error' });
+        }
+      } catch (e) {
+        failed++;
+        errors.push({ name: lead.name, email: lead.email, error: e.message });
+      }
+
+      // 300ms delay between sends to respect rate limits
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    res.json({ success: true, sent, failed, total: leads.length, errors: errors.slice(0, 10) });
+  } catch (err) { next(err); }
+});
+
+// ─── POST /api/leads/:id/email — send single outreach email to a lead ────────
 router.post('/:id/email', protect, authorize('admin'), async (req, res, next) => {
   try {
     const lead = await prisma.lead.findUnique({ where: { id: req.params.id } });
