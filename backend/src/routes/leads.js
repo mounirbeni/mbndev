@@ -524,31 +524,21 @@ router.post('/bulk-email', protect, authorize('admin'), async (req, res, next) =
       return res.json({ success: true, sent: 0, failed: 0, message: 'No eligible leads to email (all already contacted or no email address).' });
     }
 
+    const results = await Promise.allSettled(
+      leads.map(async (lead) => {
+        const tpl    = templates.outreach({ name: lead.name, type: lead.type || 'riad' });
+        const result = await sendEmail({ to: lead.email, subject: tpl.subject, html: tpl.html });
+        if (!result.sent) throw new Error(result.reason || 'send failed');
+        await prisma.lead.update({ where: { id: lead.id }, data: { status: 'emailed', emailSentAt: new Date() } });
+        return lead.name;
+      })
+    );
+
     let sent = 0, failed = 0;
     const errors = [];
-
-    for (const lead of leads) {
-      try {
-        const tpl = templates.outreach({ name: lead.name, type: lead.type || 'riad' });
-        const result = await sendEmail({ to: lead.email, subject: tpl.subject, html: tpl.html });
-
-        if (result.sent) {
-          await prisma.lead.update({
-            where: { id: lead.id },
-            data:  { status: 'emailed', emailSentAt: new Date() },
-          });
-          sent++;
-        } else {
-          failed++;
-          errors.push({ name: lead.name, email: lead.email, error: result.error || 'Unknown error' });
-        }
-      } catch (e) {
-        failed++;
-        errors.push({ name: lead.name, email: lead.email, error: e.message });
-      }
-
-      // 300ms delay between sends to respect rate limits
-      await new Promise(r => setTimeout(r, 300));
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].status === 'fulfilled') { sent++; }
+      else { failed++; errors.push({ name: leads[i].name, email: leads[i].email, error: results[i].reason?.message }); }
     }
 
     res.json({ success: true, sent, failed, total: leads.length, errors: errors.slice(0, 10) });
