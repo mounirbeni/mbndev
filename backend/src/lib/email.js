@@ -808,7 +808,6 @@ const templates = {
     const defaultBody = `
 ${textBlock(`My name is <strong style="color:${T.textPrimary};">Mounir</strong>, a professional web developer based in Morocco. I came across <strong style="color:${T.textPrimary};">${name}</strong> and wanted to reach out directly.`)}
 ${divider('16px 0')}
-${textBlock(`I recently built <strong style="color:${T.purpleLight};">${ref.label}</strong> — ${ref.desc}`)}
 ${textBlock(`Here is what I can do for you:`)}
 ${infoBox([
   ['Website Audit',     'I review your current online presence and identify exactly what is hurting your bookings'],
