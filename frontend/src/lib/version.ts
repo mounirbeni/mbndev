@@ -1,10 +1,9 @@
 import {
-  Pencil, BookmarkCheck, CreditCard, ShieldCheck, ListChecks,
-  Clock, StickyNote, Zap, Command, Activity, RefreshCw,
+  Target, Send, Sparkles, Smartphone, Accessibility, Command,
   type LucideIcon,
 } from 'lucide-react';
 
-export const APP_VERSION = '3.0.0';
+export const APP_VERSION = '3.5.0';
 
 export interface ChangeEntry {
   icon: LucideIcon;
@@ -16,78 +15,42 @@ export interface ChangeEntry {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    icon: Target,
+    title: 'Leads Manager',
+    desc: 'Track prospects end-to-end — import leads from CSV, update statuses, and never lose a follow-up.',
+    tag: 'new',
+    href: '/dashboard/admin/leads',
+  },
+  {
+    icon: Send,
+    title: 'Bulk Outreach Email',
+    desc: 'Send your outreach email to every new lead at once — delivered in parallel, no timeouts.',
+    tag: 'new',
+    href: '/dashboard/admin/leads',
+  },
+  {
+    icon: Sparkles,
+    title: 'Landing Motion Upgrade',
+    desc: 'Magnetic buttons, cursor-reactive parallax, 3D-tilt cards, animated pricing, and a swipeable testimonial carousel across the site.',
+    tag: 'improved',
+  },
+  {
+    icon: Smartphone,
+    title: 'Mobile Experience',
+    desc: 'Device-tilt parallax in the hero, touch press feedback on cards, a glowing bottom-nav indicator — and Leads is now reachable from the mobile menu.',
+    tag: 'improved',
+  },
+  {
     icon: Command,
-    title: 'Command Palette',
-    desc: 'Press ⌘K anywhere in the dashboard to search projects, clients, orders and navigate instantly.',
-    tag: 'new',
-    href: '/dashboard/admin',
-  },
-  {
-    icon: Activity,
-    title: 'Activity Log',
-    desc: 'A live feed of every action on the platform — status changes, payments, file uploads, and more.',
-    tag: 'new',
-    href: '/dashboard/admin/activity',
-  },
-  {
-    icon: RefreshCw,
-    title: 'Refresh Token Security',
-    desc: 'Sessions now use short-lived access tokens + a secure httpOnly refresh cookie. Logins last longer without compromising security.',
+    title: 'Command Palette: Leads',
+    desc: 'Press ⌘K and jump straight to the Leads manager — now included in admin navigation results.',
     tag: 'improved',
+    href: '/dashboard/admin/leads',
   },
   {
-    icon: ShieldCheck,
-    title: 'Silent Token Refresh',
-    desc: 'Expired access tokens are silently renewed in the background — no more surprise logouts on active sessions.',
-    tag: 'improved',
-  },
-  {
-    icon: ListChecks,
-    title: 'Project Stage Tracker',
-    desc: 'See exactly where your project stands — a live visual stepper shows every stage from order to delivery.',
+    icon: Accessibility,
+    title: 'Reduced Motion Support',
+    desc: 'The entire site now respects your system "reduce motion" setting — decorative animation is disabled automatically.',
     tag: 'new',
-    href: '/dashboard/client/projects',
-  },
-  {
-    icon: Clock,
-    title: 'Deadline Urgency Badge',
-    desc: 'Project cards now highlight deadlines in real time — orange for 3 days left, red for overdue.',
-    tag: 'new',
-    href: '/dashboard/client/projects',
-  },
-  {
-    icon: StickyNote,
-    title: 'Admin Client Notes',
-    desc: 'Admins can now attach private notes to any client — visible only in the admin panel.',
-    tag: 'new',
-    href: '/dashboard/admin/clients',
-  },
-  {
-    icon: Zap,
-    title: 'Quick Status Update',
-    desc: 'Admins can change a project status directly from the projects list — no need to open the full project.',
-    tag: 'improved',
-    href: '/dashboard/admin/projects',
-  },
-  {
-    icon: Pencil,
-    title: 'Edit Order Before Paying',
-    desc: 'Update your order description and notes directly on the checkout page before submitting any payment.',
-    tag: 'new',
-    href: '/dashboard/client/orders',
-  },
-  {
-    icon: BookmarkCheck,
-    title: 'Pay Later',
-    desc: "Save your order and come back to pay when you\'re ready.",
-    tag: 'new',
-    href: '/dashboard/client/orders',
-  },
-  {
-    icon: CreditCard,
-    title: 'Payment Status Tracking',
-    desc: 'Once you submit a payment, the form is hidden and replaced with a status card until the admin reviews it.',
-    tag: 'improved',
-    href: '/dashboard/client/payments',
   },
 ];

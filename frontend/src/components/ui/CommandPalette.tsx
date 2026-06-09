@@ -8,7 +8,7 @@ import {
   Search, FolderOpen, Users, ShoppingBag, CreditCard,
   LayoutDashboard, BarChart2, Package, MessageSquare,
   Receipt, LogOut, Settings, ChevronRight, Command,
-  Loader2, User, ExternalLink,
+  Loader2, User, ExternalLink, Activity, Target,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { searchAPI } from '@/lib/api';
@@ -61,7 +61,8 @@ function useStaticItems(isAdmin: boolean, router: ReturnType<typeof useRouter>, 
     { type: 'nav', id: 'admin-payments', label: 'Payments',     icon: CreditCard,      href: '/dashboard/admin/payments',   group: 'Admin Navigation' },
     { type: 'nav', id: 'admin-invoices', label: 'Invoices',     icon: Receipt,         href: '/dashboard/admin/invoices',   group: 'Admin Navigation' },
     { type: 'nav', id: 'admin-analytics',label: 'Analytics',    icon: BarChart2,       href: '/dashboard/admin/analytics',  group: 'Admin Navigation' },
-    { type: 'nav', id: 'admin-activity', label: 'Activity Log', icon: BarChart2,       href: '/dashboard/admin/activity',   group: 'Admin Navigation' },
+    { type: 'nav', id: 'admin-activity', label: 'Activity Log', icon: Activity,        href: '/dashboard/admin/activity',   group: 'Admin Navigation' },
+    { type: 'nav', id: 'admin-leads',    label: 'Leads',        icon: Target,          href: '/dashboard/admin/leads',      group: 'Admin Navigation' },
   ];
 
   const clientNav: NavAction[] = [
