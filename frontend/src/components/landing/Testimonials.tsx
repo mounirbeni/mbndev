@@ -238,6 +238,7 @@ export default function Testimonials() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-40px' }}
                   transition={{ duration: 0.6, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                  whileTap={{ scale: 0.97 }}
                   className="group rounded-2xl p-5 relative overflow-hidden"
                   style={{
                     background: 'rgba(10,10,16,0.88)',

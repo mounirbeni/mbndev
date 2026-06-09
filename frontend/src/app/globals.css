@@ -1593,7 +1593,8 @@ input, textarea, select {
   animation: marqueeX var(--marquee-speed, 35s) linear infinite;
   will-change: transform;
 }
-.marquee-track:hover { animation-play-state: paused; }
+.marquee-track:hover,
+.marquee-track:active { animation-play-state: paused; }
 
 /* ── Balanced headlines ─────────────────────────────────────────────────── */
 .text-balance { text-wrap: balance; }

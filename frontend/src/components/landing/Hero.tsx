@@ -105,6 +105,20 @@ export default function Hero() {
     mouseX.set(e.clientX / window.innerWidth - 0.5);
   }, [mouseX, reducedMotion]);
 
+  // Touch devices: drive the same parallax from the gyroscope (device tilt).
+  // On iOS 13+ orientation events need a permission gesture, so they simply
+  // never fire there — the effect degrades silently.
+  useEffect(() => {
+    if (reducedMotion) return;
+    if (!window.matchMedia('(pointer: coarse)').matches) return;
+    const onTilt = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null) return;
+      mouseX.set(Math.max(-0.5, Math.min(0.5, e.gamma / 60)));
+    };
+    window.addEventListener('deviceorientation', onTilt);
+    return () => window.removeEventListener('deviceorientation', onTilt);
+  }, [mouseX, reducedMotion]);
+
   return (
     <section
       ref={sectionRef}
@@ -341,23 +355,26 @@ export default function Hero() {
           })}
         </motion.div>
 
-        {/* Mobile stats */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.65 }}
+        {/* Mobile stats — springy staggered entrance */}
+        <div
           className="lg:hidden shrink-0 flex justify-around px-6 py-5"
           style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(7,6,15,0.9)' }}
         >
-          {STATS.map((s) => (
-            <div key={s.label} className="text-center">
-              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff' }}>
+          {STATS.map((s, i) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 14, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.6 + i * 0.09, type: 'spring', damping: 18, stiffness: 260, mass: 0.7 }}
+              className="text-center"
+            >
+              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
                 <AnimatedCounter val={s.val} suffix={s.suffix} />
               </div>
               <div style={{ fontSize: '10px', color: 'rgba(148,163,184,0.6)', marginTop: 3 }}>{s.label}</div>
-            </div>
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Scroll hint */}

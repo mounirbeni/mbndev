@@ -105,6 +105,7 @@ export default function Portfolio() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           whileHover={{ y: -4 }}
+          whileTap={{ scale: 0.99 }}
           className="mb-5 group"
         >
           <a
@@ -185,6 +186,7 @@ export default function Portfolio() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.7, delay: i * 0.09, ease: [0.16, 1, 0.3, 1] }}
               whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.975 }}
               className="group block rounded-2xl overflow-hidden premium-surface"
             >
               {/* Top beam on hover */}

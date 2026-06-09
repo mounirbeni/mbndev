@@ -52,6 +52,7 @@ function SpotlightCard({
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
       whileHover={{ y: -4, borderColor: `${glowColor}40` }}
+      whileTap={{ scale: 0.985 }}
       className={`group relative rounded-2xl cursor-default overflow-hidden spotlight-card ${className}`}
       style={{
         rotateX: springRotateX,
