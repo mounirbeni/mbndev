@@ -76,6 +76,7 @@ export default function AdminLeadsPage() {
   const [sending,     setSending]     = useState(false);
   const [importing,   setImporting]   = useState(false);
   const [syncing,     setSyncing]     = useState(false);
+  const [bulkSending, setBulkSending] = useState(false);
   const [copied,      setCopied]      = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
@@ -88,6 +89,23 @@ export default function AdminLeadsPage() {
   }, []);
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
+
+  // ── Bulk email all new leads ──────────────────────────────────────────────
+  const handleBulkEmail = async () => {
+    const eligible = leads.filter(l => l.email && l.status === 'new').length;
+    if (eligible === 0) { toast.error('No new leads with email addresses to contact.'); return; }
+    if (!confirm(`Send outreach emails to ${eligible} new lead${eligible !== 1 ? 's' : ''}? This cannot be undone.`)) return;
+    setBulkSending(true);
+    try {
+      const { data } = await leadsAPI.bulkEmail();
+      toast.success(`Sent ${data.sent} email${data.sent !== 1 ? 's' : ''}${data.failed > 0 ? ` — ${data.failed} failed` : ''}.`);
+      fetchLeads();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Bulk email failed.');
+    } finally {
+      setBulkSending(false);
+    }
+  };
 
   // ── Import defaults ───────────────────────────────────────────────────────
   const handleImport = async () => {
@@ -235,6 +253,12 @@ export default function AdminLeadsPage() {
             style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', boxShadow: '0 0 16px rgba(124,58,237,0.35)' }}>
             <Download className="w-3.5 h-3.5" />
             {importing ? 'Importing…' : 'Import Leads'}
+          </button>
+          <button onClick={handleBulkEmail} disabled={bulkSending}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all disabled:opacity-60"
+            style={{ background: bulkSending ? 'rgba(239,68,68,0.3)' : 'linear-gradient(135deg,#dc2626,#b91c1c)', boxShadow: '0 0 16px rgba(220,38,38,0.3)' }}>
+            <Send className="w-3.5 h-3.5" />
+            {bulkSending ? 'Sending…' : 'Send All Emails'}
           </button>
         </div>
       </div>
