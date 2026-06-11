@@ -83,6 +83,7 @@ export default function AdminLeadsPage() {
   const [syncing,     setSyncing]     = useState(false);
   const [bulkSending,   setBulkSending]   = useState(false);
   const [bulkResetting, setBulkResetting] = useState(false);
+  const [testSending,   setTestSending]   = useState(false);
   const [copied,        setCopied]        = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
@@ -110,6 +111,28 @@ export default function AdminLeadsPage() {
       toast.error(err?.response?.data?.message || 'Bulk email failed.');
     } finally {
       setBulkSending(false);
+    }
+  };
+
+  // ── Test email delivery ───────────────────────────────────────────────────
+  const handleTestEmail = async () => {
+    setTestSending(true);
+    try {
+      const { data } = await leadsAPI.testEmail('mobanunir@gmail.com');
+      if (data.success) {
+        toast.success('Test email sent! Check mobanunir@gmail.com (and spam folder).');
+      } else {
+        const reason = data.result?.reason || 'unknown';
+        if (!data.brevoConfigured) {
+          toast.error('BREVO_API_KEY is not set in Vercel environment variables — emails cannot be sent.');
+        } else {
+          toast.error(`Brevo rejected the send: ${reason}`);
+        }
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Test failed.');
+    } finally {
+      setTestSending(false);
     }
   };
 
@@ -199,10 +222,14 @@ export default function AdminLeadsPage() {
     if (!emailTarget) return;
     setSending(true);
     try {
-      await leadsAPI.sendEmail(emailTarget.id, { subject: emailSubject, body: emailBody });
-      setLeads(prev => prev.map(l => l.id === emailTarget.id ? { ...l, status: 'emailed' } : l));
-      toast.success(`Email sent to ${emailTarget.name}!`);
-      setEmailTarget(null);
+      const { data } = await leadsAPI.sendEmail(emailTarget.id, { subject: emailSubject, body: emailBody });
+      if (data.success) {
+        setLeads(prev => prev.map(l => l.id === emailTarget.id ? { ...l, status: 'emailed' } : l));
+        toast.success(`Email sent to ${emailTarget.name}!`);
+        setEmailTarget(null);
+      } else {
+        toast.error(`Send failed: ${data.result?.reason || 'Brevo not configured — check BREVO_API_KEY in Vercel env vars.'}`);
+      }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Email failed.');
     } finally {
@@ -264,6 +291,12 @@ export default function AdminLeadsPage() {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-400 hover:text-white text-sm transition-colors"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <RefreshCcw className="w-3.5 h-3.5" /> Refresh
+          </button>
+          <button onClick={handleTestEmail} disabled={testSending}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
+            style={{ background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.25)', color: '#60a5fa' }}>
+            <Zap className="w-3.5 h-3.5" />
+            {testSending ? 'Testing…' : 'Test Email'}
           </button>
           <button onClick={handleSyncContacts} disabled={syncing}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all disabled:opacity-60"

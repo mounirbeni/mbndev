@@ -553,6 +553,31 @@ router.delete('/:id', protect, authorize('admin'), async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ─── GET /api/leads/email-check — verify Brevo config ────────────────────────
+router.get('/email-check', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const hasKey = !!process.env.BREVO_API_KEY;
+    const from   = process.env.EMAIL_FROM || 'MBN DEV <contact@mbndev.ma>';
+    res.json({ success: true, brevoConfigured: hasKey, from, env: process.env.NODE_ENV || 'unknown' });
+  } catch (err) { next(err); }
+});
+
+// ─── POST /api/leads/test-email — send one test email and return full result ──
+router.post('/test-email', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const { to = 'mobanunir@gmail.com' } = req.body;
+    const tpl    = templates.outreach({ name: 'Test Riad', type: 'riad' });
+    const result = await sendEmail({ to, subject: '[TEST] ' + tpl.subject, html: tpl.html });
+    res.json({
+      success:          result.sent,
+      to,
+      result,
+      brevoConfigured:  !!process.env.BREVO_API_KEY,
+      from:             process.env.EMAIL_FROM || 'MBN DEV <contact@mbndev.ma>',
+    });
+  } catch (err) { next(err); }
+});
+
 // ─── POST /api/leads/:id/email — send outreach email ─────────────────────────
 // ─── POST /api/leads/bulk-email — send outreach email to all new leads with email ─
 router.post('/bulk-email', protect, authorize('admin'), async (req, res, next) => {

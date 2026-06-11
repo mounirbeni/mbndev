@@ -239,6 +239,8 @@ export const leadsAPI = {
   syncContacts:    ()                                      => api.post('/leads/sync-contacts'),
   bulkEmail:       ()                                      => api.post('/leads/bulk-email'),
   resetAll:        ()                                      => api.post('/leads/reset-all'),
+  testEmail:       (to: string)                            => api.post('/leads/test-email', { to }),
+  emailCheck:      ()                                      => api.get('/leads/email-check'),
   getTemplate:     (type: string, name: string)            => api.get('/leads/templates', { params: { type, name } }),
 };
 
