@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ExternalLink, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type ProjectKey = 'carrylink' | 'lueur' | 'tyy' | 'emll' | 'riad';
+type ProjectKey = 'carrylink' | 'lueur' | 'tyy' | 'emll' | 'riad' | 'riaddemo' | 'watchstore';
 
 const projectsMeta: {
   key: ProjectKey;
@@ -17,11 +17,13 @@ const projectsMeta: {
   initial: string;
   index: string;
 }[] = [
-  { key: 'carrylink', title: 'CarryLink',   url: 'https://carrylink.vercel.app/',   gradient: 'from-violet-600/20 to-blue-700/10',    accentHex: '#8b5cf6', initial: 'CL', index: '01' },
-  { key: 'lueur',     title: 'Lueur Skin',  url: 'https://lueurskin.vercel.app/',   gradient: 'from-purple-500/20 to-violet-700/10',  accentHex: '#a78bfa', initial: 'LS', index: '02' },
-  { key: 'tyy',       title: 'TyyMaroc',    url: 'https://tyymaroc.vercel.app/',    gradient: 'from-indigo-500/20 to-purple-700/10',  accentHex: '#818cf8', initial: 'TM', index: '03' },
-  { key: 'emll',      title: 'Emll',        url: 'https://emll.vercel.app/',        gradient: 'from-violet-400/20 to-indigo-600/10', accentHex: '#c4b5fd', initial: 'EM', index: '04' },
-  { key: 'riad',      title: 'RiadConnect', url: 'https://www.riadconnect.com/',    gradient: 'from-purple-600/20 to-violet-500/10', accentHex: '#7c3aed', initial: 'RC', index: '05' },
+  { key: 'carrylink',  title: 'CarryLink',       url: 'https://carrylink.vercel.app/',          gradient: 'from-violet-600/20 to-blue-700/10',    accentHex: '#8b5cf6', initial: 'CL', index: '01' },
+  { key: 'lueur',      title: 'Lueur Skin',      url: 'https://lueurskin.vercel.app/',          gradient: 'from-purple-500/20 to-violet-700/10',  accentHex: '#a78bfa', initial: 'LS', index: '02' },
+  { key: 'tyy',        title: 'TyyMaroc',        url: 'https://tyymaroc.vercel.app/',           gradient: 'from-indigo-500/20 to-purple-700/10',  accentHex: '#818cf8', initial: 'TM', index: '03' },
+  { key: 'emll',       title: 'Emll',            url: 'https://emll.vercel.app/',               gradient: 'from-violet-400/20 to-indigo-600/10',  accentHex: '#c4b5fd', initial: 'EM', index: '04' },
+  { key: 'riad',       title: 'RiadConnect',     url: 'https://www.riadconnect.com/',           gradient: 'from-purple-600/20 to-violet-500/10',  accentHex: '#7c3aed', initial: 'RC', index: '05' },
+  { key: 'riaddemo',   title: 'RiadDemo',        url: 'https://riaddemo.vercel.app',            gradient: 'from-orange-500/20 to-amber-600/10',   accentHex: '#f97316', initial: 'RD', index: '06' },
+  { key: 'watchstore', title: 'WatchStoreMaroc', url: 'https://watchstoremaroc.vercel.app',     gradient: 'from-yellow-500/20 to-amber-700/10',   accentHex: '#eab308', initial: 'WM', index: '07' },
 ];
 
 function ProjectNumber({ n }: { n: string }) {

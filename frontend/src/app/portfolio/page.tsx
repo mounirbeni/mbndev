@@ -115,6 +115,42 @@ const projects: {
     ],
     highlight: 'Commission-free direct bookings with AI guest assistant',
   },
+  {
+    id: 6,
+    title: 'RiadDemo',
+    url: 'https://riaddemo.vercel.app',
+    category: 'Hospitality',
+    type: 'Riad Booking Website',
+    description: 'Elegant booking website for a Moroccan Riad featuring room showcases, availability management, and a seamless direct reservation flow — built to convert visitors into guests.',
+    tags: ['Next.js', 'Booking System', 'Tailwind CSS', 'Vercel'],
+    gradient: 'from-orange-600/35 to-amber-400/20',
+    accent: 'text-orange-400',
+    border: 'border-orange-500/20',
+    stats: [
+      { label: 'Type',    value: 'Hospitality' },
+      { label: 'Market',  value: 'Morocco'     },
+      { label: 'Booking', value: 'Direct'      },
+    ],
+    highlight: 'Elegant riad showcase with direct booking and room availability',
+  },
+  {
+    id: 7,
+    title: 'WatchStoreMaroc',
+    url: 'https://watchstoremaroc.vercel.app',
+    category: 'E-Commerce',
+    type: 'Luxury Watch Store',
+    description: 'Premium e-commerce store for luxury and fashion watches in Morocco. Features a curated product catalog, smart filtering by brand and price range, and a polished shopping experience.',
+    tags: ['Next.js', 'E-Commerce', 'Product Catalog', 'Tailwind CSS'],
+    gradient: 'from-yellow-600/30 to-amber-500/15',
+    accent: 'text-yellow-400',
+    border: 'border-yellow-500/20',
+    stats: [
+      { label: 'Style',   value: 'Luxury'  },
+      { label: 'Market',  value: 'Morocco' },
+      { label: 'Product', value: 'Watches' },
+    ],
+    highlight: 'Premium watch catalog with brand filtering and sleek checkout',
+  },
 ];
 
 // Map category IDs to translation keys
