@@ -6,7 +6,8 @@ import Link from 'next/link';
 import {
   Zap, ArrowRight, MapPin, Clock, Briefcase, Code2, Database,
   Smartphone, Palette, ChevronDown, Globe, Star, Users, Rocket,
-  MessageCircle, ArrowUpRight, CheckCircle2, Sparkles,
+  MessageCircle, ArrowUpRight, CheckCircle2, Sparkles, Film, PenTool,
+  Megaphone, Video,
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
@@ -115,6 +116,86 @@ const roles: Role[] = [
     ],
     nice: ['Familiarity with Tailwind CSS utility classes', 'Experience with Lottie or CSS animations', 'Understanding of Core Web Vitals'],
   },
+  {
+    id: 5,
+    title: 'Motion Graphics Designer',
+    icon: Film,
+    type: 'Freelance',
+    location: 'Remote',
+    commitment: 'Project-based',
+    gradient: 'from-fuchsia-600/30 to-purple-500/15',
+    accent: 'text-fuchsia-400',
+    border: 'border-fuchsia-500/20',
+    summary: 'Bring projects to life through animation — from micro-interactions on the web to full brand motion packages and video intros. Your work sets the energy of every product we ship.',
+    skills: ['After Effects', 'Lottie / Rive', 'Adobe Premiere', 'CSS Animation', 'GSAP'],
+    responsibilities: [
+      'Create animated UI components and micro-interactions for web projects',
+      'Produce brand motion packages: logo animations, intro/outro sequences',
+      'Export Lottie / Rive files for seamless integration into React apps',
+      'Collaborate with UI designers to ensure motion feels cohesive with the brand',
+    ],
+    nice: ['Experience with 3D motion (Cinema 4D / Spline)', 'Knowledge of SVG animation', 'Short-form social video editing'],
+  },
+  {
+    id: 6,
+    title: 'Graphic Designer',
+    icon: PenTool,
+    type: 'Freelance',
+    location: 'Remote',
+    commitment: 'Project-based',
+    gradient: 'from-amber-600/30 to-yellow-500/15',
+    accent: 'text-amber-400',
+    border: 'border-amber-500/20',
+    summary: 'Design print and digital brand assets for client projects — from full brand identity kits to social media content and marketing collateral.',
+    skills: ['Adobe Illustrator', 'Photoshop', 'Brand Identity', 'Typography', 'Figma'],
+    responsibilities: [
+      'Create logos, brand identities, and full visual guidelines',
+      'Design social media templates, banners, and marketing materials',
+      'Produce print-ready assets (brochures, business cards, flyers)',
+      'Maintain brand consistency across all delivered assets',
+    ],
+    nice: ['Experience with packaging design', 'Arabic typography knowledge', 'Photo retouching skills'],
+  },
+  {
+    id: 7,
+    title: 'Video Editor',
+    icon: Video,
+    type: 'Freelance',
+    location: 'Remote',
+    commitment: 'Project-based',
+    gradient: 'from-cyan-600/30 to-blue-500/15',
+    accent: 'text-cyan-400',
+    border: 'border-cyan-500/20',
+    summary: 'Edit and produce promotional videos, product demos, and social content for client launches. You turn raw footage and assets into polished, shareable content.',
+    skills: ['Adobe Premiere Pro', 'DaVinci Resolve', 'After Effects', 'Color Grading', 'Audio Mixing'],
+    responsibilities: [
+      'Edit promotional and explainer videos for web product launches',
+      'Create short-form content optimised for Instagram, TikTok, and YouTube',
+      'Add motion graphics, captions, and sound design to video assets',
+      'Deliver in multiple formats and aspect ratios for cross-platform use',
+    ],
+    nice: ['Experience with screen recording / product walkthroughs', 'AI video tools (Runway, Sora)', 'Arabic / French voiceover sourcing'],
+  },
+  {
+    id: 8,
+    title: 'Social Media & Content Manager',
+    icon: Megaphone,
+    type: 'Freelance',
+    location: 'Remote',
+    commitment: 'Part-time / Ongoing',
+    gradient: 'from-green-600/30 to-teal-500/15',
+    accent: 'text-green-400',
+    border: 'border-green-500/20',
+    summary: 'Manage and grow MBN DEV\'s social presence across Instagram, LinkedIn, and TikTok. Write engaging content, schedule posts, and help turn our portfolio work into leads.',
+    skills: ['Instagram', 'LinkedIn', 'TikTok', 'Copywriting', 'Content Strategy'],
+    responsibilities: [
+      'Plan and schedule weekly content across Instagram, LinkedIn, and TikTok',
+      'Write captions, threads, and short-form copy that showcase our work',
+      'Repurpose project deliverables into engaging case study content',
+      'Monitor analytics and iterate based on performance data',
+    ],
+    nice: ['Experience with Arabic or French content creation', 'Basic Canva / design skills', 'Knowledge of B2B SaaS marketing'],
+  },
 ];
 
 const perks = [
@@ -217,7 +298,7 @@ export default function CareersPage() {
           <motion.div {...fadeUp} className="text-center mb-14">
             <span className="section-label mb-4">Open Positions</span>
             <h2 className="text-3xl sm:text-4xl font-black text-white mt-4">
-              4 roles open{' '}
+              8 roles open{' '}
               <span className="gradient-text">right now</span>
             </h2>
             <p className="text-slate-500 mt-3 text-sm">All positions are freelance · remote · project-based</p>
