@@ -238,6 +238,7 @@ export const leadsAPI = {
   importDefaults:  ()                                      => api.post('/leads/import'),
   syncContacts:    ()                                      => api.post('/leads/sync-contacts'),
   bulkEmail:       ()                                      => api.post('/leads/bulk-email'),
+  resetAll:        ()                                      => api.post('/leads/reset-all'),
   getTemplate:     (type: string, name: string)            => api.get('/leads/templates', { params: { type, name } }),
 };
 

@@ -48,16 +48,21 @@ const TYPE_ICONS: Record<string, LucideIcon> = {
 };
 
 const DM_TEMPLATE = (name: string, type: string) => {
-  const portfolioRef = type === 'riad' ? 'RiadConnect' : type === 'boutique' ? 'TyyMaroc' : 'Emll';
+  const portfolioRef = type === 'riad'
+    ? 'RiadConnect — https://www.riadconnect.com\nDémo riad : https://riaddemo.vercel.app'
+    : type === 'boutique'
+    ? 'TyyMaroc'
+    : 'Emll';
   return `Bonjour ${name},
 
-Je suis Mounir, développeur web spécialisé dans les entreprises marocaines. J'ai vu votre page Instagram et j'ai adoré votre travail.
+Je suis Mounir, développeur web spécialisé dans les entreprises marocaines. J'ai vu votre page et j'ai adoré votre travail.
 
-Beaucoup de vos clients potentiels cherchent votre business sur Google — sans site web, vous perdez des réservations/ventes chaque jour.
+Beaucoup de vos clients potentiels cherchent votre business sur Google — sans site web, vous perdez des réservations chaque jour.
 
-J'ai récemment créé ${portfolioRef} pour un client similaire et les résultats ont été excellents.
+J'ai récemment créé des sites pour des riads similaires :
+${portfolioRef}
 
-Je vous propose un site professionnel à partir de **799$/mois** — devis gratuit en 24h. Intéressé(e) ?
+Je vous propose un site professionnel à partir de 799$ — devis gratuit en 24h. Intéressé(e) ?
 
 mbndev.ma`;
 };
@@ -76,8 +81,9 @@ export default function AdminLeadsPage() {
   const [sending,     setSending]     = useState(false);
   const [importing,   setImporting]   = useState(false);
   const [syncing,     setSyncing]     = useState(false);
-  const [bulkSending, setBulkSending] = useState(false);
-  const [copied,      setCopied]      = useState(false);
+  const [bulkSending,   setBulkSending]   = useState(false);
+  const [bulkResetting, setBulkResetting] = useState(false);
+  const [copied,        setCopied]        = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
   const fetchLeads = useCallback((silent = false) => {
@@ -104,6 +110,23 @@ export default function AdminLeadsPage() {
       toast.error(err?.response?.data?.message || 'Bulk email failed.');
     } finally {
       setBulkSending(false);
+    }
+  };
+
+  // ── Reset all emailed leads back to new ──────────────────────────────────
+  const handleResetAll = async () => {
+    const emailed = leads.filter(l => l.status === 'emailed').length;
+    if (emailed === 0) { toast('No emailed leads to reset — all already new.'); return; }
+    if (!confirm(`Reset ${emailed} emailed lead${emailed !== 1 ? 's' : ''} back to "new"? This lets you send bulk emails to them again.`)) return;
+    setBulkResetting(true);
+    try {
+      const { data } = await leadsAPI.resetAll();
+      toast.success(data.message || 'Leads reset to new.');
+      fetchLeads();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Reset failed.');
+    } finally {
+      setBulkResetting(false);
     }
   };
 
@@ -253,6 +276,12 @@ export default function AdminLeadsPage() {
             style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', boxShadow: '0 0 16px rgba(124,58,237,0.35)' }}>
             <Download className="w-3.5 h-3.5" />
             {importing ? 'Importing…' : 'Import Leads'}
+          </button>
+          <button onClick={handleResetAll} disabled={bulkResetting}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
+            style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', color: '#fbbf24' }}>
+            <RefreshCcw className="w-3.5 h-3.5" />
+            {bulkResetting ? 'Resetting…' : 'Reset All'}
           </button>
           <button onClick={handleBulkEmail} disabled={bulkSending}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all disabled:opacity-60"

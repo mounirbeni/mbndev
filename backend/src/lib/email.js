@@ -798,6 +798,26 @@ const templates = {
     const APP_URL_LOCAL = process.env.CLIENT_URL || 'https://mbndev.ma';
     const firstName = name.split(' ')[0];
 
+    const riadProofSection = type === 'riad' ? `
+${divider('16px 0')}
+${textBlock(`<strong style="color:${T.textPrimary};">Live proof — websites I built for Moroccan riads:</strong>`)}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:12px 0 0;">
+  <tr>
+    <td style="padding-right:6px;vertical-align:top;width:50%;">
+      <a href="https://www.riadconnect.com/" style="display:block;text-decoration:none;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:12px;padding:14px 16px;">
+        <div style="font-size:13px;font-weight:700;color:#a78bfa;font-family:${T.font};margin-bottom:3px;">RiadConnect</div>
+        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">riadconnect.com →</div>
+      </a>
+    </td>
+    <td style="padding-left:6px;vertical-align:top;width:50%;">
+      <a href="https://riaddemo.vercel.app" style="display:block;text-decoration:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px 16px;">
+        <div style="font-size:13px;font-weight:700;color:#818cf8;font-family:${T.font};margin-bottom:3px;">Riad Demo Site</div>
+        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">riaddemo.vercel.app →</div>
+      </a>
+    </td>
+  </tr>
+</table>` : '';
+
     const defaultBody = `
 ${textBlock(`My name is <strong style="color:${T.textPrimary};">Mounir</strong>, a professional web developer based in Morocco. I came across <strong style="color:${T.textPrimary};">${name}</strong> and wanted to reach out directly.`)}
 ${divider('16px 0')}
@@ -808,6 +828,7 @@ ${infoBox([
   ['Redesign',          'I rebuild your existing site with a modern, conversion-focused design'],
   ['New Website',       'I design and develop a full professional website from scratch — tailored to your property'],
 ])}
+${riadProofSection}
 ${divider('16px 0')}
 ${infoBox([
   ['Delivery',          '14 days from project start'],

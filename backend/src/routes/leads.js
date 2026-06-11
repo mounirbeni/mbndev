@@ -416,6 +416,37 @@ const DEFAULT_LEADS = [
   { name: 'Riad Salmiya',                   type: 'riad', city: 'Marrakech', email: 'riadsalmiya@yahoo.com',                    website: 'none',  priority: 'hot', outreachAngle: 'Has email contact — pitch Starter package for direct bookings and cut OTA commissions.',       source: 'Email list' },
   { name: 'Riad El Walla Marrakech',        type: 'riad', city: 'Marrakech', email: 'riadelwallamarrakech@gmail.com',           website: 'none',  priority: 'hot', outreachAngle: 'Has Gmail — pitch Starter package for direct bookings and cut OTA commissions.',              source: 'Email list' },
   { name: 'Riad Sierra',                    type: 'riad', city: 'Marrakech', email: 'hello@riadsierra.com',                     website: 'basic', priority: 'hot', outreachAngle: 'Has domain email — likely has a website. Offer modern redesign with direct booking system.',    source: 'Email list' },
+
+  // ═══ CSV IMPORT — Marrakech Riads with emails (from uploaded CSV) ══════════
+  { name: '72 Riad',                        type: 'riad', city: 'Marrakech', email: 'info@riad72.com',                          website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — offer modern redesign with direct booking and availability calendar.',        source: 'CSV upload' },
+  { name: 'Ksar Kasbah & Spa',              type: 'riad', city: 'Marrakech', email: 'contact@ksarfawz-spa.com',                 website: 'basic', priority: 'hot',  outreachAngle: 'Spa kasbah riad with domain email — pitch premium Pro package with spa booking integration.',     source: 'CSV upload' },
+  { name: "Maison d'hôtes Chamade",         type: 'riad', city: 'Marrakech', email: 'maisondhotes@chamadeluxury.com',           website: 'basic', priority: 'hot',  outreachAngle: 'Luxury maison d\'hôtes with branded email — upgrade to full premium site with direct booking.',  source: 'CSV upload' },
+  { name: 'Riad Altair',                    type: 'riad', city: 'Marrakech', email: 'riadaltair@gmail.com',                    website: 'none',  priority: 'hot',  outreachAngle: 'Gmail only — pitch Starter package with direct booking to cut OTA commissions.',                   source: 'CSV upload' },
+  { name: 'Riad 48 Spa',                    type: 'riad', city: 'Marrakech', email: 'riadkasbah48@gmail.com',                  website: 'none',  priority: 'hot',  outreachAngle: 'Spa riad with Gmail — pitch Pro package with spa booking and availability calendar.',              source: 'CSV upload' },
+  { name: 'Riad Anya',                      type: 'riad', city: 'Marrakech', email: 'clientriadanya@gmail.com',                website: 'none',  priority: 'hot',  outreachAngle: 'Has Gmail — pitch Starter package for direct bookings and cut OTA commissions.',                   source: 'CSV upload' },
+  { name: 'Riad Carina',                    type: 'riad', city: 'Marrakech', email: 'contact@riadcarina.net',                  website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — likely has basic site. Offer modern redesign with direct booking system.',       source: 'CSV upload' },
+  { name: 'Riad Anaïs',                     type: 'riad', city: 'Marrakech', email: 'info@riad-anais.com',                     website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — offer premium redesign with booking calendar and multilingual support.',         source: 'CSV upload' },
+  { name: 'Riad Ajebel',                    type: 'riad', city: 'Marrakech', email: 'contact@riadajebel.com',                  website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — likely has basic site. Offer modern redesign with integrated Stripe checkout.', source: 'CSV upload' },
+  { name: 'Riad Al Mamoune',                type: 'riad', city: 'Marrakech', email: 'contact@riadalmamoune.com',               website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — offer modern redesign with direct booking and availability calendar.',          source: 'CSV upload' },
+  { name: 'Riad Dama & Spa',                type: 'riad', city: 'Marrakech', email: 'riaddama.maroc@gmail.com',                website: 'none',  priority: 'hot',  outreachAngle: 'Spa riad with Gmail — pitch Pro package with spa amenity showcase and booking system.',            source: 'CSV upload' },
+  { name: 'Riad Dar Al Amane',              type: 'riad', city: 'Marrakech', email: 'riaddaralamane@gmail.com',                website: 'none',  priority: 'hot',  outreachAngle: 'Has Gmail — pitch Starter package for direct bookings and cut OTA commissions.',                   source: 'CSV upload' },
+  { name: 'Riad Dar Najwa',                 type: 'riad', city: 'Marrakech', email: 'riad.darnajwa@gmail.com',                 website: 'none',  priority: 'hot',  outreachAngle: 'Has Gmail — pitch Starter package for direct bookings and cut OTA commissions.',                   source: 'CSV upload' },
+  { name: 'Riad Dar One',                   type: 'riad', city: 'Marrakech', email: 'booking@riad-dar-one.com',                website: 'basic', priority: 'hot',  outreachAngle: 'Has booking domain email — upgrade with full Stripe checkout and modern design.',                   source: 'CSV upload' },
+  { name: 'Riad Daria Marrakech',           type: 'riad', city: 'Marrakech', email: 'jcd@riaddariamarrakech.com',              website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — offer modern redesign with direct booking and multilingual support.',            source: 'CSV upload' },
+  { name: 'Riad Jonan',                     type: 'riad', city: 'Marrakech', email: 'riadjonan@gmail.com',                    website: 'none',  priority: 'hot',  outreachAngle: 'Has Gmail — pitch Starter package for direct bookings and cut OTA commissions.',                   source: 'CSV upload' },
+  { name: 'Riad Zineb Hotel',               type: 'riad', city: 'Marrakech', email: 'info@riadzineb.com',                     website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — hotel-riad hybrid needs modern upgrade with booking engine and availability.',   source: 'CSV upload' },
+  { name: 'Riad Zoraida',                   type: 'riad', city: 'Marrakech', email: 'contact@riadzoraida.com',                website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — offer modern redesign with direct booking calendar and photo gallery.',          source: 'CSV upload' },
+  { name: 'Riad Mariana',                   type: 'riad', city: 'Marrakech', email: 'contact@riadmariana.com',                website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — offer modern redesign with direct booking calendar and multilingual support.',   source: 'CSV upload' },
+  { name: 'Riad Nyla',                      type: 'riad', city: 'Marrakech', email: 'info@riadnyla.com',                      website: 'basic', priority: 'hot',  outreachAngle: 'Has domain email — offer modern redesign with direct booking and availability calendar.',          source: 'CSV upload' },
+  { name: 'Riad Nour Boutique',             type: 'riad', city: 'Marrakech', email: 'resa.nourboutique@gmail.com',             website: 'none',  priority: 'hot',  outreachAngle: 'Boutique riad with Gmail reservation email — pitch Starter with direct booking flow.',            source: 'CSV upload' },
+  { name: 'Riad Dar des Arts',              type: 'riad', city: 'Marrakech', email: 'contact@darsociety.com',                 website: 'basic', priority: 'hot',  outreachAngle: 'Arts-focused riad with domain email — pitch premium showcase site with art gallery integration.',  source: 'CSV upload' },
+  { name: 'Riad LallaBaya',                 type: 'riad', city: 'Marrakech', email: 'riadlallabaya@lellabcollection.com',      website: 'basic', priority: 'hot',  outreachAngle: 'Part of Lella collection — branded domain email. Upgrade to cohesive premium portfolio site.',     source: 'CSV upload' },
+  { name: 'Villa Des Orangers',             type: 'riad', city: 'Marrakech', email: 'message@villadesorangers.com',            website: 'yes',   priority: 'warm', outreachAngle: 'Luxury villa-riad with domain email — pitch premium redesign to match 5-star positioning.',         source: 'CSV upload' },
+  { name: 'The Mellah Hotel',               type: 'riad', city: 'Marrakech', email: 'hello@hotelthemellah.com',               website: 'yes',   priority: 'warm', outreachAngle: 'Boutique hotel in the Mellah with domain email — offer modern redesign + booking system upgrade.',  source: 'CSV upload' },
+
+  // ═══ TEST LEADS — for email delivery verification ════════════════════════
+  { name: 'Mounir Test Gmail',              type: 'riad', city: 'Marrakech', email: 'mobanunir@gmail.com',                    website: 'none',  priority: 'hot',  outreachAngle: 'Test lead — verify email delivery to Gmail.',   source: 'Test' },
+  { name: 'Mounir Test iCloud',             type: 'riad', city: 'Marrakech', email: 'mobanunir@icloud.com',                   website: 'none',  priority: 'hot',  outreachAngle: 'Test lead — verify email delivery to iCloud.',  source: 'Test' },
 ];
 
 // ─── GET /api/leads — list all leads (admin only) ────────────────────────────
@@ -471,6 +502,17 @@ router.post('/sync-contacts', protect, authorize('admin'), async (req, res, next
       }
     }
     res.json({ success: true, message: `Updated contact info for ${updated} leads.`, updated });
+  } catch (err) { next(err); }
+});
+
+// ─── POST /api/leads/reset-all — reset emailed leads back to 'new' ──────────
+router.post('/reset-all', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const { count } = await prisma.lead.updateMany({
+      where: { status: 'emailed' },
+      data:  { status: 'new', emailSentAt: null },
+    });
+    res.json({ success: true, message: `Reset ${count} lead${count !== 1 ? 's' : ''} back to new.`, count });
   } catch (err) { next(err); }
 });
 
