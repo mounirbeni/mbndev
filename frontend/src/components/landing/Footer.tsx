@@ -61,6 +61,7 @@ export default function Footer() {
     { label: t('nav.pricing'),   href: '/pricing'   },
     { label: t('nav.about'),     href: '/about'     },
     { label: t('nav.contact'),   href: '/contact'   },
+    { label: 'Careers',          href: '/careers'   },
   ];
 
   const serviceLinks = [
