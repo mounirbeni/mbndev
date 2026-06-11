@@ -800,19 +800,19 @@ const templates = {
 
     const riadProofSection = type === 'riad' ? `
 ${divider('16px 0')}
-${textBlock(`<strong style="color:${T.textPrimary};">Live proof — websites I built for Moroccan riads:</strong>`)}
+${textBlock(`<strong style="color:${T.textPrimary};">Live proof — websites I built for similar properties:</strong>`)}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:12px 0 0;">
   <tr>
     <td style="padding-right:6px;vertical-align:top;width:50%;">
-      <a href="https://www.riadconnect.com/" style="display:block;text-decoration:none;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:13px;font-weight:700;color:#a78bfa;font-family:${T.font};margin-bottom:3px;">RiadConnect</div>
-        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">riadconnect.com →</div>
+      <a href="https://riaddemo.vercel.app" style="display:block;text-decoration:none;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:12px;padding:14px 16px;">
+        <div style="font-size:13px;font-weight:700;color:#a78bfa;font-family:${T.font};margin-bottom:3px;">Riad Demo Site</div>
+        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">riaddemo.vercel.app →</div>
       </a>
     </td>
     <td style="padding-left:6px;vertical-align:top;width:50%;">
-      <a href="https://riaddemo.vercel.app" style="display:block;text-decoration:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:13px;font-weight:700;color:#818cf8;font-family:${T.font};margin-bottom:3px;">Riad Demo Site</div>
-        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">riaddemo.vercel.app →</div>
+      <a href="https://emll.vercel.app" style="display:block;text-decoration:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px 16px;">
+        <div style="font-size:13px;font-weight:700;color:#818cf8;font-family:${T.font};margin-bottom:3px;">Emll</div>
+        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">emll.vercel.app →</div>
       </a>
     </td>
   </tr>

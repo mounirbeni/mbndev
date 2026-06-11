@@ -49,17 +49,17 @@ const TYPE_ICONS: Record<string, LucideIcon> = {
 
 const DM_TEMPLATE = (name: string, type: string) => {
   const portfolioRef = type === 'riad'
-    ? 'RiadConnect — https://www.riadconnect.com\nDémo riad : https://riaddemo.vercel.app'
+    ? '• Riad Demo Site : https://riaddemo.vercel.app\n• Emll : https://emll.vercel.app'
     : type === 'boutique'
-    ? 'TyyMaroc'
-    : 'Emll';
+    ? '• TyyMaroc\n• Emll : https://emll.vercel.app'
+    : '• Emll : https://emll.vercel.app';
   return `Bonjour ${name},
 
 Je suis Mounir, développeur web spécialisé dans les entreprises marocaines. J'ai vu votre page et j'ai adoré votre travail.
 
 Beaucoup de vos clients potentiels cherchent votre business sur Google — sans site web, vous perdez des réservations chaque jour.
 
-J'ai récemment créé des sites pour des riads similaires :
+Quelques exemples de sites que j'ai réalisés :
 ${portfolioRef}
 
 Je vous propose un site professionnel à partir de 799$ — devis gratuit en 24h. Intéressé(e) ?
