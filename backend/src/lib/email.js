@@ -852,43 +852,52 @@ ${textBlock(`Or simply reply to this email — I read everything and respond wit
     };
   },
 
-  // ── June 2026 Platform Update ─────────────────────────────────────────────────
+  // ── June 2026 Client Update ───────────────────────────────────────────────────
   juneUpdate: ({ user }) => {
     const first   = (user?.name || 'there').split(' ')[0];
     const dashUrl = `${APP_URL}/dashboard/client`;
     const reqUrl  = `${APP_URL}/request`;
+    const msgUrl  = `${APP_URL}/dashboard/client/messages`;
     return {
-      subject: `${first}, here's everything we shipped in June`,
+      subject: `${first}, here's what's new in your dashboard`,
       html: layout({
-        preheader: `New broadcast page, card stack dashboard, smarter leads outreach, and more — all live now.`,
-        badgeHtml: badge('June 2026 — Platform Update', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
-        heading:   `June update: here's what's new, ${first}.`,
-        intro:     `We've been heads-down building. Here's everything that shipped this month — all live in your dashboard right now.`,
+        preheader: `Better project tracking, faster payments, and direct messaging — all live in your account now.`,
+        badgeHtml: badge('June 2026 — What\'s New', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
+        heading:   `A few things just got better for you, ${first}.`,
+        intro:     `We've been improving the experience for clients this month. Here's what changed in your account.`,
         body: [
 
           divider('28px 0 24px'),
 
-          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};">Dashboard</p>`,
-          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">New card stack overview</h2>`,
-          textBlock(`Your admin dashboard now shows your key metrics — projects, clients, revenue, active work — as an animated card stack. Click through them or use the nav arrows. Cleaner, faster to scan.`),
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};">Projects</p>`,
+          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">See exactly where your project stands</h2>`,
+          textBlock(`Your project page now shows a live 5-stage progress tracker — from kickoff all the way to delivery. No more guessing what stage things are at.`),
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:12px 0 0;">`,
+          `<tr>`,
+          ...[
+            ['🟣', 'Kickoff'],
+            ['🔵', 'In Progress'],
+            ['🟠', 'Review'],
+            ['🟡', 'Revision'],
+            ['🟢', 'Delivered'],
+          ].map(([dot, label]) =>
+            `<td style="text-align:center;padding:0 4px;">` +
+            `<div style="background:#0d0d15;border:1px solid ${T.border};border-radius:10px;padding:10px 8px;">` +
+            `<div style="font-size:16px;margin-bottom:4px;">${dot}</div>` +
+            `<div style="font-size:11px;color:${T.textSecond};font-family:${T.font};font-weight:600;">${label}</div>` +
+            `</div></td>`
+          ).join(''),
+          `</tr></table>`,
 
           divider('28px 0'),
 
-          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">Broadcasting</p>`,
-          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Dedicated broadcast page</h2>`,
-          textBlock(`There's now a full page for sending emails to all users — <strong style="color:#fff;">Dashboard → Broadcast</strong>. Pick a template, preview the subject line, confirm recipients, and send. Sent history is logged automatically.`),
-          ctaButton('Open broadcast page →', `${APP_URL}/dashboard/admin/broadcast`),
-
-          divider('28px 0'),
-
-          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.amber};font-family:${T.font};">Leads</p>`,
-          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Smarter outreach tools</h2>`,
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">Payments</p>`,
+          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Edit your order before you pay</h2>`,
           `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">`,
           ...[
-            ['🔄', 'Reset All',      'Reset emailed leads back to "new" so you can run a fresh Send All campaign without re-importing.'],
-            ['🧪', 'Test Email',     'Send a test email to yourself before a campaign to verify formatting and delivery.'],
-            ['📋', 'Email Check',    'One-click diagnostic showing whether Brevo is configured and which address emails go out from.'],
-            ['💬', 'WhatsApp DMs',   'DM templates updated with live demo links — riaddemo.vercel.app and emll.vercel.app — for riad outreach.'],
+            ['✏️', 'Edit before paying',   'Changed your mind about the scope? Update your order description or notes right on the checkout page — before any payment.'],
+            ['💾', 'Save & pay later',     'Not ready to pay now? Save your order and come back to it later. It stays in your dashboard exactly as you left it.'],
+            ['📡', 'Live payment status',  'After you submit payment proof, the page shows "Awaiting Confirmation" in real time — no need to guess if it went through.'],
           ].map(([icon, title, desc]) =>
             `<tr><td style="padding:0 0 10px;">` +
             `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d0d15;border:1px solid ${T.border};border-radius:12px;">` +
@@ -903,11 +912,12 @@ ${textBlock(`Or simply reply to this email — I read everything and respond wit
 
           divider('28px 0'),
 
-          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.blue};font-family:${T.font};">Your account</p>`,
-          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Ready to start a project?</h2>`,
-          textBlock(`If you've been thinking about it — now's the time. Fill in the request form, get a fixed quote within 24 hours, and track everything live in your dashboard.`),
-          ctaButton('Start a project →', reqUrl),
-          textBlock(`Or <a href="${dashUrl}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">open your dashboard</a> to see what's new.`, { mt: '4' }),
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.blue};font-family:${T.font};">Messages</p>`,
+          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Talk to us directly inside your project</h2>`,
+          textBlock(`Every project has a built-in message thread. Ask questions, share feedback, or request changes — all in one place. We reply fast.`),
+          ctaButton('Open your dashboard →', dashUrl),
+          textBlock(`Or <a href="${msgUrl}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">go straight to messages</a> if you have something in mind. And if you're ready to start a new project, <a href="${reqUrl}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">the request form is here</a>.`, { mt: '4' }),
+
         ],
       }),
     };

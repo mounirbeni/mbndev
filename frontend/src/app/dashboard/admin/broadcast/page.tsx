@@ -16,7 +16,7 @@ const TEMPLATES = [
   {
     key:         'juneUpdate',
     label:       'June 2026 — Platform Update',
-    description: 'Card stack dashboard, broadcast page, leads reset & test email, WhatsApp DM templates with demo links.',
+    description: 'Client-facing update: live project stage tracker, edit order before paying, save & pay later, real-time payment status, direct messaging.',
     when:        'Now',
     icon:        Newspaper,
     color:       'emerald',
