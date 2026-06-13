@@ -24,7 +24,7 @@ const TEMPLATES = [
     border:      'border-violet-500/30',
     iconBg:      'bg-violet-500/15 text-violet-400',
     badge:       'bg-violet-500/20 text-violet-300 border-violet-500/30',
-    subject:     'New on MBN DEV — You can now edit orders, pay later, and more',
+    subject:     '{name}, here\'s what\'s new in your dashboard',
   },
   {
     key:         'getStarted',
@@ -63,7 +63,7 @@ const TEMPLATES = [
     border:      'border-amber-500/30',
     iconBg:      'bg-amber-500/15 text-amber-400',
     badge:       'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    subject:     'What\'s coming next on MBN DEV — June preview',
+    subject:     '{name}, a quick update on what we\'re building',
   },
   {
     key:         'specialOffer',
@@ -76,7 +76,7 @@ const TEMPLATES = [
     border:      'border-rose-500/30',
     iconBg:      'bg-rose-500/15 text-rose-400',
     badge:       'bg-rose-500/20 text-rose-300 border-rose-500/30',
-    subject:     '{name} — exclusive offer inside (expires soon)',
+    subject:     '{name}, I wanted to reach out personally',
   },
 ];
 

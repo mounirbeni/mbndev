@@ -570,7 +570,7 @@ const templates = {
     const dashUrl = `${APP_URL}/dashboard/client`;
     const checkoutUrl = `${APP_URL}/dashboard/client/orders`;
     return {
-      subject: `New on MBN DEV — You can now edit orders, pay later, and more`,
+      subject: `${first}, here's what's new in your dashboard`,
       html: layout({
         preheader: `Edit your order before paying, save it for later, and track your payment status in real time.`,
         badgeHtml: badge('Platform Update — May 2026', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
@@ -750,7 +750,7 @@ const templates = {
     const first   = (user?.name || 'there').split(' ')[0];
     const dashUrl = `${APP_URL}/dashboard/client`;
     return {
-      subject: `What's coming next on MBN DEV — June preview`,
+      subject: `${first}, a quick update on what we're building`,
       html: layout({
         preheader: `A sneak peek at the features we're building right now. Your feedback shaped these.`,
         badgeHtml: badge('Coming soon', { bg: T.amberBg, color: T.amber, border: T.amberBorder }),
@@ -841,7 +841,7 @@ ${ctaButton('View my portfolio', APP_URL_LOCAL + '/portfolio')}
 ${textBlock(`Or simply reply to this email — I read everything and respond within 24 hours.`)}`;
 
     return {
-      subject: `Professional website for ${name} — free audit included`,
+      subject: `Quick question about ${name}'s online presence`,
       html: layout({
         preheader: `Professional web development for Moroccan riads — site audit, fixes, redesign, or new build. Free consultation included.`,
         badgeHtml: badge('MBN DEV — Web Development', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
@@ -859,7 +859,7 @@ ${textBlock(`Or simply reply to this email — I read everything and respond wit
     const expiry     = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     return {
-      subject: `${first} — exclusive offer inside (expires ${expiry})`,
+      subject: `${first}, I wanted to reach out personally`,
       html: layout({
         preheader: `A limited offer for MBN DEV clients. Valid for one week only.`,
         badgeHtml: badge('Limited offer', { bg: T.amberBg, color: T.amber, border: T.amberBorder }),
