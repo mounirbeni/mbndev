@@ -6,13 +6,12 @@ import Link from 'next/link';
 import {
   FolderOpen, Users, CreditCard, Clock, ArrowRight, TrendingUp,
   AlertTriangle, RefreshCcw, DollarSign, Activity, CheckCircle2,
-  ArrowUpRight, ShoppingBag, Package, Mail,
+  ArrowUpRight, ShoppingBag, Package, Mail, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { Project, User, Payment } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
-import StatsCard from '@/components/dashboard/StatsCard';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import { formatCurrency, timeAgo, getInitials } from '@/lib/utils';
 import Button from '@/components/ui/Button';
@@ -72,6 +71,7 @@ export default function AdminDashboard() {
   const [selectedTemplate, setSelectedTemplate] = useState('platformUpdate');
   const [showBroadcast,   setShowBroadcast]   = useState(false);
   const [broadcastCount,  setBroadcastCount]  = useState<number | null>(null);
+  const [stackIndex,      setStackIndex]      = useState(0);
 
   const fetchAnalytics = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -131,38 +131,42 @@ export default function AdminDashboard() {
 
   const a = analytics;
 
-  const statsRow = useMemo(() => [
+  const stackCards = useMemo(() => [
     {
       title:    t('admin.allProjects'),
-      value:    loading ? '—' : (a?.totalProjects ?? 0),
-      subtitle: 'Total in platform',
+      value:    loading ? '—' : String(a?.totalProjects ?? 0),
+      sub:      loading ? '' : `${a?.byStatus.inProgress ?? 0} active · ${a?.byStatus.completed ?? 0} done`,
       icon:     FolderOpen,
-      color:    'purple' as const,
-      index:    0,
+      gradient: 'from-violet-600 via-purple-600 to-blue-600',
+      glow:     'rgba(124,58,237,0.35)',
+      href:     '/dashboard/admin/projects',
     },
     {
-      title:    t('status.inProgress'),
-      value:    loading ? '—' : (a?.byStatus.inProgress ?? 0),
-      subtitle: 'Active right now',
-      icon:     Activity,
-      color:    'blue' as const,
-      index:    1,
+      title:    'Clients',
+      value:    loading ? '—' : String(a?.activeClients ?? 0),
+      sub:      loading ? '' : `${a?.totalClients ?? 0} registered total`,
+      icon:     Users,
+      gradient: 'from-blue-600 via-cyan-600 to-teal-600',
+      glow:     'rgba(6,182,212,0.35)',
+      href:     '/dashboard/admin/clients',
     },
     {
       title:    t('admin.totalRevenue'),
       value:    loading ? '—' : formatCurrency(a?.totalRevenue ?? 0),
-      subtitle: 'All confirmed payments',
+      sub:      loading ? '' : `${formatCurrency(a?.pendingRevenue ?? 0)} pending`,
       icon:     DollarSign,
-      color:    'green' as const,
-      index:    2,
+      gradient: 'from-emerald-600 via-green-600 to-lime-600',
+      glow:     'rgba(16,185,129,0.35)',
+      href:     '/dashboard/admin/payments',
     },
     {
-      title:    'Active Clients',
-      value:    loading ? '—' : (a?.activeClients ?? 0),
-      subtitle: `${a?.totalClients ?? 0} total registered`,
-      icon:     Users,
-      color:    'yellow' as const,
-      index:    3,
+      title:    t('status.inProgress'),
+      value:    loading ? '—' : String(a?.byStatus.inProgress ?? 0),
+      sub:      loading ? '' : `${a?.byStatus.review ?? 0} in review · ${a?.byStatus.revision ?? 0} revision`,
+      icon:     Activity,
+      gradient: 'from-orange-600 via-amber-600 to-yellow-600',
+      glow:     'rgba(245,158,11,0.35)',
+      href:     '/dashboard/admin/projects',
     },
   ], [loading, a, t]);
 
@@ -312,13 +316,94 @@ export default function AdminDashboard() {
         )}
       </AnimatePresence>
 
-      {/* ── Stats ─────────────────────────────────────────────────────────────── */}
-      <div className="tab-scroll lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible -mx-0.5 px-0.5">
-        {statsRow.map((s) => (
-          <div key={s.title} className="w-[152px] flex-shrink-0 lg:w-auto">
-            <StatsCard {...s} />
+      {/* ── Card Stack Overview ───────────────────────────────────────────────── */}
+      <div className="flex gap-4 items-center">
+
+        {/* Stack */}
+        <div className="relative flex-1 h-36 sm:h-32">
+          {stackCards.map((card, i) => {
+            const offset   = i - stackIndex;
+            const isFront  = i === stackIndex;
+            const distance = Math.abs(offset);
+            return (
+              <motion.div
+                key={card.title}
+                animate={{
+                  x:       offset * 14,
+                  y:       distance * 4,
+                  scale:   1 - distance * 0.04,
+                  zIndex:  stackCards.length - distance,
+                  opacity: distance > 2 ? 0 : 1 - distance * 0.18,
+                }}
+                transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+                className="absolute inset-0 cursor-pointer"
+                onClick={() => !isFront && setStackIndex(i)}
+              >
+                <div
+                  className={`h-full rounded-2xl bg-gradient-to-br ${card.gradient} p-5 flex flex-col justify-between overflow-hidden`}
+                  style={{ boxShadow: isFront ? `0 8px 32px ${card.glow}, 0 1px 0 rgba(255,255,255,0.12) inset` : 'none' }}
+                >
+                  {/* noise texture overlay */}
+                  <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
+                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }} />
+
+                  <div className="relative flex items-start justify-between">
+                    <div>
+                      <p className="text-white/70 text-xs font-semibold uppercase tracking-widest">{card.title}</p>
+                      <p className="text-white text-3xl font-black mt-1 tabular-nums leading-none">{card.value}</p>
+                    </div>
+                    <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                      <card.icon className="w-4.5 h-4.5 text-white" strokeWidth={1.8} />
+                    </div>
+                  </div>
+
+                  <div className="relative flex items-end justify-between">
+                    <p className="text-white/60 text-xs">{card.sub}</p>
+                    {isFront && (
+                      <Link href={card.href} onClick={(e) => e.stopPropagation()}>
+                        <span className="text-[11px] text-white/80 hover:text-white font-semibold flex items-center gap-0.5 transition-colors">
+                          View all <ArrowUpRight className="w-3 h-3" />
+                        </span>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Nav controls */}
+        <div className="flex flex-col items-center gap-3 shrink-0">
+          <button
+            onClick={() => setStackIndex((v) => Math.max(0, v - 1))}
+            disabled={stackIndex === 0}
+            className="w-7 h-7 rounded-full bg-white/5 border border-white/8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-25"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+
+          <div className="flex flex-col gap-1.5">
+            {stackCards.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setStackIndex(i)}
+                className={cn(
+                  'w-1 rounded-full transition-all duration-200',
+                  i === stackIndex ? 'h-5 bg-primary-400' : 'h-1.5 bg-white/20 hover:bg-white/35'
+                )}
+              />
+            ))}
           </div>
-        ))}
+
+          <button
+            onClick={() => setStackIndex((v) => Math.min(stackCards.length - 1, v + 1))}
+            disabled={stackIndex === stackCards.length - 1}
+            className="w-7 h-7 rounded-full bg-white/5 border border-white/8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-25"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* ── Revenue highlight ─────────────────────────────────────────────────── */}
