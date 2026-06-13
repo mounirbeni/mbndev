@@ -25,13 +25,21 @@ async function sendEmail({ to, subject, html, text }) {
     return { sent: false, reason: 'no_brevo_key' };
   }
 
-  const sender = parseSender(FROM);
-  const body   = JSON.stringify({
+  const sender      = parseSender(FROM);
+  const senderEmail = sender.email;
+
+  const body = JSON.stringify({
     sender,
     to:          [{ email: to }],
+    replyTo:     { email: senderEmail, name: sender.name },
     subject,
     htmlContent: html,
     textContent: text || stripHtml(html),
+    headers: {
+      'List-Unsubscribe':      `<mailto:${senderEmail}?subject=unsubscribe>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      'X-Mailer':              'MBN DEV Mailer',
+    },
   });
 
   return new Promise((resolve) => {
@@ -823,7 +831,7 @@ ${textBlock(`My name is <strong style="color:${T.textPrimary};">Mounir</strong>,
 ${divider('16px 0')}
 ${textBlock(`Here is what I can do for you:`)}
 ${infoBox([
-  ['Website Audit',     'I review your current online presence and identify exactly what is hurting your bookings'],
+  ['Website Review',    'I look at your current online presence and identify what is hurting your bookings'],
   ['Fix Issues',        'I correct technical problems, broken pages, slow load times, and poor mobile experience'],
   ['Redesign',          'I rebuild your existing site with a modern, conversion-focused design'],
   ['New Website',       'I design and develop a full professional website from scratch — tailored to your property'],
@@ -836,14 +844,14 @@ ${infoBox([
   ['You own the code',  'Full source code delivered to you'],
   ['Revisions',         'Included until you are satisfied'],
 ])}
-${notice(`No hidden fees. No lock-in. After delivery, the website is yours — you are free to host it anywhere. I offer a <strong style="color:${T.green};">free 15-minute consultation</strong> to review your current situation and answer any questions.`, { type: 'success' })}
+${notice(`No hidden fees. No lock-in. After delivery, the website is yours — you can host it anywhere. I offer a <strong style="color:${T.green};">15-minute call</strong> to review your current situation and answer any questions.`, { type: 'success' })}
 ${ctaButton('View my portfolio', APP_URL_LOCAL + '/portfolio')}
 ${textBlock(`Or simply reply to this email — I read everything and respond within 24 hours.`)}`;
 
     return {
       subject: `Quick question about ${name}'s online presence`,
       html: layout({
-        preheader: `Professional web development for Moroccan riads — site audit, fixes, redesign, or new build. Free consultation included.`,
+        preheader: `I noticed something about your online presence and wanted to reach out directly.`,
         badgeHtml: badge('MBN DEV — Web Development', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
         heading:   `Hello ${firstName},`,
         body:      customBody || defaultBody,
@@ -932,37 +940,36 @@ ${textBlock(`Or simply reply to this email — I read everything and respond wit
     return {
       subject: `${first}, I wanted to reach out personally`,
       html: layout({
-        preheader: `A limited offer for MBN DEV clients. Valid for one week only.`,
-        badgeHtml: badge('Limited offer', { bg: T.amberBg, color: T.amber, border: T.amberBorder }),
-        heading:   `A special offer, just for you.`,
-        intro:     `As one of our early clients, we want to give you something back. For the next 7 days, we're offering an exclusive deal on new projects.`,
+        preheader: `Something I wanted to share with you personally, ${first}.`,
+        badgeHtml: badge('For you', { bg: T.amberBg, color: T.amber, border: T.amberBorder }),
+        heading:   `${first}, I wanted to reach out.`,
+        intro:     `You've been with us since the beginning. As a thank you, we're giving early clients a price reduction on their next project — no strings attached.`,
         body: [
           divider('28px 0 24px'),
 
-          // Offer card
           `<div style="background:linear-gradient(135deg,${T.purpleBg},#0e0816);border:1px solid ${T.purpleBorder};border-radius:18px;padding:32px 28px;text-align:center;margin:0 0 24px;">`,
           `<div style="font-size:36px;margin-bottom:12px;">🎁</div>`,
-          `<div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};margin-bottom:10px;">Exclusive client offer</div>`,
+          `<div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};margin-bottom:10px;">Early client thank-you</div>`,
           `<div style="font-size:32px;font-weight:800;color:#fff;font-family:${T.font};letter-spacing:-0.04em;margin-bottom:8px;">10% off your next project</div>`,
-          `<div style="font-size:14px;color:${T.textSecond};font-family:${T.font};line-height:1.7;margin-bottom:20px;">Start a new project request before <strong style="color:${T.amber};">${expiry}</strong> and get 10% off the total price — applied automatically.</div>`,
+          `<div style="font-size:14px;color:${T.textSecond};font-family:${T.font};line-height:1.7;margin-bottom:20px;">Start a project request before <strong style="color:${T.amber};">${expiry}</strong> and we'll apply 10% off before invoicing.</div>`,
           `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">`,
           `<tr><td style="border-radius:12px;" bgcolor="${T.purple}">`,
           `<!--[if !mso]><!-->`,
-          `<a href="${requestUrl}" style="background:linear-gradient(135deg,${T.purple},${T.purpleDark});display:inline-block;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:12px;font-family:${T.font};letter-spacing:-0.01em;">Claim my 10% discount →</a>`,
+          `<a href="${requestUrl}" style="background:linear-gradient(135deg,${T.purple},${T.purpleDark});display:inline-block;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:12px;font-family:${T.font};letter-spacing:-0.01em;">Start a project request →</a>`,
           `<!--<![endif]-->`,
           `</td></tr></table>`,
           `</div>`,
 
           infoBox([
-            ['Discount',     '10% off total project price'],
+            ['Reduction',    '10% off total project price'],
             ['Applies to',   'All project types'],
-            ['Valid until',  expiry,             { color: T.amber, bold: true }],
-            ['How to use',   'Start a request — we apply it manually before invoicing'],
+            ['Valid until',  expiry, { color: T.amber, bold: true }],
+            ['How to use',   'Start a request — we apply it before invoicing'],
           ]),
 
-          notice(`This offer is exclusive to existing MBN DEV clients and cannot be combined with other promotions. To claim, simply start a new project request before the expiry date and mention this email.`, { type: 'info' }),
+          notice(`Available to existing MBN DEV clients only. To use it, start a new project request before the date above and mention this email.`, { type: 'info' }),
         ].join(''),
-        footer: `You received this exclusive offer because you have an account on MBN DEV. Offer valid until ${expiry}.`,
+        footer: `You received this message because you have an account on MBN DEV. To stop receiving emails, reply with "unsubscribe".`,
       }),
     };
   },
