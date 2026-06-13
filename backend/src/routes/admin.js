@@ -382,6 +382,7 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
 // Returns: { sent, failed, skipped, total }
 
 const BROADCAST_TEMPLATES = {
+  juneUpdate:     (user) => templates.juneUpdate({ user }),
   platformUpdate: (user) => templates.platformUpdate({ user }),
   getStarted:     (user) => templates.getStarted({ user }),
   checkIn:        (user) => templates.checkIn({ user }),

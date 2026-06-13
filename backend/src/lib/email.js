@@ -852,6 +852,67 @@ ${textBlock(`Or simply reply to this email — I read everything and respond wit
     };
   },
 
+  // ── June 2026 Platform Update ─────────────────────────────────────────────────
+  juneUpdate: ({ user }) => {
+    const first   = (user?.name || 'there').split(' ')[0];
+    const dashUrl = `${APP_URL}/dashboard/client`;
+    const reqUrl  = `${APP_URL}/request`;
+    return {
+      subject: `${first}, here's everything we shipped in June`,
+      html: layout({
+        preheader: `New broadcast page, card stack dashboard, smarter leads outreach, and more — all live now.`,
+        badgeHtml: badge('June 2026 — Platform Update', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
+        heading:   `June update: here's what's new, ${first}.`,
+        intro:     `We've been heads-down building. Here's everything that shipped this month — all live in your dashboard right now.`,
+        body: [
+
+          divider('28px 0 24px'),
+
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};">Dashboard</p>`,
+          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">New card stack overview</h2>`,
+          textBlock(`Your admin dashboard now shows your key metrics — projects, clients, revenue, active work — as an animated card stack. Click through them or use the nav arrows. Cleaner, faster to scan.`),
+
+          divider('28px 0'),
+
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">Broadcasting</p>`,
+          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Dedicated broadcast page</h2>`,
+          textBlock(`There's now a full page for sending emails to all users — <strong style="color:#fff;">Dashboard → Broadcast</strong>. Pick a template, preview the subject line, confirm recipients, and send. Sent history is logged automatically.`),
+          ctaButton('Open broadcast page →', `${APP_URL}/dashboard/admin/broadcast`),
+
+          divider('28px 0'),
+
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.amber};font-family:${T.font};">Leads</p>`,
+          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Smarter outreach tools</h2>`,
+          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">`,
+          ...[
+            ['🔄', 'Reset All',      'Reset emailed leads back to "new" so you can run a fresh Send All campaign without re-importing.'],
+            ['🧪', 'Test Email',     'Send a test email to yourself before a campaign to verify formatting and delivery.'],
+            ['📋', 'Email Check',    'One-click diagnostic showing whether Brevo is configured and which address emails go out from.'],
+            ['💬', 'WhatsApp DMs',   'DM templates updated with live demo links — riaddemo.vercel.app and emll.vercel.app — for riad outreach.'],
+          ].map(([icon, title, desc]) =>
+            `<tr><td style="padding:0 0 10px;">` +
+            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d0d15;border:1px solid ${T.border};border-radius:12px;">` +
+            `<tr><td style="padding:16px 18px;">` +
+            `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>` +
+            `<td style="font-size:18px;padding-right:14px;vertical-align:top;width:28px;line-height:1.4;">${icon}</td>` +
+            `<td><div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:3px;">${title}</div>` +
+            `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">${desc}</div></td>` +
+            `</tr></table></td></tr></table></td></tr>`
+          ).join(''),
+          `</table>`,
+
+          divider('28px 0'),
+
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.blue};font-family:${T.font};">Your account</p>`,
+          `<h2 style="margin:0 0 16px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Ready to start a project?</h2>`,
+          textBlock(`If you've been thinking about it — now's the time. Fill in the request form, get a fixed quote within 24 hours, and track everything live in your dashboard.`),
+          ctaButton('Start a project →', reqUrl),
+          textBlock(`Or <a href="${dashUrl}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">open your dashboard</a> to see what's new.`, { mt: '4' }),
+        ],
+      }),
+    };
+  },
+
   // ── Week 2: limited-time offer ────────────────────────────────────────────────
   specialOffer: ({ user }) => {
     const first      = (user?.name || 'there').split(' ')[0];

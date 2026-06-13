@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail, Users, Send, CheckCircle2, Clock, Zap, Gift,
-  Calendar, AlertTriangle, ChevronRight, Sparkles, RefreshCcw,
+  Calendar, AlertTriangle, ChevronRight, Sparkles, RefreshCcw, Newspaper,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -13,6 +13,19 @@ import { cn } from '@/lib/utils';
 /* ── Template definitions ─────────────────────────────────────────────────── */
 
 const TEMPLATES = [
+  {
+    key:         'juneUpdate',
+    label:       'June 2026 — Platform Update',
+    description: 'Card stack dashboard, broadcast page, leads reset & test email, WhatsApp DM templates with demo links.',
+    when:        'Now',
+    icon:        Newspaper,
+    color:       'emerald',
+    gradient:    'from-emerald-600/20 to-teal-600/10',
+    border:      'border-emerald-500/30',
+    iconBg:      'bg-emerald-500/15 text-emerald-400',
+    badge:       'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    subject:     '{name}, here\'s everything we shipped in June',
+  },
   {
     key:         'platformUpdate',
     label:       'May 2026 — Platform Update',
