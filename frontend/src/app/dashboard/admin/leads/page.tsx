@@ -118,9 +118,9 @@ export default function AdminLeadsPage() {
   const handleTestEmail = async () => {
     setTestSending(true);
     try {
-      const { data } = await leadsAPI.testEmail('mobanunir@gmail.com');
+      const { data } = await leadsAPI.testEmail('mounirbanniwork@gmail.com');
       if (data.success) {
-        toast.success('Test email sent! Check mobanunir@gmail.com (and spam folder).');
+        toast.success('Test email sent! Check mounirbanniwork@gmail.com (and spam folder).');
       } else {
         const reason = data.result?.reason || 'unknown';
         if (!data.brevoConfigured) {
