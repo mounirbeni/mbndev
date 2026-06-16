@@ -116,11 +116,13 @@ export default function AdminLeadsPage() {
 
   // ── Test email delivery ───────────────────────────────────────────────────
   const handleTestEmail = async () => {
+    const to = window.prompt('Send test email to:', 'mounirbanniwork@gmail.com');
+    if (!to) return;
     setTestSending(true);
     try {
-      const { data } = await leadsAPI.testEmail('mounirbanniwork@gmail.com');
+      const { data } = await leadsAPI.testEmail(to);
       if (data.success) {
-        toast.success('Test email sent! Check mounirbanniwork@gmail.com (and spam folder).');
+        toast.success(`Test email sent! Check ${to} (and spam folder).`);
       } else {
         const reason = data.result?.reason || 'unknown';
         if (!data.brevoConfigured) {
