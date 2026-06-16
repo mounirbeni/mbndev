@@ -803,28 +803,35 @@ const templates = {
 
   // ── Outreach — cold email to a prospect ──────────────────────────────────────
   outreach: ({ name, type = 'riad', customBody = null }) => {
-    const APP_URL_LOCAL = process.env.CLIENT_URL || 'https://mbndev.ma';
     const firstName = name.split(' ')[0];
 
-    const riadProofSection = type === 'riad' ? `
+    const mbnRiadProofSection = `
 ${divider('16px 0')}
-${textBlock(`<strong style="color:${T.textPrimary};">Live proof — websites I built for similar properties:</strong>`)}
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:12px 0 0;">
-  <tr>
-    <td style="padding-right:6px;vertical-align:top;width:50%;">
-      <a href="https://riaddemo.vercel.app" style="display:block;text-decoration:none;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:13px;font-weight:700;color:#a78bfa;font-family:${T.font};margin-bottom:3px;">Riad Demo Site</div>
-        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">riaddemo.vercel.app →</div>
-      </a>
-    </td>
-    <td style="padding-left:6px;vertical-align:top;width:50%;">
-      <a href="https://emll.vercel.app" style="display:block;text-decoration:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:13px;font-weight:700;color:#818cf8;font-family:${T.font};margin-bottom:3px;">Emll</div>
-        <div style="font-size:11px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">emll.vercel.app →</div>
-      </a>
-    </td>
-  </tr>
-</table>` : '';
+${textBlock(`<strong style="color:${T.textPrimary};">Démo en direct — découvrez Mbn Riad :</strong>`)}
+<a href="https://riadkader.vercel.app/fr" style="display:block;text-decoration:none;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:12px;padding:16px 18px;margin-top:12px;">
+  <div style="font-size:14px;font-weight:700;color:#a78bfa;font-family:${T.font};margin-bottom:3px;">Mbn Riad — démo interactive</div>
+  <div style="font-size:12px;color:${T.textSecond};font-family:${T.font};word-break:break-all;">riadkader.vercel.app/fr →</div>
+</a>`;
+
+    const riadBodyFr = `
+${textBlock(`Je m'appelle <strong style="color:${T.textPrimary};">Mounir</strong>, développeur web basé au Maroc, spécialisé dans les solutions de réservation en ligne pour les riads. J'ai découvert <strong style="color:${T.textPrimary};">${name}</strong> et je voulais vous contacter directement.`)}
+${divider('16px 0')}
+${textBlock(`Combien de clients avez-vous perdus ce mois-ci parce qu'ils ont trouvé un autre riad avec un site et une réservation en ligne, et pas le vôtre ?`)}
+${textBlock(`J'ai développé <strong style="color:${T.textPrimary};">Mbn Riad</strong>, une plateforme de démonstration qui montre ce que votre riad pourrait offrir avec un vrai système de réservation directe — sans dépendre uniquement du téléphone, de WhatsApp ou des plateformes externes qui prennent une commission sur chaque réservation.`)}
+${infoBox([
+  ['Site bilingue',        'Français / Anglais, design soigné avec une identité marocaine'],
+  ['Réservation directe',  'Le client vérifie la disponibilité et réserve en ligne, sans attendre de réponse'],
+  ['Calendrier interactif', 'Affichage automatique des chambres disponibles pour chaque date'],
+  ['Tableau de bord',      'Gérez réservations, prix, photos et chambres vous-même, sans programmeur'],
+  ['Comptes clients',      'Vos clients peuvent suivre leurs propres réservations'],
+  ['Notifications email',  'Confirmation automatique envoyée au client et au propriétaire'],
+  ['Zéro commission',      'Contrairement aux plateformes de réservation externes'],
+])}
+${mbnRiadProofSection}
+${divider('16px 0')}
+${notice(`Ceci est uniquement une démonstration — si elle vous plaît, je la personnalise avec le nom, le logo, les photos et les couleurs de votre riad. Le tarif dépend de la personnalisation souhaitée (nombre de chambres, traductions, nom de domaine) — je vous envoie un devis précis après que vous ayez vu la démo. Je propose un <strong style="color:${T.green};">appel de 15 minutes</strong> pour répondre à vos questions.`, { type: 'success' })}
+${ctaButton('Voir la démo Mbn Riad', 'https://riadkader.vercel.app/fr')}
+${textBlock(`Ou répondez simplement à cet email — je lis tout et je réponds en moins de 24h.`)}`;
 
     const defaultBody = `
 ${textBlock(`My name is <strong style="color:${T.textPrimary};">Mounir</strong>, a professional web developer based in Morocco. I came across <strong style="color:${T.textPrimary};">${name}</strong> and wanted to reach out directly.`)}
@@ -836,26 +843,26 @@ ${infoBox([
   ['Redesign',          'I rebuild your existing site with a modern, conversion-focused design'],
   ['New Website',       'I design and develop a full professional website from scratch — tailored to your property'],
 ])}
-${riadProofSection}
 ${divider('16px 0')}
-${infoBox([
-  ['Delivery',          '14 days from project start'],
-  ['Starting price',    '$799 — all-inclusive'],
-  ['You own the code',  'Full source code delivered to you'],
-  ['Revisions',         'Included until you are satisfied'],
-])}
 ${notice(`No hidden fees. No lock-in. After delivery, the website is yours — you can host it anywhere. I offer a <strong style="color:${T.green};">15-minute call</strong> to review your current situation and answer any questions.`, { type: 'success' })}
-${ctaButton('View my portfolio', APP_URL_LOCAL + '/portfolio')}
 ${textBlock(`Or simply reply to this email — I read everything and respond within 24 hours.`)}`;
 
+    const isRiad = type === 'riad';
+
     return {
-      subject: `Quick question about ${name}'s online presence`,
+      subject: isRiad
+        ? `Combien de réservations ${name} perd-il chaque mois ?`
+        : `Quick question about ${name}'s online presence`,
       html: layout({
-        preheader: `I noticed something about your online presence and wanted to reach out directly.`,
-        badgeHtml: badge('MBN DEV — Web Development', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
-        heading:   `Hello ${firstName},`,
-        body:      customBody || defaultBody,
-        footer:    `You are receiving this email because your business matches our services. To unsubscribe, reply with "Unsubscribe". — Mounir Banni, MBN DEV, contact@mbndev.ma`,
+        preheader: isRiad
+          ? `Une démo qui montre ce que ${name} pourrait offrir avec une réservation en ligne directe, sans commission.`
+          : `I noticed something about your online presence and wanted to reach out directly.`,
+        badgeHtml: badge(isRiad ? 'Mbn Riad — Solution de réservation' : 'MBN DEV — Web Development', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
+        heading:   isRiad ? `Bonjour,` : `Hello ${firstName},`,
+        body:      customBody || (isRiad ? riadBodyFr : defaultBody),
+        footer:    isRiad
+          ? `Vous recevez cet email car votre établissement correspond à nos services. Pour vous désinscrire, répondez "Unsubscribe". — Mounir Banni, MBN DEV, contact@mbndev.ma`
+          : `You are receiving this email because your business matches our services. To unsubscribe, reply with "Unsubscribe". — Mounir Banni, MBN DEV, contact@mbndev.ma`,
       }),
     };
   },
