@@ -493,8 +493,7 @@ export default function AdminLeadsPage() {
                         {lead.phone && (
                           <div className="flex items-center gap-1.5 text-xs">
                             <Phone className="w-3 h-3 text-slate-600 shrink-0" />
-                            <a href={`https://wa.me/${lead.phone.replace(/\s+/g,'').replace('+','')}`}
-                              target="_blank" rel="noreferrer"
+                            <a href={`whatsappbusiness://send?phone=${lead.phone.replace(/\s+/g,'').replace('+','')}`}
                               className="text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-0.5">
                               {lead.phone} <ExternalLink className="w-2.5 h-2.5" />
                             </a>
@@ -532,10 +531,9 @@ export default function AdminLeadsPage() {
                         {(lead.phone || lead.email) && (
                           lead.phone ? (
                             <a
-                              href={`https://wa.me/${lead.phone.replace(/\s+/g,'').replace('+','')}?text=${encodeURIComponent(DM_TEMPLATE(lead.name, lead.type))}`}
-                              target="_blank" rel="noreferrer"
+                              href={`whatsappbusiness://send?phone=${lead.phone.replace(/\s+/g,'').replace('+','')}&text=${encodeURIComponent(DM_TEMPLATE(lead.name, lead.type))}`}
                               onClick={() => updateStatus(lead.id, 'emailed')}
-                              title="⚡ Quick Send via WhatsApp"
+                              title="⚡ Quick Send via WhatsApp Business"
                               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105"
                               style={{ background: 'linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.2))', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' }}>
                               <Zap className="w-3 h-3" /> WhatsApp
@@ -560,11 +558,10 @@ export default function AdminLeadsPage() {
                           </button>
                         )}
 
-                        {/* WhatsApp icon — always shown if has phone */}
+                        {/* WhatsApp Business icon — always shown if has phone */}
                         {lead.phone && (
-                          <a href={`https://wa.me/${lead.phone.replace(/\s+/g,'').replace('+','')}`}
-                            target="_blank" rel="noreferrer"
-                            title="WhatsApp (no pre-fill)"
+                          <a href={`whatsappbusiness://send?phone=${lead.phone.replace(/\s+/g,'').replace('+','')}`}
+                            title="WhatsApp Business (no pre-fill)"
                             className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-105"
                             style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.22)' }}>
                             <Phone className="w-3.5 h-3.5 text-emerald-400" />
