@@ -9,7 +9,7 @@ import {
   Target, Mail, Phone, Instagram, Globe, Download, Plus,
   Flame, Star, X, Send, Copy, ExternalLink, Trash2, RefreshCcw,
   ChevronDown, MessageCircle, Check, Building2, Utensils, ShoppingBag,
-  Map, Zap, type LucideIcon,
+  Map, Zap, type LucideIcon, MessageSquare,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -71,9 +71,10 @@ mbndev.ma`;
 export default function AdminLeadsPage() {
   const [leads,       setLeads]       = useState<Lead[]>([]);
   const [loading,     setLoading]     = useState(true);
-  const [filterPri,   setFilterPri]   = useState<string>('all');
-  const [filterType,  setFilterType]  = useState<string>('all');
-  const [filterStatus,setFilterStatus]= useState<string>('all');
+  const [filterPri,    setFilterPri]    = useState<string>('all');
+  const [filterType,   setFilterType]   = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterWhatsApp, setFilterWhatsApp] = useState<boolean>(false);
   const [emailTarget, setEmailTarget] = useState<Lead | null>(null);
   const [dmTarget,    setDmTarget]    = useState<Lead | null>(null);
   const [emailSubject,setEmailSubject]= useState('');
@@ -255,12 +256,14 @@ export default function AdminLeadsPage() {
     if (filterPri    !== 'all' && l.priority !== filterPri)    return false;
     if (filterType   !== 'all' && l.type     !== filterType)   return false;
     if (filterStatus !== 'all' && l.status   !== filterStatus) return false;
+    if (filterWhatsApp && !l.phone)                            return false;
     return true;
   });
 
-  const hotCount  = leads.filter(l => l.priority === 'hot').length;
-  const newCount  = leads.filter(l => l.status   === 'new').length;
-  const convCount = leads.filter(l => l.status   === 'converted').length;
+  const hotCount      = leads.filter(l => l.priority === 'hot').length;
+  const newCount      = leads.filter(l => l.status   === 'new').length;
+  const convCount     = leads.filter(l => l.status   === 'converted').length;
+  const whatsAppCount = leads.filter(l => !!l.phone).length;
 
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
@@ -283,7 +286,7 @@ export default function AdminLeadsPage() {
           </div>
           <div>
             <h1 className="text-white font-semibold text-lg leading-tight">Lead Outreach</h1>
-            <p className="text-slate-500 text-xs">{leads.length} prospects · {hotCount} hot · {convCount} converted</p>
+            <p className="text-slate-500 text-xs">{leads.length} prospects · {hotCount} hot · {whatsAppCount} WhatsApp · {convCount} converted</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -326,19 +329,28 @@ export default function AdminLeadsPage() {
       </div>
 
       {/* ── Stat cards ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { label: 'Total Leads',  value: leads.length,  color: '#6366f1' },
-          { label: 'Hot',       icon: Flame,  value: hotCount,      color: '#ef4444' },
-          { label: 'Contacted', icon: Mail,   value: leads.filter(l => ['emailed','dm_sent'].includes(l.status)).length, color: '#f59e0b' },
-          { label: 'Converted', icon: Check,  value: convCount,     color: '#10b981' },
+          { label: 'Total Leads',  value: leads.length,   color: '#6366f1', onClick: undefined },
+          { label: 'Hot',          icon: Flame,  value: hotCount,       color: '#ef4444', onClick: undefined },
+          { label: 'Contacted',    icon: Mail,   value: leads.filter(l => ['emailed','dm_sent'].includes(l.status)).length, color: '#f59e0b', onClick: undefined },
+          { label: 'Converted',    icon: Check,  value: convCount,      color: '#10b981', onClick: undefined },
+          { label: 'WhatsApp',     icon: MessageSquare, value: whatsAppCount, color: '#25d366',
+            onClick: () => setFilterWhatsApp(v => !v), active: filterWhatsApp },
         ].map(s => (
-          <div key={s.label} className="rounded-2xl p-4"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div key={s.label}
+            onClick={s.onClick}
+            className={`rounded-2xl p-4 transition-all ${s.onClick ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
+            style={{
+              background: s.active ? `${s.color}22` : 'rgba(255,255,255,0.04)',
+              border: s.active ? `1px solid ${s.color}55` : '1px solid rgba(255,255,255,0.07)',
+              boxShadow: s.active ? `0 0 14px ${s.color}30` : undefined,
+            }}>
             <div className="text-2xl font-bold tabular-nums" style={{ color: s.color }}>{s.value}</div>
             <div className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">
               {s.icon && <s.icon className="w-3 h-3" style={{ color: s.color }} />}
               {s.label}
+              {s.active && <span className="ml-1 text-[10px] font-semibold" style={{ color: s.color }}>● ON</span>}
             </div>
           </div>
         ))}
@@ -346,6 +358,18 @@ export default function AdminLeadsPage() {
 
       {/* ── Filters ── */}
       <div className="flex flex-wrap gap-2">
+        {/* WhatsApp quick-filter */}
+        <button
+          onClick={() => setFilterWhatsApp(v => !v)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+          style={filterWhatsApp
+            ? { background: 'rgba(37,211,102,0.2)', color: '#25d366', border: '1px solid rgba(37,211,102,0.45)', boxShadow: '0 0 10px rgba(37,211,102,0.25)' }
+            : { background: 'rgba(255,255,255,0.05)', color: '#64748b', border: '1px solid rgba(255,255,255,0.09)' }}>
+          <MessageSquare className="w-3.5 h-3.5" />
+          WhatsApp only
+          {filterWhatsApp && <span className="ml-0.5 text-[10px] opacity-70">({whatsAppCount})</span>}
+        </button>
+
         {/* Priority */}
         <div className="flex gap-1 rounded-xl p-1" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
           {['all','hot','warm'].map(v => (
