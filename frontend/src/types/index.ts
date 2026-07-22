@@ -74,6 +74,8 @@ export interface Project {
   designColors?: string[];
   designRefs?: string[];
   isInstallment?: boolean;
+  clientNameOverride?: string | null;
+  clientCompanyOverride?: string | null;
   // Legacy nested shape (some pages still use this)
   designPreferences?: {
     style?: string;

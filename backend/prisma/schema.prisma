@@ -104,6 +104,9 @@ model Project {
   revisions    Int           @default(0)
   maxRevisions Int           @default(3)
   isInstallment Boolean      @default(false)
+  // Client display overrides (admin can set these to override the linked user's name/company on invoices)
+  clientNameOverride    String?
+  clientCompanyOverride String?
   // Design preferences (flattened)
   designStyle  String?
   designColors String[]

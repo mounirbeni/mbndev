@@ -60,7 +60,7 @@ export default function AdminProjectWorkspace() {
   const [tab, setTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ status: '', progress: 0, notes: '', budget: 0, deadline: '' });
+  const [editForm, setEditForm] = useState({ status: '', progress: 0, notes: '', budget: 0, deadline: '', clientNameOverride: '', clientCompanyOverride: '' });
   const [saving, setSaving] = useState(false);
   const [msgText, setMsgText] = useState('');
   const [sending, setSending] = useState(false);
@@ -85,7 +85,7 @@ export default function AdminProjectWorkspace() {
       ]);
       const p = pRes.data.project;
       setProject(p);
-      setEditForm({ status: p.status, progress: p.progress, notes: p.notes || '', budget: p.budget, deadline: p.deadline?.split('T')[0] || '' });
+      setEditForm({ status: p.status, progress: p.progress, notes: p.notes || '', budget: p.budget, deadline: p.deadline?.split('T')[0] || '', clientNameOverride: p.clientNameOverride || '', clientCompanyOverride: p.clientCompanyOverride || '' });
       setMessages(mRes.data.messages || []);
       const allPay: Payment[] = payRes.data.payments || [];
       setPayments(allPay.filter((pay) => {
@@ -138,7 +138,11 @@ export default function AdminProjectWorkspace() {
     }
     setSaving(true);
     try {
-      await projectAPI.update(id, editForm);
+      await projectAPI.update(id, {
+        ...editForm,
+        clientNameOverride:    editForm.clientNameOverride.trim()    || null,
+        clientCompanyOverride: editForm.clientCompanyOverride.trim() || null,
+      });
       toast.success(t('toast.saved'));
       setEditing(false);
       fetchAll();
@@ -259,6 +263,8 @@ export default function AdminProjectWorkspace() {
   if (!project) return null;
 
   const client = typeof project.client === 'object' ? project.client : null;
+  const displayName    = project.clientNameOverride    || client?.name    || '';
+  const displayCompany = project.clientCompanyOverride || client?.company || '';
   const paidTotal = payments.filter((p) => p.status === 'paid' || p.status === 'partial').reduce((s, p) => s + p.amount, 0);
 
   return (
@@ -342,9 +348,13 @@ export default function AdminProjectWorkspace() {
             </div>
             <div className="flex items-center gap-3 flex-wrap">
               <span className="text-slate-400 text-sm capitalize">{project.type?.replace('-', ' ')}</span>
-              {client && (
+              {(displayName || displayCompany) && (
                 <span className="flex items-center gap-1.5 text-slate-500 text-sm">
-                  <Users className="w-3 h-3" /> {client.name} {client.company ? `· ${client.company}` : ''}
+                  <Users className="w-3 h-3" />
+                  {displayName}{displayCompany ? ` · ${displayCompany}` : ''}
+                  {project.clientNameOverride && (
+                    <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold rounded bg-amber-500/15 text-amber-400 border border-amber-500/20">custom</span>
+                  )}
                 </span>
               )}
             </div>
@@ -391,6 +401,26 @@ export default function AdminProjectWorkspace() {
               <input type="date" value={editForm.deadline}
                 onChange={(e) => setEditForm((f) => ({ ...f, deadline: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5">Client Name <span className="text-slate-600">(override)</span></label>
+              <input
+                type="text"
+                value={editForm.clientNameOverride}
+                onChange={(e) => setEditForm((f) => ({ ...f, clientNameOverride: e.target.value }))}
+                placeholder={client?.name || 'Enter client name…'}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500 placeholder:text-slate-600"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5">Company <span className="text-slate-600">(override)</span></label>
+              <input
+                type="text"
+                value={editForm.clientCompanyOverride}
+                onChange={(e) => setEditForm((f) => ({ ...f, clientCompanyOverride: e.target.value }))}
+                placeholder={client?.company || 'Enter company name…'}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500 placeholder:text-slate-600"
+              />
             </div>
             <div className="sm:col-span-2">
               <label className="block text-xs text-slate-400 mb-1.5">{t('admin.notes')}</label>
