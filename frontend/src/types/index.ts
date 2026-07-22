@@ -76,6 +76,8 @@ export interface Project {
   isInstallment?: boolean;
   clientNameOverride?: string | null;
   clientCompanyOverride?: string | null;
+  clientEmailOverride?: string | null;
+  clientPhoneOverride?: string | null;
   // Legacy nested shape (some pages still use this)
   designPreferences?: {
     style?: string;

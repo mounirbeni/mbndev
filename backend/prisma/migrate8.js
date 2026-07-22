@@ -12,7 +12,13 @@ async function main() {
   await prisma.$executeRawUnsafe(
     `ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "clientCompanyOverride" TEXT`
   );
-  console.log('Migration 8 complete: clientNameOverride + clientCompanyOverride added to Project');
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "clientEmailOverride" TEXT`
+  );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "clientPhoneOverride" TEXT`
+  );
+  console.log('Migration 8 complete: client override fields added to Project');
 }
 
 main()

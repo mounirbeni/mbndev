@@ -242,6 +242,14 @@ prisma.$executeRawUnsafe(
   `ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "clientCompanyOverride" TEXT`
 ).catch((e) => console.error('[startup] clientCompanyOverride migration failed:', e.message));
 
+prisma.$executeRawUnsafe(
+  `ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "clientEmailOverride" TEXT`
+).catch((e) => console.error('[startup] clientEmailOverride migration failed:', e.message));
+
+prisma.$executeRawUnsafe(
+  `ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "clientPhoneOverride" TEXT`
+).catch((e) => console.error('[startup] clientPhoneOverride migration failed:', e.message));
+
 // ─── Background reconciler ────────────────────────────────────────────────────
 // In dev: runs every 10 min via setInterval.
 // In production (Vercel serverless): only runs via POST /api/payments/reconcile.

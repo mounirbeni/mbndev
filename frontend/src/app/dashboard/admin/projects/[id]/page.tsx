@@ -60,7 +60,7 @@ export default function AdminProjectWorkspace() {
   const [tab, setTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ status: '', progress: 0, notes: '', budget: 0, deadline: '', clientNameOverride: '', clientCompanyOverride: '' });
+  const [editForm, setEditForm] = useState({ status: '', progress: 0, notes: '', budget: 0, deadline: '', clientNameOverride: '', clientCompanyOverride: '', clientEmailOverride: '', clientPhoneOverride: '' });
   const [saving, setSaving] = useState(false);
   const [msgText, setMsgText] = useState('');
   const [sending, setSending] = useState(false);
@@ -85,7 +85,7 @@ export default function AdminProjectWorkspace() {
       ]);
       const p = pRes.data.project;
       setProject(p);
-      setEditForm({ status: p.status, progress: p.progress, notes: p.notes || '', budget: p.budget, deadline: p.deadline?.split('T')[0] || '', clientNameOverride: p.clientNameOverride || '', clientCompanyOverride: p.clientCompanyOverride || '' });
+      setEditForm({ status: p.status, progress: p.progress, notes: p.notes || '', budget: p.budget, deadline: p.deadline?.split('T')[0] || '', clientNameOverride: p.clientNameOverride || '', clientCompanyOverride: p.clientCompanyOverride || '', clientEmailOverride: p.clientEmailOverride || '', clientPhoneOverride: p.clientPhoneOverride || '' });
       setMessages(mRes.data.messages || []);
       const allPay: Payment[] = payRes.data.payments || [];
       setPayments(allPay.filter((pay) => {
@@ -142,6 +142,8 @@ export default function AdminProjectWorkspace() {
         ...editForm,
         clientNameOverride:    editForm.clientNameOverride.trim()    || null,
         clientCompanyOverride: editForm.clientCompanyOverride.trim() || null,
+        clientEmailOverride:   editForm.clientEmailOverride.trim()   || null,
+        clientPhoneOverride:   editForm.clientPhoneOverride.trim()   || null,
       });
       toast.success(t('toast.saved'));
       setEditing(false);
@@ -419,6 +421,26 @@ export default function AdminProjectWorkspace() {
                 value={editForm.clientCompanyOverride}
                 onChange={(e) => setEditForm((f) => ({ ...f, clientCompanyOverride: e.target.value }))}
                 placeholder={client?.company || 'Enter company name…'}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500 placeholder:text-slate-600"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5">Email <span className="text-slate-600">(override)</span></label>
+              <input
+                type="email"
+                value={editForm.clientEmailOverride}
+                onChange={(e) => setEditForm((f) => ({ ...f, clientEmailOverride: e.target.value }))}
+                placeholder={client?.email || 'Enter email…'}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500 placeholder:text-slate-600"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5">Phone <span className="text-slate-600">(override)</span></label>
+              <input
+                type="tel"
+                value={editForm.clientPhoneOverride}
+                onChange={(e) => setEditForm((f) => ({ ...f, clientPhoneOverride: e.target.value }))}
+                placeholder="e.g. +212600000000"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary-500 placeholder:text-slate-600"
               />
             </div>

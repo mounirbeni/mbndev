@@ -156,7 +156,7 @@ exports.getAllProjects = async (req, res, next) => {
 // ─── Update project (admin) ───────────────────────────────────────────────────
 exports.updateProject = async (req, res, next) => {
   try {
-    const { status, progress, notes, deadline, budget, isInstallment, clientNameOverride, clientCompanyOverride } = req.body;
+    const { status, progress, notes, deadline, budget, isInstallment, clientNameOverride, clientCompanyOverride, clientEmailOverride, clientPhoneOverride } = req.body;
 
     if (progress !== undefined) {
       const p = Number(progress);
@@ -179,6 +179,8 @@ exports.updateProject = async (req, res, next) => {
         ...(isInstallment !== undefined ? { isInstallment: Boolean(isInstallment) }  : {}),
         ...(clientNameOverride    !== undefined ? { clientNameOverride:    clientNameOverride    || null } : {}),
         ...(clientCompanyOverride !== undefined ? { clientCompanyOverride: clientCompanyOverride || null } : {}),
+        ...(clientEmailOverride   !== undefined ? { clientEmailOverride:   clientEmailOverride   || null } : {}),
+        ...(clientPhoneOverride   !== undefined ? { clientPhoneOverride:   clientPhoneOverride   || null } : {}),
       },
       include: withClientLight,
     });

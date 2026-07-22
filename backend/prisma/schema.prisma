@@ -107,6 +107,8 @@ model Project {
   // Client display overrides (admin can set these to override the linked user's name/company on invoices)
   clientNameOverride    String?
   clientCompanyOverride String?
+  clientEmailOverride   String?
+  clientPhoneOverride   String?
   // Design preferences (flattened)
   designStyle  String?
   designColors String[]
