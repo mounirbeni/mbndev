@@ -103,6 +103,7 @@ model Project {
   notes        String?
   revisions    Int           @default(0)
   maxRevisions Int           @default(3)
+  isInstallment Boolean      @default(false)
   // Design preferences (flattened)
   designStyle  String?
   designColors String[]

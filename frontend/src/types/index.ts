@@ -73,6 +73,7 @@ export interface Project {
   designStyle?: string;
   designColors?: string[];
   designRefs?: string[];
+  isInstallment?: boolean;
   // Legacy nested shape (some pages still use this)
   designPreferences?: {
     style?: string;
@@ -127,7 +128,7 @@ export interface Payment {
   client: User | string;
   amount: number;
   currency: string;
-  status: 'pending' | 'pending_verification' | 'processing' | 'paid' | 'failed' | 'refunded';
+  status: 'pending' | 'pending_verification' | 'processing' | 'paid' | 'partial' | 'failed' | 'refunded';
   method?: string;
   milestoneTitle?: string;
   description?: string;

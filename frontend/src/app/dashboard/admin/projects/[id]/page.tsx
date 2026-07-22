@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -18,7 +19,7 @@ import {
   Send, Check, Clock, AlertCircle, Download, Upload, FileText,
   DollarSign, Edit2, Save, Users, Activity,
   RefreshCw, TrendingUp, Target, Package, Star, Edit3,
-  Share2, Copy, CheckCheck, Trash2,
+  Share2, Copy, CheckCheck, Trash2, Plus, Repeat,
 } from 'lucide-react';
 
 const TAB_DEFS = [
@@ -68,6 +69,10 @@ export default function AdminProjectWorkspace() {
   const [copied, setCopied] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceForm, setInvoiceForm] = useState({ amount: '', description: '', method: '', status: 'pending' });
+  const [creatingInvoice, setCreatingInvoice] = useState(false);
+  const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -197,6 +202,51 @@ export default function AdminProjectWorkspace() {
     finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
   };
 
+  const toggleInstallment = async () => {
+    const next = !project?.isInstallment;
+    try {
+      await projectAPI.update(id, { isInstallment: next });
+      toast.success(next ? 'Marked as installment project' : 'Installment mode removed');
+      fetchAll();
+    } catch { toast.error(t('toast.error')); }
+  };
+
+  const createInvoice = async () => {
+    if (!invoiceForm.amount || isNaN(Number(invoiceForm.amount)) || Number(invoiceForm.amount) <= 0) {
+      toast.error('Enter a valid amount'); return;
+    }
+    setCreatingInvoice(true);
+    try {
+      await paymentAPI.adminCreate({
+        projectId:   id,
+        amount:      Number(invoiceForm.amount),
+        description: invoiceForm.description || undefined,
+        method:      invoiceForm.method || undefined,
+        status:      invoiceForm.status,
+      });
+      toast.success('Invoice created');
+      setShowInvoiceModal(false);
+      setInvoiceForm({ amount: '', description: '', method: '', status: 'pending' });
+      fetchAll();
+    } catch { toast.error(t('toast.error')); }
+    finally { setCreatingInvoice(false); }
+  };
+
+  const togglePaymentStatus = async (payment: Payment) => {
+    const pid = payment._id ?? payment.id ?? '';
+    const nextStatus = payment.status === 'paid' ? 'partial' : 'paid';
+    setUpdatingPaymentId(pid);
+    try {
+      await paymentAPI.setStatus(pid, nextStatus);
+      toast.success(nextStatus === 'partial' ? 'Marked as partially paid' : 'Marked as paid');
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('toast.error'));
+    } finally {
+      setUpdatingPaymentId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-4 max-w-5xl">
@@ -209,7 +259,7 @@ export default function AdminProjectWorkspace() {
   if (!project) return null;
 
   const client = typeof project.client === 'object' ? project.client : null;
-  const paidTotal = payments.filter((p) => p.status === 'paid').reduce((s, p) => s + p.amount, 0);
+  const paidTotal = payments.filter((p) => p.status === 'paid' || p.status === 'partial').reduce((s, p) => s + p.amount, 0);
 
   return (
     <div className="space-y-5 max-w-5xl">
@@ -281,6 +331,12 @@ export default function AdminProjectWorkspace() {
             <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-2xl font-bold text-white">{project.title}</h1>
               <StatusBadge status={project.status} />
+              {project.isInstallment && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full"
+                  style={{ background: 'rgba(168,85,247,0.15)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.3)' }}>
+                  <Repeat className="w-3 h-3" /> Installments
+                </span>
+              )}
               {project.package && <PlanBadge plan={project.package} size="sm" />}
             </div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -542,11 +598,12 @@ export default function AdminProjectWorkspace() {
           {/* PAYMENTS */}
           {tab === 'payments' && (
             <div className="space-y-4">
+              {/* Stats */}
               <div className="grid sm:grid-cols-3 gap-4">
                 {[
                   { label: t('request.field.budget'), value: formatCurrency(project.budget), color: 'text-white' },
                   { label: t('admin.collected'),      value: formatCurrency(paidTotal), color: 'text-green-400' },
-                  { label: t('admin.outstanding'),    value: formatCurrency(project.budget - paidTotal), color: 'text-yellow-400' },
+                  { label: t('admin.outstanding'),    value: formatCurrency(Math.max(0, project.budget - paidTotal)), color: 'text-yellow-400' },
                 ].map((s) => (
                   <div key={s.label} className="glass rounded-xl p-4 border border-white/5 text-center">
                     <div className={`text-2xl font-black ${s.color} mb-1`}>{s.value}</div>
@@ -554,6 +611,38 @@ export default function AdminProjectWorkspace() {
                   </div>
                 ))}
               </div>
+
+              {/* Installment controls */}
+              <div className="glass rounded-xl p-4 border border-white/5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(168,85,247,0.15)' }}>
+                    <Repeat className="w-4 h-4" style={{ color: '#c084fc' }} />
+                  </div>
+                  <div>
+                    <div className="text-white text-sm font-medium">Installment Payments</div>
+                    <div className="text-slate-500 text-xs">Client pays in multiple installments</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={toggleInstallment}
+                    className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                    style={{ background: project.isInstallment ? 'rgba(168,85,247,0.7)' : 'rgba(255,255,255,0.1)' }}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${project.isInstallment ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+                  <button
+                    onClick={() => setShowInvoiceModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all"
+                    style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }}
+                  >
+                    <Plus className="w-3.5 h-3.5" /> New Invoice
+                  </button>
+                </div>
+              </div>
+
+              {/* Payment list */}
               {payments.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border border-white/5">
                   <CreditCard className="w-10 h-10 text-slate-700 mx-auto mb-3" />
@@ -561,21 +650,55 @@ export default function AdminProjectWorkspace() {
                 </div>
               ) : (
                 <div className="glass rounded-2xl border border-white/5 overflow-hidden divide-y divide-white/5">
-                  {payments.map((p) => (
-                    <div key={p._id} className="flex items-center gap-4 p-4">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${p.status === 'paid' ? 'bg-green-500/10' : p.status === 'failed' ? 'bg-red-500/10' : 'bg-yellow-500/10'}`}>
-                        {p.status === 'paid' ? <Check className="w-4 h-4 text-green-400" /> : p.status === 'failed' ? <AlertCircle className="w-4 h-4 text-red-400" /> : <Clock className="w-4 h-4 text-yellow-400" />}
+                  {payments.map((p) => {
+                    const pid = p._id ?? p.id ?? '';
+                    const isPartial = p.status === 'partial';
+                    const isPaid    = p.status === 'paid';
+                    const canToggle = isPaid || isPartial;
+                    const isUpdating = updatingPaymentId === pid;
+                    return (
+                      <div key={pid} className="flex items-center gap-4 p-4">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          isPaid ? 'bg-green-500/10' : isPartial ? 'bg-purple-500/10' : p.status === 'failed' ? 'bg-red-500/10' : 'bg-yellow-500/10'
+                        }`}>
+                          {isPaid    ? <Check className="w-4 h-4 text-green-400" />
+                          : isPartial ? <Repeat className="w-4 h-4 text-purple-400" />
+                          : p.status === 'failed' ? <AlertCircle className="w-4 h-4 text-red-400" />
+                          : <Clock className="w-4 h-4 text-yellow-400" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white text-sm font-medium truncate">{p.milestoneTitle || p.description || 'Payment'}</div>
+                          <div className="text-slate-500 text-xs">{formatDate(p.createdAt)}</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          {canToggle && (
+                            <button
+                              onClick={() => togglePaymentStatus(p)}
+                              disabled={isUpdating}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-all disabled:opacity-50"
+                              style={isPartial
+                                ? { background: 'rgba(34,197,94,0.1)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.2)' }
+                                : { background: 'rgba(168,85,247,0.1)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.2)' }}
+                            >
+                              {isUpdating
+                                ? <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                                : isPartial ? <><Check className="w-3 h-3" /> Mark Paid</>
+                                : <><Repeat className="w-3 h-3" /> Partial</>
+                              }
+                            </button>
+                          )}
+                          <div className="text-right">
+                            <div className="text-white font-bold">{formatCurrency(p.amount)}</div>
+                            <div className={`text-xs capitalize ${
+                              isPaid ? 'text-green-400' : isPartial ? 'text-purple-400' : p.status === 'failed' ? 'text-red-400' : 'text-yellow-400'
+                            }`}>
+                              {isPartial ? 'partial' : p.status}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="text-white text-sm font-medium">{p.milestoneTitle || p.description || 'Payment'}</div>
-                        <div className="text-slate-500 text-xs">{formatDate(p.createdAt)}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-white font-bold">{formatCurrency(p.amount)}</div>
-                        <div className={`text-xs capitalize ${p.status === 'paid' ? 'text-green-400' : p.status === 'failed' ? 'text-red-400' : 'text-yellow-400'}`}>{p.status}</div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -628,5 +751,94 @@ export default function AdminProjectWorkspace() {
         </motion.div>
       </AnimatePresence>
     </div>
+
+    {/* New Invoice Modal */}
+    {showInvoiceModal && typeof document !== 'undefined' && ReactDOM.createPortal(
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+        onClick={(e) => e.target === e.currentTarget && setShowInvoiceModal(false)}>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md rounded-2xl p-6 space-y-4"
+          style={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-white font-bold text-lg">New Invoice</h2>
+              <p className="text-slate-500 text-xs mt-0.5">Create an installment payment entry</p>
+            </div>
+            <button onClick={() => setShowInvoiceModal(false)}
+              className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-lg">
+              ×
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5">Amount ($) *</label>
+              <input
+                type="number"
+                placeholder="e.g. 500"
+                value={invoiceForm.amount}
+                onChange={(e) => setInvoiceForm((f) => ({ ...f, amount: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5">Description</label>
+              <input
+                type="text"
+                placeholder="e.g. Installment #2 — July"
+                value={invoiceForm.description}
+                onChange={(e) => setInvoiceForm((f) => ({ ...f, description: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-primary-500"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1.5">Payment Method</label>
+                <select
+                  value={invoiceForm.method}
+                  onChange={(e) => setInvoiceForm((f) => ({ ...f, method: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-primary-500"
+                >
+                  <option value="">Not specified</option>
+                  <option value="cih_bank">CIH Bank</option>
+                  <option value="paypal">PayPal</option>
+                  <option value="taptapsend">TapTapSend</option>
+                  <option value="mock">Mock</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1.5">Status</label>
+                <select
+                  value={invoiceForm.status}
+                  onChange={(e) => setInvoiceForm((f) => ({ ...f, status: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-primary-500"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="partial">Partially Paid</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button onClick={() => setShowInvoiceModal(false)}
+              className="flex-1 py-2.5 text-sm font-semibold text-slate-400 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">
+              Cancel
+            </button>
+            <button onClick={createInvoice} disabled={creatingInvoice}
+              className="flex-1 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              style={{ background: 'rgba(99,102,241,0.8)' }}>
+              {creatingInvoice
+                ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Creating…</>
+                : <><Plus className="w-4 h-4" /> Create Invoice</>
+              }
+            </button>
+          </div>
+        </motion.div>
+      </div>,
+      document.body
+    )}
   );
 }

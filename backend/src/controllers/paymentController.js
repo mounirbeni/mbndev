@@ -660,6 +660,123 @@ exports.rejectManualPayment = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// ─── POST /payments/admin-create — Admin creates installment payment ──────────
+
+exports.adminCreatePayment = async (req, res, next) => {
+  const ip = getClientIp(req);
+
+  try {
+    const { projectId, amount, description, method, status } = req.body;
+
+    if (!projectId) return res.status(400).json({ success: false, message: 'projectId is required.' });
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      return res.status(400).json({ success: false, message: 'amount must be a positive number.' });
+    }
+
+    const ALLOWED_STATUSES = ['pending', 'paid', 'partial'];
+    const safeStatus = ALLOWED_STATUSES.includes(status) ? status : 'pending';
+
+    const project = await prisma.project.findUnique({
+      where:  { id: projectId },
+      select: { id: true, clientId: true, title: true },
+    });
+    if (!project) return res.status(404).json({ success: false, message: 'Project not found.' });
+
+    const payment = await prisma.payment.create({
+      data: {
+        clientId:    project.clientId,
+        projectId:   project.id,
+        amount:      Number(amount),
+        description: description ? String(description).trim().slice(0, 200) : `Installment payment — ${project.title}`,
+        status:      safeStatus,
+        method:      method || null,
+        paidAt:      safeStatus === 'paid' ? new Date() : null,
+        ipAddress:   ip,
+      },
+    });
+
+    logPaymentEvent({
+      paymentId:  payment.id,
+      actorId:    req.user.id,
+      actorRole:  'admin',
+      event:      'created',
+      fromStatus: null,
+      toStatus:   safeStatus,
+      note:       `Admin-created installment payment for project ${project.id}`,
+      metadata:   { projectId: project.id, amount: Number(amount), method },
+      ip,
+    }).catch(() => {});
+
+    logAdminAction({
+      adminId:    req.user.id,
+      action:     'mock_payment',
+      targetType: 'project',
+      targetId:   project.id,
+      after:      { paymentId: payment.id, amount: Number(amount), status: safeStatus },
+      ip,
+    }).catch(() => {});
+
+    res.status(201).json({ success: true, payment: fmt(payment) });
+  } catch (err) { next(err); }
+};
+
+// ─── PUT /payments/:id/admin-status — Admin sets payment status (paid ↔ partial) ──
+
+exports.setInstallmentStatus = async (req, res, next) => {
+  const { id } = req.params;
+  const ip = getClientIp(req);
+
+  try {
+    const { status: newStatus } = req.body;
+    const ALLOWED = ['paid', 'partial'];
+    if (!ALLOWED.includes(newStatus)) {
+      return res.status(400).json({ success: false, message: `status must be one of: ${ALLOWED.join(', ')}` });
+    }
+
+    const payment = await prisma.payment.findUnique({
+      where:  { id },
+      select: { id: true, status: true, amount: true, clientId: true, projectId: true },
+    });
+    if (!payment) return res.status(404).json({ success: false, message: 'Payment not found.' });
+
+    try { assertTransition(payment.status, newStatus); }
+    catch (smErr) {
+      return res.status(smErr.statusCode || 409).json({ success: false, message: smErr.message });
+    }
+
+    const updated = await prisma.payment.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        paidAt: newStatus === 'paid' ? new Date() : null,
+      },
+    });
+
+    logPaymentEvent({
+      paymentId:  id,
+      actorId:    req.user.id,
+      actorRole:  'admin',
+      event:      newStatus === 'paid' ? 'approved' : 'updated',
+      fromStatus: payment.status,
+      toStatus:   newStatus,
+      note:       `Admin changed status from ${payment.status} to ${newStatus}`,
+      ip,
+    }).catch(() => {});
+
+    logAdminAction({
+      adminId:    req.user.id,
+      action:     'approve_payment',
+      targetType: 'payment',
+      targetId:   id,
+      before:     { status: payment.status },
+      after:      { status: newStatus },
+      ip,
+    }).catch(() => {});
+
+    res.json({ success: true, payment: fmt(updated) });
+  } catch (err) { next(err); }
+};
+
 // ─── POST /payments/mock — Admin-only dev payment ────────────────────────────
 
 exports.mockPayment = async (req, res, next) => {

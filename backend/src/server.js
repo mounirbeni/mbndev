@@ -229,6 +229,11 @@ app.use((err, req, res, _next) => {
   });
 });
 
+// ─── Auto-migrate: add isInstallment to Project if not yet present ────────────
+prisma.$executeRawUnsafe(
+  `ALTER TABLE "Project" ADD COLUMN IF NOT EXISTS "isInstallment" BOOLEAN NOT NULL DEFAULT false`
+).catch((e) => console.error('[startup] isInstallment migration failed:', e.message));
+
 // ─── Background reconciler ────────────────────────────────────────────────────
 // In dev: runs every 10 min via setInterval.
 // In production (Vercel serverless): only runs via POST /api/payments/reconcile.

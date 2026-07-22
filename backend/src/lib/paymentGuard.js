@@ -19,10 +19,11 @@ const prisma = require('./prisma');
 // Any transition NOT listed here is an illegal state change and will throw 409.
 
 const VALID_TRANSITIONS = {
-  pending:              new Set(['pending_verification']),
+  pending:              new Set(['pending_verification', 'paid', 'partial']),
   pending_verification: new Set(['processing', 'failed']),
   processing:           new Set(['paid', 'failed', 'pending_verification']), // internal lock state
-  paid:                 new Set(['refunded']),
+  paid:                 new Set(['refunded', 'partial']),
+  partial:              new Set(['paid', 'refunded']),
   failed:               new Set([]),   // terminal
   refunded:             new Set([]),   // terminal
 };

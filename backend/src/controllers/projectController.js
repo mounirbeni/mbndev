@@ -156,7 +156,7 @@ exports.getAllProjects = async (req, res, next) => {
 // ─── Update project (admin) ───────────────────────────────────────────────────
 exports.updateProject = async (req, res, next) => {
   try {
-    const { status, progress, notes, deadline, budget } = req.body;
+    const { status, progress, notes, deadline, budget, isInstallment } = req.body;
 
     if (progress !== undefined) {
       const p = Number(progress);
@@ -175,7 +175,8 @@ exports.updateProject = async (req, res, next) => {
         ...(progress !== undefined ? { progress: Number(progress) }               : {}),
         ...(notes    !== undefined ? { notes }                                    : {}),
         ...(deadline !== undefined ? { deadline: deadline ? new Date(deadline) : null } : {}),
-        ...(budget   !== undefined ? { budget: Number(budget) }                  : {}),
+        ...(budget        !== undefined ? { budget: Number(budget) }                  : {}),
+        ...(isInstallment !== undefined ? { isInstallment: Boolean(isInstallment) }  : {}),
       },
       include: withClientLight,
     });

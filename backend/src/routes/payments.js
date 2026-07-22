@@ -9,6 +9,8 @@ const {
   rejectManualPayment,
   triggerReconciliation,
   getPaymentAnalytics,
+  adminCreatePayment,
+  setInstallmentStatus,
 } = require('../controllers/paymentController');
 const { protect, authorize } = require('../middleware/auth');
 const { submitManualRules } = require('../middleware/validate');
@@ -38,6 +40,12 @@ router.post('/reconcile', protect, authorize('admin'), triggerReconciliation);
 
 // Payment analytics dashboard data
 router.get('/meta/analytics', protect, authorize('admin'), getPaymentAnalytics);
+
+// Admin: create installment payment for a project (bypasses order flow)
+router.post('/admin-create', protect, authorize('admin'), adminCreatePayment);
+
+// Admin: change installment payment status (paid ↔ partial)
+router.put('/:id/admin-status', protect, authorize('admin'), setInstallmentStatus);
 
 // Mock payment (dev + demo only — hard-blocked in production by controller)
 router.post('/mock', protect, mockPayment);

@@ -10,7 +10,7 @@ import { formatCurrency, formatDate, getProjectTypeLabel } from '@/lib/utils';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
-import { Search, AlertTriangle, RefreshCcw, ChevronDown, Loader2 } from 'lucide-react';
+import { Search, AlertTriangle, RefreshCcw, ChevronDown, Loader2, Repeat } from 'lucide-react';
 import Link from 'next/link';
 import PlanBadge from '@/components/ui/PlanBadge';
 
@@ -271,7 +271,15 @@ export default function AdminProjectsPage() {
                       className="border-b border-white/5 hover:bg-white/2 transition-colors"
                     >
                       <td className="p-4">
-                        <div className="text-white text-sm font-medium">{p.title}</div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className="text-white text-sm font-medium">{p.title}</div>
+                          {(p as any).isInstallment && (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold rounded-full"
+                              style={{ background: 'rgba(168,85,247,0.15)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.25)' }}>
+                              <Repeat className="w-2.5 h-2.5" /> Installments
+                            </span>
+                          )}
+                        </div>
                         <div className="text-slate-500 text-xs">{getProjectTypeLabel(p.type, t)}</div>
                       </td>
                       <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">{client?.name || '—'}</td>
