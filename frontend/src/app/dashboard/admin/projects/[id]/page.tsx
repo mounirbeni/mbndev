@@ -262,6 +262,7 @@ export default function AdminProjectWorkspace() {
   const paidTotal = payments.filter((p) => p.status === 'paid' || p.status === 'partial').reduce((s, p) => s + p.amount, 0);
 
   return (
+    <>
     <div className="space-y-5 max-w-5xl">
       <div className="flex items-center justify-between">
         <Link href="/dashboard/admin/projects" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
@@ -840,5 +841,6 @@ export default function AdminProjectWorkspace() {
       </div>,
       document.body
     )}
+    </>
   );
 }
