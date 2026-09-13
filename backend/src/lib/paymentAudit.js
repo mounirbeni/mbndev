@@ -21,7 +21,7 @@ const prisma = require('./prisma');
  *   paymentId:  string,
  *   actorId?:   string|null,   // null = system / automated
  *   actorRole?: string,        // 'admin' | 'client' | 'system'
- *   event:      string,        // created | submitted | approved | rejected | expired | rolled_back | flagged
+ *   event:      string,        // created | submitted | approved | rejected | expired | rolled_back | flagged | approval_blocked
  *   fromStatus?: string|null,
  *   toStatus:   string,
  *   note?:      string|null,

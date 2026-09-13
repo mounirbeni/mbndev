@@ -4,6 +4,28 @@ const { notifyAdmins } = require('../lib/notifications');
 const { calculatePrice, VALID_PLANS } = require('../lib/pricing');
 const { sendEmail, templates } = require('../lib/email');
 const { wa } = require('../lib/whatsapp');
+const { assertOrderTransition, ACTIVE_PAYMENT_STATUSES } = require('../lib/orderGuard');
+
+/**
+ * Throws a 409 if this order currently has a payment awaiting verification —
+ * used to block edits/cancel/delete that would corrupt a payment already in
+ * flight (price change after submission, cancelling out from under an
+ * in-review payment, etc).
+ */
+async function assertNoActivePayment(orderId) {
+  const active = await prisma.payment.findFirst({
+    where: { orderId, status: { in: ACTIVE_PAYMENT_STATUSES } },
+    select: { id: true, status: true },
+  });
+  if (active) {
+    const err = new Error(
+      `This order has a payment "${active.status}" — it cannot be changed until that payment is resolved (approved or rejected).`
+    );
+    err.statusCode = 409;
+    err.code = 'PAYMENT_IN_FLIGHT';
+    throw err;
+  }
+}
 
 // POST /api/orders — Create a new order (client)
 exports.createOrder = async (req, res, next) => {
@@ -153,6 +175,11 @@ exports.updateOrder = async (req, res, next) => {
     if (order.clientId !== req.user.id) return res.status(403).json({ success: false, message: 'Not authorized' });
     if (order.status !== 'pending') return res.status(400).json({ success: false, message: 'Only pending orders can be modified' });
 
+    // A payment already submitted against this order locks its price/contents —
+    // editing it here would silently invalidate the amount the client already
+    // told the admin they paid, and desync payment.snapshotAmount from reality.
+    await assertNoActivePayment(order.id);
+
     const { description, notes, pages, features, addons } = req.body;
 
     const newPages    = pages    !== undefined ? Number(pages)    : order.pages;
@@ -197,6 +224,12 @@ exports.cancelOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Only pending orders can be cancelled' });
     }
 
+    // Cancelling out from under a payment that's already awaiting verification
+    // is exactly how a payment could later get approved against a dead order —
+    // resolve the payment (approve/reject) first.
+    await assertNoActivePayment(order.id);
+    assertOrderTransition(order.status, 'cancelled');
+
     const updated = await prisma.order.update({
       where: { id: req.params.id },
       data:  { status: 'cancelled' },
@@ -213,6 +246,23 @@ exports.deleteOrder = async (req, res, next) => {
   try {
     const order = await prisma.order.findUnique({ where: { id: req.params.id } });
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    // Financial history must never be casually destroyed. Deleting an order
+    // that has ANY payment (including old rejected/expired ones) or a linked
+    // project would orphan that payment's order reference — and if it were
+    // ever mid-verification, later approval would silently create a "paid"
+    // payment with no order and no project. Admins should cancel instead.
+    const [paymentCount, project] = await Promise.all([
+      prisma.payment.count({ where: { orderId: order.id } }),
+      prisma.project.findUnique({ where: { orderId: order.id }, select: { id: true } }),
+    ]);
+    if (paymentCount > 0 || project) {
+      return res.status(409).json({
+        success: false,
+        message: 'This order has payment history or a linked project and cannot be deleted. Cancel it instead.',
+        code: 'ORDER_HAS_HISTORY',
+      });
+    }
 
     await prisma.order.delete({ where: { id: req.params.id } });
     res.json({ success: true, message: 'Order deleted' });

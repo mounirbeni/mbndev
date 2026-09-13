@@ -396,8 +396,13 @@ exports.approveManualPayment = async (req, res, next) => {
       }
     }
 
-    // ── Edge case: order already paid (or no linked order) ────────────────────
-    if (!payment.orderId || !payment.order || payment.order.status !== 'pending') {
+    // ── Edge case: no linked order (genuinely orphaned payment) ───────────────
+    // Never happened via the normal submission flow, but a payment can end up
+    // here if its order was later hard-deleted (deleteOrder now refuses that
+    // while payment history exists, so this should only occur for truly
+    // ancient/orphaned rows). Approve it as-is — there's nothing to reconcile
+    // it against.
+    if (!payment.orderId || !payment.order) {
       await prisma.payment.update({
         where: { id },
         data:  { status: 'paid', paidAt: new Date() },
@@ -406,7 +411,7 @@ exports.approveManualPayment = async (req, res, next) => {
       logPaymentEvent({
         paymentId: id, actorId: req.user.id, actorRole: 'admin',
         event: 'approved', fromStatus: 'pending_verification', toStatus: 'paid',
-        note: 'Approved without project creation (order already processed or no order link)',
+        note: 'Approved without project creation (no linked order)',
         ip,
       }).catch(() => {});
       logAdminAction({
@@ -426,6 +431,67 @@ exports.approveManualPayment = async (req, res, next) => {
         success: true,
         payment: fmt(await prisma.payment.findUnique({ where: { id } })),
         project: null,
+      });
+    }
+
+    // ── Edge case: order already paid elsewhere ────────────────────────────────
+    // A second payment attempt against an order a prior payment already
+    // activated. Mark this one paid too (it's real money the client sent) but
+    // don't create a second project — Project.orderId is unique per order.
+    if (payment.order.status === 'paid') {
+      await prisma.payment.update({
+        where: { id },
+        data:  { status: 'paid', paidAt: new Date() },
+      });
+
+      logPaymentEvent({
+        paymentId: id, actorId: req.user.id, actorRole: 'admin',
+        event: 'approved', fromStatus: 'pending_verification', toStatus: 'paid',
+        note: 'Approved without project creation (order already paid via another payment)',
+        ip,
+      }).catch(() => {});
+      logAdminAction({
+        adminId: req.user.id, action: 'approve_payment',
+        targetType: 'payment', targetId: id,
+        before: { status: 'pending_verification' }, after: { status: 'paid' },
+        ip, userAgent: ua,
+      }).catch(() => {});
+
+      notify(payment.clientId, {
+        type: 'payment_received', title: 'Payment Verified',
+        message: 'Your payment has been verified by the admin.',
+        link: '/dashboard/client/orders',
+      }).catch(() => {});
+
+      return res.json({
+        success: true,
+        payment: fmt(await prisma.payment.findUnique({ where: { id } })),
+        project: null,
+      });
+    }
+
+    // ── Guard: never approve a payment against a cancelled (or any other
+    // non-pending, non-paid) order. Doing so would record real money as
+    // "verified" with no project and no way to deliver the work — an admin
+    // must explicitly reject/refund instead. Roll the optimistic lock back to
+    // pending_verification so the payment isn't left stuck in "processing".
+    if (payment.order.status !== 'pending') {
+      await prisma.payment.updateMany({
+        where: { id, status: 'processing' },
+        data:  { status: 'pending_verification' },
+      }).catch(() => {});
+
+      logPaymentEvent({
+        paymentId: id, actorId: req.user.id, actorRole: 'admin',
+        event: 'approval_blocked', fromStatus: 'processing', toStatus: 'pending_verification',
+        note: `Approval refused — linked order status is "${payment.order.status}", not "pending". Reject or refund this payment instead.`,
+        ip,
+      }).catch(() => {});
+
+      return res.status(409).json({
+        success: false,
+        message: `This order is "${payment.order.status}" — a payment cannot be approved against it. Reject this payment (and refund if money was received) instead.`,
+        code: 'ORDER_NOT_PAYABLE',
       });
     }
 
