@@ -204,6 +204,24 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
       });
       if (near) setTimeout(() => scrollToBottom('smooth'), 50);
     },
+    // SSE has no replay — any message sent while this connection was down
+    // (Vercel recycles it roughly every ~60s) never arrives as message:new.
+    // On reconnect, quietly merge in anything the current view is missing
+    // rather than trusting every event was delivered live.
+    reconnected: () => {
+      if (!projectId) return;
+      messageAPI.get(projectId).then(({ data }) => {
+        const fresh: any[] = data.messages || [];
+        setMessages((prev) => {
+          const known = new Set(prev.map(msgId));
+          const missing = fresh.filter((m) => !known.has(msgId(m)));
+          if (missing.length === 0) return prev;
+          return [...prev, ...missing].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        });
+      }).catch(() => {});
+    },
   }), [projectId, scrollToBottom]);
 
   useRealtime({ on: realtimeHandlers });

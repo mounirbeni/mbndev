@@ -78,7 +78,11 @@ export default function ClientMessagesPage() {
         return updatedThread;
       }));
     },
-  }), [selected?.projectId, userId]);
+    // SSE has no replay — a thread update published while disconnected
+    // never arrives as message:new. Re-fetch the thread list on reconnect
+    // (silently, no loading spinner) rather than trusting live delivery.
+    reconnected: () => fetchThreads(true),
+  }), [selected?.projectId, userId, fetchThreads]);
 
   useRealtime({ on: realtimeHandlers });
 

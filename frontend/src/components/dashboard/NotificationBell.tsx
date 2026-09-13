@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Bell, Check, CheckCheck, X, Loader2, BellOff } from 'lucide-react';
@@ -39,24 +39,42 @@ export default function NotificationBell() {
   const [unread,  setUnread]  = useState(0);
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const openRef = useRef(open);
+  useEffect(() => { openRef.current = open; }, [open]);
+
+  const fetchCount = useCallback(() =>
+    notificationAPI.getUnread()
+      .then(({ data }) => setUnread(data.count))
+      .catch(() => {}),
+  []);
 
   useEffect(() => {
-    const fetchCount = () =>
-      notificationAPI.getUnread()
-        .then(({ data }) => setUnread(data.count))
-        .catch(() => {});
     fetchCount();
     const onVis = () => { if (document.visibilityState === 'visible') fetchCount(); };
     document.addEventListener('visibilitychange', onVis);
     return () => document.removeEventListener('visibilitychange', onVis);
-  }, []);
+  }, [fetchCount]);
 
   const realtimeHandlers = useMemo(() => ({
     'notification:new': (n: any) => {
       setUnread((c) => c + 1);
       setNotifs((prev) => [{ ...n, read: false }, ...prev].slice(0, 50));
     },
-  }), []);
+    // SSE has no replay — anything published while disconnected (Vercel
+    // recycles the connection roughly every ~60s) is otherwise lost. On
+    // reconnect, re-fetch the truth from the API instead of trusting that
+    // every event was actually delivered live.
+    reconnected: () => {
+      fetchCount();
+      if (openRef.current) {
+        setLoading(true);
+        notificationAPI.getAll()
+          .then(({ data }) => setNotifs(data.notifications || []))
+          .catch(() => {})
+          .finally(() => setLoading(false));
+      }
+    },
+  }), [fetchCount]);
   useRealtime({ on: realtimeHandlers });
 
   useEffect(() => {

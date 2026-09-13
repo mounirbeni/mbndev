@@ -10,7 +10,18 @@ export type RealtimeEvent =
   | 'message:new'
   | 'project:updated'
   | 'project:activity'
-  | 'ready';
+  | 'ready'
+  // Synthetic, client-side-only event — never sent by the server. Fired
+  // when the stream re-establishes after having been open before (not on
+  // the very first connect). SSE has no replay/Last-Event-ID support here,
+  // and Vercel's function duration limit forces a reconnect roughly every
+  // ~60s regardless of network conditions — any event published in the gap
+  // between disconnect and reconnect is otherwise lost forever. Components
+  // that hold state derived from realtime events (message threads,
+  // notification lists, a project's own status) should treat this as "go
+  // re-fetch your current state" using the REST endpoint they already use
+  // on mount, to close that gap.
+  | 'reconnected';
 
 type Handler = (data: any) => void;
 
@@ -55,6 +66,7 @@ interface SseState {
   reconnectAttempt: number;
   closedByUs:       boolean;
   listeners:        ListenerMap;
+  hasConnectedOnce: boolean;
 }
 
 const state: SseState = {
@@ -64,6 +76,7 @@ const state: SseState = {
   reconnectAttempt: 0,
   closedByUs:       false,
   listeners:        new Map(),
+  hasConnectedOnce: false,
 };
 
 // ── Listener helpers ──────────────────────────────────────────────────────────
@@ -118,6 +131,14 @@ function openConnection(token: string) {
 
   es.onopen = () => {
     state.reconnectAttempt = 0;
+    if (state.hasConnectedOnce) {
+      // A genuine reconnect (not the initial connect) — notify listeners so
+      // they can re-fetch and close any gap in what SSE alone delivered.
+      state.listeners.get('reconnected')?.forEach((h) => {
+        try { h(null); } catch (e) { console.error('[realtime] handler error:', e); }
+      });
+    }
+    state.hasConnectedOnce = true;
   };
 
   es.onerror = () => {
@@ -138,6 +159,7 @@ function closeConnection() {
   state.es    = null;
   state.token = null;
   state.reconnectAttempt = 0;
+  state.hasConnectedOnce = false;
   // NOTE: We deliberately do NOT clear state.listeners here.
   // Each component is responsible for removing its own listeners on unmount.
 }
