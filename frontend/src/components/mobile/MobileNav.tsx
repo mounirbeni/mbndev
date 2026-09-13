@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -16,6 +16,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { getInitials } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -144,6 +145,9 @@ function NavSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   /* Spring config for sheet entrance */
   const sheetSpring = { type: 'spring' as const, damping: 30, stiffness: 300, mass: 0.88 };
 
+  const sheetRef = useRef<HTMLDivElement>(null);
+  useDialogA11y(open, handleClose, sheetRef);
+
   return (
     <AnimatePresence>
       {open && (
@@ -168,6 +172,11 @@ function NavSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
           {/* ── Sheet panel ─────────────────────────────────────────────── */}
           <motion.div
             key="nav-sheet"
+            ref={sheetRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+            tabIndex={-1}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}

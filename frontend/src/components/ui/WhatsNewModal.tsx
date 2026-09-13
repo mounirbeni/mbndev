@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, ArrowRight } from 'lucide-react';
 import { APP_VERSION, CHANGELOG } from '@/lib/version';
 import { useRouter } from 'next/navigation';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 
 const STORAGE_KEY = 'mbndev_seen_version';
 
@@ -43,6 +44,10 @@ export default function WhatsNewModal() {
     router.push(href);
   };
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogA11y(open, dismiss, dialogRef);
+  const titleId = useId();
+
   if (!mounted) return null;
 
   return createPortal(
@@ -63,11 +68,16 @@ export default function WhatsNewModal() {
           {/* Modal — narrow on mobile, wide 2-col on laptop */}
           <motion.div
             key="whats-new-modal"
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
             initial={{ opacity: 0, scale: 0.92, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 16 }}
             transition={{ type: 'spring', damping: 26, stiffness: 320, mass: 0.75 }}
-            className="fixed z-[9991] inset-x-4 bottom-[88px]
+            className="fixed z-[9991] inset-x-4 bottom-[88px] outline-none
                        sm:inset-auto sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2
                        sm:w-full sm:max-w-lg lg:max-w-2xl"
           >
@@ -106,7 +116,7 @@ export default function WhatsNewModal() {
                       <Sparkles className="w-5 h-5 text-violet-400" />
                     </div>
                     <div>
-                      <h2 className="text-white font-black text-base leading-tight">What&apos;s New</h2>
+                      <h2 id={titleId} className="text-white font-black text-base leading-tight">What&apos;s New</h2>
                       <span
                         className="text-[10px] font-bold tracking-widest uppercase mt-0.5 block"
                         style={{ color: '#a78bfa' }}

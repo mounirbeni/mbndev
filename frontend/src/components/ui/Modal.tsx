@@ -2,8 +2,9 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 
 interface ModalProps {
   isOpen: boolean;
@@ -32,6 +33,10 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogA11y(isOpen, onClose, dialogRef);
+  const titleId = useId();
+
   if (!mounted) return null;
 
   return createPortal(
@@ -49,14 +54,19 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
 
           {/* Modal */}
           <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
-            className={`relative w-full ${sizeMap[size]} glass rounded-2xl shadow-2xl`}
+            className={`relative w-full ${sizeMap[size]} glass rounded-2xl shadow-2xl outline-none`}
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <h2 className="text-lg font-semibold text-white">{title}</h2>
+              <h2 id={titleId} className="text-lg font-semibold text-white">{title}</h2>
               <button
                 onClick={onClose}
                 className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
