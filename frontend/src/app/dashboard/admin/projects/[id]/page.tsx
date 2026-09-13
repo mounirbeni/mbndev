@@ -185,7 +185,11 @@ export default function AdminProjectWorkspace() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 50 * 1024 * 1024) { toast.error('File too large. Maximum size is 50MB.'); return; }
+    // Kept in sync with the actual server-side limit (middleware/upload.js) —
+    // that limit itself sits under Vercel's ~4.5MB platform request-body
+    // ceiling, so this check must not advertise a size the backend can't
+    // actually accept.
+    if (file.size > 4 * 1024 * 1024) { toast.error('File too large. Maximum size is 4MB.'); return; }
     const fd = new FormData();
     fd.append('file', file);
     setUploading(true);

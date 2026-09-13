@@ -1152,7 +1152,7 @@ const en: Dict = {
   'client.typeMessage':         'Type a message…',
   'client.sendMessage':         'Send message',
   'client.uploadFile':          'Click to upload a file',
-  'client.uploadHint':          'Any file type, max 10MB',
+  'client.uploadHint':          'Any file type, max 4MB',
   'client.uploading':           'Uploading…',
   'client.noFiles':             'No files yet.',
   'client.noPayments':          'No payments yet.',

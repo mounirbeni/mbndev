@@ -29,16 +29,26 @@ const fileFilter = (req, file, cb) => {
 
 // Memory storage: the controller hands the buffer to lib/storage, which
 // uploads to Vercel Blob in production or the local uploads dir in dev.
+//
+// The limit here MUST stay under Vercel's platform-level request body
+// ceiling for Node serverless functions (~4.5MB) — that ceiling rejects an
+// oversized request before it ever reaches this code, with a generic 413
+// instead of the friendly message the error handler in server.js gives for
+// LIMIT_FILE_SIZE. 4MB leaves headroom for multipart boundary/header
+// overhead on top of the raw file bytes.
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB
+
 const upload = multer({
   storage: multer.memoryStorage(),
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10 MB
+    fileSize: MAX_UPLOAD_BYTES,
     files:    1,
   },
 });
 
 module.exports = upload;
-module.exports.ALLOWED_EXTS  = ALLOWED_EXTS;
-module.exports.ALLOWED_MIMES = ALLOWED_MIMES;
-module.exports.fileFilter    = fileFilter;
+module.exports.ALLOWED_EXTS    = ALLOWED_EXTS;
+module.exports.ALLOWED_MIMES   = ALLOWED_MIMES;
+module.exports.fileFilter      = fileFilter;
+module.exports.MAX_UPLOAD_BYTES = MAX_UPLOAD_BYTES;

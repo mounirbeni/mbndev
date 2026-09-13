@@ -443,7 +443,7 @@ Upload a file to a project.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `file` | File | The file to upload (max 10 MB) |
+| `file` | File | The file to upload (max 4 MB) |
 
 **Response `201`:**
 ```json
