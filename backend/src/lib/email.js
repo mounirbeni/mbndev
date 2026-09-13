@@ -53,6 +53,10 @@ async function sendEmail({ to, subject, html, text }) {
           'Content-Type':   'application/json',
           'Content-Length': Buffer.byteLength(body),
         },
+        // Without this, an unresponsive Brevo endpoint hangs indefinitely —
+        // and any caller that awaits sendEmail() (payment confirmations,
+        // invoices, etc.) would hang the whole request with it.
+        timeout: 10_000,
       },
       (res) => {
         let data = '';
@@ -70,6 +74,11 @@ async function sendEmail({ to, subject, html, text }) {
     req.on('error', (err) => {
       console.error('[email] request error:', err.message);
       resolve({ sent: false, reason: err.message });
+    });
+    // Node's `timeout` option only emits an event — it doesn't abort the
+    // request by itself.
+    req.on('timeout', () => {
+      req.destroy(new Error('Brevo request timed out after 10s'));
     });
     req.write(body);
     req.end();

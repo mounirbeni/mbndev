@@ -294,13 +294,17 @@ exports.submitManualPayment = async (req, res, next) => {
       metadata: { orderId: order.id },
     }).catch(() => {});
 
+    // Await — Vercel serverless can kill the function once the response is
+    // sent, before an unawaited promise resolves (same reasoning as
+    // orderController.createOrder). A payment-submission alert to the admin
+    // is exactly the kind of message that must not be silently dropped.
     if (process.env.ADMIN_EMAIL) {
-      sendEmail({
+      await sendEmail({
         to: process.env.ADMIN_EMAIL,
         ...templates.adminPaymentSubmitted({ order, client: order.client, method: label }),
       }).catch(() => {});
     }
-    wa.paymentSubmitted({ client: order.client, order, method: label }).catch(() => {});
+    await wa.paymentSubmitted({ client: order.client, order, method: label }).catch(() => {});
 
     res.json({ success: true, payment: fmt(payment) });
   } catch (err) { next(err); }
@@ -590,12 +594,15 @@ exports.approveManualPayment = async (req, res, next) => {
 
     const paidPayment = await prisma.payment.findUnique({ where: { id } });
 
-    sendEmail({
+    // Awaited — payment-verified/invoice email is exactly the kind of
+    // critical transactional message that must not be silently dropped by
+    // the function exiting once the response is sent (Vercel serverless).
+    await sendEmail({
       to: payment.client.email,
       ...templates.paymentVerified({ client: payment.client, order: payment.order, project }),
     }).catch(() => {});
 
-    sendEmail({
+    await sendEmail({
       to: payment.client.email,
       ...templates.invoiceEmail({
         client:  payment.client,
@@ -605,7 +612,7 @@ exports.approveManualPayment = async (req, res, next) => {
       }),
     }).catch(() => {});
 
-    wa.paymentVerified({ client: payment.client, order: payment.order, projectId: project.id }).catch(() => {});
+    await wa.paymentVerified({ client: payment.client, order: payment.order, projectId: project.id }).catch(() => {});
 
     res.json({ success: true, payment: fmt(paidPayment), project: fmt(project) });
   } catch (err) { next(err); }
@@ -714,7 +721,10 @@ exports.rejectManualPayment = async (req, res, next) => {
     }
 
     if (payment.client?.email) {
-      sendEmail({
+      // Awaited for the same reason as approve/submit — the client needs to
+      // know their payment failed so they can resubmit; it must not be
+      // silently dropped when the response ends the function.
+      await sendEmail({
         to:      payment.client.email,
         subject: `Payment Not Confirmed — ${orderTitle}`,
         html: `
