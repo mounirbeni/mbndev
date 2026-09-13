@@ -168,14 +168,12 @@ app.use('/api/auth/check-email',     enumerationLimiter);
 app.use('/api/auth/check-phone',     enumerationLimiter);
 app.use('/api',                      apiLimiter);
 
-// ─── Static uploads (local-dev fallback) ─────────────────────────────────────
-// In production files live in Vercel Blob (absolute URLs); this mount only
-// serves files saved locally when no BLOB_READ_WRITE_TOKEN is configured.
-const { LOCAL_DIR } = require('./lib/storage');
-app.use('/uploads', express.static(LOCAL_DIR, {
-  maxAge: '7d',
-  setHeaders: (res) => res.setHeader('X-Content-Type-Options', 'nosniff'),
-}));
+// NOTE: local-dev uploaded files used to be served unauthenticated via a
+// static /uploads mount here. That's gone — project files (local disk in
+// dev, Vercel Blob in production) are now only reachable through the
+// authenticated GET /api/projects/:id/files/:fileId route in
+// routes/projects.js, which checks the requester owns the project (or is
+// an admin) before streaming the bytes through.
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
 app.use('/api/auth',          require('./routes/auth'));

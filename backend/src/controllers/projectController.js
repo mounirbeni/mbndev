@@ -11,6 +11,7 @@ const { sendEmail, templates } = require('../lib/email');
 const { wa }   = require('../lib/whatsapp');
 const { matchesSignature } = require('../lib/fileSignature');
 const path = require('path');
+const fs = require('fs');
 const { PROJECT_STATUS } = require('../lib/constants');
 
 const VALID_PROJECT_STATUSES = Object.values(PROJECT_STATUS);
@@ -19,8 +20,11 @@ const VALID_PROJECT_STATUSES = Object.values(PROJECT_STATUS);
 
 // Lightweight: used for list views — no activityLogs (expensive join)
 const withClientLight = {
-  client:     { select: { id: true, name: true, email: true, avatar: true, company: true } },
-  files:      true,
+  client: { select: { id: true, name: true, email: true, avatar: true, company: true } },
+  // Deliberately excludes `url` — files are downloaded through the
+  // authenticated GET /:id/files/:fileId route, never by exposing the raw
+  // (permanent, unauthenticated) storage URL to the client.
+  files: { select: { id: true, name: true, uploadedAt: true, projectId: true } },
   milestones: true,
 };
 
@@ -310,7 +314,78 @@ exports.uploadFile = async (req, res, next) => {
       uploaderName: req.user.name,
     }).catch(() => {});
 
-    res.json({ success: true, file: fmt(file) });
+    // Never return the raw storage URL — same reasoning as withClientLight.
+    const { url: _url, ...safeFile } = file;
+    res.json({ success: true, file: fmt(safeFile) });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// A small, fixed lookup — the same extensions middleware/upload.js allows —
+// rather than adding a mime-type-detection dependency for this alone.
+const EXT_CONTENT_TYPES = {
+  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+  '.gif': 'image/gif', '.webp': 'image/webp', '.pdf': 'application/pdf',
+  '.zip': 'application/zip', '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.txt': 'text/plain',
+};
+
+// ─── Download a project file (authenticated) ──────────────────────────────────
+// Project deliverables were previously served straight off a public,
+// unauthenticated URL (Vercel Blob `access: 'public'`, or a plain
+// express.static mount in local dev) — protected only by the filename being
+// hard to guess. Any leaked URL granted permanent access with no way to
+// revoke it. This proxies the actual bytes through an authorized request
+// instead, so the underlying storage URL is never exposed to the client.
+exports.downloadProjectFile = async (req, res, next) => {
+  try {
+    const { id: projectId, fileId } = req.params;
+
+    const file = await prisma.projectFile.findFirst({
+      where:  { id: fileId, projectId },
+      select: { id: true, name: true, url: true, projectId: true },
+    });
+    if (!file) {
+      return res.status(404).json({ success: false, message: 'File not found' });
+    }
+
+    const project = await prisma.project.findUnique({
+      where:  { id: projectId },
+      select: { clientId: true },
+    });
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+    if (req.user.role !== 'admin' && project.clientId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized to access this file' });
+    }
+
+    const ext         = path.extname(file.name).toLowerCase();
+    const contentType = EXT_CONTENT_TYPES[ext] || 'application/octet-stream';
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `inline; filename="${file.name.replace(/"/g, '')}"`);
+    res.setHeader('Cache-Control', 'private, no-store');
+
+    if (file.url.startsWith('/uploads/')) {
+      const { LOCAL_DIR } = require('../lib/storage');
+      const localPath = path.join(LOCAL_DIR, path.basename(file.url));
+      if (!fs.existsSync(localPath)) {
+        return res.status(404).json({ success: false, message: 'File no longer exists in storage' });
+      }
+      return fs.createReadStream(localPath).pipe(res);
+    }
+
+    // Remote (Vercel Blob) storage — fetch server-side and stream the bytes
+    // through, so the underlying (permanent, unauthenticated) blob URL is
+    // never sent to the browser.
+    const upstream = await fetch(file.url);
+    if (!upstream.ok || !upstream.body) {
+      return res.status(502).json({ success: false, message: 'Could not retrieve the file from storage' });
+    }
+    const { Readable } = require('stream');
+    Readable.fromWeb(upstream.body).pipe(res);
   } catch (err) {
     next(err);
   }

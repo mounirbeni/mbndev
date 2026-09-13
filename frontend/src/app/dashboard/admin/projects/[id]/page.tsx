@@ -46,7 +46,7 @@ const ACTION_ICONS: Record<string, React.ElementType> = {
 
 export default function AdminProjectWorkspace() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
 
@@ -529,7 +529,7 @@ export default function AdminProjectWorkspace() {
                         <div className="text-white text-sm font-medium truncate">{f.name}</div>
                         {f.uploadedAt && <div className="text-slate-500 text-xs">{formatDate(f.uploadedAt)}</div>}
                       </div>
-                      <a href={f.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
+                      <a href={`/api/projects/${project.id}/files/${f._id || f.id}?token=${encodeURIComponent(token || '')}`} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
                         <Download className="w-4 h-4" />
                       </a>
                     </div>
