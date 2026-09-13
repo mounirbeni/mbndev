@@ -1,3 +1,13 @@
+// ─── Package CRUD (marketing/display content ONLY) ───────────────────────────
+// These rows populate the public pricing page and the landing page's pricing
+// section — nothing more. Actual order pricing is always computed
+// server-side by lib/pricing.js's calculatePrice(), from its own fixed
+// PACKAGE_INCLUSIONS/BASE_PRICES config, and never reads this table.
+// Editing a Package here changes what's advertised, not what an order costs.
+// If that ever needs to change, calculatePrice must be updated to read from
+// this table (with caching) instead — don't let the two drift into silently
+// disagreeing with each other.
+
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 

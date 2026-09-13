@@ -1,6 +1,13 @@
 // ─── Pricing engine ─────────────────────────────────────────────────────────
 // SOURCE OF TRUTH: this must stay in sync with frontend/src/app/request/page.tsx
 // The backend ALWAYS recalculates totalPrice — never trust the client's number.
+//
+// This is the ONLY thing that determines what an order costs. The `Package`
+// DB model (controllers/packageController.js) is separate, admin-editable
+// marketing content for the public pricing page — it is never read here.
+// Don't let the two silently drift into disagreeing about what a plan costs;
+// if Package rows are ever meant to drive real pricing, this file needs to
+// read from them (with caching) instead of PACKAGE_INCLUSIONS below.
 
 const BASE_PRICES = {
   website:   799,

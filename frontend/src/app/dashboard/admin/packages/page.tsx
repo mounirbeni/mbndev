@@ -125,6 +125,15 @@ export default function AdminPackagesPage() {
         </Button>
       </div>
 
+      <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+        <p className="text-xs text-amber-200/80 leading-relaxed">
+          These cards are marketing content only — they control what&apos;s shown on the public pricing page.
+          They do <span className="font-semibold">not</span> affect what an order actually costs; that price is
+          always calculated server-side from the request form&apos;s plan/pages/features.
+        </p>
+      </div>
+
       <div className="grid md:grid-cols-3 gap-4">
         {loading
           ? Array.from({ length: 3 }).map((_, i) => (
