@@ -38,5 +38,9 @@
   },
   "overrides": {
     "qs": "6.16.0"
+  },
+  "allowScripts": {
+    "prisma": true,
+    "@prisma/engines": true
   }
 }
