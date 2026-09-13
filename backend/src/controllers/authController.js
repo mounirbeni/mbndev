@@ -14,6 +14,7 @@ const {
   clearLoginAttempts,
   checkRegistrationRate,
   recordRegistrationAttempt,
+  getIp,
 } = require('../lib/authSecurity');
 
 const APP_URL           = process.env.CLIENT_URL || 'http://localhost:3000';
@@ -185,9 +186,10 @@ exports.login = async (req, res, next) => {
     }
 
     const email = normalizeEmail(rawEmail);
+    const ip    = getIp(req);
 
     // ── Brute-force gate ──
-    const bruteCheck = await checkLoginBruteForce(email);
+    const bruteCheck = await checkLoginBruteForce(email, ip);
     if (bruteCheck.locked) {
       return res.status(429).json({
         success: false,
@@ -208,7 +210,7 @@ exports.login = async (req, res, next) => {
       await recordLoginAttempt(email, req, false);
 
       // Re-check how many attempts remain after recording
-      const afterCheck = await checkLoginBruteForce(email);
+      const afterCheck = await checkLoginBruteForce(email, ip);
       if (afterCheck.locked) {
         return res.status(429).json({
           success: false,

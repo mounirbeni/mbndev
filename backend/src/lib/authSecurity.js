@@ -1,78 +1,27 @@
 // ─── Auth Security Utilities ──────────────────────────────────────────────────
 // Brute-force protection, phone normalisation, email normalisation.
 // DB-backed — works correctly on Vercel serverless (no in-memory state needed).
+// Pure helpers/constants live in ./authSecurityPure (no DB dependency, so they
+// can be unit-tested without a live Postgres connection); this module wraps
+// them with the Prisma-backed queries.
 
 const prisma = require('./prisma');
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const LOGIN_WINDOW_MS   = 15 * 60 * 1000;  // 15-minute rolling window
-const LOGIN_MAX_FAILS   = 5;               // lock after 5 failures in window
-const LOGIN_LOCK_MS     = 15 * 60 * 1000;  // lockout duration: 15 minutes
-
-const REG_WINDOW_MS     = 60 * 60 * 1000;  // 1-hour rolling window
-const REG_MAX_ATTEMPTS  = 5;              // max registration attempts per IP/hour
-
-// ─── Email normalisation ──────────────────────────────────────────────────────
-
-/**
- * Normalise an email address for consistent storage and lookup.
- * Lowercases and trims; does NOT strip dots or aliases — preserves deliverability.
- */
-function normalizeEmail(raw) {
-  if (!raw) return '';
-  return String(raw).trim().toLowerCase();
-}
-
-// ─── Phone normalisation ──────────────────────────────────────────────────────
-
-/**
- * Normalise a phone number to a digit-only (or E.164) string.
- * Returns null if the input is empty or invalid.
- *
- * Rules:
- *  - Strip spaces, dashes, parentheses, dots
- *  - Replace leading 00 with + (international prefix)
- *  - Must be 7–15 digits (E.164 max = 15)
- */
-function normalizePhone(raw) {
-  if (!raw) return null;
-
-  let s = String(raw).trim();
-  if (!s) return null;
-
-  // Replace 00 international prefix with +
-  if (s.startsWith('00')) s = '+' + s.slice(2);
-
-  const hasPlus = s.startsWith('+');
-
-  // Strip everything except digits
-  const digits = s.replace(/\D/g, '');
-
-  if (!digits || digits.length < 7 || digits.length > 15) return null;
-
-  return hasPlus ? `+${digits}` : digits;
-}
-
-/**
- * Returns true if the raw phone string is syntactically valid (after normalisation).
- */
-function isValidPhone(raw) {
-  return normalizePhone(raw) !== null;
-}
+const {
+  normalizeEmail,
+  normalizePhone,
+  isValidPhone,
+  getIp,
+  computeLockout,
+  LOGIN_WINDOW_MS,
+  LOGIN_MAX_FAILS,
+  LOGIN_LOCK_MS,
+  GLOBAL_WINDOW_MS,
+  GLOBAL_MAX_FAILS,
+  REG_WINDOW_MS,
+  REG_MAX_ATTEMPTS,
+} = require('./authSecurityPure');
 
 // ─── Brute-force / login-attempt tracking ────────────────────────────────────
-
-/**
- * Get IP address from Express request, handling common proxy headers.
- */
-function getIp(req) {
-  return (
-    (req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
-    req.socket?.remoteAddress ||
-    null
-  );
-}
 
 /**
  * Record a login attempt (success or failure) for the given normalised email.
@@ -94,39 +43,45 @@ async function recordLoginAttempt(email, req, success) {
 }
 
 /**
- * Check whether an email is currently locked out due to too many failed logins.
- * Uses a single DB query — fetches the recent failures and computes both the
- * count and the most-recent timestamp in JS rather than making two round-trips.
+ * Check whether login should be blocked for this (email, ip) pair.
+ * `ip` may be null (proxy misconfiguration) — in that case only the global
+ * gate applies, which still protects the account, just at a higher bar.
+ * See authSecurityPure.computeLockout for the decision logic.
  *
  * Returns: { locked: boolean, remainingMs: number, attemptsLeft: number }
  */
-async function checkLoginBruteForce(email) {
-  const since      = new Date(Date.now() - LOGIN_WINDOW_MS);
+async function checkLoginBruteForce(email, ip) {
   const normalised = normalizeEmail(email);
+  const now        = Date.now();
 
-  // Fetch just enough rows to make the decision — at most LOGIN_MAX_FAILS + 1
-  const recentFails = await prisma.loginAttempt.findMany({
-    where: {
-      email:     normalised,
-      success:   false,
-      createdAt: { gte: since },
-    },
-    orderBy: { createdAt: 'desc' },
-    take:    LOGIN_MAX_FAILS + 1, // one extra tells us if we're over the limit
-    select:  { createdAt: true },
+  const [ipFailRows, globalFailRows] = await Promise.all([
+    ip
+      ? prisma.loginAttempt.findMany({
+          where: {
+            email: normalised, ip, success: false,
+            createdAt: { gte: new Date(now - LOGIN_WINDOW_MS) },
+          },
+          orderBy: { createdAt: 'desc' },
+          take:    LOGIN_MAX_FAILS + 1,
+          select:  { createdAt: true },
+        })
+      : [],
+    prisma.loginAttempt.findMany({
+      where: {
+        email: normalised, success: false,
+        createdAt: { gte: new Date(now - GLOBAL_WINDOW_MS) },
+      },
+      orderBy: { createdAt: 'desc' },
+      take:    GLOBAL_MAX_FAILS + 1,
+      select:  { createdAt: true },
+    }),
+  ]);
+
+  return computeLockout({
+    ipFails:     ipFailRows.map((r) => r.createdAt),
+    globalFails: globalFailRows.map((r) => r.createdAt),
+    now,
   });
-
-  const failCount = recentFails.length;
-
-  if (failCount < LOGIN_MAX_FAILS) {
-    return { locked: false, remainingMs: 0, attemptsLeft: LOGIN_MAX_FAILS - failCount };
-  }
-
-  // Most recent failure is recentFails[0] (ordered desc)
-  const lockUntil   = new Date(recentFails[0].createdAt.getTime() + LOGIN_LOCK_MS);
-  const remainingMs = Math.max(0, lockUntil.getTime() - Date.now());
-
-  return { locked: remainingMs > 0, remainingMs, attemptsLeft: 0 };
 }
 
 /**
@@ -195,4 +150,7 @@ module.exports = {
   clearLoginAttempts,
   checkRegistrationRate,
   recordRegistrationAttempt,
+  LOGIN_MAX_FAILS,
+  GLOBAL_MAX_FAILS,
+  LOGIN_LOCK_MS,
 };
