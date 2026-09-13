@@ -148,10 +148,24 @@ const apiLimiter = rateLimit({
   message:         { success: false, message: 'Too many requests, please slow down.' },
 });
 
+// check-email/check-phone exist to give signup-form UX feedback while
+// typing, but they also reveal whether an account exists — the generic
+// apiLimiter (120/min) is far too loose for an existence-revealing endpoint,
+// letting mass account enumeration at a rate no legitimate typing UX needs.
+const enumerationLimiter = rateLimit({
+  windowMs:        5 * 60 * 1000,
+  max:             15, // 15 checks per 5 min per IP — plenty for real typing, not for scraping
+  standardHeaders: true,
+  legacyHeaders:   false,
+  message:         { success: false, message: 'Too many requests, please slow down.' },
+});
+
 app.use('/api/auth/login',           authLimiter);
 app.use('/api/auth/register',        authLimiter);
 app.use('/api/auth/forgot-password', authLimiter);
 app.use('/api/auth/reset-password',  authLimiter);
+app.use('/api/auth/check-email',     enumerationLimiter);
+app.use('/api/auth/check-phone',     enumerationLimiter);
 app.use('/api',                      apiLimiter);
 
 // ─── Static uploads (local-dev fallback) ─────────────────────────────────────

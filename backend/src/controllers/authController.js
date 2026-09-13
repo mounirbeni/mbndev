@@ -21,6 +21,11 @@ const APP_URL           = process.env.CLIENT_URL || 'http://localhost:3000';
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 const hashToken          = (raw) => crypto.createHash('sha256').update(raw).digest('hex');
 
+// Constant-time-adjacent login: compared against on every login attempt for
+// a nonexistent user, so the response takes roughly the same time as a real
+// one (see login() below) instead of leaking account existence via timing.
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync('mbndev-timing-safety-dummy-password', 10);
+
 // Access token: short-lived (15 min default, overridden by JWT_EXPIRE)
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '15m' });
@@ -204,7 +209,13 @@ exports.login = async (req, res, next) => {
       where: { email: { equals: email, mode: 'insensitive' } },
     });
 
-    const credentialsValid = user && await bcrypt.compare(password, user.password);
+    // Always run a bcrypt compare, even for a nonexistent user, against a
+    // constant dummy hash — otherwise a request for an unregistered email
+    // returns almost instantly (no hash to compare against) while a real
+    // email incurs the full bcrypt round-trip, letting an attacker enumerate
+    // registered emails purely from response timing.
+    const passwordMatches = await bcrypt.compare(password, user ? user.password : DUMMY_PASSWORD_HASH);
+    const credentialsValid = Boolean(user) && passwordMatches;
 
     if (!credentialsValid) {
       await recordLoginAttempt(email, req, false);
