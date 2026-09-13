@@ -11,12 +11,29 @@ const { deleteStoredFiles } = require('../lib/storage');
 
 router.get('/clients', protect, authorize('admin'), async (req, res, next) => {
   try {
-    const clients = await prisma.user.findMany({
-      where:   { role: 'client' },
-      select:  { id: true, name: true, email: true, company: true, phone: true, isActive: true, deletionRequestedAt: true, adminNotes: true, createdAt: true, role: true, plan: true },
-      orderBy: { createdAt: 'desc' },
+    const page  = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 25));
+    const where = { role: 'client' };
+
+    const [clients, total, activeTotal] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select:  { id: true, name: true, email: true, company: true, phone: true, isActive: true, deletionRequestedAt: true, adminNotes: true, createdAt: true, role: true, plan: true },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.user.count({ where }),
+      prisma.user.count({ where: { ...where, isActive: true } }),
+    ]);
+
+    res.json({
+      success: true,
+      clients: fmt(clients),
+      pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
+      // Counted across ALL matching clients, not just the current page.
+      stats: { total, activeCount: activeTotal, inactiveCount: total - activeTotal },
     });
-    res.json({ success: true, clients: fmt(clients) });
   } catch (err) { next(err); }
 });
 

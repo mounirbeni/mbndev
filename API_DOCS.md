@@ -1084,7 +1084,9 @@ Soft-delete a package (sets `isActive: false` — does not remove from DB).
 All routes in this section require `admin` role. All routes are mounted under `/api/admin`.
 
 ### GET `/api/admin/clients`
-List every client account (role `client`), including private admin-only fields.
+List client accounts (role `client`), including private admin-only fields. Paginated.
+
+**Query params:** `page` (default `1`), `limit` (default `25`, max `100`).
 
 **Response `200`:**
 ```json
@@ -1104,10 +1106,14 @@ List every client account (role `client`), including private admin-only fields.
       "plan": "pro",
       "createdAt": "2026-01-15T10:00:00.000Z"
     }
-  ]
+  ],
+  "pagination": { "page": 1, "limit": 25, "total": 142, "totalPages": 6 },
+  "stats": { "total": 142, "activeCount": 130, "inactiveCount": 12 }
 }
 ```
-No pagination — returns every client in one response.
+`pagination` describes the current page. `stats` is computed across **all** matching
+clients (not just the current page), so the UI can show accurate active/inactive
+totals alongside a paginated table.
 
 ---
 

@@ -10,7 +10,9 @@ import { formatDate, getInitials } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import PlanBadge from '@/components/ui/PlanBadge';
 import toast from 'react-hot-toast';
-import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX, Trash2, X, StickyNote } from 'lucide-react';
+import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX, Trash2, X, StickyNote, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const PAGE_SIZE = 25;
 
 export default function AdminClientsPage() {
   const { t } = useLanguage();
@@ -22,11 +24,19 @@ export default function AdminClientsPage() {
   const [notesTarget, setNotesTarget] = useState<User | null>(null);
   const [notesText, setNotesText] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [stats, setStats] = useState({ total: 0, activeCount: 0, inactiveCount: 0 });
 
-  const fetchClients = useCallback((silent = false) => {
+  const fetchClients = useCallback((pageNum = 1, silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
-    adminAPI.getClients()
-      .then(({ data }) => setClients(data.clients))
+    adminAPI.getClients(pageNum, PAGE_SIZE)
+      .then(({ data }) => {
+        setClients(data.clients);
+        setPage(data.pagination?.page ?? pageNum);
+        setTotalPages(data.pagination?.totalPages ?? 1);
+        if (data.stats) setStats(data.stats);
+      })
       .catch((err) => {
         console.error(err);
         if (!silent) setFetchError(t('toast.error'));
@@ -34,16 +44,18 @@ export default function AdminClientsPage() {
       .finally(() => { if (!silent) setLoading(false); });
   }, []);
 
-  useEffect(() => { fetchClients(); }, [fetchClients]);
+  useEffect(() => { fetchClients(1); }, [fetchClients]);
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
       await adminAPI.deleteClient(deleteTarget._id ?? deleteTarget.id ?? '');
-      setClients((prev) => prev.filter((c) => (c._id ?? c.id) !== (deleteTarget._id ?? deleteTarget.id)));
       toast.success('Client account deleted.');
       setDeleteTarget(null);
+      // Re-fetch (rather than local filter) so pagination/stats — which
+      // reflect ALL clients, not just this page — stay accurate.
+      fetchClients(page, true);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || t('toast.error'));
     } finally {
@@ -54,8 +66,8 @@ export default function AdminClientsPage() {
   const approveDeletion = async (id: string) => {
     try {
       await adminAPI.approveDeletion(id);
-      setClients((prev) => prev.filter((c) => (c._id ?? c.id) !== id));
       toast.success('Account deleted.');
+      fetchClients(page, true);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || t('toast.error'));
     }
@@ -102,14 +114,16 @@ export default function AdminClientsPage() {
       setClients((prev) =>
         prev.map((c) => (c._id === id ? { ...c, isActive: data.user.isActive } : c))
       );
+      setStats((prev) => ({
+        ...prev,
+        activeCount: prev.activeCount + (data.user.isActive ? 1 : -1),
+        inactiveCount: prev.inactiveCount + (data.user.isActive ? -1 : 1),
+      }));
       toast.success(t('toast.saved'));
     } catch {
       toast.error(t('toast.error'));
     }
   };
-
-  const activeCount   = clients.filter((c) => c.isActive).length;
-  const inactiveCount = clients.length - activeCount;
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -118,7 +132,7 @@ export default function AdminClientsPage() {
           <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
           <span className="text-red-300 flex-1">{fetchError}</span>
           <button
-            onClick={() => fetchClients(false)}
+            onClick={() => fetchClients(page, false)}
             className="flex items-center gap-1.5 text-red-400 hover:text-red-300 font-medium transition-colors"
           >
             <RefreshCcw className="w-3.5 h-3.5" />
@@ -133,19 +147,19 @@ export default function AdminClientsPage() {
           {t('admin.clients')}
         </h1>
         <p className="text-slate-400 text-sm mt-1">
-          {loading ? 'Loading...' : `${clients.length} ${t('admin.clients.count')}`}
+          {loading ? 'Loading...' : `${stats.total} ${t('admin.clients.count')}`}
         </p>
       </div>
 
       {/* Stats */}
-      {!loading && clients.length > 0 && (
+      {!loading && stats.total > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
             <div className="h-[3px] bg-gradient-to-r from-primary-600 via-primary-500 to-violet-500" />
             <div className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-xs mb-0.5">{t('admin.clients')}</p>
-                <p className="text-2xl font-black text-white">{clients.length}</p>
+                <p className="text-2xl font-black text-white">{stats.total}</p>
               </div>
               <div className="w-9 h-9 rounded-xl bg-primary-500/15 flex items-center justify-center">
                 <Users className="w-4.5 h-4.5 text-primary-400" strokeWidth={1.8} />
@@ -157,7 +171,7 @@ export default function AdminClientsPage() {
             <div className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-xs mb-0.5">{t('status.active')}</p>
-                <p className="text-2xl font-black text-emerald-400">{activeCount}</p>
+                <p className="text-2xl font-black text-emerald-400">{stats.activeCount}</p>
               </div>
               <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
                 <UserCheck className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.8} />
@@ -169,7 +183,7 @@ export default function AdminClientsPage() {
             <div className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-xs mb-0.5">{t('status.inactive')}</p>
-                <p className="text-2xl font-black text-red-400">{inactiveCount}</p>
+                <p className="text-2xl font-black text-red-400">{stats.inactiveCount}</p>
               </div>
               <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center">
                 <UserX className="w-4.5 h-4.5 text-red-400" strokeWidth={1.8} />
@@ -404,6 +418,33 @@ export default function AdminClientsPage() {
           </table>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center justify-between px-1">
+          <span className="text-slate-500 text-xs">
+            Page {page} of {totalPages}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fetchClients(page - 1)}
+              disabled={page <= 1}
+              className="flex items-center gap-1 text-xs font-semibold text-slate-300 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Prev
+            </button>
+            <button
+              onClick={() => fetchClients(page + 1)}
+              disabled={page >= totalPages}
+              className="flex items-center gap-1 text-xs font-semibold text-slate-300 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

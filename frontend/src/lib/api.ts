@@ -232,7 +232,7 @@ export const packageAPI = {
 };
 
 export const adminAPI = {
-  getClients:      ()                              => api.get('/admin/clients'),
+  getClients:      (page = 1, limit = 25)          => api.get('/admin/clients', { params: { page, limit } }),
   toggleClient:    (id: string)                    => api.put(`/admin/clients/${id}/toggle`),
   deleteClient:    (id: string)                    => api.delete(`/admin/clients/${id}`),
   approveDeletion: (id: string)                    => api.post(`/admin/clients/${id}/approve-deletion`),
