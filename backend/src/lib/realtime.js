@@ -31,10 +31,22 @@ const REDIS_CHANNEL = 'mbndev:realtime';
 const INSTANCE_ID   = crypto.randomBytes(8).toString('hex');
 
 let redisPub = null;
+let redisConnected = false;
 
 (function initRedis() {
   const url = process.env.REDIS_URL;
-  if (!url) return;
+  if (!url) {
+    // On Vercel each lambda instance has its own memory — without Redis,
+    // publishToUser/publishToAdmins only reach connections held by the SAME
+    // instance that handled the triggering request. This fails completely
+    // silently otherwise, so warn loudly at startup and surface it via
+    // getStatus() → /api/health instead of pretending realtime is reliable.
+    if (process.env.VERCEL) {
+      // eslint-disable-next-line no-console
+      console.warn('[realtime] REDIS_URL is not set on a multi-instance deployment — real-time events will only reach clients connected to the SAME serverless instance that publishes them. Configure REDIS_URL to fix this.');
+    }
+    return;
+  }
   try {
     const Redis = require('ioredis');
     redisPub = new Redis(url, { maxRetriesPerRequest: 2, enableOfflineQueue: false });
@@ -50,9 +62,12 @@ let redisPub = null;
       } catch { /* malformed message — ignore */ }
     });
 
+    redisPub.on('connect', () => { redisConnected = true; });
+    redisPub.on('close',   () => { redisConnected = false; });
+
     // Never let Redis connectivity take the API down — local delivery
     // continues to work regardless.
-    redisPub.on('error', () => {});
+    redisPub.on('error', () => { redisConnected = false; });
     redisSub.on('error', () => {});
   } catch (err) {
     redisPub = null;
@@ -196,10 +211,23 @@ function stats() {
   };
 }
 
+/**
+ * Diagnostics for /api/health — lets ops see whether cross-instance realtime
+ * fan-out is actually configured/connected, instead of it failing silently.
+ */
+function getStatus() {
+  return {
+    redisConfigured: !!process.env.REDIS_URL,
+    redisConnected,
+    multiInstanceSafe: !process.env.VERCEL || !!process.env.REDIS_URL,
+  };
+}
+
 module.exports = {
   subscribe,
   publishToUser,
   publishToAdmins,
   publishToUserAndAdmins,
   stats,
+  getStatus,
 };

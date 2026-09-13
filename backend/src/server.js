@@ -40,6 +40,20 @@ app.use(pinoHttp({
     if (res.statusCode >= 400)        return 'warn';
     return 'silent'; // suppress 1xx / 2xx / 3xx entirely
   },
+  // Never let credentials reach the log stream. pino-http's default request
+  // serializer includes the full headers object, and the app deliberately
+  // logs every 4xx/5xx — which happens on routine events like a bad login or
+  // an expired token — so without this, live JWTs and the refresh cookie
+  // would be written to logs in plaintext.
+  redact: {
+    paths: [
+      'req.headers.authorization',
+      'req.headers.cookie',
+      'req.headers["x-refresh-token"]',
+      'res.headers["set-cookie"]',
+    ],
+    censor: '[redacted]',
+  },
 }));
 
 // Trust proxy (Vercel / nginx) — required for express-rate-limit and X-Forwarded-For
@@ -53,25 +67,25 @@ app.use(helmet({
 }));
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://mbndev.vercel.app',
-  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
-].filter(Boolean);
+// SECURITY: ".vercel.app" is a shared public namespace — anyone can deploy a
+// free project there — so trusting it by default would grant any
+// attacker-controlled "*.vercel.app" page a credentialed CORS relationship
+// with this API. Preview-domain trust is opt-in only, via a narrow,
+// project-specific suffix (e.g. "-my-team.vercel.app"); see lib/cors.js.
+const { isOriginAllowed, loadCorsConfig } = require('./lib/cors');
+const corsConfig = loadCorsConfig(process.env);
 
-const allowedVercelDomains = (process.env.ALLOWED_VERCEL_DOMAINS || '.vercel.app')
-  .split(',').map((d) => d.trim()).filter(Boolean);
+if (corsConfig.hasBarePublicSuffix) {
+  console.error('[startup] ALLOWED_VERCEL_DOMAINS must not be the bare "vercel.app" public suffix — refusing to start.');
+  process.exit(1);
+}
+if (process.env.VERCEL && corsConfig.allowedVercelDomains.length === 0) {
+  console.warn('[startup] ALLOWED_VERCEL_DOMAINS is not set — no Vercel preview-deployment origins will be trusted (only CLIENT_URL and this deployment\'s own URL).');
+}
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // Only allow specific vercel preview domains (configured via env)
-    if (allowedVercelDomains.some((d) => origin.endsWith(d))) {
-      return callback(null, true);
-    }
+    if (isOriginAllowed(origin, corsConfig)) return callback(null, true);
     return callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
@@ -170,7 +184,8 @@ app.get('/api/health', async (req, res) => {
     res.json({
       status:    'ok',
       db:        'connected',
-      realtime:  realtime.stats(),
+      realtime:  { ...realtime.stats(), ...realtime.getStatus() },
+      storage:   { blobConfigured: !!process.env.BLOB_READ_WRITE_TOKEN },
       uptime:    process.uptime(),
       timestamp: new Date().toISOString(),
       version:   process.env.npm_package_version || '1.0.0',

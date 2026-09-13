@@ -71,3 +71,11 @@ test('closed connections are pruned, not counted', () => {
   assert.equal(realtime.publishToUser('user-4', 'x', {}), 0);
   unsub();
 });
+
+test('getStatus reports Redis as unconfigured when REDIS_URL is unset', () => {
+  // The test process never sets REDIS_URL, so realtime.js's module-level
+  // initRedis() will have skipped Redis entirely.
+  const status = realtime.getStatus();
+  assert.equal(status.redisConfigured, false);
+  assert.equal(status.redisConnected, false);
+});
