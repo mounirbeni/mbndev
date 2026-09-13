@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, ArrowRight } from 'lucide-react';
 import { APP_VERSION, CHANGELOG } from '@/lib/version';
@@ -18,6 +19,15 @@ export default function WhatsNewModal() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
+  // dashboard/layout.tsx wraps content in a motion.div driven by `transform`
+  // (see MobileNav's nav-sheet animation), which creates a containing block
+  // for position:fixed descendants — so without a portal this modal is
+  // sized/positioned relative to that transformed box instead of the real
+  // viewport. `mounted` defers the portal to a client-only effect so this
+  // never touches `document` during SSR.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
     const seen = localStorage.getItem(STORAGE_KEY);
     if (seen !== APP_VERSION) setOpen(true);
@@ -33,7 +43,9 @@ export default function WhatsNewModal() {
     router.push(href);
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -186,6 +198,7 @@ export default function WhatsNewModal() {
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

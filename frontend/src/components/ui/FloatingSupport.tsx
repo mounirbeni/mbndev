@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageCircle, Phone, Mail } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,12 +16,23 @@ export default function FloatingSupport() {
   const { t }  = useLanguage();
   const haptic = useHaptic();
 
+  // dashboard/layout.tsx wraps content in a motion.div driven by `transform`
+  // (see MobileNav's nav-sheet animation), which creates a containing block
+  // for position:fixed descendants — so without a portal this FAB visibly
+  // shrinks/shifts while the mobile nav sheet is open instead of staying
+  // pinned to the real viewport. `mounted` defers the portal to a client-
+  // only effect so this never touches `document` during SSR.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const toggle = () => {
     haptic('light');
     setOpen(v => !v);
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     /*
       On mobile the BottomNav is ~58 px + safe-area.
       We position the FAB above it: bottom = 58 + 8 (gap) + safe-area ≈ 72 px.
@@ -120,6 +132,7 @@ export default function FloatingSupport() {
           <span className="absolute inset-0 rounded-full animate-ping opacity-20 bg-primary-500 pointer-events-none" />
         )}
       </motion.button>
-    </div>
+    </div>,
+    document.body
   );
 }
