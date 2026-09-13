@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "build": {
+    "env": { "NEXT_TELEMETRY_DISABLED": "1" }
+  },
+  "installCommand": "npm install && cd ../backend && npm install",
+  "functions": {
+    "api/index.js": { "maxDuration": 60 }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/uploads/(.*)", "destination": "/api/index.js" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options",        "value": "DENY" },
+        { "key": "Referrer-Policy",        "value": "strict-origin-when-cross-origin" },
+        { "key": "Cache-Control",          "value": "no-store" }
+      ]
+    }
+  ]
+}
