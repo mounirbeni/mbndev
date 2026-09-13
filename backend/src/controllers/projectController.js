@@ -9,6 +9,11 @@ const { SM }   = require('../lib/systemMessages');
 const realtime = require('../lib/realtime');
 const { sendEmail, templates } = require('../lib/email');
 const { wa }   = require('../lib/whatsapp');
+const { matchesSignature } = require('../lib/fileSignature');
+const path = require('path');
+const { PROJECT_STATUS } = require('../lib/constants');
+
+const VALID_PROJECT_STATUSES = Object.values(PROJECT_STATUS);
 
 // ─── Shared query shapes ──────────────────────────────────────────────────────
 
@@ -158,10 +163,24 @@ exports.updateProject = async (req, res, next) => {
   try {
     const { status, progress, notes, deadline, budget } = req.body;
 
+    if (status !== undefined && !VALID_PROJECT_STATUSES.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status "${status}". Must be one of: ${VALID_PROJECT_STATUSES.join(', ')}.`,
+      });
+    }
+
     if (progress !== undefined) {
       const p = Number(progress);
       if (isNaN(p) || p < 0 || p > 100) {
         return res.status(400).json({ success: false, message: 'progress must be 0-100' });
+      }
+    }
+
+    if (budget !== undefined) {
+      const b = Number(budget);
+      if (isNaN(b) || b < 0) {
+        return res.status(400).json({ success: false, message: 'budget must be a non-negative number' });
       }
     }
 
@@ -247,6 +266,18 @@ exports.uploadFile = async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    // Never trust the client-declared extension/MIME type alone — verify the
+    // actual bytes match what the filename claims to be, so a renamed
+    // arbitrary payload can't slip past the extension/MIME allow-list in
+    // middleware/upload.js.
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (!matchesSignature(req.file.buffer, ext)) {
+      return res.status(400).json({
+        success: false,
+        message: `File content does not match its extension '${ext}'.`,
+      });
     }
 
     const project = await prisma.project.findUnique({
