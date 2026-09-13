@@ -33,12 +33,18 @@ exports.getThreads = async (req, res, next) => {
         _count: {
           select: {
             messages: {
+              // Per-USER read state via MessageRead — not the shared
+              // Message.isRead boolean. With more than one admin account,
+              // isRead was a single flag shared by every admin: opening a
+              // thread as admin A marked it read for admin B too, even
+              // though B never saw it. readBy:none scopes "unread" to
+              // "this specific viewer hasn't read it yet".
               where: {
-                isRead: false,
                 OR: [
                   { senderId: { not: userId } },
                   { senderId: null },
                 ],
+                readBy: { none: { userId } },
               },
             },
           },
@@ -134,16 +140,27 @@ exports.getMessages = async (req, res, next) => {
     // Reverse so client receives chronological order
     messages.reverse();
 
-    // Mark fetched messages from others as read (only the visible page)
+    // Mark fetched messages from others as read BY THIS USER (only the
+    // visible page). Per-user via MessageRead — see getThreads for why a
+    // shared Message.isRead boolean is wrong once there's more than one
+    // admin account. Message.isRead is still set too, best-effort, as a
+    // "has anyone read this" convenience flag for API consumers that only
+    // care about that — but it is no longer what unread counts are based on.
     const unreadIds = messages
-      .filter((m) => !m.isRead && m.senderId !== req.user.id)
+      .filter((m) => m.senderId !== req.user.id)
       .map((m) => m.id);
 
     if (unreadIds.length > 0) {
-      prisma.message.updateMany({
-        where: { id: { in: unreadIds } },
-        data:  { isRead: true },
+      const userId = req.user.id;
+      prisma.messageRead.createMany({
+        data: unreadIds.map((messageId) => ({ messageId, userId })),
+        skipDuplicates: true,
       }).catch(() => {}); // fire-and-forget — don't block the response
+
+      prisma.message.updateMany({
+        where: { id: { in: unreadIds }, isRead: false },
+        data:  { isRead: true },
+      }).catch(() => {});
     }
 
     res.json({
@@ -204,12 +221,12 @@ exports.getUnreadCount = async (req, res, next) => {
   try {
     const count = await prisma.message.count({
       where: {
-        isRead:  false,
         project: req.user.role === 'admin' ? {} : { clientId: req.user.id },
         OR: [
           { senderId: { not: req.user.id } },
           { senderId: null },
         ],
+        readBy: { none: { userId: req.user.id } },
       },
     });
     res.json({ success: true, count });
