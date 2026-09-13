@@ -12,6 +12,7 @@
  *  3. Orphaned paid payments        → paid but project never created (alerts admin)
  *  4. Order/payment sync drift      → order says "paid" but payment says otherwise
  *  5. Abandoned orders              → pending > 7 days with no payment attempt
+ *  6. Notification retention        → prune read notifications older than 90 days
  *
  * In production (Vercel serverless) this runs:
  *   - On every cold-start via server.js
@@ -27,6 +28,7 @@ const { sendEmail, templates }            = require('../lib/email');
 
 const STUCK_PROCESSING_MS  = 10 * 60 * 1000;   // 10 min
 const ABANDONED_ORDER_MS   = 7  * 24 * 3600 * 1000; // 7 days
+const NOTIFICATION_RETENTION_MS = 90 * 24 * 3600 * 1000; // 90 days
 
 let _running = false;  // reentrant guard
 
@@ -45,6 +47,7 @@ async function runReconciliation() {
     orphanedPaid:        0,
     orderSyncFixed:      0,
     abandonedOrders:     0,
+    notificationsPruned: 0,
     errors:              [],
   };
 
@@ -54,6 +57,7 @@ async function runReconciliation() {
     await detectOrphanedPaid(report);
     await fixOrderPaymentSync(report);
     await detectAbandonedOrders(report);
+    await pruneOldNotifications(report);
   } catch (err) {
     report.errors.push({ step: 'top_level', error: err.message });
     console.error('[reconcile] Fatal error:', err.message);
@@ -332,6 +336,23 @@ async function detectAbandonedOrders(report) {
     }
   } catch (err) {
     report.errors.push({ step: 'detectAbandonedOrders', error: err.message });
+  }
+}
+
+// ─── 6. Notification retention ───────────────────────────────────────────────
+// Notification rows accumulate forever otherwise — nothing else ever
+// deletes them. Only prunes READ notifications past the retention window;
+// an unread notification is never deleted regardless of age.
+
+async function pruneOldNotifications(report) {
+  try {
+    const cutoff = new Date(Date.now() - NOTIFICATION_RETENTION_MS);
+    const result = await prisma.notification.deleteMany({
+      where: { read: true, createdAt: { lte: cutoff } },
+    });
+    report.notificationsPruned = result.count;
+  } catch (err) {
+    report.errors.push({ step: 'pruneOldNotifications', error: err.message });
   }
 }
 

@@ -85,6 +85,9 @@ model Order {
   payments     Payment[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([clientId, createdAt])
+  @@index([status, createdAt])
 }
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
@@ -137,6 +140,8 @@ model Milestone {
   status      String    @default("pending")  // "pending" | "paid"
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
+
+  @@index([projectId])
 }
 
 // ─── Project Files ────────────────────────────────────────────────────────────
@@ -150,6 +155,9 @@ model ProjectFile {
   uploadedById String
   uploadedBy   User     @relation(fields: [uploadedById], references: [id])
   uploadedAt   DateTime @default(now())
+
+  @@index([projectId])
+  @@index([uploadedById])
 }
 
 // ─── Messages ─────────────────────────────────────────────────────────────────
@@ -300,6 +308,9 @@ model Notification {
   link      String?
   metadata  Json?
   createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
 
 // ─── Login Attempts (brute-force protection) ──────────────────────────────────
@@ -351,4 +362,7 @@ model ActivityLog {
   description String
   metadata    Json?
   createdAt   DateTime @default(now())
+
+  @@index([projectId, createdAt])
+  @@index([userId, createdAt])
 }
