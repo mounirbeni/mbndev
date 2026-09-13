@@ -265,6 +265,31 @@ exports.updateProject = async (req, res, next) => {
   }
 };
 
+// ─── Authorize BEFORE multer buffers the file ─────────────────────────────────
+// Runs ahead of upload.single('file') in the route chain (see routes/projects.js)
+// so a non-owner's request is rejected from just the URL param, before
+// multer.memoryStorage() reads the (up to 4MB) request body into memory at
+// all. Checking ownership only after uploadFile() ran let any authenticated
+// client force repeated full-size memory allocations against arbitrary
+// project IDs purely to get rejected afterward.
+exports.checkProjectUploadAuth = async (req, res, next) => {
+  try {
+    const project = await prisma.project.findUnique({
+      where:  { id: req.params.id },
+      select: { id: true, clientId: true },
+    });
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+    if (req.user.role !== 'admin' && project.clientId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized to upload to this project' });
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ─── Upload file to project ───────────────────────────────────────────────────
 exports.uploadFile = async (req, res, next) => {
   try {
@@ -284,20 +309,7 @@ exports.uploadFile = async (req, res, next) => {
       });
     }
 
-    const project = await prisma.project.findUnique({
-      where:  { id: req.params.id },
-      select: { id: true, clientId: true },
-    });
-
-    // Authorization happens before the file is persisted — with memory
-    // storage a denied request leaves nothing behind to clean up.
-    if (!project) {
-      return res.status(404).json({ success: false, message: 'Project not found' });
-    }
-    if (req.user.role !== 'admin' && project.clientId !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'Not authorized to upload to this project' });
-    }
-
+    // Ownership was already verified by checkProjectUploadAuth above.
     const fileUrl = await saveUpload(req.file);
 
     const file = await prisma.projectFile.create({

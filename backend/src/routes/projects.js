@@ -7,6 +7,7 @@ const {
   updateProject,
   deleteProject,
   uploadFile,
+  checkProjectUploadAuth,
   downloadProjectFile,
   getStats,
   generateShareToken,
@@ -31,7 +32,7 @@ router.get('/stats', protect, authorize('admin'), getStats);
 router.get('/:id', protect, getProject);
 router.put('/:id', protect, authorize('admin'), updateProject);
 router.delete('/:id', protect, authorize('admin'), deleteProject);
-router.post('/:id/upload', protect, upload.single('file'), uploadFile);
+router.post('/:id/upload', protect, checkProjectUploadAuth, upload.single('file'), uploadFile);
 // A plain <a href> download link can't send an Authorization header, so
 // this accepts a ?token= query param too — see protectViaHeaderOrQueryToken.
 router.get('/:id/files/:fileId', protectViaHeaderOrQueryToken, downloadProjectFile);
