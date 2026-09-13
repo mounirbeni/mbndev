@@ -182,6 +182,7 @@ export const projectAPI = {
     }),
   getStats:        ()                                => api.get('/projects/stats'),
   generateShare:   (id: string)                      => api.post(`/projects/${id}/share`, {}),
+  revokeShare:     (id: string)                      => api.post(`/projects/${id}/share/revoke`, {}),
   getByShareToken: (token: string)                   => api.get(`/projects/share/${token}`),
   delete:          (id: string)                      => api.delete(`/projects/${id}`),
 };

@@ -467,7 +467,7 @@ exports.generateShareToken = async (req, res, next) => {
     if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
 
     const token    = jwt.sign(
-      { projectId: project.id, type: 'share' },
+      { projectId: project.id, type: 'share', v: project.shareTokenVersion },
       process.env.JWT_SECRET,
       { expiresIn: '90d' }
     );
@@ -476,6 +476,25 @@ exports.generateShareToken = async (req, res, next) => {
 
     res.json({ success: true, token, shareUrl });
   } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Revoke every share link issued for this project ─────────────────────────
+// The share token is a stateless 90-day JWT with no per-token record to
+// delete — bumping shareTokenVersion invalidates every token issued before
+// this call (their embedded `v` no longer matches), without touching
+// anything else about the project.
+exports.revokeShareTokens = async (req, res, next) => {
+  try {
+    const project = await prisma.project.update({
+      where: { id: req.params.id },
+      data:  { shareTokenVersion: { increment: 1 } },
+      select: { id: true, shareTokenVersion: true },
+    });
+    res.json({ success: true, message: 'All existing share links for this project have been revoked.', shareTokenVersion: project.shareTokenVersion });
+  } catch (err) {
+    if (err.code === 'P2025') return res.status(404).json({ success: false, message: 'Project not found' });
     next(err);
   }
 };
@@ -503,6 +522,15 @@ exports.getProjectByShareToken = async (req, res, next) => {
     });
 
     if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+    // A token's embedded version must match the project's current one — an
+    // admin revoking share links bumps shareTokenVersion, which invalidates
+    // every token issued before that call even though they're not otherwise
+    // expired. Tokens signed before this field existed have decoded.v ===
+    // undefined, which only matches a project still at its default (0).
+    if ((decoded.v ?? 0) !== project.shareTokenVersion) {
+      return res.status(400).json({ success: false, message: 'This share link has been revoked' });
+    }
 
     res.json({
       success: true,

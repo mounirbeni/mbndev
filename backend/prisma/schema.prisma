@@ -124,6 +124,12 @@ model Project {
   designStyle  String?
   designColors String[]
   designRefs   String[]
+  // Bumped to invalidate every previously issued share link for this
+  // project at once (see generateShareToken/getProjectByShareToken) — the
+  // share token is a stateless JWT with no per-token record, so this is
+  // what makes a link individually revocable instead of just expiring
+  // naturally after 90 days.
+  shareTokenVersion Int      @default(0)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 

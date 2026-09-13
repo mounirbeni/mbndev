@@ -11,6 +11,7 @@ const {
   downloadProjectFile,
   getStats,
   generateShareToken,
+  revokeShareTokens,
   getProjectByShareToken,
 } = require('../controllers/projectController');
 const { protect, authorize, protectViaHeaderOrQueryToken } = require('../middleware/auth');
@@ -39,5 +40,7 @@ router.get('/:id/files/:fileId', protectViaHeaderOrQueryToken, downloadProjectFi
 
 // Admin: generate shareable link for a project
 router.post('/:id/share', protect, authorize('admin'), generateShareToken);
+// Admin: revoke every previously issued share link for a project
+router.post('/:id/share/revoke', protect, authorize('admin'), revokeShareTokens);
 
 module.exports = router;

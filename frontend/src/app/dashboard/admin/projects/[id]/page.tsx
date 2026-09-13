@@ -18,7 +18,7 @@ import {
   Send, Check, Clock, AlertCircle, Download, Upload, FileText,
   DollarSign, Edit2, Save, Users, Activity,
   RefreshCw, TrendingUp, Target, Package, Star, Edit3,
-  Share2, Copy, CheckCheck, Trash2,
+  Share2, Copy, CheckCheck, Trash2, ShieldOff,
 } from 'lucide-react';
 
 const TAB_DEFS = [
@@ -168,6 +168,15 @@ export default function AdminProjectWorkspace() {
     }
   };
 
+  const handleRevokeShare = async () => {
+    try {
+      await projectAPI.revokeShare(id);
+      toast.success('Existing share links revoked. Previously shared links no longer work.');
+    } catch {
+      toast.error(t('toast.error'));
+    }
+  };
+
   const handleDelete = async () => {
     if (!deleteConfirm) { setDeleteConfirm(true); return; }
     setDeleting(true);
@@ -234,6 +243,13 @@ export default function AdminProjectWorkspace() {
                   ? <><span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" /> {t('common.loading')}</>
                   : <><Share2 className="w-3.5 h-3.5" /> {t('common.share')}</>
               }
+            </button>
+            <button
+              onClick={handleRevokeShare}
+              title="Revoke all previously issued share links for this project"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-red-400 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-xl transition-all"
+            >
+              <ShieldOff className="w-3.5 h-3.5" /> Revoke
             </button>
             <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
               <Edit2 className="w-3.5 h-3.5" /> {t('common.edit')}
