@@ -23,6 +23,18 @@ api.interceptors.request.use((config) => {
 
 let _refreshPromise: Promise<string | null> | null = null;
 
+// silentRefresh used to only ever write the rotated token to localStorage.
+// AuthContext's React state (and anything derived from it, e.g. useRealtime
+// opening the SSE connection with useAuth().token) kept the OLD token until
+// a full reload or an explicit refresh()/getMe() call — so a reconnect right
+// after a silent refresh used a token that could already be invalidated.
+// AuthProvider registers a listener here on mount so both stay in sync.
+type TokenRefreshListener = (token: string, user?: unknown) => void;
+let _onTokenRefreshed: TokenRefreshListener | null = null;
+export function setTokenRefreshedListener(fn: TokenRefreshListener | null) {
+  _onTokenRefreshed = fn;
+}
+
 async function silentRefresh(): Promise<string | null> {
   if (_refreshPromise) return _refreshPromise;
 
@@ -40,6 +52,7 @@ async function silentRefresh(): Promise<string | null> {
           const maxAge = 60 * 60 * 24 * 7;
           document.cookie = `mbndev_auth=${data.user.role}; path=/; max-age=${maxAge}; samesite=lax`;
         }
+        _onTokenRefreshed?.(data.token, data.user);
         return data.token as string;
       }
       return null;

@@ -4,7 +4,7 @@ import {
   createContext, useContext, useEffect, useState,
   ReactNode, useCallback, useRef,
 } from 'react';
-import { authAPI, resetUnauthorizedFlag } from '@/lib/api';
+import { authAPI, resetUnauthorizedFlag, setTokenRefreshedListener } from '@/lib/api';
 import { User } from '@/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -65,6 +65,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Track whether a background /auth/me check is already in-flight
   const checkingRef = useRef(false);
+
+  // ── Stay in sync with a token silently rotated by the axios interceptor ──
+  // Without this, a 401-triggered refresh updates localStorage but not this
+  // component's state — so useAuth().token (and anything built on it, like
+  // useRealtime's SSE connection) keeps using the stale token until a full
+  // reload or an explicit refresh()/getMe() call.
+  useEffect(() => {
+    setTokenRefreshedListener((newToken, newUser) => {
+      setToken(newToken);
+      if (newUser) setUser(newUser as User);
+    });
+    return () => setTokenRefreshedListener(null);
+  }, []);
 
   // ── Session restore on mount ───────────────────────────────────────────────
   // 1. Optimistically restore cached user (instant, no flash)
