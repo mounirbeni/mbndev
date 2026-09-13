@@ -171,6 +171,15 @@ const createOrderRules = [
   handle,
 ];
 
+const updateOrderRules = [
+  body('description').optional().trim().isLength({ max: 5000 }),
+  body('notes').optional().trim().isLength({ max: 2000 }),
+  body('pages').optional().isInt({ min: 1, max: 100 }),
+  body('features').optional().isArray({ max: 20 }),
+  body('addons').optional().isArray({ max: 10 }),
+  handle,
+];
+
 const calculatePriceRules = [
   query('serviceType').optional().isIn(VALID_SERVICES),
   query('pages').optional().isInt({ min: 1, max: 100 }),
@@ -202,6 +211,7 @@ module.exports = {
   checkEmailRules,
   checkPhoneRules,
   createOrderRules,
+  updateOrderRules,
   calculatePriceRules,
   submitManualRules,
   sendMessageRules,

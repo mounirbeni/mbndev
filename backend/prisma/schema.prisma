@@ -72,6 +72,11 @@ model Order {
   deliveryDays Int      @default(14)
   notes        String?
   status       String   @default("pending") // pending | paid | cancelled
+  // The plan (starter | pro | premium | custom) totalPrice was calculated
+  // under at creation time. Nullable because existing orders predate this
+  // column; null means "no plan discount applied" (the pre-existing
+  // behavior), never "recalculate under the client's current plan".
+  plan         String?
   designStyle  String?
   designColors String[]
   designRefs   String[]
@@ -261,6 +266,9 @@ model AdminAuditLog {
 
 // ─── Packages (Pricing) ───────────────────────────────────────────────────────
 
+// Marketing/display content for the public pricing page ONLY — see
+// controllers/packageController.js. Never consulted by lib/pricing.js's
+// calculatePrice(), which is the sole source of truth for order pricing.
 model Package {
   id           String   @id @default(cuid())
   name         String

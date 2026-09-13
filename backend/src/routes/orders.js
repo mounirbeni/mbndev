@@ -9,7 +9,7 @@ const {
   calculateOrderPrice,
 } = require('../controllers/orderController');
 const { protect, authorize } = require('../middleware/auth');
-const { createOrderRules, calculatePriceRules } = require('../middleware/validate');
+const { createOrderRules, updateOrderRules, calculatePriceRules } = require('../middleware/validate');
 
 // Price calculator — protected so unauthenticated bots can't probe pricing freely
 router.get('/price', protect, calculatePriceRules, calculateOrderPrice);
@@ -18,7 +18,7 @@ router.get('/price', protect, calculatePriceRules, calculateOrderPrice);
 router.post('/',          protect, createOrderRules, createOrder);
 router.get ('/',          protect, getOrders);
 router.get ('/:id',        protect, getOrder);
-router.put ('/:id',        protect, updateOrder);
+router.put ('/:id',        protect, updateOrderRules, updateOrder);
 router.put ('/:id/cancel', protect, cancelOrder);
 router.delete('/:id',       protect, authorize('admin'), deleteOrder);
 

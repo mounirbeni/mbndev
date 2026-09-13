@@ -63,6 +63,7 @@ exports.createOrder = async (req, res, next) => {
           totalPrice,
           deliveryDays,
           notes:        notes || null,
+          plan:         safePlan,
           designStyle:  designStyle || null,
           designColors: designColors || [],
           designRefs:   designRefs || [],
@@ -186,12 +187,16 @@ exports.updateOrder = async (req, res, next) => {
     const newFeatures = features !== undefined ? features          : order.features;
     const newAddons   = addons   !== undefined ? addons            : order.addons;
 
+    // Recalculate under the SAME plan the order was originally created with
+    // — not null, and never the client's current (possibly since-changed)
+    // plan — so an edit can't silently move the price away from what the
+    // client actually agreed to.
     const { totalPrice, deliveryDays } = calculatePrice({
       serviceType: order.serviceType,
       pages:       newPages,
       features:    newFeatures,
       addons:      newAddons,
-      plan:        null,
+      plan:        order.plan,
     });
 
     const updated = await prisma.order.update({
