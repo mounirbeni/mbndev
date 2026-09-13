@@ -12,6 +12,19 @@ test('stripHtml removes tags but keeps text content', () => {
   assert.equal(stripHtml('<b>hello</b> <script>alert(1)</script>world'), 'hello alert(1)world');
 });
 
+test('password fields pass through untouched, regardless of route', async () => {
+  const req = {
+    method: 'POST',
+    path: '/api/auth/register',
+    body: { password: '<b>weird</b>pass', newPassword: 'a<1>b', currentPassword: 'x<y>z', name: '<script>evil()</script>' },
+  };
+  const out = await run(req);
+  assert.equal(out.body.password, '<b>weird</b>pass');
+  assert.equal(out.body.newPassword, 'a<1>b');
+  assert.equal(out.body.currentPassword, 'x<y>z');
+  assert.equal(out.body.name, 'evil()'); // non-password fields still sanitized
+});
+
 test('sanitizeBody strips HTML from an ordinary route', async () => {
   const req = { method: 'POST', path: '/api/orders', body: { notes: '<img src=x onerror=alert(1)>hi' } };
   const out = await run(req);

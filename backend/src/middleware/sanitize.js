@@ -13,17 +13,28 @@ function stripHtml(value) {
     .replace(/\0/g, '');       // strip null bytes
 }
 
+// Credential fields must reach bcrypt exactly as the user typed them.
+// Stripping "<...>"-shaped substrings out of a password before hashing (and
+// again, identically, before comparing) doesn't break login — the same
+// transform runs both times — but it silently narrows the effective
+// password character space, which is exactly the kind of thing a password
+// field must never do to what a user typed.
+const SENSITIVE_KEYS = new Set(['password', 'newPassword', 'currentPassword']);
+
 /**
- * Recursively sanitize all string values in an object or array.
+ * Recursively sanitize all string values in an object or array. `key` is the
+ * property name this value was found under, if any — used to skip
+ * SENSITIVE_KEYS regardless of nesting depth.
  */
-function sanitizeDeep(data) {
+function sanitizeDeep(data, key) {
+  if (key && SENSITIVE_KEYS.has(key)) return data;
   if (Array.isArray(data)) {
-    return data.map(sanitizeDeep);
+    return data.map((item) => sanitizeDeep(item));
   }
   if (data !== null && typeof data === 'object') {
     const result = {};
-    for (const key of Object.keys(data)) {
-      result[key] = sanitizeDeep(data[key]);
+    for (const k of Object.keys(data)) {
+      result[k] = sanitizeDeep(data[k], k);
     }
     return result;
   }
