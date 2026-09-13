@@ -11,6 +11,13 @@ if (missingEnv.length) {
   console.error(`[startup] Missing required environment variable(s): ${missingEnv.join(', ')}`);
   process.exit(1);
 }
+// Not required (falling back keeps existing deployments working), but
+// signing both access and refresh tokens with the same secret removes the
+// cryptographic separation between the two token types — warn so this is
+// visible rather than a silent hardening gap.
+if (!process.env.JWT_REFRESH_SECRET) {
+  console.warn('[startup] JWT_REFRESH_SECRET is not set — falling back to JWT_SECRET for refresh tokens too. Set a distinct value (see .env.example) for better token separation.');
+}
 
 const express      = require('express');
 const cors         = require('cors');

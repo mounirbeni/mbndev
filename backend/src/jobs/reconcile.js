@@ -320,7 +320,7 @@ async function detectAbandonedOrders(report) {
               <p>Hi ${order.client.name},</p>
               <p>You started an order for <strong>${order.title}</strong> but haven't completed payment yet.</p>
               <p>Your order is still saved and ready to go.</p>
-              <p><a href="${process.env.FRONTEND_URL || 'https://mbndev.vercel.app'}/checkout/${order.id}"
+              <p><a href="${process.env.CLIENT_URL}/checkout/${order.id}"
                     style="background:#7c3aed;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:12px">
                 Complete Your Order →
               </a></p>
