@@ -30,12 +30,33 @@ function sanitizeDeep(data) {
   return stripHtml(data);
 }
 
+// Routes/fields that are deliberately exempt from blanket HTML-stripping —
+// content genuinely meant to contain markup. This middleware runs globally,
+// before routing, so exemptions are declared here rather than per-route.
+// Exempted fields are NOT left unsanitized: the owning route is responsible
+// for running them through a proper allow-list sanitizer (see
+// routes/leads.js's use of sanitize-html) before using them — stripping
+// *all* tags here would just break that route's actual feature.
+const HTML_FIELD_EXEMPTIONS = [
+  { method: 'POST', pathPattern: /^\/api\/leads\/[^/]+\/email$/, fields: ['body'] },
+];
+
 /**
  * Express middleware: sanitize req.body in place.
  */
 function sanitizeBody(req, _res, next) {
   if (req.body && typeof req.body === 'object') {
-    req.body = sanitizeDeep(req.body);
+    const exemption = HTML_FIELD_EXEMPTIONS.find(
+      (e) => e.method === req.method && e.pathPattern.test(req.path)
+    );
+    if (exemption) {
+      const preserved = {};
+      for (const field of exemption.fields) preserved[field] = req.body[field];
+      req.body = sanitizeDeep(req.body);
+      Object.assign(req.body, preserved);
+    } else {
+      req.body = sanitizeDeep(req.body);
+    }
   }
   next();
 }

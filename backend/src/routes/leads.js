@@ -2,6 +2,26 @@ const router  = require('express').Router();
 const { protect, authorize } = require('../middleware/auth');
 const prisma   = require('../lib/prisma');
 const { sendEmail, templates } = require('../lib/email');
+const sanitizeHtml = require('sanitize-html');
+
+// The custom outreach-email body is exempt from the global HTML-stripping
+// middleware (see middleware/sanitize.js) because it's genuinely meant to
+// contain markup — but it's still sanitized here with an allow-list, not
+// trusted as-is, in case this account is ever compromised or this field is
+// wired to non-admin input in the future.
+const EMAIL_BODY_SANITIZE_OPTS = {
+  allowedTags: [
+    'p', 'br', 'b', 'strong', 'i', 'em', 'u', 'a', 'ul', 'ol', 'li',
+    'h1', 'h2', 'h3', 'blockquote', 'span', 'div', 'img', 'table',
+    'thead', 'tbody', 'tr', 'td', 'th', 'hr',
+  ],
+  allowedAttributes: {
+    a:   ['href', 'target', 'rel', 'style'],
+    img: ['src', 'alt', 'style', 'width', 'height'],
+    '*': ['style'],
+  },
+  allowedSchemes: ['http', 'https', 'mailto'],
+};
 
 // ─── Default leads seed (377 prospects found in Morocco) ─────────────────────
 const DEFAULT_LEADS = [
@@ -622,7 +642,8 @@ router.post('/:id/email', protect, authorize('admin'), async (req, res, next) =>
     const { subject, body } = req.body;
     if (!subject || !body) return res.status(400).json({ success: false, message: 'Subject and body are required.' });
 
-    const result = await sendEmail({ to: lead.email, subject, html: body });
+    const safeHtml = sanitizeHtml(body, EMAIL_BODY_SANITIZE_OPTS);
+    const result = await sendEmail({ to: lead.email, subject, html: safeHtml });
 
     if (result.sent) {
       await prisma.lead.update({
