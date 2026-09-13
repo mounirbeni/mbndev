@@ -14,12 +14,13 @@ const {
 } = require('../controllers/projectController');
 const { protect, authorize, protectViaHeaderOrQueryToken } = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const { createProjectRules } = require('../middleware/validate');
 
 // Public: view project by share token (no auth required — must be before /:id)
 router.get('/share/:token', getProjectByShareToken);
 
 // Client routes
-router.post('/', protect, authorize('client', 'admin'), createProject);
+router.post('/', protect, authorize('client', 'admin'), createProjectRules, createProject);
 router.get('/mine', protect, authorize('client'), getMyProjects);
 
 // Admin routes

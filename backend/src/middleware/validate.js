@@ -180,6 +180,23 @@ const updateOrderRules = [
   handle,
 ];
 
+// ─── Projects ────────────────────────────────────────────────────────────────
+
+const createProjectRules = [
+  body('title').trim().isLength({ min: 3, max: 200 }).withMessage('Title must be 3–200 characters.'),
+  body('description').optional({ checkFalsy: true }).trim().isLength({ max: 5000 }),
+  body('type').optional({ checkFalsy: true }).trim().isLength({ max: 100 }),
+  body('budget').isFloat({ min: 0, max: 10_000_000 }).withMessage('Budget must be a non-negative number.'),
+  body('deadline').optional({ checkFalsy: true }).isISO8601().withMessage('Invalid deadline date.'),
+  body('features').optional().isArray({ max: 30 }),
+  body('package').optional({ checkFalsy: true }).isIn(VALID_PLANS),
+  body('notes').optional({ checkFalsy: true }).trim().isLength({ max: 2000 }),
+  body('designPreferences.style').optional({ checkFalsy: true }).trim().isLength({ max: 200 }),
+  body('designPreferences.colors').optional().isArray({ max: 10 }),
+  body('designPreferences.references').optional().isArray({ max: 10 }),
+  handle,
+];
+
 const calculatePriceRules = [
   query('serviceType').optional().isIn(VALID_SERVICES),
   query('pages').optional().isInt({ min: 1, max: 100 }),
@@ -212,6 +229,7 @@ module.exports = {
   checkPhoneRules,
   createOrderRules,
   updateOrderRules,
+  createProjectRules,
   calculatePriceRules,
   submitManualRules,
   sendMessageRules,
