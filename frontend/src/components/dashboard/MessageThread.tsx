@@ -153,6 +153,12 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
   const [content,  setContent]  = useState('');
   const [loading,  setLoading]  = useState(false);
   const [sending,  setSending]  = useState(false);
+  // The API already supports cursor-based history pagination (?before=) —
+  // this component used to ignore it entirely and always fetch the whole
+  // thread. hasMore/cursor/loadingMore track the "load earlier" affordance.
+  const [hasMore,     setHasMore]     = useState(false);
+  const [cursor,      setCursor]      = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef    = useRef<HTMLDivElement>(null);
   const inputRef     = useRef<HTMLInputElement>(null);
@@ -176,15 +182,43 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
     if (!projectId) return;
     setLoading(true);
     setMessages([]);
+    setHasMore(false);
+    setCursor(null);
     messageAPI
       .get(projectId)
       .then(({ data }) => {
         setMessages(data.messages || []);
+        setHasMore(!!data.hasMore);
+        setCursor(data.nextCursor || null);
         onUnreadChange?.(projectId, 0);
       })
       .catch(() => toast.error(t('client.failedLoad')))
       .finally(() => setLoading(false));
   }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Load an older page, preserving scroll position ─────────────────────────
+  const loadOlder = useCallback(async () => {
+    if (!projectId || !cursor || loadingMore) return;
+    const el = containerRef.current;
+    const prevHeight = el?.scrollHeight ?? 0;
+    setLoadingMore(true);
+    try {
+      const { data } = await messageAPI.get(projectId, cursor);
+      const older: Message[] = data.messages || [];
+      setMessages((prev) => [...older, ...prev]);
+      setHasMore(!!data.hasMore);
+      setCursor(data.nextCursor || null);
+      // Older messages were prepended above the current viewport — restore
+      // the same visual scroll position instead of jumping to the top.
+      requestAnimationFrame(() => {
+        if (el) el.scrollTop = el.scrollHeight - prevHeight;
+      });
+    } catch {
+      toast.error(t('client.failedLoad'));
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [projectId, cursor, loadingMore, t]);
 
   // Scroll to bottom on initial load
   useEffect(() => {
@@ -295,6 +329,20 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
             <p className="text-slate-600 text-xs mt-1.5 max-w-[200px]">
               {t('client.noMessages.sub')}
             </p>
+          </div>
+        )}
+
+        {!loading && hasMore && (
+          <div className="flex justify-center pb-1">
+            <button
+              onClick={loadOlder}
+              disabled={loadingMore}
+              className="text-xs font-medium text-slate-400 hover:text-white px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors disabled:opacity-50"
+            >
+              {loadingMore
+                ? <span className="inline-flex items-center gap-1.5"><Loader2 className="w-3 h-3 animate-spin" /> {t('common.loading')}</span>
+                : 'Load earlier messages'}
+            </button>
           </div>
         )}
 
