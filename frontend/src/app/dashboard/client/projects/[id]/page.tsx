@@ -8,6 +8,7 @@ import { projectAPI, messageAPI, paymentAPI } from '@/lib/api';
 import { Project, Message, Payment } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import ProjectStageTracker from '@/components/dashboard/ProjectStageTracker';
+import MessageThread from '@/components/dashboard/MessageThread';
 import Button from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,10 +65,7 @@ export default function ClientProjectWorkspace() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [tab,      setTab]      = useState('overview');
   const [loading,  setLoading]  = useState(true);
-  const [msgText,  setMsgText]  = useState('');
-  const [sending,  setSending]  = useState(false);
   const [uploading, setUploading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef   = useRef<HTMLInputElement>(null);
 
   const fetchAll = async () => {
@@ -116,24 +114,6 @@ export default function ClientProjectWorkspace() {
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
   }, [id]);
-
-  useEffect(() => {
-    if (tab === 'messages') {
-      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    }
-  }, [tab, messages]);
-
-  const sendMessage = async () => {
-    if (!msgText.trim()) return;
-    setSending(true);
-    try {
-      await messageAPI.send(id, { content: msgText.trim() });
-      setMsgText('');
-      const mRes = await messageAPI.get(id);
-      setMessages(mRes.data.messages || []);
-    } catch { toast.error(t('client.failedMessage')); }
-    finally { setSending(false); }
-  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -398,66 +378,17 @@ export default function ClientProjectWorkspace() {
           )}
 
           {/* ── MESSAGES ── */}
+          {/* Uses the shared MessageThread component (also used on the admin
+              side and the dedicated /messages page) instead of a hand-rolled
+              bubble list — that hand-rolled version rendered system messages
+              (payment verified, status changed, etc.) as raw JSON, since it
+              never checked msg.type === 'system' the way MessageThread does. */}
           {tab === 'messages' && (
             <div
               className="glass rounded-2xl border border-white/5 flex flex-col overflow-hidden"
               style={{ height: 'calc(100svh - 320px)', minHeight: '360px', maxHeight: '600px' }}
             >
-              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center">
-                    <MessageSquare className="w-10 h-10 text-slate-700 mb-3" />
-                    <p className="text-slate-500 text-sm">{t('client.noMessages')}</p>
-                  </div>
-                ) : (
-                  messages.map((m: any) => {
-                    const isMe = m.sender?.id === user?.id || m.sender?._id === (user as any)?._id;
-                    return (
-                      <div key={m.id || m._id} className={`flex gap-2.5 ${isMe ? 'flex-row-reverse' : ''}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                          isMe ? 'bg-primary-500' : 'bg-white/10'
-                        }`}>
-                          {m.sender?.name?.[0]?.toUpperCase()}
-                        </div>
-                        <div className={`max-w-[78%] sm:max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                          <div className={`px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                            isMe ? 'bg-primary-500/25 text-white rounded-tr-sm' : 'bg-white/8 text-slate-200 rounded-tl-sm'
-                          }`}>
-                            {m.content}
-                          </div>
-                          <span className="text-slate-600 text-[11px] px-1">
-                            {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <div className="shrink-0 p-3 sm:p-4 border-t border-white/5">
-                <div className="flex gap-2">
-                  <input
-                    value={msgText}
-                    onChange={(e) => setMsgText(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                    placeholder={t('client.typeMessage')}
-                    inputMode="text"
-                    enterKeyHint="send"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary-500 transition-colors"
-                  />
-                  <button
-                    onClick={sendMessage}
-                    disabled={sending || !msgText.trim()}
-                    className="w-10 h-10 shrink-0 bg-primary-500 hover:bg-primary-600 disabled:opacity-40 rounded-xl flex items-center justify-center text-white transition-all active:scale-95"
-                  >
-                    {sending
-                      ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                      : <Send className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
+              <MessageThread projectId={id} />
             </div>
           )}
 
