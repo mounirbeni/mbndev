@@ -390,6 +390,14 @@ const BROADCAST_TEMPLATES = {
   specialOffer:   (user) => templates.specialOffer({ user }),
 };
 
+// Vercel's function has a hard duration ceiling (maxDuration: 60 in
+// vercel.json). sendBroadcast paces sends 350ms apart, so a batch bigger
+// than this would either get killed mid-send with no record of what
+// actually went out, or (as fire-and-forget) silently never finish once the
+// response was already sent. Rather than either, refuse the single-shot
+// send outright above this size and require it in smaller batches.
+const MAX_SYNC_BROADCAST_RECIPIENTS = 100;
+
 router.post('/broadcast', protect, authorize('admin'), async (req, res, next) => {
   try {
     const { template: tplKey = 'platformUpdate' } = req.body;
@@ -410,20 +418,25 @@ router.post('/broadcast', protect, authorize('admin'), async (req, res, next) =>
       return res.json({ success: true, message: 'No active users found.', sent: 0, failed: 0, skipped: 0, total: 0 });
     }
 
-    // Run async — respond immediately with accepted, let it send in background
+    if (users.length > MAX_SYNC_BROADCAST_RECIPIENTS) {
+      return res.status(400).json({
+        success: false,
+        message: `${users.length} active users exceeds the ${MAX_SYNC_BROADCAST_RECIPIENTS}-recipient limit for a single broadcast — sending that many would risk being cut off mid-send by the platform's function time limit with no record of what went out. Split this into smaller batches.`,
+      });
+    }
+
+    // Awaited — the response now reports what ACTUALLY happened (sent/
+    // failed/skipped counts) instead of an optimistic "started in the
+    // background" message that was true regardless of whether the sends
+    // ever actually completed once the response ended the function.
+    const { sent, failed, skipped } = await sendBroadcast(users, templateFn);
+    console.log(`[broadcast] template="${tplKey}" total=${users.length} sent=${sent} failed=${failed} skipped=${skipped}`);
+
     res.json({
       success: true,
-      message: `Broadcast started for ${users.length} user(s). Sending in the background.`,
-      total:   users.length,
+      message: `Broadcast complete: ${sent} sent, ${failed} failed, ${skipped} skipped.`,
+      total: users.length, sent, failed, skipped,
     });
-
-    // Fire-and-forget — don't block the HTTP response
-    sendBroadcast(users, templateFn).then(({ sent, failed, skipped }) => {
-      console.log(`[broadcast] template="${tplKey}" total=${users.length} sent=${sent} failed=${failed} skipped=${skipped}`);
-    }).catch((err) => {
-      console.error('[broadcast] unexpected error:', err.message);
-    });
-
   } catch (err) { next(err); }
 });
 

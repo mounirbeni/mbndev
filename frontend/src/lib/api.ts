@@ -226,7 +226,9 @@ export const adminAPI = {
   saveNotes:       (id: string, notes: string)     => api.put(`/admin/clients/${id}/notes`, { notes }),
   broadcastCount:  ()                              => api.get('/admin/broadcast-count'),
   getAnalytics:    ()                              => api.get('/admin/analytics'),
-  broadcast:       (template = 'platformUpdate')   => api.post('/admin/broadcast', { template }),
+  // Long timeout: the backend now awaits the full send (up to ~100
+  // recipients paced 350ms apart) instead of responding immediately.
+  broadcast:       (template = 'platformUpdate')   => api.post('/admin/broadcast', { template }, { timeout: 60_000 }),
 };
 
 export const leadsAPI = {
