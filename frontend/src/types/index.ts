@@ -53,7 +53,7 @@ export interface ActivityLog {
   user?: Pick<User, 'id' | 'name' | 'role'>;
   action: string;
   description: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -155,7 +155,7 @@ export interface PaymentEvent {
   fromStatus?: string | null;
   toStatus: string;
   note?: string | null;
-  metadata?: Record<string, any> | null;
+  metadata?: Record<string, unknown> | null;
   ip?: string | null;
   createdAt: string;
 }
@@ -191,7 +191,7 @@ export interface Notification {
   message: string;
   read: boolean;
   link?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
