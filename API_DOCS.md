@@ -1081,21 +1081,10 @@ Soft-delete a package (sets `isActive: false` — does not remove from DB).
 
 ## 8. Admin
 
-All routes in this section require `admin` role.
+All routes in this section require `admin` role. All routes are mounted under `/api/admin`.
 
 ### GET `/api/admin/clients`
-List all client accounts.
-
-**Auth required:** Yes — `admin`
-
-**Query params:**
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `search` | string | Filter by name or email |
-| `plan` | string | `starter`, `pro`, `premium`, `custom` |
-| `page` | number | Page number |
-| `limit` | number | Items per page |
+List every client account (role `client`), including private admin-only fields.
 
 **Response `200`:**
 ```json
@@ -1106,96 +1095,100 @@ List all client accounts.
       "id": "clx...",
       "name": "Jane Doe",
       "email": "jane@example.com",
+      "company": "Acme Inc",
+      "phone": "+212600000000",
+      "isActive": true,
+      "deletionRequestedAt": null,
+      "adminNotes": "VIP client — always prioritize.",
+      "role": "client",
       "plan": "pro",
-      "projectCount": 3,
       "createdAt": "2026-01-15T10:00:00.000Z"
     }
-  ],
-  "total": 24
+  ]
 }
 ```
+No pagination — returns every client in one response.
 
 ---
 
-### GET `/api/admin/clients/:id`
-Get a single client with full detail including admin notes.
+### PUT `/api/admin/clients/:id/toggle`
+Activate or deactivate a client account (flips `isActive`). Deactivated clients cannot log in.
 
-**Auth required:** Yes — `admin`
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "client": {
-    "id": "clx...",
-    "name": "Jane Doe",
-    "email": "jane@example.com",
-    "plan": "pro",
-    "adminNotes": "VIP client — always prioritize.",
-    "projects": [ ... ],
-    "payments": [ ... ]
-  }
-}
-```
-
----
-
-### PUT `/api/admin/clients/:id`
-Update a client's plan, status, or admin notes.
-
-**Auth required:** Yes — `admin`
-
-**Request body** (all optional):
-```json
-{
-  "plan": "premium",
-  "isActive": true,
-  "adminNotes": "Upgraded to premium on renewal."
-}
-```
-
-**Response `200`:**
-```json
-{ "success": true, "client": { ... } }
-```
+**Response `200`:** `{ "success": true, "user": { "id", "name", "email", "isActive", "role" } }`
 
 ---
 
 ### DELETE `/api/admin/clients/:id`
-Hard-delete a client and all related data in safe cascade order.
+Hard-delete a client and every related record (payments, orders, projects and their
+milestones/messages/files/activity logs, notifications, password reset tokens, login
+attempts) in one atomic transaction. Refuses to delete an admin account or your own account.
 
-**Auth required:** Yes — `admin`
+**Response `200`:** `{ "success": true, "message": "Client account deleted." }`
+**Errors:** `403` if target is an admin or is the requesting admin; `404` if not found.
 
-**Response `200`:**
-```json
-{ "success": true, "message": "Client deleted" }
-```
+---
+
+### POST `/api/admin/clients/:id/approve-deletion`
+Approve a client's self-service deletion request (set via `DELETE /api/auth/account`) —
+actually performs the same cascade delete as above. **Errors:** `400` if the client has no
+pending `deletionRequestedAt`.
+
+**Response `200`:** `{ "success": true, "message": "Account deleted." }`
+
+---
+
+### POST `/api/admin/clients/:id/reject-deletion`
+Clear a client's pending deletion request without deleting anything.
+
+**Response `200`:** `{ "success": true, "message": "Deletion request rejected." }`
+
+---
+
+### PUT `/api/admin/clients/:id/notes`
+Set (or clear) an admin's private notes on a client. Never visible to the client.
+
+**Request body:** `{ "notes": "VIP client — always prioritize." }` (`notes: null` clears it)
+
+**Response `200`:** `{ "success": true, "user": { "id", "adminNotes" } }`
+
+---
+
+### GET `/api/admin/broadcast-count`
+Count of active clients — used to preview how many recipients a broadcast will reach
+before sending.
+
+**Response `200`:** `{ "success": true, "count": 24 }`
 
 ---
 
 ### GET `/api/admin/analytics`
-Aggregate KPIs for the admin dashboard.
-
-**Auth required:** Yes — `admin`
-
-**Query params:**
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `from` | ISO date | Start date |
-| `to` | ISO date | End date |
+Aggregate KPIs for the admin dashboard (revenue, project/payment counts and breakdowns,
+monthly trends, recent activity). Cached per calendar month for ~60s
+(`Cache-Control: private, max-age=60, stale-while-revalidate=30`).
 
 **Response `200`:**
 ```json
 {
   "success": true,
   "analytics": {
+    "totalProjects": 42,
+    "totalClients": 30,
+    "activeClients": 27,
     "totalRevenue": 48000,
-    "activeProjects": 12,
-    "pendingOrders": 5,
-    "newClients": 8,
-    "revenueByMonth": [ { "month": "2026-05", "revenue": 12000 } ],
-    "projectsByStatus": { "in-progress": 12, "review": 3, "completed": 18 }
+    "pendingRevenue": 3200,
+    "paidCount": 38,
+    "pendingCount": 4,
+    "totalPayments": 45,
+    "byStatus": { "pending": 2, "paid": 5, "inProgress": 12, "review": 3, "revision": 1, "completed": 18, "cancelled": 1 },
+    "byType": { "website": 20, "ecommerce": 10, "dashboard": 8, "mobile": 4 },
+    "monthlyRevenue": [ { "month": "2026-05", "revenue": 12000 } ],
+    "monthlyClients": [ { "month": "2026-05", "count": 4 } ],
+    "monthlyProjects": [ { "month": "2026-05", "count": 6 } ],
+    "recentProjects": [ "...up to 5, newest first" ],
+    "recentPayments": [ "...up to 5 paid, newest first" ],
+    "recentClients": [ "...up to 5, newest first" ],
+    "year": 2026,
+    "currentMonth": 5
   }
 }
 ```
@@ -1203,191 +1196,132 @@ Aggregate KPIs for the admin dashboard.
 ---
 
 ### POST `/api/admin/broadcast`
-Send a broadcast message or email to all clients or a filtered segment.
+Send a templated email to every active user (clients and admins). Awaits the full send
+(paced ~350ms/recipient) and returns real sent/failed/skipped counts — refuses outright
+above 100 recipients (split into smaller batches instead) so a single call can't be cut
+off mid-send by the platform's function time limit.
 
-**Auth required:** Yes — `admin`
-
-**Request body:**
-```json
-{
-  "subject": "Platform maintenance tonight",
-  "body": "We will be down from 02:00–04:00 UTC.",
-  "target": "all"
-}
-```
-
-**`target` values:** `all`, `active`, `plan:pro`, `plan:premium`
+**Request body:** `{ "template": "platformUpdate" }`
+**`template` values:** `juneUpdate`, `platformUpdate`, `getStarted`, `checkIn`, `comingSoon`, `specialOffer`
 
 **Response `200`:**
 ```json
-{ "success": true, "sent": 24 }
+{ "success": true, "message": "Broadcast complete: 24 sent, 0 failed, 0 skipped.", "total": 24, "sent": 24, "failed": 0, "skipped": 0 }
 ```
-
----
-
-### GET `/api/admin/activity`
-Admin audit log — actions taken by the admin.
-
-**Auth required:** Yes — `admin`
-
-**Query params:**
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `type` | string | Action type filter |
-| `page` | number | Page number |
-| `limit` | number | Items per page |
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "activity": [
-    {
-      "id": "...",
-      "type": "payment_approved",
-      "description": "Approved payment clx... for Jane Doe",
-      "createdAt": "2026-06-09T11:00:00.000Z"
-    }
-  ],
-  "total": 120
-}
-```
+**Errors:** `400` for an unknown template, or for more than 100 active recipients.
 
 ---
 
 ## 9. Leads
 
-All routes require `admin` role.
+Internal sales-pipeline tool for the site owner's own outreach — not client-facing. All
+routes require `admin` role and are mounted under `/api/leads`.
 
 ### GET `/api/leads`
-List all leads with optional filtering.
+List leads, optionally filtered.
 
-**Auth required:** Yes — `admin`
+**Query params:** `status`, `type`, `priority` (all optional, exact match)
 
-**Query params:**
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `status` | string | `new`, `contacted`, `qualified`, `lost`, `converted` |
-| `source` | string | `contact_form`, `referral`, `linkedin`, `cold_outreach`, etc. |
-| `search` | string | Name, email, or company |
-| `page` | number | Page number |
-| `limit` | number | Items per page |
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "leads": [
-    {
-      "id": "clx...",
-      "name": "Ahmed Bennani",
-      "company": "StartupX",
-      "email": "ahmed@startupx.ma",
-      "phone": "+212600000001",
-      "status": "new",
-      "source": "contact_form",
-      "notes": "Interested in e-commerce package.",
-      "createdAt": "2026-06-01T09:00:00.000Z"
-    }
-  ],
-  "total": 82
-}
-```
+**Response `200`:** `{ "success": true, "leads": [ { "id", "name", "type", "city", "phone", "email", "instagram", "website", "priority", "outreachAngle", "source", "notes", "status", "emailSentAt", "createdAt", ... } ] }`
+No pagination — returns every matching lead, ordered by priority then newest first.
 
 ---
 
 ### POST `/api/leads`
 Create a single lead.
 
-**Auth required:** Yes — `admin`
+**Request body:** `{ "name": "Riad Example", "type": "riad", "city": "Marrakech", "phone", "email", "instagram", "website", "priority": "warm", "outreachAngle", "source", "notes" }`
+Only `name` is required (`type` defaults to `"riad"`, `priority` to `"warm"`).
 
-**Request body:**
-```json
-{
-  "name": "Ahmed Bennani",
-  "company": "StartupX",
-  "email": "ahmed@startupx.ma",
-  "phone": "+212600000001",
-  "source": "linkedin",
-  "status": "new",
-  "notes": "Met at DevDays Casablanca"
-}
-```
-
-**Response `201`:**
-```json
-{ "success": true, "lead": { "id": "...", ... } }
-```
-
----
-
-### POST `/api/leads/import`
-Bulk-import leads from a CSV payload.
-
-**Auth required:** Yes — `admin`
-
-**Request body:**
-```json
-{
-  "leads": [
-    { "name": "Lead One", "email": "one@example.com", "source": "csv" },
-    { "name": "Lead Two", "email": "two@example.com", "source": "csv" }
-  ]
-}
-```
-
-**Response `201`:**
-```json
-{ "success": true, "imported": 2, "skipped": 0 }
-```
-
-**Note:** Duplicate emails are upserted, not rejected.
-
----
-
-### GET `/api/leads/:id`
-Get a single lead.
-
-**Auth required:** Yes — `admin`
-
-**Response `200`:**
-```json
-{ "success": true, "lead": { ... } }
-```
+**Response `201`:** `{ "success": true, "lead": { ... } }`
 
 ---
 
 ### PUT `/api/leads/:id`
-Update a lead.
+Update a lead's status, notes, priority, or contact info.
 
-**Auth required:** Yes — `admin`
+**Request body** (all optional): `{ "status", "notes", "priority", "email", "phone", "instagram" }`
 
-**Request body** (all optional):
-```json
-{
-  "status": "contacted",
-  "notes": "Sent proposal on 2026-06-09"
-}
-```
-
-**Response `200`:**
-```json
-{ "success": true, "lead": { ... } }
-```
+**Response `200`:** `{ "success": true, "lead": { ... } }`
 
 ---
 
 ### DELETE `/api/leads/:id`
-Delete a lead.
+Delete a lead permanently.
 
-**Auth required:** Yes — `admin`
+**Response `200`:** `{ "success": true }`
 
-**Response `200`:**
-```json
-{ "success": true, "message": "Lead deleted" }
-```
+---
+
+### POST `/api/leads/import`
+Upsert-style bulk import from the hardcoded `DEFAULT_LEADS` list baked into the backend
+(not a client-supplied payload) — adds any not already present by name, skips the rest.
+
+**Response `200`:** `{ "success": true, "message": "Added 12 new leads. Total: 82.", "count": 82 }`
+
+---
+
+### POST `/api/leads/sync-contacts`
+Backfills missing `phone`/`email`/`instagram` on existing leads from `DEFAULT_LEADS`,
+without overwriting fields that already have a value.
+
+**Response `200`:** `{ "success": true, "message": "Updated contact info for 3 leads.", "updated": 3 }`
+
+---
+
+### POST `/api/leads/reset-all`
+Reset every lead with `status: "emailed"` back to `"new"` and clear `emailSentAt` — undoes
+a broadcast for re-sending.
+
+**Response `200`:** `{ "success": true, "message": "Reset 5 leads back to new.", "count": 5 }`
+
+---
+
+### GET `/api/leads/email-check`
+Diagnostic — reports whether Brevo is configured, without sending anything.
+
+**Response `200`:** `{ "success": true, "brevoConfigured": true, "from": "MBN DEV <contact@mbndev.ma>", "env": "production" }`
+
+---
+
+### POST `/api/leads/test-email`
+Send one test outreach email and return the full send result — for verifying Brevo
+end-to-end.
+
+**Request body:** `{ "to": "you@example.com" }` (optional — omitting it requires an explicit
+recipient rather than defaulting to one)
+
+**Response `200`:** `{ "success": true, "to": "you@example.com", "result": { "sent": true, "id": "..." }, "brevoConfigured": true, "from": "..." }`
+
+---
+
+### POST `/api/leads/bulk-email`
+Send the outreach template to every lead with `status: "new"` and a non-null email,
+marking each as `"emailed"` on success. Uses `Promise.allSettled` so one failure doesn't
+stop the rest.
+
+**Response `200`:** `{ "success": true, "sent": 18, "failed": 1, "total": 19, "errors": [ { "name", "email", "error" } ] }` (errors capped to the first 10)
+
+---
+
+### POST `/api/leads/:id/email`
+Send a custom one-off email to a single lead.
+
+**Request body:** `{ "subject": "...", "body": "<p>Full HTML — allow-listed tags only, sanitized server-side</p>" }`
+Both fields are required. `body` is genuinely rendered as HTML (sanitized via an
+allow-list, not stripped) — this is the one endpoint in the app where that's true.
+
+**Response `200`:** `{ "success": true, "result": { "sent": true, "id": "..." } }`
+**Errors:** `404` if the lead has no email; `400` if `subject`/`body` missing.
+
+---
+
+### GET `/api/leads/templates`
+Preview the outreach email template's rendered subject/HTML without sending anything.
+
+**Query params:** `type` (default `"riad"`), `name` (default `"your business"`)
+
+**Response `200`:** `{ "success": true, "subject": "...", "html": "<html>...</html>" }`
 
 ---
 
