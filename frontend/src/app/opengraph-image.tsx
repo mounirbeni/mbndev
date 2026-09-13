@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
 export const alt = 'MBN DEV — Custom Websites Built to Elevate Your Business';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
