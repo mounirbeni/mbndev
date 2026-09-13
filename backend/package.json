@@ -27,8 +27,7 @@
     "hpp": "^0.2.3",
     "ioredis": "^5.11.1",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.1",
-    "nodemailer": "^8.0.7",
+    "multer": "^2.0.2",
     "pg": "^8.13.0",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0"
@@ -36,5 +35,8 @@
   "devDependencies": {
     "nodemon": "^3.1.0",
     "prisma": "^7.0.0"
+  },
+  "overrides": {
+    "qs": "6.16.0"
   }
 }

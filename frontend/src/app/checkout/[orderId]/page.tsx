@@ -231,7 +231,7 @@ export default function CheckoutPage() {
           Your order <span className="text-white font-semibold">#{orderId.slice(-8).toUpperCase()}</span> has been saved.
         </p>
         <p className="text-slate-500 text-sm leading-relaxed mb-8">
-          You can complete payment anytime from your dashboard under <span className="text-slate-300">My Orders</span>. We'll keep it ready for you.
+          You can complete payment anytime from your dashboard under <span className="text-slate-300">My Orders</span>. We&apos;ll keep it ready for you.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/dashboard/client/orders"><Button size="md">View My Orders</Button></Link>
@@ -402,7 +402,7 @@ export default function CheckoutPage() {
                 <div className="flex-1">
                   <h2 className="text-white font-bold text-base mb-1">Payment Submitted — Awaiting Confirmation</h2>
                   <p className="text-slate-400 text-sm leading-relaxed mb-3">
-                    Your payment has been submitted via <span className="text-white font-semibold capitalize">{(pendingPayment.method || '').replace('_', ' ')}</span>. We're verifying it now — this usually takes a few hours.
+                    Your payment has been submitted via <span className="text-white font-semibold capitalize">{(pendingPayment.method || '').replace('_', ' ')}</span>. We&apos;re verifying it now — this usually takes a few hours.
                   </p>
                   <div className="flex items-center gap-3 flex-wrap">
                     <div className="flex items-center gap-2 text-xs text-amber-400/80">

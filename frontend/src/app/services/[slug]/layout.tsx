@@ -23,12 +23,13 @@ const SERVICE_META: Record<string, { title: string; description: string }> = {
   },
 };
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const meta = SERVICE_META[params.slug];
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const meta = SERVICE_META[slug];
   if (!meta) {
     return { title: 'Service', description: 'MBN DEV service detail.' };
   }
-  const url = `https://mbndev.ma/services/${params.slug}`;
+  const url = `https://mbndev.ma/services/${slug}`;
   return {
     title:       meta.title,
     description: meta.description,

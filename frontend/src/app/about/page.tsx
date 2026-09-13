@@ -182,7 +182,7 @@ export default function AboutPage() {
 
                 <div className="relative z-10">
                   {/* Big quote mark */}
-                  <div className="text-8xl font-black leading-none text-violet-900/60 mb-4 font-serif">"</div>
+                  <div className="text-8xl font-black leading-none text-violet-900/60 mb-4 font-serif">&quot;</div>
                   <p className="text-white text-xl font-medium leading-relaxed mb-8 italic">
                     {t('about.story.quote')}
                   </p>

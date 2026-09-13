@@ -46,19 +46,19 @@ Both apps are deployed together on **Vercel** via `vercel.json` at the repo root
 - `lib/storage.js` — File storage abstraction. With `BLOB_READ_WRITE_TOKEN` set (production), uploads go to **Vercel Blob** and the DB stores absolute blob URLs. Without it (local dev), files are written to `backend/uploads` and served from `/uploads`. `saveUpload(file)` / `deleteStoredFiles(urls)`. Upload middleware uses multer **memoryStorage**.
 - `lib/systemMessages.js` — Creates system chat messages (stored as `type='system'`, content is `JSON.stringify({icon, title, body})`). Auto-pushes via SSE. The `SM` object has named templates: `paymentVerified`, `statusChanged`, `fileUploaded`, `milestoneUpdated`, `revisionRequested`.
 - `lib/notifications.js` — Persists `Notification` rows and pushes `notification:new` via SSE.
-- `lib/email.js` — Nodemailer wrapper.
+- `lib/email.js` — Brevo Transactional Email API wrapper.
 - `middleware/auth.js` — `protect` (JWT verify, password-change invalidation) and `authorize(...roles)`. All routes use `protect`; admin-only routes additionally call `authorize('admin')`. User object is attached as `req.user` with both `.id` and `._id` for compatibility.
 
 **Route → Controller pattern:** every `routes/X.js` file imports from `controllers/X.js`.
 
 ### Frontend (`frontend/src/`)
 
-**Stack:** Next.js 14 App Router, TypeScript, Tailwind CSS, Framer Motion, Axios.
+**Stack:** Next.js 16 App Router, TypeScript, Tailwind CSS, Framer Motion, Axios.
 
 #### Auth flow
 - JWT stored in `localStorage` (`mbndev_token`). Role stored as a cookie (`mbndev_auth=admin|client`) for edge middleware.
 - `AuthContext` manages the session, exposes `user`, `token`, `isAdmin`, `isClient`, `login`, `logout`, `refresh`.
-- `src/middleware.ts` (edge) reads the cookie for fast SSR redirects; it is a UX guard only — the JWT is the real credential validated by the backend.
+- `src/proxy.ts` reads the cookie for fast SSR redirects; it is a UX guard only — the JWT is the real credential validated by the backend.
 
 #### Routing structure
 ```

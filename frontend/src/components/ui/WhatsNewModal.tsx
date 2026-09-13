@@ -94,7 +94,7 @@ export default function WhatsNewModal() {
                       <Sparkles className="w-5 h-5 text-violet-400" />
                     </div>
                     <div>
-                      <h2 className="text-white font-black text-base leading-tight">What's New</h2>
+                      <h2 className="text-white font-black text-base leading-tight">What&apos;s New</h2>
                       <span
                         className="text-[10px] font-bold tracking-widest uppercase mt-0.5 block"
                         style={{ color: '#a78bfa' }}
@@ -177,7 +177,7 @@ export default function WhatsNewModal() {
                       boxShadow: '0 6px 24px rgba(124,58,237,0.35)',
                     }}
                   >
-                    Got it — let's go
+                    Got it — let&apos;s go
                   </button>
                 </div>
 
