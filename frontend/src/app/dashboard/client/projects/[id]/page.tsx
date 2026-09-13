@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -13,6 +13,7 @@ import Button from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePolling } from '@/hooks/usePolling';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft, LayoutDashboard, MessageSquare, Paperclip, CreditCard,
@@ -94,26 +95,17 @@ export default function ClientProjectWorkspace() {
   useEffect(() => { fetchAll(); }, [id]);
 
   // Real-time polling: project status + messages every 10 s (when tab visible)
-  useEffect(() => {
-    if (!id) return;
-    const silentRefresh = async () => {
-      try {
-        const [pRes, mRes] = await Promise.all([
-          projectAPI.getOne(id),
-          messageAPI.get(id),
-        ]);
-        setProject(pRes.data.project);
-        setMessages(mRes.data.messages || []);
-      } catch {}
-    };
-    let timer: ReturnType<typeof setInterval> | null = null;
-    const start = () => { timer = setInterval(silentRefresh, 10_000); };
-    const stop  = () => { if (timer) { clearInterval(timer); timer = null; } };
-    const onVis = () => document.visibilityState === 'visible' ? start() : stop();
-    start();
-    document.addEventListener('visibilitychange', onVis);
-    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  const silentRefresh = useCallback(async () => {
+    try {
+      const [pRes, mRes] = await Promise.all([
+        projectAPI.getOne(id),
+        messageAPI.get(id),
+      ]);
+      setProject(pRes.data.project);
+      setMessages(mRes.data.messages || []);
+    } catch {}
   }, [id]);
+  usePolling(silentRefresh, { interval: 10_000, immediate: false, disabled: !id });
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
