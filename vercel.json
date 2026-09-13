@@ -28,6 +28,9 @@
       "destination": "/frontend/$1"
     }
   ],
+  "crons": [
+    { "path": "/api/payments/cron-reconcile", "schedule": "0 */6 * * *" }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

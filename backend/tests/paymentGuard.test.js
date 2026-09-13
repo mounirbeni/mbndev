@@ -18,6 +18,10 @@ test('processing -> pending_verification is allowed (rollback after a failed app
   assert.doesNotThrow(() => assertTransition('processing', 'pending_verification'));
 });
 
+test('processing -> failed is allowed (regression: a payment stuck in "processing" must be rejectable)', () => {
+  assert.doesNotThrow(() => assertTransition('processing', 'failed'));
+});
+
 test('paid -> paid is rejected — a payment cannot be approved twice', () => {
   assert.throws(() => assertTransition('paid', 'paid'), (err) => {
     assert.equal(err.statusCode, 409);

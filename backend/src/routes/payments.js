@@ -8,10 +8,16 @@ const {
   approveManualPayment,
   rejectManualPayment,
   triggerReconciliation,
+  cronReconcile,
   getPaymentAnalytics,
 } = require('../controllers/paymentController');
 const { protect, authorize } = require('../middleware/auth');
 const { submitManualRules } = require('../middleware/validate');
+
+// Vercel Cron entry point — NOT behind `protect` (no user JWT available to a
+// cron invocation). Authenticated instead via a CRON_SECRET bearer token
+// inside the handler itself. See vercel.json's `crons` block.
+router.get('/cron-reconcile', cronReconcile);
 
 // ─── Client + shared ──────────────────────────────────────────────────────────
 

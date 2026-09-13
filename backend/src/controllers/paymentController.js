@@ -638,9 +638,14 @@ exports.rejectManualPayment = async (req, res, next) => {
 
     const safeReason = reason ? String(reason).trim().slice(0, 500) : null;
 
-    // ── Optimistic lock: pending_verification → failed (atomic) ──────────────
+    // ── Optimistic lock: {pending_verification | processing} → failed (atomic) ──
+    // Matches whatever prePayment.status the transition was just validated
+    // FROM — not hardcoded to pending_verification — so a payment stuck in
+    // "processing" (e.g. the admin's browser died mid-approval) can also be
+    // rejected instead of being permanently unrecoverable except via the
+    // reconciler.
     const locked = await prisma.payment.updateMany({
-      where: { id, status: 'pending_verification' },
+      where: { id, status: prePayment.status },
       data:  { status: 'failed', rejectionReason: safeReason },
     });
 
@@ -822,6 +827,27 @@ exports.triggerReconciliation = async (req, res, next) => {
       console.error('[reconcile] On-demand run failed:', err.message);
     });
   } catch (err) { next(err); }
+};
+
+// ─── GET /payments/cron-reconcile — Vercel Cron entry point ──────────────────
+// No admin JWT here — Vercel Cron can't authenticate as a user. Protected
+// instead by a shared secret: Vercel automatically sends
+// `Authorization: Bearer <CRON_SECRET>` on requests it makes to paths listed
+// in vercel.json's `crons` block, when CRON_SECRET is set as an env var.
+// Without CRON_SECRET configured this refuses every request rather than
+// silently allowing unauthenticated reconciliation triggers.
+exports.cronReconcile = async (req, res) => {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    console.error('[reconcile] CRON_SECRET is not set — refusing the cron-triggered reconciliation request.');
+    return res.status(503).json({ success: false, message: 'Reconciliation cron is not configured.' });
+  }
+  if (req.headers.authorization !== `Bearer ${secret}`) {
+    return res.status(401).json({ success: false, message: 'Unauthorized.' });
+  }
+
+  const result = await runReconciliation();
+  res.status(result.errors.length > 0 ? 500 : 200).json({ success: result.errors.length === 0, result });
 };
 
 // ─── GET /payments/analytics — Payment analytics (admin) ─────────────────────
