@@ -59,6 +59,7 @@ Both apps are deployed together on **Vercel** via `vercel.json` at the repo root
 - JWT stored in `localStorage` (`mbndev_token`). Role stored as a cookie (`mbndev_auth=admin|client`) for edge middleware.
 - `AuthContext` manages the session, exposes `user`, `token`, `isAdmin`, `isClient`, `login`, `logout`, `refresh`.
 - `src/proxy.ts` reads the cookie for fast SSR redirects; it is a UX guard only — the JWT is the real credential validated by the backend.
+- **Known trade-off:** the access token lives in `localStorage`, readable by any script running on the page. This is a deliberate, accepted choice (not an oversight) — mitigated by a short access-token lifetime (`JWT_EXPIRE`, default 15m) plus an httpOnly refresh cookie, and by the strict CSP in `frontend/next.config.js` (`object-src 'none'`, `frame-ancestors 'none'`, no `unsafe-eval` in production). The CSP's `script-src` still includes `'unsafe-inline'`, so a stored/reflected XSS elsewhere in the app could still run an injected inline `<script>` and read the token same-origin. Closing that gap fully would mean moving to nonce-based CSP (Next.js supports this natively) — a larger, cross-cutting change deliberately out of scope for incremental hardening; treat any new stored/reflected-XSS finding as high priority given this exposure, rather than revisiting the token-storage architecture itself.
 
 #### Routing structure
 ```
