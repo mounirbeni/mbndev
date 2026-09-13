@@ -61,7 +61,11 @@ model PasswordResetToken {
 model Order {
   id           String   @id @default(cuid())
   clientId     String
-  client       User     @relation(fields: [clientId], references: [id])
+  // Restrict (explicit, matches the prior default) is relied on directly by
+  // deleteUserCascade (routes/admin.js) — it deletes a client's Orders
+  // BEFORE the User row precisely because this relation blocks the delete
+  // otherwise. Change this and update that function together.
+  client       User     @relation(fields: [clientId], references: [id], onDelete: Restrict)
   serviceType  String   // website | ecommerce | dashboard | mobile | custom
   title        String
   description  String?
@@ -97,7 +101,12 @@ model Project {
   title        String
   description  String
   clientId     String
-  client       User          @relation("ClientProjects", fields: [clientId], references: [id])
+  // Restrict (explicit, matches the prior default) — deleteUserCascade
+  // (routes/admin.js) deletes each of a client's Projects individually
+  // BEFORE the User row precisely because this relation blocks the delete
+  // otherwise (that per-project delete is also what cascades Milestones,
+  // Messages, MessageReads, ProjectFiles and ActivityLogs for it).
+  client       User          @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Restrict)
   // Link back to the order that created this project
   orderId      String?       @unique
   order        Order?        @relation(fields: [orderId], references: [id])
@@ -153,7 +162,10 @@ model ProjectFile {
   name         String
   url          String
   uploadedById String
-  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  // Restrict (explicit) — deleteUserCascade deletes a user's cross-project
+  // uploads (files they uploaded to OTHER clients' projects) explicitly
+  // before deleting the User, since this relation blocks it otherwise.
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
   uploadedAt   DateTime @default(now())
 
   @@index([projectId])
@@ -184,7 +196,10 @@ model MessageRead {
   messageId String
   message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
   userId    String
-  user      User    @relation(fields: [userId], references: [id])
+  // Restrict (explicit) — deleteUserCascade explicitly clears a user's
+  // MessageRead rows (their reads of OTHER clients'/projects' messages)
+  // before deleting the User, since this relation blocks it otherwise.
+  user      User    @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@unique([messageId, userId])
 }
@@ -200,7 +215,13 @@ model Payment {
   orderId               String?
   order                 Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
   clientId              String
-  client                User      @relation(fields: [clientId], references: [id])
+  // Restrict (explicit, matches the prior default) — deleteUserCascade
+  // deletes a client's Payments BEFORE the User row precisely because this
+  // relation blocks the delete otherwise. Financial records must never be
+  // silently cascaded away — deleting the User first would either fail
+  // loudly (good) or, if this were ever changed to Cascade, destroy payment
+  // history (bad). Change this and update that function together.
+  client                User      @relation(fields: [clientId], references: [id], onDelete: Restrict)
   amount                Float
   currency              String    @default("usd")
   status                String    @default("pending")  // pending | pending_verification | processing | paid | failed | refunded
@@ -357,7 +378,11 @@ model ActivityLog {
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  // Restrict (explicit) — deleteUserCascade explicitly clears logs where
+  // this user is the actor (which can span OTHER clients' projects, e.g. an
+  // admin's actions) before deleting the User, since this relation blocks
+  // it otherwise.
+  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   action      String   // status_change | file_upload | message_sent | payment_received | milestone_updated | revision_requested | project_delivered
   description String
   metadata    Json?
