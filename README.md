@@ -5,7 +5,7 @@ A full-stack project management and client portal platform built to streamline t
 ## 🚀 Tech Stack
 
 ### Frontend
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS, Framer Motion
 - **Data Fetching:** Axios
@@ -16,9 +16,9 @@ A full-stack project management and client portal platform built to streamline t
 - **Framework:** Express.js (Node.js)
 - **Database:** PostgreSQL with Prisma ORM
 - **Authentication:** JWT (JSON Web Tokens)
-- **Real-time:** In-memory Server-Sent Events (SSE)
+- **Real-time:** Server-Sent Events (SSE), with optional Redis fan-out for multi-instance production deployments
 - **Security:** Helmet, CORS, HPP, Rate Limiting
-- **Email:** Nodemailer
+- **Email:** Brevo Transactional Email API (configured through environment variables)
 
 ## 🛠️ Local Development
 
@@ -28,7 +28,7 @@ A full-stack project management and client portal platform built to streamline t
 - npm or yarn
 
 ### Environment Variables
-You need to set up `.env` files in both the `frontend/` and `backend/` directories. Refer to the respective `.env.example` files if available, or configure database connections, JWT secrets, and port configurations.
+You need to configure `backend/.env` from `backend/.env.example`. The frontend uses same-origin `/api` calls by default; `frontend/.env.example` documents the optional browser settings.
 
 ### Running the Backend
 

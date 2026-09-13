@@ -1,6 +1,7 @@
 'use client';
 
 import { notFound } from 'next/navigation';
+import { use } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -287,8 +288,8 @@ function discountPct(original: number, current: number) {
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
-export default function ServiceDetailPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const service = serviceData[slug];
   if (!service) notFound();
 
