@@ -20,17 +20,24 @@ import Logo3D from '@/components/ui/Logo3D';
 import Button from '@/components/ui/Button';
 
 // ── Payment method config ────────────────────────────────────────────────────
+// Recipient details come ONLY from env vars — never hardcode real payment
+// credentials in source. A method whose config is incomplete is hidden from
+// checkout entirely rather than falling back to fake/placeholder data.
 
 const CIH_BANK = {
-  holder: process.env.NEXT_PUBLIC_CIH_HOLDER || 'MOUNIR BANNI',
-  rib:    process.env.NEXT_PUBLIC_CIH_RIB    || '230 450 3396820211017700 73',
-  iban:   process.env.NEXT_PUBLIC_CIH_IBAN   || 'MA64 2304 5033 9682 0211 0177 0073',
-  swift:  process.env.NEXT_PUBLIC_CIH_SWIFT  || 'CIHMMAMC',
+  holder: process.env.NEXT_PUBLIC_CIH_HOLDER || '',
+  rib:    process.env.NEXT_PUBLIC_CIH_RIB    || '',
+  iban:   process.env.NEXT_PUBLIC_CIH_IBAN   || '',
+  swift:  process.env.NEXT_PUBLIC_CIH_SWIFT  || '',
   bank:   'CIH Bank',
 };
+const CIH_AVAILABLE = Boolean(CIH_BANK.holder && CIH_BANK.rib && CIH_BANK.iban && CIH_BANK.swift);
 
-const PAYPAL_EMAIL = process.env.NEXT_PUBLIC_PAYPAL_ME || 'mobanunir@gmail.com';
-const TAPTAP_PHONE = process.env.NEXT_PUBLIC_TAPTAP_PHONE || '+212705914424';
+const PAYPAL_EMAIL     = process.env.NEXT_PUBLIC_PAYPAL_ME || '';
+const PAYPAL_AVAILABLE = Boolean(PAYPAL_EMAIL);
+
+const TAPTAP_PHONE     = process.env.NEXT_PUBLIC_TAPTAP_PHONE || '';
+const TAPTAP_AVAILABLE = Boolean(TAPTAP_PHONE);
 
 type PayMethod = 'cih_bank' | 'paypal' | 'taptapsend';
 
@@ -41,10 +48,10 @@ export default function CheckoutPage() {
   const { orderId }       = useParams<{ orderId: string }>();
 
   const METHODS: { id: PayMethod; label: string; desc: string; logo: string }[] = [
-    { id: 'cih_bank',   label: t('checkout.method.cih'),    desc: t('checkout.method.cihDesc'),    logo: '/images/cih.jpe'    },
-    { id: 'paypal',     label: t('checkout.method.paypal'), desc: t('checkout.method.paypalDesc'), logo: '/images/paypal.jpe' },
-    { id: 'taptapsend', label: t('checkout.method.taptap'), desc: t('checkout.method.taptapDesc'), logo: '/images/taptap.jpeg'},
-  ];
+    CIH_AVAILABLE    ? { id: 'cih_bank' as const,   label: t('checkout.method.cih'),    desc: t('checkout.method.cihDesc'),    logo: '/images/cih.jpe'    } : null,
+    PAYPAL_AVAILABLE ? { id: 'paypal' as const,     label: t('checkout.method.paypal'), desc: t('checkout.method.paypalDesc'), logo: '/images/paypal.jpe' } : null,
+    TAPTAP_AVAILABLE ? { id: 'taptapsend' as const, label: t('checkout.method.taptap'), desc: t('checkout.method.taptapDesc'), logo: '/images/taptap.jpeg'} : null,
+  ].filter((m): m is { id: PayMethod; label: string; desc: string; logo: string } => m !== null);
   const router            = useRouter();
   const { user, loading: authLoading } = useAuth();
 
@@ -52,7 +59,7 @@ export default function CheckoutPage() {
   const [loading,      setLoading]    = useState(true);
   const [paying,       setPaying]     = useState(false);
   const [error,        setError]      = useState('');
-  const [method,       setMethod]     = useState<PayMethod>('cih_bank');
+  const [method,       setMethod]     = useState<PayMethod | null>(METHODS[0]?.id ?? null);
   const [externalRef,  setExternalRef] = useState('');
   const [copied,       setCopied]     = useState('');
   const [done,         setDone]       = useState(false);
@@ -96,6 +103,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = async () => {
     if (paying) return; // hard guard against double-click
+    if (!method) { toast.error('No payment method is available.'); return; }
     setPaying(true);
     try {
       const res = await paymentAPI.submitManual({
@@ -431,7 +439,17 @@ export default function CheckoutPage() {
           )}
 
           {/* Payment methods — only show when no pending payment */}
-          {!pendingPayment && <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
+          {!pendingPayment && METHODS.length === 0 && (
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-2xl p-5 sm:p-6 border border-amber-500/20 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-white font-semibold text-sm mb-1">Payment is temporarily unavailable</p>
+                <p className="text-slate-400 text-sm">No payment method is configured right now. Please contact support to complete this order.</p>
+              </div>
+            </motion.div>
+          )}
+
+          {!pendingPayment && METHODS.length > 0 && <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="glass rounded-2xl p-5 sm:p-6 border border-white/10">
             <h2 className="text-white font-semibold text-sm mb-4">{t('checkout.payMethod')}</h2>
 
             <div className="space-y-2 mb-5">
