@@ -4,7 +4,7 @@ import {
   createContext, useContext, useEffect, useState,
   ReactNode, useCallback, useRef,
 } from 'react';
-import { authAPI, resetUnauthorizedFlag, setTokenRefreshedListener } from '@/lib/api';
+import { authAPI, resetUnauthorizedFlag, setTokenRefreshedListener, RegisterPayload } from '@/lib/api';
 import { User } from '@/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,19 +14,11 @@ interface AuthContextValue {
   token:      string | null;
   loading:    boolean;
   login:      (email: string, password: string) => Promise<void>;
-  register:   (data: RegisterData) => Promise<void>;
+  register:   (data: RegisterPayload) => Promise<void>;
   logout:     () => void;
   refresh:    () => Promise<void>;
   isAdmin:    boolean;
   isClient:   boolean;
-}
-
-interface RegisterData {
-  name:     string;
-  email:    string;
-  password: string;
-  company?: string;
-  phone?:   string;
 }
 
 // ─── Storage keys ─────────────────────────────────────────────────────────────
@@ -152,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // ── register ──────────────────────────────────────────────────────────────
-  const register = async (registerData: RegisterData) => {
+  const register = async (registerData: RegisterPayload) => {
     const { data } = await authAPI.register(registerData);
     persistSession(data.token, data.user);
   };

@@ -152,15 +152,173 @@ api.interceptors.response.use(
   },
 );
 
+// ─── Request payload types ─────────────────────────────────────────────────────
+// Mirrors backend/src/middleware/validate.js — kept intentionally loose where
+// the backend itself treats a field as freeform (e.g. arbitrary status enums
+// aren't repeated here as literal unions to avoid drifting out of sync).
+
+export interface RegisterPayload {
+  name:     string;
+  email:    string;
+  password: string;
+  company?: string;
+  phone?:   string;
+}
+
+export interface LoginPayload {
+  email:    string;
+  password: string;
+}
+
+export interface UpdateProfilePayload {
+  name?:            string;
+  company?:         string;
+  phone?:           string;
+  currentPassword?: string;
+  newPassword?:     string;
+}
+
+export interface DesignPreferences {
+  style?:      string;
+  colors?:     string[];
+  references?: string[];
+}
+
+export interface CreateProjectPayload {
+  title:               string;
+  budget:              number;
+  description?:        string;
+  type?:               string;
+  deadline?:           string;
+  features?:           string[];
+  package?:            string;
+  notes?:              string;
+  designPreferences?:  DesignPreferences;
+}
+
+export interface ProjectListParams {
+  status?: string;
+  page?:   number;
+  limit?:  number;
+  search?: string;
+}
+
+export interface UpdateProjectPayload {
+  status?:   string;
+  progress?: number;
+  notes?:    string;
+  budget?:   number;
+  deadline?: string;
+}
+
+export interface CreateOrderPayload {
+  serviceType:    string;
+  title:          string;
+  description?:   string;
+  pages?:         number;
+  features?:      string[];
+  addons?:        string[];
+  notes?:         string;
+  designStyle?:   string;
+  designColors?:  string[];
+  designRefs?:    string[];
+  plan?:          string;
+}
+
+export interface OrderListParams {
+  status?: string;
+  page?:   number;
+  limit?:  number;
+}
+
+export interface UpdateOrderPayload {
+  description?: string;
+  notes?:       string;
+  pages?:       number;
+  features?:    string[];
+  addons?:      string[];
+}
+
+export interface OrderPriceParams {
+  serviceType?: string;
+  pages?:       number;
+  plan?:        string;
+  features?:    string[];
+  addons?:      string[];
+}
+
+export interface SendMessagePayload {
+  content: string;
+}
+
+export interface MockPaymentPayload {
+  projectId:    string;
+  amount:       number;
+  description:  string;
+}
+
+export interface SubmitManualPaymentPayload {
+  orderId:         string;
+  method:          'cih_bank' | 'paypal' | 'taptapsend';
+  externalRef?:    string;
+  idempotencyKey?: string;
+}
+
+export interface PaymentListParams {
+  status?:  string;
+  flagged?: string;
+}
+
+export interface PackagePayload {
+  name:            string;
+  slug:            string;
+  price:           number;
+  description?:    string;
+  features?:       string[];
+  pages?:          number;
+  revisions?:      number;
+  deliveryDays?:   number;
+  popular?:        boolean;
+}
+
+export interface LeadListParams {
+  status?:   string;
+  type?:     string;
+  priority?: string;
+}
+
+export interface CreateLeadPayload {
+  name:            string;
+  type?:           string;
+  city?:           string;
+  phone?:          string;
+  email?:          string;
+  instagram?:      string;
+  website?:        string;
+  priority?:       string;
+  outreachAngle?:  string;
+  source?:         string;
+  notes?:          string;
+}
+
+export interface UpdateLeadPayload {
+  status?:    string;
+  notes?:     string;
+  priority?:  string;
+  email?:     string;
+  phone?:     string;
+  instagram?: string;
+}
+
 // ─── API namespaces ───────────────────────────────────────────────────────────
 
 export const authAPI = {
-  register:              (data: any)                          => api.post('/auth/register', data),
-  login:                 (data: any)                          => api.post('/auth/login', data),
+  register:              (data: RegisterPayload)              => api.post('/auth/register', data),
+  login:                 (data: LoginPayload)                 => api.post('/auth/login', data),
   logout:                ()                                   => api.post('/auth/logout'),
   refresh:               ()                                   => api.post('/auth/refresh'),
   getMe:                 ()                                   => api.get('/auth/me'),
-  updateProfile:         (data: any)                          => api.put('/auth/profile', data),
+  updateProfile:         (data: UpdateProfilePayload)         => api.put('/auth/profile', data),
   deleteAccount:         (password: string)                   => api.delete('/auth/account', { data: { password } }),
   cancelDeletionRequest: ()                                   => api.delete('/auth/account/cancel'),
   forgotPassword:        (email: string)                      => api.post('/auth/forgot-password', { email }),
@@ -170,11 +328,11 @@ export const authAPI = {
 };
 
 export const projectAPI = {
-  create:          (data: any)                       => api.post('/projects', data),
+  create:          (data: CreateProjectPayload)      => api.post('/projects', data),
   getMine:         ()                                => api.get('/projects/mine'),
-  getAll:          (params?: any)                    => api.get('/projects', { params }),
+  getAll:          (params?: ProjectListParams)      => api.get('/projects', { params }),
   getOne:          (id: string)                      => api.get(`/projects/${id}`),
-  update:          (id: string, data: any)           => api.put(`/projects/${id}`, data),
+  update:          (id: string, data: UpdateProjectPayload) => api.put(`/projects/${id}`, data),
   uploadFile:      (id: string, formData: FormData)  =>
     api.post(`/projects/${id}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -188,29 +346,29 @@ export const projectAPI = {
 };
 
 export const orderAPI = {
-  create:   (data: any)             => api.post('/orders', data),
-  getAll:   (params?: any)          => api.get('/orders', { params }),
-  getOne:   (id: string)            => api.get(`/orders/${id}`),
-  update:   (id: string, data: any) => api.put(`/orders/${id}`, data),
-  cancel:   (id: string)            => api.put(`/orders/${id}/cancel`),
-  delete:   (id: string)            => api.delete(`/orders/${id}`),
-  getPrice: (params: any)           => api.get('/orders/price', { params }),
+  create:   (data: CreateOrderPayload)      => api.post('/orders', data),
+  getAll:   (params?: OrderListParams)      => api.get('/orders', { params }),
+  getOne:   (id: string)                    => api.get(`/orders/${id}`),
+  update:   (id: string, data: UpdateOrderPayload) => api.put(`/orders/${id}`, data),
+  cancel:   (id: string)                    => api.put(`/orders/${id}/cancel`),
+  delete:   (id: string)                    => api.delete(`/orders/${id}`),
+  getPrice: (params: OrderPriceParams)      => api.get('/orders/price', { params }),
 };
 
 export const messageAPI = {
   getThreads: ()                                   => api.get('/messages/threads'),
   get:        (projectId: string, before?: string) =>
     api.get(`/messages/${projectId}`, { params: before ? { before } : {} }),
-  send:       (projectId: string, data: any)       => api.post(`/messages/${projectId}`, data),
+  send:       (projectId: string, data: SendMessagePayload) => api.post(`/messages/${projectId}`, data),
   getUnread:  ()                                   => api.get('/messages/unread'),
 };
 
 export const paymentAPI = {
-  mock:           (data: any)                   => api.post('/payments/mock', data),
-  submitManual:   (data: any)                   => api.post('/payments/manual', data),
+  mock:           (data: MockPaymentPayload)        => api.post('/payments/mock', data),
+  submitManual:   (data: SubmitManualPaymentPayload) => api.post('/payments/manual', data),
   approveManual:  (id: string)                  => api.put(`/payments/${id}/approve`, {}),
   rejectManual:   (id: string, reason?: string) => api.put(`/payments/${id}/reject`, reason ? { reason } : {}),
-  getAll:         (params?: any)                => api.get('/payments', { params }),
+  getAll:         (params?: PaymentListParams)  => api.get('/payments', { params }),
   getOne:         (id: string)                  => api.get(`/payments/${id}`),
   getEvents:      (id: string)                  => api.get(`/payments/${id}/events`),
   reconcile:      ()                            => api.post('/payments/reconcile', {}),
@@ -225,10 +383,10 @@ export const notificationAPI = {
 };
 
 export const packageAPI = {
-  getAll: ()                       => api.get('/packages'),
-  create: (data: any)              => api.post('/packages', data),
-  update: (id: string, data: any)  => api.put(`/packages/${id}`, data),
-  delete: (id: string)             => api.delete(`/packages/${id}`),
+  getAll: ()                                       => api.get('/packages'),
+  create: (data: PackagePayload)                   => api.post('/packages', data),
+  update: (id: string, data: Partial<PackagePayload>) => api.put(`/packages/${id}`, data),
+  delete: (id: string)                             => api.delete(`/packages/${id}`),
 };
 
 export const adminAPI = {
@@ -246,9 +404,9 @@ export const adminAPI = {
 };
 
 export const leadsAPI = {
-  getAll:          (params?: any)                          => api.get('/leads', { params }),
-  create:          (data: any)                             => api.post('/leads', data),
-  update:          (id: string, data: any)                 => api.put(`/leads/${id}`, data),
+  getAll:          (params?: LeadListParams)               => api.get('/leads', { params }),
+  create:          (data: CreateLeadPayload)               => api.post('/leads', data),
+  update:          (id: string, data: UpdateLeadPayload)   => api.put(`/leads/${id}`, data),
   delete:          (id: string)                            => api.delete(`/leads/${id}`),
   sendEmail:       (id: string, data: { subject: string; body: string }) => api.post(`/leads/${id}/email`, data),
   importDefaults:  ()                                      => api.post('/leads/import'),
@@ -260,9 +418,14 @@ export const leadsAPI = {
   getTemplate:     (type: string, name: string)            => api.get('/leads/templates', { params: { type, name } }),
 };
 
+export interface ActivityListParams {
+  page?:  number;
+  limit?: number;
+}
+
 export const searchAPI = {
-  global:   (q: string)    => api.get('/search', { params: { q } }),
-  activity: (params?: any) => api.get('/search/activity', { params }),
+  global:   (q: string)                  => api.get('/search', { params: { q } }),
+  activity: (params?: ActivityListParams) => api.get('/search/activity', { params }),
 };
 
 export default api;
