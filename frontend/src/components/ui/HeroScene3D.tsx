@@ -6,7 +6,7 @@
  * Mouse parallax + scroll-driven camera pull-back.
  */
 
-import { useRef, useMemo } from 'react';
+import { useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Icosahedron, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
@@ -17,7 +17,11 @@ import * as THREE from 'three';
 function ParticleField() {
   const ref = useRef<THREE.Points>(null);
 
-  const { positions, colors } = useMemo(() => {
+  // useMemo is only an optimization hint — React doesn't guarantee it runs
+  // exactly once — so calling Math.random() inside it (as this one-time
+  // particle layout needs to) isn't safe. A lazy useState initializer IS
+  // guaranteed to run exactly once per mount, which is what we actually need.
+  const [{ positions, colors }] = useState(() => {
     const count = 2000;
     const pos   = new Float32Array(count * 3);
     const col   = new Float32Array(count * 3);
@@ -39,7 +43,7 @@ function ParticleField() {
       col[i * 3 + 2] = 0.85 + t * 0.15;   // B
     }
     return { positions: pos, colors: col };
-  }, []);
+  });
 
   useFrame((_, delta) => {
     if (ref.current) {
