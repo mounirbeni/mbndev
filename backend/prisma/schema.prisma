@@ -264,6 +264,14 @@ model PaymentEvent {
   id         String   @id @default(cuid())
   paymentId  String
   payment    Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  // Intentionally NOT a @relation to User, despite always being populated
+  // from req.user.id today: this is an immutable financial audit trail and
+  // must keep showing "who did this" even after that user account is
+  // deleted (deleteUserCascade never touches PaymentEvent rows) — a real FK
+  // would force onDelete: SetNull/Cascade and silently erase or null out
+  // that history. actorId is left unenforced by design; never add a
+  // relation here without also deciding what happens to these rows on user
+  // deletion.
   actorId    String?  // null = automated system action
   actorRole  String?  // 'admin' | 'client' | 'system'
   event      String   // created | submitted | approved | rejected | expired | rolled_back | flagged | refunded
@@ -284,6 +292,14 @@ model PaymentEvent {
 
 model AdminAuditLog {
   id         String   @id @default(cuid())
+  // Intentionally NOT a @relation to User, for two reasons: (1) same
+  // survive-user-deletion rationale as PaymentEvent.actorId above — this is
+  // an immutable audit trail, not live application state; (2) jobs/
+  // reconcile.js writes the literal sentinel string 'system' here for
+  // automated actions (see logAdminAction({ adminId: 'system', ... })),
+  // which is not a real User.id and would violate a real FK constraint on
+  // every reconciliation run. Never add a relation here without first
+  // giving system-initiated rows a real actor representation.
   adminId    String
   action     String   // approve_payment | reject_payment | delete_client | toggle_client | mock_payment | reconcile
   targetType String   // payment | order | project | user
