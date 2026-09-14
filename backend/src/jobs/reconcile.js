@@ -295,43 +295,52 @@ async function detectAbandonedOrders(report) {
     });
 
     for (const order of abandoned) {
-      report.abandonedOrders++;
+      try {
+        // Notify client (once — tagged with a meta field in their notification)
+        const alreadyNotified = await prisma.notification.findFirst({
+          where: {
+            userId:   order.clientId,
+            type:     'status_update',
+            metadata: { path: ['orderId'], equals: order.id },
+          },
+          select: { id: true },
+        });
 
-      // Notify client (once — tagged with a meta field in their notification)
-      const alreadyNotified = await prisma.notification.findFirst({
-        where: {
-          userId:   order.clientId,
-          type:     'status_update',
-          metadata: { path: ['orderId'], equals: order.id },
-        },
-        select: { id: true },
-      });
-
-      if (!alreadyNotified) {
-        notify(order.clientId, {
-          type:    'status_update',
-          title:   'Complete Your Order',
-          message: `Your order "${order.title}" is waiting for payment. Click to continue checkout.`,
-          link:    `/checkout/${order.id}`,
-          metadata: { orderId: order.id, reason: 'abandoned_checkout' },
-        }).catch(() => {});
-
-        if (order.client?.email) {
-          sendEmail({
-            to:      order.client.email,
-            subject: `Your Order is Waiting — "${order.title}"`,
-            html: `
-              <p>Hi ${order.client.name},</p>
-              <p>You started an order for <strong>${order.title}</strong> but haven't completed payment yet.</p>
-              <p>Your order is still saved and ready to go.</p>
-              <p><a href="${process.env.CLIENT_URL}/checkout/${order.id}"
-                    style="background:#7c3aed;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:12px">
-                Complete Your Order →
-              </a></p>
-              <p style="color:#888;font-size:12px;margin-top:24px">If you no longer want this order, you can cancel it from your dashboard.</p>
-            `,
+        if (!alreadyNotified) {
+          notify(order.clientId, {
+            type:    'status_update',
+            title:   'Complete Your Order',
+            message: `Your order "${order.title}" is waiting for payment. Click to continue checkout.`,
+            link:    `/checkout/${order.id}`,
+            metadata: { orderId: order.id, reason: 'abandoned_checkout' },
           }).catch(() => {});
+
+          if (order.client?.email) {
+            sendEmail({
+              to:      order.client.email,
+              subject: `Your Order is Waiting — "${order.title}"`,
+              html: `
+                <p>Hi ${order.client.name},</p>
+                <p>You started an order for <strong>${order.title}</strong> but haven't completed payment yet.</p>
+                <p>Your order is still saved and ready to go.</p>
+                <p><a href="${process.env.CLIENT_URL}/checkout/${order.id}"
+                      style="background:#7c3aed;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:12px">
+                  Complete Your Order →
+                </a></p>
+                <p style="color:#888;font-size:12px;margin-top:24px">If you no longer want this order, you can cancel it from your dashboard.</p>
+              `,
+            }).catch(() => {});
+          }
         }
+        report.abandonedOrders++;
+      } catch (err) {
+        // A failure on one order (e.g. a transient DB error on the
+        // dedup check) must not abort the rest of this batch — the other
+        // two per-row loops in this file (fixStuckProcessing,
+        // expireStalePayments) already isolate errors this way; this loop
+        // previously didn't, so one bad row silently skipped every
+        // subsequent order in the same run with no record of it happening.
+        report.errors.push({ step: 'detectAbandonedOrders', orderId: order.id, error: err.message });
       }
     }
   } catch (err) {

@@ -10,6 +10,7 @@
 
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
+const { parseOptionalNumber } = require('../lib/numberParsing');
 
 exports.getPackages = async (req, res, next) => {
   try {
@@ -26,16 +27,31 @@ exports.getPackages = async (req, res, next) => {
 exports.createPackage = async (req, res, next) => {
   try {
     const { name, slug, price, description, features, pages, revisions, deliveryDays, popular } = req.body;
+
+    if (!name || !slug) {
+      return res.status(400).json({ success: false, message: 'name and slug are required.' });
+    }
+    const numericPrice = Number(price);
+    if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+      return res.status(400).json({ success: false, message: 'price must be a non-negative number.' });
+    }
+    const numericPages        = parseOptionalNumber(pages);
+    const numericRevisions    = parseOptionalNumber(revisions);
+    const numericDeliveryDays = parseOptionalNumber(deliveryDays);
+    if (numericPages === undefined || numericRevisions === undefined || numericDeliveryDays === undefined) {
+      return res.status(400).json({ success: false, message: 'pages, revisions, and deliveryDays must be numbers.' });
+    }
+
     const pkg = await prisma.package.create({
       data: {
         name,
         slug,
-        price: Number(price),
+        price: numericPrice,
         description,
         features: features || [],
-        pages: pages ? Number(pages) : null,
-        revisions: revisions ? Number(revisions) : null,
-        deliveryDays: deliveryDays ? Number(deliveryDays) : null,
+        pages: numericPages,
+        revisions: numericRevisions,
+        deliveryDays: numericDeliveryDays,
         popular: Boolean(popular),
       },
     });
@@ -48,17 +64,32 @@ exports.createPackage = async (req, res, next) => {
 exports.updatePackage = async (req, res, next) => {
   try {
     const { name, slug, price, description, features, pages, revisions, deliveryDays, popular } = req.body;
+
+    let numericPrice;
+    if (price !== undefined) {
+      numericPrice = Number(price);
+      if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+        return res.status(400).json({ success: false, message: 'price must be a non-negative number.' });
+      }
+    }
+    const numericPages        = pages        !== undefined ? parseOptionalNumber(pages)        : null;
+    const numericRevisions    = revisions    !== undefined ? parseOptionalNumber(revisions)    : null;
+    const numericDeliveryDays = deliveryDays !== undefined ? parseOptionalNumber(deliveryDays) : null;
+    if (numericPages === undefined || numericRevisions === undefined || numericDeliveryDays === undefined) {
+      return res.status(400).json({ success: false, message: 'pages, revisions, and deliveryDays must be numbers.' });
+    }
+
     const pkg = await prisma.package.update({
       where: { id: req.params.id },
       data: {
         ...(name !== undefined && { name }),
         ...(slug !== undefined && { slug }),
-        ...(price !== undefined && { price: Number(price) }),
+        ...(price !== undefined && { price: numericPrice }),
         ...(description !== undefined && { description }),
         ...(features !== undefined && { features }),
-        ...(pages !== undefined && { pages: Number(pages) }),
-        ...(revisions !== undefined && { revisions: Number(revisions) }),
-        ...(deliveryDays !== undefined && { deliveryDays: Number(deliveryDays) }),
+        ...(pages !== undefined && { pages: numericPages }),
+        ...(revisions !== undefined && { revisions: numericRevisions }),
+        ...(deliveryDays !== undefined && { deliveryDays: numericDeliveryDays }),
         ...(popular !== undefined && { popular: Boolean(popular) }),
       },
     });
@@ -77,6 +108,7 @@ exports.deletePackage = async (req, res, next) => {
     });
     res.json({ success: true, message: 'Package deactivated' });
   } catch (err) {
+    if (err.code === 'P2025') return res.status(404).json({ success: false, message: 'Package not found' });
     next(err);
   }
 };
