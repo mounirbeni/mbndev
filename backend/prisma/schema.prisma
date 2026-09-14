@@ -243,7 +243,19 @@ model Payment {
   flaggedReason         String?   // set by fraud detection — admin sees this
   riskScore             Int?      // 0–100 computed at submission; ≥ 60 = auto-flagged
   ipAddress             String?   // submitter IP (forensic tracing)
-  idempotencyKey        String?   @unique  // client-generated key — prevents double-submit
+  // Client-generated key — prevents double-submit. NOTE: environments that
+  // ran migrate6.js (e.g. production, before this column existed in
+  // schema.prisma) actually have a PARTIAL unique index —
+  // `CREATE UNIQUE INDEX ... WHERE "idempotencyKey" IS NOT NULL` — while a
+  // fresh `prisma db push` on a blank DB creates a plain, non-partial
+  // unique index for this `@unique` attribute instead. Verified these
+  // don't functionally differ (Postgres already treats NULLs as distinct
+  // under a plain unique index, so both allow unlimited NULL rows while
+  // enforcing uniqueness on non-null values identically) and that `db
+  // push` does NOT try to reconcile the difference — it treats the partial
+  // index as already satisfying this constraint and reports no drift. See
+  // migrate6.js for the historical partial-index version.
+  idempotencyKey        String?   @unique
   paidAt                DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt

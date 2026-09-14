@@ -22,6 +22,17 @@ async function main() {
       ADD COLUMN IF NOT EXISTS "idempotencyKey"  TEXT
   `);
 
+  // NOTE: this is a PARTIAL unique index (WHERE idempotencyKey IS NOT NULL),
+  // whereas schema.prisma's `idempotencyKey String? @unique` attribute makes
+  // a fresh `prisma db push` create a plain, non-partial unique index of the
+  // same name instead. Verified these are functionally equivalent (Postgres
+  // already treats NULLs as distinct under a plain unique index too) and
+  // that `db push` does not attempt to reconcile the two — it recognizes
+  // this partial index as already satisfying the schema's @unique and
+  // reports no drift. See the comment on Payment.idempotencyKey in
+  // schema.prisma for the full explanation. Do not "fix" this by dropping
+  // the WHERE clause here — that would just make a fresh environment's
+  // index bigger (indexing every NULL row) for no behavioral benefit.
   console.log('[migrate6] Adding unique index on Payment.idempotencyKey...');
   await prisma.$executeRawUnsafe(`
     CREATE UNIQUE INDEX IF NOT EXISTS "Payment_idempotencyKey_key"
