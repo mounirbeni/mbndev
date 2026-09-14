@@ -59,7 +59,7 @@ function sendTelegram(message) {
 
 // ─── Message templates ────────────────────────────────────────────────────────
 
-const wa = {
+const telegram = {
 
   welcome: ({ user }) =>
     sendTelegram([
@@ -145,4 +145,4 @@ const wa = {
 
 };
 
-module.exports = { sendTelegram, wa };
+module.exports = { sendTelegram, telegram };

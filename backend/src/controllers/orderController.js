@@ -3,7 +3,7 @@ const { fmt } = require('../lib/format');
 const { notifyAdmins } = require('../lib/notifications');
 const { calculatePrice, VALID_PLANS } = require('../lib/pricing');
 const { sendEmail, templates } = require('../lib/email');
-const { wa } = require('../lib/whatsapp');
+const { telegram } = require('../lib/telegram');
 const { assertOrderTransition, ACTIVE_PAYMENT_STATUSES } = require('../lib/orderGuard');
 
 /**
@@ -94,7 +94,7 @@ exports.createOrder = async (req, res, next) => {
       to: req.user.email,
       ...templates.orderPlaced({ user: req.user, order }),
     }).catch(() => {});
-    wa.newOrder({ client: req.user, order }).catch(() => {});
+    telegram.newOrder({ client: req.user, order }).catch(() => {});
 
     res.status(201).json({ success: true, order: fmt(order) });
   } catch (err) {

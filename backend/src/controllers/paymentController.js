@@ -23,7 +23,7 @@ const { fmt } = require('../lib/format');
 const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
 const { SM }   = require('../lib/systemMessages');
 const { sendEmail, templates } = require('../lib/email');
-const { wa }   = require('../lib/whatsapp');
+const { telegram }   = require('../lib/telegram');
 const { logPaymentEvent, logAdminAction, getPaymentEvents, getClientIp } = require('../lib/paymentAudit');
 const { assertTransition, expiryDate, isExpired, computeRiskScore, isHighRisk, isFlagged } = require('../lib/paymentGuard');
 const { runReconciliation } = require('../jobs/reconcile');
@@ -320,7 +320,7 @@ exports.submitManualPayment = async (req, res, next) => {
         ...templates.adminPaymentSubmitted({ order, client: order.client, method: label }),
       }).catch(() => {});
     }
-    await wa.paymentSubmitted({ client: order.client, order, method: label }).catch(() => {});
+    await telegram.paymentSubmitted({ client: order.client, order, method: label }).catch(() => {});
 
     res.json({ success: true, payment: fmt(payment) });
   } catch (err) { next(err); }
@@ -628,7 +628,7 @@ exports.approveManualPayment = async (req, res, next) => {
       }),
     }).catch(() => {});
 
-    await wa.paymentVerified({ client: payment.client, order: payment.order, projectId: project.id }).catch(() => {});
+    await telegram.paymentVerified({ client: payment.client, order: payment.order, projectId: project.id }).catch(() => {});
 
     res.json({ success: true, payment: fmt(paidPayment), project: fmt(project) });
   } catch (err) { next(err); }

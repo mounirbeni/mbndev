@@ -8,7 +8,7 @@ const { notify, logActivity } = require('../lib/notifications');
 const { SM }   = require('../lib/systemMessages');
 const realtime = require('../lib/realtime');
 const { sendEmail, templates } = require('../lib/email');
-const { wa }   = require('../lib/whatsapp');
+const { telegram }   = require('../lib/telegram');
 const { matchesSignature } = require('../lib/fileSignature');
 const path = require('path');
 const fs = require('fs');
@@ -239,7 +239,7 @@ exports.updateProject = async (req, res, next) => {
             toStatus:   STATUS_LABELS[status] || status,
           }),
         }).catch(() => {});
-        wa.projectStatusUpdate({ client: fullClient, project, toStatus: status }).catch(() => {});
+        telegram.projectStatusUpdate({ client: fullClient, project, toStatus: status }).catch(() => {});
       }
     }
 

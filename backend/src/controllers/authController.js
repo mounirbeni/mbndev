@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { sendEmail, templates } = require('../lib/email');
-const { wa } = require('../lib/whatsapp');
+const { telegram } = require('../lib/telegram');
 const { notifyAdmins } = require('../lib/notifications');
 const {
   normalizeEmail,
@@ -172,7 +172,7 @@ exports.register = async (req, res, next) => {
 
     // Welcome email + WhatsApp
     await sendEmail({ to: user.email, ...templates.welcome({ user }) }).catch(() => {});
-    wa.welcome({ user }).catch(() => {});
+    telegram.welcome({ user }).catch(() => {});
 
     sendToken(user, 201, res);
   } catch (err) {
