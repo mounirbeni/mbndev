@@ -166,8 +166,8 @@ export default function SharePage() {
                   </span>
                 </div>
                 <div>
-                  {project.milestones.map((m: any, i: number) => (
-                    <MilestoneItem key={i} title={m.title} status={m.status} dueDate={m.dueDate} />
+                  {project.milestones.map((m: any) => (
+                    <MilestoneItem key={m.id ?? m._id} title={m.title} status={m.status} dueDate={m.dueDate} />
                   ))}
                 </div>
               </div>

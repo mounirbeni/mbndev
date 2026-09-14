@@ -268,8 +268,8 @@ export default function ClientProjectWorkspace() {
                   <div className="glass rounded-2xl p-5 sm:p-6 border border-white/5">
                     <h3 className="text-white font-semibold mb-4">{t('client.milestones')}</h3>
                     <div className="space-y-3">
-                      {project.milestones.map((m: any, i: number) => (
-                        <div key={i} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl">
+                      {project.milestones.map((m: any) => (
+                        <div key={m.id ?? m._id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl">
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                             m.status === 'paid' ? 'bg-green-500/20' : 'bg-white/10'
                           }`}>
