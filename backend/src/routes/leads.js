@@ -585,7 +585,10 @@ router.get('/email-check', protect, authorize('admin'), async (req, res, next) =
 // ─── POST /api/leads/test-email — send one test email and return full result ──
 router.post('/test-email', protect, authorize('admin'), async (req, res, next) => {
   try {
-    const { to = 'mobanunir@gmail.com' } = req.body;
+    const { to } = req.body;
+    if (!to) {
+      return res.status(400).json({ success: false, message: 'to (recipient email) is required.' });
+    }
     const tpl    = templates.outreach({ name: 'Test Riad', type: 'riad' });
     const result = await sendEmail({ to, subject: '[TEST] ' + tpl.subject, html: tpl.html });
     res.json({
