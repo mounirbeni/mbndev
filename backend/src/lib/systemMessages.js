@@ -3,6 +3,19 @@
 // occur (payment verified, status changed, file uploaded, etc.).
 // Content is stored as JSON {icon, title, body} with type='system'.
 // Frontend renders them with distinct styling — centered, no avatar, branded.
+//
+// Message.content is a single String column shared by both message types:
+// plain text for type='user', JSON.stringify({icon, title, body}) for
+// type='system'. This is a deliberate trade-off (avoids a schema migration
+// + a separate nullable metadata column for a comparatively rare message
+// type) rather than an oversight — but it means EVERY consumer of
+// Message.content must gate JSON.parse() behind `msg.type === 'system'`
+// first, and must still fall back gracefully if parsing fails (never crash
+// or render raw JSON to the user). Every current consumer already does
+// this correctly: messageController.js's getThreads preview,
+// components/dashboard/MessageThread.tsx's SystemMessage, and both admin/
+// client messages-list and admin-project-detail pages. Follow the same
+// pattern in any new one.
 
 const prisma   = require('./prisma');
 const realtime = require('./realtime');
