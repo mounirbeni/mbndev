@@ -442,7 +442,7 @@ const templates = {
       html: layout({
         preheader: `Payment confirmed. Work on "${order.title}" starts today.`,
         badgeHtml: badge('Payment verified', { bg: T.greenBg, color: T.green, border: T.greenBorder }),
-        heading:   `You\'re live, ${first}.`,
+        heading:   `You're live, ${first}.`,
         intro:     `Your payment has been verified and your project is now active. We're on it — you'll see the first status update in your dashboard shortly.`,
         body: [
           infoBox([
@@ -551,8 +551,7 @@ const templates = {
   },
 
   // ── Project status update ─────────────────────────────────────────────────
-  projectStatusUpdate: ({ client, project, fromStatus, toStatus }) => {
-    const first  = client.name.split(' ')[0];
+  projectStatusUpdate: ({ project, fromStatus, toStatus }) => {
     const desc   = STATUS_DESCRIPTIONS[toStatus] || `Your project status has been updated to "${toStatus}".`;
     const sLabel = toStatus.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
     return {
@@ -584,7 +583,6 @@ const templates = {
   // ── Platform update announcement ──────────────────────────────────────────
   platformUpdate: ({ user }) => {
     const first   = (user?.name || 'there').split(' ')[0];
-    const dashUrl = `${APP_URL}/dashboard/client`;
     const checkoutUrl = `${APP_URL}/dashboard/client/orders`;
     return {
       subject: `${first}, here's what's new in your dashboard`,

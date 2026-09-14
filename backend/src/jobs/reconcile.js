@@ -24,7 +24,7 @@
 const prisma = require('../lib/prisma');
 const { logPaymentEvent, logAdminAction } = require('../lib/paymentAudit');
 const { notify, notifyAdmins }            = require('../lib/notifications');
-const { sendEmail, templates }            = require('../lib/email');
+const { sendEmail }                       = require('../lib/email');
 
 const STUCK_PROCESSING_MS  = 10 * 60 * 1000;   // 10 min
 const ABANDONED_ORDER_MS   = 7  * 24 * 3600 * 1000; // 7 days

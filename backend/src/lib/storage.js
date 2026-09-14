@@ -20,7 +20,6 @@ const LOCAL_DIR = process.env.VERCEL
 const hasBlobToken = () => !!process.env.BLOB_READ_WRITE_TOKEN;
 
 if (process.env.VERCEL && !hasBlobToken()) {
-  // eslint-disable-next-line no-console
   console.warn(
     '[storage] BLOB_READ_WRITE_TOKEN is not set — uploads will be written to ' +
     '/tmp and disappear when the serverless instance recycles. Create a Blob ' +

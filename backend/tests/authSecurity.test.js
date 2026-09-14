@@ -55,10 +55,8 @@ test('fewer than the global threshold, spread across IPs — not locked', () => 
 });
 
 test('lock expires once LOGIN_LOCK_MS has elapsed since the last failure', () => {
-  const lastFailAt = Date.now() - LOGIN_LOCK_MS - 1000; // just past expiry
-  const r = computeLockout({ ipFails: [new Date(lastFailAt)], globalFails: [], now: Date.now() });
-  // Only 1 fail so it wouldn't lock anyway; verify remainingMs math directly
-  // by simulating a full threshold that just expired.
+  // Verify remainingMs math directly by simulating a full threshold that
+  // just expired.
   const now = Date.now();
   const expiredFails = Array.from({ length: LOGIN_MAX_FAILS }, () => new Date(now - LOGIN_LOCK_MS - 1000));
   const r2 = computeLockout({ ipFails: expiredFails, globalFails: [], now });

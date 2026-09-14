@@ -85,7 +85,7 @@ exports.stream = async (req, res) => {
     clearInterval(heartbeat);
     unsubscribe();
     if (!res.writableEnded) {
-      try { res.end(); } catch {}
+      try { res.end(); } catch { /* connection already gone — nothing to clean up */ }
     }
   };
 

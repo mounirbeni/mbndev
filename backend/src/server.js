@@ -25,7 +25,6 @@ const helmet       = require('helmet');
 const hpp          = require('hpp');
 const rateLimit    = require('express-rate-limit');
 const crypto       = require('crypto');
-const path         = require('path');
 const prisma             = require('./lib/prisma');
 const pinoHttp           = require('pino-http');
 const { sanitizeBody }   = require('./middleware/sanitize');
@@ -210,6 +209,9 @@ app.get('/api/health', async (req, res) => {
       version:   process.env.npm_package_version || '1.0.0',
     });
   } catch (err) {
+    // Logged server-side only — the response itself must never leak
+    // connection strings or other DB internals to a caller.
+    console.error('[health] DB check failed:', err.message);
     res.status(503).json({
       status:    'error',
       db:        'disconnected',

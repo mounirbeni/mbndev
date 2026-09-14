@@ -42,7 +42,6 @@ let redisConnected = false;
     // silently otherwise, so warn loudly at startup and surface it via
     // getStatus() → /api/health instead of pretending realtime is reliable.
     if (process.env.VERCEL) {
-      // eslint-disable-next-line no-console
       console.warn('[realtime] REDIS_URL is not set on a multi-instance deployment — real-time events will only reach clients connected to the SAME serverless instance that publishes them. Configure REDIS_URL to fix this.');
     }
     return;
@@ -71,7 +70,6 @@ let redisConnected = false;
     redisSub.on('error', () => {});
   } catch (err) {
     redisPub = null;
-    // eslint-disable-next-line no-console
     console.warn('[realtime] Redis init failed, falling back to in-process delivery:', err.message);
   }
 })();
@@ -110,7 +108,7 @@ function _add(key, res) {
   // Evict oldest connection(s) if limit reached
   while (list.length >= MAX_CONNS_PER_USER) {
     const evicted = list.shift();
-    try { evicted.res.end(); } catch {}
+    try { evicted.res.end(); } catch { /* connection already gone — nothing to clean up */ }
   }
 
   list.push({ res, connectedAt: Date.now() });
@@ -197,7 +195,7 @@ function publishToUserAndAdmins(userId, event, data) {
 function stats() {
   let totalConnections = 0;
   let liveKeys = 0;
-  for (const [key, list] of SUBSCRIBERS) {
+  for (const [, list] of SUBSCRIBERS) {
     const live = list.filter((c) => !c.res.writableEnded && !c.res.destroyed);
     if (live.length > 0) { liveKeys++; totalConnections += live.length; }
   }

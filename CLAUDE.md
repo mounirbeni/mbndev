@@ -6,13 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Backend (`cd backend`)
 ```bash
-npm run dev          # Start dev server with nodemon on :5000
-npm start            # Production start
-npm run seed         # Seed DB with admin + demo client + packages
-npm test             # Node built-in test runner (tests/*.test.js) — no DB needed
-npm run db:push      # Push Prisma schema changes to DB (no migration file)
-npm run db:generate  # Regenerate Prisma client after schema edit
-npm run db:studio    # Open Prisma Studio GUI
+npm run dev             # Start dev server with nodemon on :5000
+npm start               # Production start
+npm run seed            # Seed DB with admin + demo client + packages
+npm test                # Node built-in test runner (tests/*.test.js) — no DB needed
+npm run test:integration # Node built-in test runner (tests/integration/*.test.js) — needs
+                          # DATABASE_URL against a real (throwaway) Postgres; skips cleanly if unset
+npm run lint            # ESLint (flat config, eslint.config.mjs)
+npm run db:push         # Push Prisma schema changes to DB (no migration file)
+npm run db:generate     # Regenerate Prisma client after schema edit
+npm run db:studio       # Open Prisma Studio GUI
 ```
 
 ### Frontend (`cd frontend`)

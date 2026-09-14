@@ -12,6 +12,22 @@ jobs:
   backend:
     name: Backend tests
     runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mbndev_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mbndev_ci
     steps:
       - uses: actions/checkout@v4
 
@@ -23,8 +39,20 @@ jobs:
         run: npm ci
         working-directory: backend
 
-      - name: Run tests
+      - name: Lint
+        run: npm run lint
+        working-directory: backend
+
+      - name: Push schema to CI database
+        run: npx prisma db push --config prisma/prisma.config.ts --accept-data-loss
+        working-directory: backend
+
+      - name: Run unit tests
         run: npm test
+        working-directory: backend
+
+      - name: Run integration tests
+        run: npm run test:integration
         working-directory: backend
 
   frontend:
