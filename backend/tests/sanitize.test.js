@@ -12,6 +12,22 @@ test('stripHtml removes tags but keeps text content', () => {
   assert.equal(stripHtml('<b>hello</b> <script>alert(1)</script>world'), 'hello alert(1)world');
 });
 
+test('stripHtml removes an HTML comment', () => {
+  assert.equal(stripHtml('hello <!-- a comment --> world'), 'hello  world');
+});
+
+test('stripHtml does not mangle plain comparison text containing < and >', () => {
+  // Regression: a naive /<[^>]*>/ regex treats "< 5000 and >" as one tag
+  // spanning from the first < to the next >, silently eating real content.
+  assert.equal(stripHtml('budget < 5000 and > 1000'), 'budget < 5000 and > 1000');
+  assert.equal(stripHtml('a<5 and b>3'), 'a<5 and b>3');
+  assert.equal(stripHtml('score: 10 < 20, 30 > 5'), 'score: 10 < 20, 30 > 5');
+});
+
+test('stripHtml still strips a real tag adjacent to comparison-like text', () => {
+  assert.equal(stripHtml('a < 5 <script>evil()</script> b > 3'), 'a < 5 evil() b > 3');
+});
+
 test('password fields pass through untouched, regardless of route', async () => {
   const req = {
     method: 'POST',

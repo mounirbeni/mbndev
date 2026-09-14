@@ -9,7 +9,16 @@
 function stripHtml(value) {
   if (typeof value !== 'string') return value;
   return value
-    .replace(/<[^>]*>/g, '')   // strip HTML tags
+    .replace(/<!--[\s\S]*?-->/g, '')  // strip HTML comments
+    // Only strip things that actually look like a tag: `<` or `</` followed
+    // immediately by a letter (real tag names always start with one — every
+    // HTML element and every practical XSS vector does). A blind
+    // /<[^>]*>/ regex instead treats ANY "<...>" span as a tag, so plain
+    // text like "budget < 5000 and > 1000" or "a<5 and b>3" gets its
+    // "< 5000 and >" / "<5 and b>" span silently eaten — this is real user
+    // content (notes, message text, order descriptions) getting mangled on
+    // every request, not just a theoretical edge case.
+    .replace(/<\/?[a-zA-Z][^>]*>/g, '')
     .replace(/\0/g, '');       // strip null bytes
 }
 
