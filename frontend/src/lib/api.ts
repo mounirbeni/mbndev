@@ -100,7 +100,7 @@ const RETRYABLE_METHODS   = new Set(['get', 'head', 'options', 'put', 'delete'])
 const MAX_RETRIES         = 2;
 const RETRY_BASE_DELAY_MS = 500;
 
-function shouldRetry(error: AxiosError, retryCount: number): boolean {
+export function shouldRetry(error: AxiosError, retryCount: number): boolean {
   if (retryCount >= MAX_RETRIES) return false;
   const method = error.config?.method?.toLowerCase() ?? '';
   if (!RETRYABLE_METHODS.has(method)) return false;

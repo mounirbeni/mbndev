@@ -23,6 +23,7 @@ npm run db:studio       # Open Prisma Studio GUI
 npm run dev          # Start Next.js dev server on :3000
 npm run build        # Production build (runs TypeScript type-check)
 npm run lint         # ESLint
+npm test             # Vitest (src/**/*.test.{ts,tsx}) — jsdom, no browser needed
 ```
 
 ### Schema migrations

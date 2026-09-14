@@ -56,7 +56,7 @@ jobs:
         working-directory: backend
 
   frontend:
-    name: Frontend build & type-check
+    name: Frontend build, type-check & tests
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -69,10 +69,14 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      - name: Build
-        run: npm run build
-        working-directory: frontend
-
       - name: Lint
         run: npm run lint
+        working-directory: frontend
+
+      - name: Unit tests
+        run: npm test
+        working-directory: frontend
+
+      - name: Build
+        run: npm run build
         working-directory: frontend
