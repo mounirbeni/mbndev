@@ -29,7 +29,7 @@
     }
   ],
   "crons": [
-    { "path": "/api/payments/cron-reconcile", "schedule": "0 */6 * * *" }
+    { "path": "/api/payments/cron-reconcile", "schedule": "0 3 * * *" }
   ],
   "headers": [
     {
