@@ -52,10 +52,12 @@ desktop.ini
 *.tsbuildinfo
 next-env.d.ts
 
+# ─── Local contact exports (never public) ───────────────────────
+/mbndev-leads.csv
+
 # ─── Misc ───────────────────────────────────────────────────────
 .vercel
 .netlify
 *.pem
 
-.claude/settings.local.json
 .claude/settings.local.json
