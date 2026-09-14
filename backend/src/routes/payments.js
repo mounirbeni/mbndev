@@ -45,7 +45,11 @@ router.post('/reconcile', protect, authorize('admin'), triggerReconciliation);
 // Payment analytics dashboard data
 router.get('/meta/analytics', protect, authorize('admin'), getPaymentAnalytics);
 
-// Mock payment (dev + demo only — hard-blocked in production by controller)
-router.post('/mock', protect, mockPayment);
+// Mock payment (dev + demo only — hard-blocked in production by controller).
+// authorize('admin') here is defense-in-depth: the controller already
+// enforces the same admin-only check inline, but relying on that alone
+// means a future refactor of the controller's early-return order could
+// silently drop the check without any route-level signal.
+router.post('/mock', protect, authorize('admin'), mockPayment);
 
 module.exports = router;

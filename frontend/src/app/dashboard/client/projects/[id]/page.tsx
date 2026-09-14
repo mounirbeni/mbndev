@@ -127,19 +127,6 @@ export default function ClientProjectWorkspace() {
     finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
   };
 
-  const handlePayment = async (amount: number, description: string) => {
-    try {
-      await paymentAPI.mock({ projectId: id, amount, description });
-      toast.success(t('client.paymentRecorded'));
-      const payRes = await paymentAPI.getAll();
-      const allPay: Payment[] = payRes.data.payments || [];
-      setPayments(allPay.filter((p) => {
-        const projId = typeof p.project === 'object' ? (p.project as any)._id || (p.project as any).id : p.project;
-        return projId === id;
-      }));
-    } catch { toast.error(t('client.paymentFailed')); }
-  };
-
   if (loading) {
     return (
       <div className="space-y-4 max-w-5xl">
@@ -463,12 +450,11 @@ export default function ClientProjectWorkspace() {
                       {t('client.depositLabel')} {formatCurrency(project.budget * 0.5)}
                     </div>
                   </div>
-                  <Button
-                    size="md"
-                    onClick={() => handlePayment(Math.round(project.budget * 0.5), '50% Project Deposit')}
-                  >
-                    <DollarSign className="w-4 h-4" /> {t('client.payDeposit')}
-                  </Button>
+                  <Link href="/dashboard/client/messages">
+                    <Button size="md">
+                      <DollarSign className="w-4 h-4" /> {t('client.payDeposit')}
+                    </Button>
+                  </Link>
                 </div>
               )}
 
