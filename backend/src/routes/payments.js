@@ -27,9 +27,6 @@ router.post('/manual', protect, submitManualRules, submitManualPayment);
 // List payments (client: own; admin: all, filterable by ?status=&flagged=true)
 router.get('/', protect, getPayments);
 
-// Single payment — invoice view; client can only see own
-router.get('/:id', protect, getPaymentById);
-
 // ─── Admin only ───────────────────────────────────────────────────────────────
 
 // Approve or reject a manual payment
@@ -42,8 +39,13 @@ router.get('/:id/events', protect, authorize('admin'), getPaymentEvents);
 // On-demand reconciliation — responds 202 immediately, runs async
 router.post('/reconcile', protect, authorize('admin'), triggerReconciliation);
 
-// Payment analytics dashboard data
+// Payment analytics dashboard data. This static route must come before
+// '/:id', otherwise Express treats "meta" as a payment ID and analytics is
+// unreachable.
 router.get('/meta/analytics', protect, authorize('admin'), getPaymentAnalytics);
+
+// Single payment — invoice view; client can only see own
+router.get('/:id', protect, getPaymentById);
 
 // Mock payment (dev + demo only — hard-blocked in production by controller).
 // authorize('admin') here is defense-in-depth: the controller already
