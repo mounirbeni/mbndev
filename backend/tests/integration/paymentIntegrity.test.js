@@ -13,6 +13,7 @@
 
 const { test, before, after } = require('node:test');
 const assert = require('node:assert');
+const { Prisma } = require('@prisma/client');
 
 const RUN  = !!process.env.DATABASE_URL;
 const skip = RUN ? false : 'DATABASE_URL not set — skipping DB integration tests';
@@ -113,4 +114,47 @@ test('deleting a user with an active order is rejected (onDelete: Restrict)', { 
 
   // Clean up in the correct order so `after()`'s cleanup doesn't also fail.
   await prisma.order.delete({ where: { id: order.id } });
+});
+
+test('two concurrent submissions with the same idempotency key: one wins, the loser sees P2002 (not P2034)', { skip }, async () => {
+  const user = await makeClient('idem');
+  const orderA = await prisma.order.create({
+    data: { clientId: user.id, serviceType: 'website', title: 'Idempotency test order A', totalPrice: 300, status: 'pending' },
+  });
+  const orderB = await prisma.order.create({
+    data: { clientId: user.id, serviceType: 'website', title: 'Idempotency test order B', totalPrice: 300, status: 'pending' },
+  });
+  const key = `idem-key-${Date.now()}`;
+
+  // Mirrors submitManualPayment's step 5 transaction shape (Serializable +
+  // an insert on a column with a @unique constraint) closely enough to
+  // confirm which Prisma error code a same-key race actually raises. Two
+  // DIFFERENT orders on purpose — the interesting race is on the
+  // idempotencyKey unique constraint itself, not the per-order duplicate
+  // guard (which uses a separate findFirst check, already covered above).
+  const attempt = (orderId) => prisma.$transaction(async (tx) => {
+    return tx.payment.create({
+      data: {
+        clientId: user.id,
+        orderId,
+        amount:   300,
+        status:   'pending_verification',
+        method:   'cih_bank',
+        idempotencyKey: key,
+      },
+    });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable, timeout: 10_000 });
+
+  const results = await Promise.allSettled([attempt(orderA.id), attempt(orderB.id)]);
+  const fulfilled = results.filter((r) => r.status === 'fulfilled');
+  const rejected  = results.filter((r) => r.status === 'rejected');
+
+  assert.equal(fulfilled.length, 1, 'exactly one insert should succeed');
+  assert.equal(rejected.length, 1, 'exactly one insert should fail on the unique constraint');
+  // This is the assumption submitManualPayment's P2002 handler depends on —
+  // if Prisma ever raised something else here (e.g. P2034 from the
+  // Serializable isolation level swallowing the unique-constraint race
+  // instead), that handler would silently stop catching this case and the
+  // loser would get a raw 500 again.
+  assert.equal(rejected[0].reason.code, 'P2002');
 });

@@ -242,6 +242,22 @@ exports.submitManualPayment = async (req, res, next) => {
           code:    'SERIALIZATION_FAILURE',
         });
       }
+      // Unique constraint violation on idempotencyKey (P2002) — a second
+      // request with the SAME key raced past step 1's pre-check (a plain
+      // findUnique done before this transaction opened) and both attempted
+      // the insert; the DB's @unique constraint let exactly one through.
+      // This is the expected shape of a legitimate double-submit/retry, not
+      // an error — fetch and return whichever row won, matching the same
+      // idempotent response the pre-check would have given if it had run a
+      // moment later, instead of letting this bubble up as a raw 500.
+      if (txErr.code === 'P2002' && idempotencyKey) {
+        const winner = await prisma.payment.findUnique({
+          where: { idempotencyKey: String(idempotencyKey).slice(0, 128) },
+        });
+        if (winner) {
+          return res.json({ success: true, payment: fmt(winner), idempotent: true });
+        }
+      }
       throw txErr;
     }
 
