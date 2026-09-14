@@ -102,6 +102,16 @@ function _pruneList(key) {
 }
 
 function _add(key, res) {
+  // Pruning dead connections BEFORE considering eviction means the
+  // oldest-first eviction below only ever closes a connection that is
+  // still genuinely alive — a user with fewer than MAX_CONNS_PER_USER
+  // *live* tabs never has one silently kicked out just because a stale/
+  // already-closed one was still occupying a slot in the list. 5 is a
+  // deliberately generous ceiling (desktop + mobile + a couple of
+  // background tabs) rather than a hard per-device limit; only a user
+  // genuinely exceeding it experiences rotation, and each evicted
+  // connection's client reconnects on its own (useRealtime.ts) rather than
+  // losing realtime updates outright.
   _pruneList(key);
   const list = _getList(key);
 

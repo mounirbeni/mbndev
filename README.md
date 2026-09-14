@@ -10,7 +10,7 @@ A full-stack project management and client portal platform built to streamline t
 - **Styling:** Tailwind CSS, Framer Motion
 - **Data Fetching:** Axios
 - **Real-time:** Server-Sent Events (SSE) via custom hooks
-- **Internationalization (i18n):** English, French, Arabic (with RTL support)
+- **Internationalization (i18n):** English-only. `t(key)` translation helper is kept in place for future locales, but there is no language switcher and no French/Arabic locale files currently.
 
 ### Backend
 - **Framework:** Express.js (Node.js)
