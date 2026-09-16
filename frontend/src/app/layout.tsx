@@ -27,9 +27,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://mbndev.ma'),
   manifest: '/manifest.json',
   icons: {
-    icon: [{ url: '/brand-icon.webp', sizes: '256x256', type: 'image/webp' }],
-    apple: [{ url: '/brand-icon.webp', sizes: '256x256', type: 'image/webp' }],
-    shortcut: '/brand-icon.webp',
+    icon: [{ url: '/brand-icon-transparent.webp', sizes: '128x128', type: 'image/webp' }],
+    apple: [{ url: '/brand-icon-transparent.webp', sizes: '128x128', type: 'image/webp' }],
+    shortcut: '/brand-icon-transparent.webp',
   },
   robots: {
     index: true,
@@ -87,9 +87,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" dir="ltr" className="dark">
       <head>
-        {/* All browser and home-screen icons use the approved brand mark. */}
-        <link rel="icon" type="image/webp" href="/brand-icon.webp" />
-        <link rel="apple-touch-icon" sizes="256x256" href="/brand-icon.webp" />
+        {/* Browser and home-screen icons share the transparent official brand mark. */}
+        <link rel="icon" type="image/webp" href="/brand-icon-transparent.webp" />
+        <link rel="apple-touch-icon" sizes="128x128" href="/brand-icon-transparent.webp" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://mbndev.ma" />
@@ -100,10 +100,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="format-detection" content="telephone=no" />
         <meta name="google" content="notranslate" />
         <meta name="theme-color" content="#08080b" />
-
-        <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/brand-logo.webp" />
-        <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="/brand-logo.webp" />
-        <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/brand-logo.webp" />
       </head>
       <body suppressHydrationWarning>
         <LanguageProvider>
