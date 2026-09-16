@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ExternalLink, ArrowRight, Zap } from 'lucide-react';
+import { ExternalLink, ArrowRight, Zap, BadgeCheck } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -258,6 +258,11 @@ export default function PortfolioPage() {
                       >
                         <ExternalLink className="w-4 h-4" />
                       </a>
+                    </div>
+
+                    <div className="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 w-fit">
+                      <BadgeCheck className="w-3 h-3 text-violet-400" />
+                      <span className="text-[10px] font-semibold text-violet-400 tracking-wide">Powered by MBN DEV</span>
                     </div>
 
                     <p className="text-slate-400 text-sm leading-relaxed mb-4 flex-1">{p.description}</p>

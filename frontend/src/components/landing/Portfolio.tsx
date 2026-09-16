@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
-import { ExternalLink, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, ArrowUpRight, BadgeCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type ProjectKey = 'carrylink' | 'lueur' | 'tyy' | 'emll' | 'riad' | 'riaddemo' | 'watchstore';
@@ -160,9 +160,13 @@ export default function Portfolio() {
                 <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-violet-500 mb-4">
                   {featured.type}
                 </p>
-                <h3 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
+                <h3 className="text-4xl md:text-5xl font-black text-white mb-3 leading-tight tracking-tight">
                   {featured.title}
                 </h3>
+                <div className="inline-flex items-center gap-1.5 mb-5 px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 w-fit">
+                  <BadgeCheck className="w-3 h-3 text-violet-400" />
+                  <span className="text-[10px] font-semibold text-violet-400 tracking-wide">Powered by MBN DEV</span>
+                </div>
                 <p className="text-slate-500 text-base leading-relaxed mb-8 max-w-sm">
                   {featured.desc}
                 </p>
@@ -226,7 +230,11 @@ export default function Portfolio() {
                 <h3 className="text-base font-bold text-white mb-1.5 leading-snug tracking-tight">
                   {p.title}
                 </h3>
-                <p className="text-slate-600 text-xs leading-relaxed">{p.desc}</p>
+                <p className="text-slate-600 text-xs leading-relaxed mb-2">{p.desc}</p>
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-violet-500/8 border border-violet-500/15 w-fit">
+                  <BadgeCheck className="w-2.5 h-2.5 text-violet-500" />
+                  <span className="text-[9px] font-semibold text-violet-500 tracking-wide">Powered by MBN DEV</span>
+                </div>
               </div>
             </motion.a>
           ))}
