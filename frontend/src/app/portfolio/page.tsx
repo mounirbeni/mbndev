@@ -118,7 +118,7 @@ const projects: {
   {
     id: 10,
     title: 'VitaCore',
-    url: 'https://vitacoremaroc.vercel.app',
+    url: 'https://vitapara.vercel.app/fr',
     category: 'E-Commerce',
     type: 'Health & Wellness Store',
     description: 'Health and wellness e-commerce platform for the Moroccan market, built with Next.js and deployed on Vercel.',
