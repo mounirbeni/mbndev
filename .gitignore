@@ -18,6 +18,8 @@ frontend/.env.local
 frontend/.next/
 frontend/out/
 frontend/build/
+# Prepared at build time from the versioned source under frontend/branding/.
+frontend/public/brand-icon-transparent.webp
 
 # ─── Uploads & user files ───────────────────────────────────────
 backend/uploads/
