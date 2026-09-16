@@ -247,7 +247,7 @@ function layout({ preheader = '', heading, badgeHtml = '', intro, body = '', foo
     'You received this email because you have an account with MBN DEV. If you did not expect this, you can safely ignore it.';
 
   return `<!DOCTYPE html>
-<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en" style="color-scheme:dark;supported-color-schemes:dark;" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -256,15 +256,24 @@ function layout({ preheader = '', heading, badgeHtml = '', intro, body = '', foo
   <title>${e(heading)}</title>
   <!--[if mso]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
   <style>
+    /* Some mail clients (notably the Gmail app) only honor the CSS
+       color-scheme property declared here — not just the <meta> tags
+       above — and otherwise auto-relight a dark-designed email when the
+       device/app itself is in light mode, mismatching our badge/text
+       colors against a suddenly-white background. Declaring it in both
+       places, plus forcing the background with !important, is the most
+       reliable combination without building a separate light theme. */
+    :root { color-scheme: dark; supported-color-schemes: dark; }
+    body, .email-bg { background-color: ${T.bg} !important; }
     @media only screen and (max-width:620px) {
       .ep { padding-left:24px !important; padding-right:24px !important; }
       h1  { font-size:24px !important; letter-spacing:-0.03em !important; }
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:${T.bg};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+<body class="email-bg" style="margin:0;padding:0;background-color:${T.bg} !important;color-scheme:dark;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
 ${pre}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${T.bg};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="email-bg" style="background-color:${T.bg} !important;">
 <tr><td align="center" style="padding:52px 16px 72px;">
 
   <!-- Outer 600px wrapper -->
