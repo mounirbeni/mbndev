@@ -197,6 +197,14 @@ function steps(items) {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0;">${itemsHtml}</table>`;
 }
 
+// Small square glyph badge — the professional alternative to an emoji icon.
+// Renders a bold single letter/character on a gradient tile, matching the
+// numbered badges in steps() so every "icon" in an email uses one visual
+// language instead of mixing emoji with brand styling.
+function iconBadge(glyph, { size = 40, fontSize = 15 } = {}) {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width:${size}px;height:${size}px;border-radius:10px;background:linear-gradient(135deg,${T.purple},${T.purpleDark});text-align:center;vertical-align:middle;color:#fff;font-size:${fontSize}px;font-weight:700;font-family:${T.font};line-height:${size}px;">${e(glyph)}</td></tr></table>`;
+}
+
 function notice(text, { type = 'info' } = {}) {
   const map = {
     info:     { bg: T.blueBg,   border: T.blueBorder,   color: T.blue,        icon: 'i' },
@@ -603,15 +611,15 @@ const templates = {
 
           `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 0;">`,
           ...[
-            ['🕌', 'Marrakech', 'Riads, tour operators, and retail businesses.'],
-            ['🏙️', 'Casablanca', 'Corporate, e-commerce, and logistics companies.'],
-            ['🏛️', 'Rabat', 'Institutions and professional service firms.'],
-          ].map(([icon, title, desc]) =>
+            ['M', 'Marrakech', 'Riads, tour operators, and retail businesses.'],
+            ['C', 'Casablanca', 'Corporate, e-commerce, and logistics companies.'],
+            ['R', 'Rabat', 'Institutions and professional service firms.'],
+          ].map(([letter, title, desc]) =>
             `<tr><td style="padding:0 0 10px;vertical-align:top;">` +
             `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d0d15;border:1px solid ${T.border};border-radius:12px;">` +
             `<tr><td style="padding:14px 18px;">` +
             `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>` +
-            `<td style="font-size:18px;padding-right:14px;vertical-align:top;line-height:1.4;">${icon}</td>` +
+            `<td style="padding-right:14px;vertical-align:top;">${iconBadge(letter, { size: 34, fontSize: 13 })}</td>` +
             `<td><div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:3px;">${title}</div>` +
             `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">${desc}</div></td>` +
             `</tr></table></td></tr></table></td></tr>`
@@ -630,7 +638,7 @@ const templates = {
 
           // ── CTA ─────────────────────────────────────────────────────────────
           `<div style="background:linear-gradient(135deg,${T.purpleBg},#0e0816);border:1px solid ${T.purpleBorder};border-radius:16px;padding:32px 28px;text-align:center;">`,
-          `<div style="font-size:28px;margin-bottom:12px;">🚀</div>`,
+          badge('v3.6.0', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
           `<h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#fff;font-family:${T.font};letter-spacing:-0.02em;">See what's new</h3>`,
           `<p style="margin:0 0 24px;font-size:14px;color:${T.textSecond};font-family:${T.font};line-height:1.7;">Head to your dashboard — the full changelog is one click away from the notification bell.</p>`,
           `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">`,
@@ -795,18 +803,21 @@ ${textBlock(`<strong style="color:${T.textPrimary};">Live proof — websites I b
   </tr>
 </table>` : '';
 
+    const serviceSteps = steps([
+      { title: 'Website Review',  desc: 'I look at your current online presence and identify what is hurting your bookings.' },
+      { title: 'Fix Issues',      desc: 'I correct technical problems, broken pages, slow load times, and poor mobile experience.' },
+      { title: 'Redesign',        desc: 'I rebuild your existing site with a modern, conversion-focused design.' },
+      { title: 'New Website',     desc: 'I design and develop a full professional website from scratch — tailored to your property.' },
+    ]);
+
     const defaultBody = `
 ${textBlock(`My name is <strong style="color:${T.textPrimary};">Mounir</strong>, a professional web developer based in Morocco. I came across <strong style="color:${T.textPrimary};">${name}</strong> and wanted to reach out directly.`)}
-${divider('16px 0')}
-${textBlock(`Here is what I can do for you:`)}
-${infoBox([
-  ['Website Review',    'I look at your current online presence and identify what is hurting your bookings'],
-  ['Fix Issues',        'I correct technical problems, broken pages, slow load times, and poor mobile experience'],
-  ['Redesign',          'I rebuild your existing site with a modern, conversion-focused design'],
-  ['New Website',       'I design and develop a full professional website from scratch — tailored to your property'],
-])}
+${divider('20px 0')}
+<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};">How I can help</p>
+${serviceSteps}
 ${riadProofSection}
-${divider('16px 0')}
+${divider('20px 0')}
+<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">The offer</p>
 ${infoBox([
   ['Delivery',          '14 days from project start'],
   ['Starting price',    '$799 — all-inclusive'],
@@ -815,7 +826,15 @@ ${infoBox([
 ])}
 ${notice(`No hidden fees. No lock-in. After delivery, the website is yours — you can host it anywhere. I offer a <strong style="color:${T.green};">15-minute call</strong> to review your current situation and answer any questions.`, { type: 'success' })}
 ${ctaButton('View my portfolio', APP_URL_LOCAL + '/portfolio')}
-${textBlock(`Or simply reply to this email — I read everything and respond within 24 hours.`)}`;
+${divider('28px 0 20px')}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+  <td style="padding-right:14px;vertical-align:top;">${iconBadge('M', { size: 40, fontSize: 15 })}</td>
+  <td style="vertical-align:middle;">
+    <div style="font-size:14px;font-weight:700;color:${T.textPrimary};font-family:${T.font};">Mounir Banni</div>
+    <div style="font-size:12.5px;color:${T.textMuted};font-family:${T.font};">Founder, MBN DEV — contact@mbndev.ma</div>
+  </td>
+</tr></table>
+${textBlock(`Or simply reply to this email — I read everything and respond within 24 hours.`, { mt: '16' })}`;
 
     return {
       subject: `Quick question about ${name}'s online presence`,
