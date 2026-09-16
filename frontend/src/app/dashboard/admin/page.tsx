@@ -97,7 +97,7 @@ export default function AdminDashboard() {
   }, [fetchAnalytics]);
 
   const TEMPLATES = [
-    { key: 'platformUpdate', label: 'May 2026 — Platform Update',    when: 'Now',    color: 'violet' },
+    { key: 'platformUpdate', label: 'v3.6.0 — Platform Update',      when: 'Now',    color: 'violet' },
     { key: 'getStarted',     label: 'Week 1 — Get started nudge',    when: 'Week 1', color: 'green'  },
     { key: 'checkIn',        label: 'Week 1 — Personal check-in',    when: 'Week 1', color: 'blue'   },
     { key: 'comingSoon',     label: 'Week 2 — What\'s coming next',  when: 'Week 2', color: 'amber'  },
@@ -174,40 +174,73 @@ export default function AdminDashboard() {
     <div className="space-y-6 max-w-7xl">
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="relative rounded-2xl overflow-hidden p-5 sm:p-6"
-        style={{
-          background: 'linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(59,130,246,0.04) 50%, rgba(6,182,212,0.03) 100%)',
-          border: '1px solid rgba(124,58,237,0.12)',
-          boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
-        }}
-      >
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.4), rgba(168,85,247,0.3), transparent)' }} />
-        <div className="absolute inset-0 ambient-grid opacity-20 pointer-events-none" />
+      {/* Outer wrapper is `relative` so the broadcast panel below can anchor to
+          the whole header without being clipped by the header's own
+          `overflow-hidden` (needed to keep the ambient-grid background inside
+          the rounded corners) — nesting the panel inside that box was cutting
+          it off and, on narrow phones, letting its fixed 288px width overlap
+          the title text to its left. */}
+      <div className="relative">
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="relative rounded-2xl overflow-hidden p-5 sm:p-6"
+          style={{
+            background: 'linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(59,130,246,0.04) 50%, rgba(6,182,212,0.03) 100%)',
+            border: '1px solid rgba(124,58,237,0.12)',
+            boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
+          }}
+        >
+          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.4), rgba(168,85,247,0.3), transparent)' }} />
+          <div className="absolute inset-0 ambient-grid opacity-20 pointer-events-none" />
 
-        <div className="relative flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {t('admin.dashboard')}
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">{t('admin.dashboard.sub')}</p>
-        </div>
+          <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              {t('admin.dashboard')}
+            </h1>
+            <p className="text-slate-400 text-sm mt-1">{t('admin.dashboard.sub')}</p>
+          </div>
 
-        <div className="flex items-center gap-2 shrink-0 relative">
+          <div className="flex items-center gap-2 shrink-0">
 
-          {/* ── Broadcast panel ──────────────────────────────────────────── */}
-          <AnimatePresence>
-            {showBroadcast && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: -6 }}
-                animate={{ opacity: 1, scale: 1,    y: 0  }}
-                exit={{   opacity: 0, scale: 0.95, y: -6  }}
-                transition={{ duration: 0.15 }}
-                className="absolute top-10 right-0 z-50 w-72 bg-[#111118] border border-white/10 rounded-2xl shadow-2xl p-4"
-              >
+            {/* Trigger button */}
+            <button
+              onClick={() => { setShowBroadcast((v) => !v); setBroadcastDone(false); }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border bg-violet-500/10 border-violet-500/20 text-violet-300 hover:bg-violet-500/20"
+            >
+              <Mail className="w-3.5 h-3.5" /> Send email
+            </button>
+
+            {/* Live indicator */}
+            {!loading && !fetchError && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <span className="relative flex w-2 h-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative inline-flex rounded-full w-2 h-2 bg-emerald-400" />
+                </span>
+                <span className="text-emerald-400 text-[11px] font-semibold">Live</span>
+              </div>
+            )}
+          </div>
+          </div>{/* closes relative flex wrapper */}
+        </motion.div>
+
+        {/* ── Broadcast panel ────────────────────────────────────────────────── */}
+        {/* Sits outside the header's overflow-hidden box, anchored below the
+            whole header (never over the title) and capped to the viewport
+            width on mobile instead of a fixed 288px that had nowhere to go
+            but left. */}
+        <AnimatePresence>
+          {showBroadcast && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -6 }}
+              animate={{ opacity: 1, scale: 1,    y: 0  }}
+              exit={{   opacity: 0, scale: 0.95, y: -6  }}
+              transition={{ duration: 0.15 }}
+              className="absolute top-full mt-2 right-0 left-0 sm:left-auto z-50 mx-4 sm:mx-0 sm:w-72 bg-[#111118] border border-white/10 rounded-2xl shadow-2xl p-4"
+            >
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                     Send email to all users
@@ -272,28 +305,7 @@ export default function AdminDashboard() {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Trigger button */}
-          <button
-            onClick={() => { setShowBroadcast((v) => !v); setBroadcastDone(false); }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border bg-violet-500/10 border-violet-500/20 text-violet-300 hover:bg-violet-500/20"
-          >
-            <Mail className="w-3.5 h-3.5" /> Send email
-          </button>
-
-          {/* Live indicator */}
-          {!loading && !fetchError && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              <span className="relative flex w-2 h-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex rounded-full w-2 h-2 bg-emerald-400" />
-              </span>
-              <span className="text-emerald-400 text-[11px] font-semibold">Live</span>
-            </div>
-          )}
-        </div>
-        </div>{/* closes relative flex wrapper */}
-      </motion.div>
+      </div>
 
       {/* ── Error banner ────────────────────────────────────────────────────── */}
       <AnimatePresence>
@@ -317,10 +329,15 @@ export default function AdminDashboard() {
       </AnimatePresence>
 
       {/* ── Card Stack Overview ───────────────────────────────────────────────── */}
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center overflow-hidden">
 
         {/* Stack */}
-        <div className="relative flex-1 h-36 sm:h-32">
+        {/* min-w-0 lets this flex-1 box actually shrink to its share of the
+            row on narrow phones — without it, flex items default to
+            min-width:auto and the stacked cards' peeking offset (up to ~42px)
+            could push the whole row wider than the viewport, shoving the
+            nav controls to the right past the screen edge. */}
+        <div className="relative flex-1 min-w-0 h-36 sm:h-32">
           {stackCards.map((card, i) => {
             const offset   = i - stackIndex;
             const isFront  = i === stackIndex;
