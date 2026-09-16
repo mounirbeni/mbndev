@@ -1,9 +1,10 @@
 import {
   Target, Send, Sparkles, Smartphone, Accessibility, Command, Settings,
+  MapPin, Shield,
   type LucideIcon,
 } from 'lucide-react';
 
-export const APP_VERSION = '3.5.0';
+export const APP_VERSION = '3.6.0';
 
 export interface ChangeEntry {
   icon: LucideIcon;
@@ -14,6 +15,18 @@ export interface ChangeEntry {
 }
 
 export const CHANGELOG: ChangeEntry[] = [
+  {
+    icon: MapPin,
+    title: 'SEO: New Location Pages',
+    desc: 'Dedicated pages for Marrakech, Casablanca, and Rabat help local businesses in these cities find us on Google — plus every blog article now has its own optimized title and description for better search visibility.',
+    tag: 'new',
+  },
+  {
+    icon: Shield,
+    title: 'Security Improvements',
+    desc: 'We\'ve rolled out a range of security and reliability improvements across the platform to keep your account and data safer.',
+    tag: 'improved',
+  },
   {
     icon: Settings,
     title: 'Admin Settings',
