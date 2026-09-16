@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-/** Official MBN DEV identity: approved purple MBN monogram and wordmark. */
+/** Official MBN DEV identity: approved purple MBN monogram on a transparent background. */
 export type LogoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface Props {
@@ -30,12 +30,12 @@ export default function Logo3D({ size = 'md', className = '' }: Props) {
       style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, gap, whiteSpace: 'nowrap', lineHeight: 1 }}
     >
       <Image
-        src="/brand-icon.webp"
+        src="/brand-icon-transparent.webp"
         alt=""
         aria-hidden="true"
-        width={256}
-        height={256}
-        style={{ width: icon, height: icon, flexShrink: 0, objectFit: 'contain', mixBlendMode: 'screen' }}
+        width={128}
+        height={128}
+        style={{ width: icon, height: icon, flexShrink: 0, objectFit: 'contain' }}
       />
       <span aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'Inter, Arial, sans-serif', fontSize: font, fontWeight: 900, letterSpacing: '-0.015em' }}>
         <span style={{ color: '#f4f0ff', textShadow: '0 0 8px rgba(196,181,253,0.18)' }}>MBN</span>
