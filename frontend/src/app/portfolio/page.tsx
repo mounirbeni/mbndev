@@ -190,7 +190,7 @@ const projects: {
   {
     id: 14,
     title: 'Riad Dar Kader',
-    url: null,
+    url: 'https://riadkader.vercel.app/fr',
     category: 'Hospitality',
     type: 'Riad Booking Website',
     description: "Custom riad booking platform built for Riad Dar Kader in Marrakech's Medina, near the Mouassine Museum, with direct reservations.",
