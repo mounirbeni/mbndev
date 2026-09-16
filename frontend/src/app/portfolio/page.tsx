@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ExternalLink, ArrowRight, Zap, BadgeCheck } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
@@ -14,6 +15,7 @@ type Category = 'All' | 'E-Commerce' | 'Web App' | 'SaaS' | 'Hospitality';
 const projects: {
   id: number;
   title: string;
+  image: string;
   url: string | null; // null = no confirmed live deployment — rendered as "Selected Work"
   category: Category;
   type: string;
@@ -28,6 +30,7 @@ const projects: {
   {
     id: 2,
     title: 'Lueur Skin',
+    image: '/images/portfolio/lueur-skin.png',
     url: 'https://lueurskin.vercel.app/',
     category: 'E-Commerce',
     type: 'Premium Skincare Store',
@@ -46,6 +49,7 @@ const projects: {
   {
     id: 4,
     title: 'EMLL',
+    image: '/images/portfolio/emll.png',
     url: 'https://emll.vercel.app/',
     category: 'Hospitality',
     type: 'Travel Experience Booking',
@@ -64,7 +68,8 @@ const projects: {
   {
     id: 5,
     title: 'RiadConnect',
-    url: 'https://www.riadconnect.com/',
+    image: '/images/portfolio/riadconnect.png',
+    url: 'https://riadconnect.vercel.app/',
     category: 'SaaS',
     type: 'Hospitality SaaS Platform',
     description: 'Commission-free booking platform for Moroccan Riads. Provides AI guest assistant, custom riad websites, SEO optimization, and WhatsApp integration — giving riads full ownership of their bookings.',
@@ -82,6 +87,7 @@ const projects: {
   {
     id: 8,
     title: 'EmpowerFit',
+    image: '/images/portfolio/empowerfit.png',
     url: 'https://empowerfiit.netlify.app/',
     category: 'Web App',
     type: 'Fitness Coaching PWA',
@@ -100,6 +106,7 @@ const projects: {
   {
     id: 9,
     title: 'EDU Platform',
+    image: '/images/portfolio/edu-platform.png',
     url: 'https://edumaroc.vercel.app',
     category: 'SaaS',
     type: 'Educational Platform (LMS)',
@@ -118,6 +125,7 @@ const projects: {
   {
     id: 10,
     title: 'VitaCore',
+    image: '/images/portfolio/vitacore.png',
     url: 'https://vitapara.vercel.app/fr',
     category: 'E-Commerce',
     type: 'Health & Wellness Store',
@@ -136,6 +144,7 @@ const projects: {
   {
     id: 11,
     title: 'Sitey & AndK',
+    image: '/images/portfolio/sitey-andk.png',
     url: 'https://siteyandk.vercel.app',
     category: 'SaaS',
     type: 'Website Marketplace',
@@ -154,6 +163,7 @@ const projects: {
   {
     id: 12,
     title: 'Transo',
+    image: '/images/portfolio/transo.png',
     url: 'https://transomaroc.vercel.app',
     category: 'Web App',
     type: 'Courier & Shipping Platform',
@@ -172,6 +182,7 @@ const projects: {
   {
     id: 13,
     title: 'ChronoCraft',
+    image: '/images/portfolio/chronocraft.png',
     url: 'https://watchstoremaroc.vercel.app',
     category: 'E-Commerce',
     type: 'Luxury Watch Store',
@@ -190,6 +201,7 @@ const projects: {
   {
     id: 14,
     title: 'Riad Dar Kader',
+    image: '/images/portfolio/riad-dar-kader.png',
     url: 'https://mbndemo.vercel.app/fr',
     category: 'Hospitality',
     type: 'Riad Booking Website',
@@ -208,6 +220,7 @@ const projects: {
   {
     id: 15,
     title: 'Yed Lmiima',
+    image: '/images/portfolio/yed-lmiima.png',
     url: 'https://yedlmiima.com',
     category: 'E-Commerce',
     type: 'Moroccan Cuisine Ordering',
@@ -226,6 +239,7 @@ const projects: {
   {
     id: 16,
     title: 'Abaq',
+    image: '/images/portfolio/abaq.png',
     url: 'https://abaq-peach.vercel.app',
     category: 'E-Commerce',
     type: 'Luxury Perfume Store',
@@ -244,6 +258,7 @@ const projects: {
   {
     id: 17,
     title: 'Clinic Manager',
+    image: '/images/portfolio/clinic-manager.png',
     url: 'https://clcdemo.vercel.app',
     category: 'SaaS',
     type: 'Clinic Management System',
@@ -262,6 +277,7 @@ const projects: {
   {
     id: 18,
     title: 'MBN Health',
+    image: '/images/portfolio/mbn-health.png',
     url: 'https://clinicmaroc.vercel.app',
     category: 'SaaS',
     type: 'Clinic Management SaaS',
@@ -280,6 +296,7 @@ const projects: {
   {
     id: 19,
     title: 'Caramelio',
+    image: '/images/portfolio/caramelio.png',
     url: 'https://caramelio.vercel.app',
     category: 'Hospitality',
     type: 'Café, Bakery & Restaurant',
@@ -298,6 +315,7 @@ const projects: {
   {
     id: 20,
     title: 'Calogym',
+    image: '/images/portfolio/calogym.png',
     url: 'https://calogym.vercel.app',
     category: 'Web App',
     type: 'Fitness Tracking PWA',
@@ -316,6 +334,7 @@ const projects: {
   {
     id: 21,
     title: 'Tarique / طريق',
+    image: '/images/portfolio/tarique.png',
     url: 'https://www.tarique.ma',
     category: 'E-Commerce',
     type: 'Auto & Motorcycle Marketplace',
@@ -412,9 +431,14 @@ export default function PortfolioPage() {
                 >
                   {/* Preview area */}
                   <div className={`h-44 bg-gradient-to-br ${p.gradient} relative flex items-center justify-center overflow-hidden`}>
-                    <div className={`text-6xl font-black ${p.accent} opacity-10 select-none tracking-tighter`}>
-                      {p.title.replace(/\s/g, '')}
-                    </div>
+                    <Image
+                      src={p.image}
+                      alt={`${p.title} project preview`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#090713]/85 via-[#090713]/20 to-transparent" />
                     {/* Type badge */}
                     <span className="absolute top-3 right-3 text-[10px] bg-black/30 backdrop-blur-sm border border-white/15 rounded-full px-2.5 py-1 text-slate-300">
                       {p.type}
