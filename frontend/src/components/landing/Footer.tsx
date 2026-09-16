@@ -138,6 +138,15 @@ export default function Footer() {
               A Moroccan development studio building production-grade digital
               products for businesses worldwide.
             </p>
+            {/* City pages — internal linking for local SEO */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-600 mb-5">
+              <span>Serving:</span>
+              <Link href="/web-design-marrakech" className="hover:text-slate-400 transition-colors">Marrakech</Link>
+              <span>·</span>
+              <Link href="/web-design-casablanca" className="hover:text-slate-400 transition-colors">Casablanca</Link>
+              <span>·</span>
+              <Link href="/web-design-rabat" className="hover:text-slate-400 transition-colors">Rabat</Link>
+            </div>
             {/* Social links */}
             <div className="flex items-center gap-3">
               {[
