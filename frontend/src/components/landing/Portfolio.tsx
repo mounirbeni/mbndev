@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ExternalLink, ArrowUpRight, BadgeCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -12,18 +13,19 @@ const projectsMeta: {
   key: ProjectKey;
   title: string;
   url: string;
+  image: string;
   gradient: string;
   accentHex: string;
   initial: string;
   index: string;
 }[] = [
-  { key: 'carrylink',  title: 'Transo',           url: 'https://transomaroc.vercel.app',         gradient: 'from-sky-600/20 to-blue-700/10',       accentHex: '#38bdf8', initial: 'TR', index: '01' },
-  { key: 'lueur',      title: 'Lueur Skin',      url: 'https://lueurskin.vercel.app/',          gradient: 'from-purple-500/20 to-violet-700/10',  accentHex: '#a78bfa', initial: 'LS', index: '02' },
-  { key: 'tyy',        title: 'VitaCore',         url: 'https://vitacoremaroc.vercel.app',       gradient: 'from-rose-500/20 to-pink-700/10',      accentHex: '#fda4af', initial: 'VC', index: '03' },
-  { key: 'emll',       title: 'EMLL',             url: 'https://emll.vercel.app/',               gradient: 'from-violet-400/20 to-indigo-600/10',  accentHex: '#c4b5fd', initial: 'EM', index: '04' },
-  { key: 'riad',       title: 'RiadConnect',     url: 'https://www.riadconnect.com/',           gradient: 'from-purple-600/20 to-violet-500/10',  accentHex: '#7c3aed', initial: 'RC', index: '05' },
-  { key: 'riaddemo',   title: 'ChronoCraft',      url: 'https://watchstoremaroc.vercel.app',     gradient: 'from-yellow-500/20 to-amber-700/10',   accentHex: '#eab308', initial: 'CC', index: '06' },
-  { key: 'watchstore', title: 'Tarique / طريق',  url: 'https://www.tarique.ma',                 gradient: 'from-amber-500/20 to-orange-700/10',   accentHex: '#fbbf24', initial: 'TA', index: '07' },
+  { key: 'carrylink',  title: 'Transo',          url: 'https://transomaroc.vercel.app',         image: '/images/portfolio/transo.png',       gradient: 'from-sky-600/20 to-blue-700/10',      accentHex: '#38bdf8', initial: 'TR', index: '01' },
+  { key: 'lueur',      title: 'Lueur Skin',      url: 'https://lueurskin.vercel.app/',          image: '/images/portfolio/lueur-skin.png',   gradient: 'from-purple-500/20 to-violet-700/10', accentHex: '#a78bfa', initial: 'LS', index: '02' },
+  { key: 'tyy',        title: 'VitaCore',        url: 'https://vitapara.vercel.app/fr',         image: '/images/portfolio/vitacore.png',     gradient: 'from-rose-500/20 to-pink-700/10',     accentHex: '#fda4af', initial: 'VC', index: '03' },
+  { key: 'emll',       title: 'EMLL',            url: 'https://emll.vercel.app/',               image: '/images/portfolio/emll.png',         gradient: 'from-violet-400/20 to-indigo-600/10', accentHex: '#c4b5fd', initial: 'EM', index: '04' },
+  { key: 'riad',       title: 'RiadConnect',     url: 'https://riadconnect.vercel.app/',        image: '/images/portfolio/riadconnect.png',  gradient: 'from-purple-600/20 to-violet-500/10', accentHex: '#7c3aed', initial: 'RC', index: '05' },
+  { key: 'riaddemo',   title: 'ChronoCraft',     url: 'https://watchstoremaroc.vercel.app',     image: '/images/portfolio/chronocraft.png',  gradient: 'from-yellow-500/20 to-amber-700/10',  accentHex: '#eab308', initial: 'CC', index: '06' },
+  { key: 'watchstore', title: 'Tarique / طريق',  url: 'https://www.tarique.ma',                 image: '/images/portfolio/tarique.png',      gradient: 'from-amber-500/20 to-orange-700/10',  accentHex: '#fbbf24', initial: 'TA', index: '07' },
 ];
 
 function ProjectNumber({ n }: { n: string }) {
@@ -124,6 +126,15 @@ export default function Portfolio() {
             <div className="flex flex-col md:flex-row">
               {/* Preview */}
               <div className={`relative md:w-5/12 h-60 md:h-80 bg-gradient-to-br ${featured.gradient} overflow-hidden shrink-0`}>
+                <Image
+                  src={featured.image}
+                  alt={`${featured.title} project preview`}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 42vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#090713]/85 via-[#090713]/20 to-transparent" />
                 {/* Giant initial watermark */}
                 <div
                   className="absolute inset-0 flex items-center justify-center font-black select-none transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2"
@@ -203,6 +214,14 @@ export default function Portfolio() {
 
               {/* Preview */}
               <div className={`h-36 bg-gradient-to-br ${p.gradient} relative overflow-hidden`}>
+                <Image
+                  src={p.image}
+                  alt={`${p.title} project preview`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#090713]/85 via-[#090713]/20 to-transparent" />
                 <div
                   className="absolute inset-0 flex items-center justify-center font-black select-none transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2"
                   style={{ fontSize: '72px', color: 'rgba(124,58,237,0.08)' }}
