@@ -582,56 +582,34 @@ const templates = {
 
   // ── Platform update announcement ──────────────────────────────────────────
   platformUpdate: ({ user }) => {
-    const first   = (user?.name || 'there').split(' ')[0];
-    const checkoutUrl = `${APP_URL}/dashboard/client/orders`;
+    const first     = (user?.name || 'there').split(' ')[0];
+    const dashboardUrl = `${APP_URL}/dashboard/client`;
     return {
-      subject: `${first}, here's what's new in your dashboard`,
+      subject: `${first}, what's new on MBN DEV (v3.6.0)`,
       html: layout({
-        preheader: `Edit your order before paying, save it for later, and track your payment status in real time.`,
-        badgeHtml: badge('Platform Update — May 2026', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
-        heading:   `We just shipped 4 new features for you, ${first}.`,
-        intro:     `Based on your feedback, we've made the checkout and payment experience much more flexible. Here's everything that's new.`,
+        preheader: `New local pages for Marrakech, Casablanca, and Rabat clients, plus a round of security and reliability improvements.`,
+        badgeHtml: badge('Platform Update — v3.6.0', { bg: T.purpleBg, color: T.purpleLight, border: T.purpleBorder }),
+        heading:   `Here's what we shipped for you, ${first}.`,
+        intro:     `A quick update on what's new across MBN DEV this release.`,
         body: [
 
           divider('28px 0 24px'),
 
-          // ── Feature 1: Edit Order ────────────────────────────────────────────
-          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};">Checkout</p>`,
-          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Edit your order before you pay</h2>`,
+          // ── Feature 1: Local pages ───────────────────────────────────────────
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.purpleLight};font-family:${T.font};">Growing our reach</p>`,
+          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">New dedicated pages for Marrakech, Casablanca &amp; Rabat</h2>`,
 
-          notice(`You can now modify your order description and notes directly on the checkout page — before submitting any payment. Just click <strong style="color:#fff;">Edit Order</strong> in the order summary card.`, { type: 'info' }),
+          notice(`We've launched local pages covering our services for businesses in these three cities — useful if you know someone nearby who's looking for a website or online store.`, { type: 'info' }),
 
           `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 0;">`,
-          `<tr>`,
-          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
-          `<div style="font-size:22px;margin-bottom:10px;">✏️</div>`,
-          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">Update Requirements</div>`,
-          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">Changed your mind about the details? Edit your order description or add notes right from the checkout page — no need to cancel and restart.</div>`,
-          `</td>`,
-          `<td style="width:4%;"></td>`,
-          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
-          `<div style="font-size:22px;margin-bottom:10px;">💾</div>`,
-          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">Saves Instantly</div>`,
-          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">Changes are saved to your order immediately with updated pricing — so what you pay for is exactly what you asked for.</div>`,
-          `</td>`,
-          `</tr>`,
-          `</table>`,
-
-          divider('32px 0'),
-
-          // ── Feature 2: Pay Later ─────────────────────────────────────────────
-          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">Flexibility</p>`,
-          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Not ready to pay right now? Save it for later.</h2>`,
-
-          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">`,
           ...[
-            ['🔖', 'Save Order & Pay Later', 'A new button at the bottom of checkout lets you save your order without paying. Your order stays in your dashboard, ready whenever you are.'],
-            ['📋', 'Pick up where you left off', 'Go to My Orders in your dashboard at any time and click the checkout link to complete payment — your order details are all preserved.'],
-            ['🔔', 'No pressure', 'Your saved order won\'t expire. Come back in an hour or in a week — it will be waiting for you exactly as you left it.'],
+            ['🕌', 'Marrakech', 'Riads, tour operators, and retail businesses.'],
+            ['🏙️', 'Casablanca', 'Corporate, e-commerce, and logistics companies.'],
+            ['🏛️', 'Rabat', 'Institutions and professional service firms.'],
           ].map(([icon, title, desc]) =>
-            `<tr><td style="padding:0 0 12px;vertical-align:top;">` +
+            `<tr><td style="padding:0 0 10px;vertical-align:top;">` +
             `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d0d15;border:1px solid ${T.border};border-radius:12px;">` +
-            `<tr><td style="padding:16px 18px;">` +
+            `<tr><td style="padding:14px 18px;">` +
             `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>` +
             `<td style="font-size:18px;padding-right:14px;vertical-align:top;line-height:1.4;">${icon}</td>` +
             `<td><div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:3px;">${title}</div>` +
@@ -642,39 +620,23 @@ const templates = {
 
           divider('32px 0'),
 
-          // ── Feature 3: Payment waiting state ────────────────────────────────
-          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.amber};font-family:${T.font};">Payments</p>`,
-          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Real-time payment verification status</h2>`,
+          // ── Feature 2: Security ──────────────────────────────────────────────
+          `<p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">Security</p>`,
+          `<h2 style="margin:0 0 18px;font-size:19px;font-weight:700;color:#ffffff;font-family:${T.font};letter-spacing:-0.02em;">Security &amp; reliability improvements</h2>`,
 
-          notice(`Once you submit your payment proof, the checkout page now shows a clear <strong style="color:#fff;">"Awaiting Confirmation"</strong> status — no more wondering if your payment went through. The page updates automatically once we verify it.`, { type: 'success' }),
-
-          `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 0;">`,
-          `<tr>`,
-          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
-          `<div style="font-size:22px;margin-bottom:10px;">⏳</div>`,
-          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">No Double Submissions</div>`,
-          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">After submitting, the payment button is hidden. You won't accidentally submit the same payment twice.</div>`,
-          `</td>`,
-          `<td style="width:4%;"></td>`,
-          `<td style="width:48%;vertical-align:top;background:#0d0d15;border:1px solid ${T.border};border-radius:14px;padding:20px 22px;">`,
-          `<div style="font-size:22px;margin-bottom:10px;">🔁</div>`,
-          `<div style="font-size:14px;font-weight:600;color:#fff;font-family:${T.font};margin-bottom:6px;">Retry if Needed</div>`,
-          `<div style="font-size:13px;color:${T.textSecond};font-family:${T.font};line-height:1.65;">If we don't receive your payment, you'll get a notification and the payment form reappears automatically — ready for a fresh attempt.</div>`,
-          `</td>`,
-          `</tr>`,
-          `</table>`,
+          notice(`We've rolled out a round of security and reliability improvements across the platform to keep your account and data safer. As always, we don't publish specifics about security work.`, { type: 'success' }),
 
           divider('32px 0'),
 
           // ── CTA ─────────────────────────────────────────────────────────────
           `<div style="background:linear-gradient(135deg,${T.purpleBg},#0e0816);border:1px solid ${T.purpleBorder};border-radius:16px;padding:32px 28px;text-align:center;">`,
           `<div style="font-size:28px;margin-bottom:12px;">🚀</div>`,
-          `<h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#fff;font-family:${T.font};letter-spacing:-0.02em;">Ready to try it out?</h3>`,
-          `<p style="margin:0 0 24px;font-size:14px;color:${T.textSecond};font-family:${T.font};line-height:1.7;">Head to your dashboard to place or manage your orders. The new checkout experience is live right now.</p>`,
+          `<h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#fff;font-family:${T.font};letter-spacing:-0.02em;">See what's new</h3>`,
+          `<p style="margin:0 0 24px;font-size:14px;color:${T.textSecond};font-family:${T.font};line-height:1.7;">Head to your dashboard — the full changelog is one click away from the notification bell.</p>`,
           `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">`,
           `<tr><td style="border-radius:12px;" bgcolor="${T.purple}">`,
           `<!--[if !mso]><!-->`,
-          `<a href="${checkoutUrl}" style="background:linear-gradient(135deg,${T.purple},${T.purpleDark});display:inline-block;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:12px;font-family:${T.font};letter-spacing:-0.01em;">View My Orders →</a>`,
+          `<a href="${dashboardUrl}" style="background:linear-gradient(135deg,${T.purple},${T.purpleDark});display:inline-block;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:12px;font-family:${T.font};letter-spacing:-0.01em;">Go to My Dashboard →</a>`,
           `<!--<![endif]-->`,
           `</td></tr></table>`,
           `</div>`,

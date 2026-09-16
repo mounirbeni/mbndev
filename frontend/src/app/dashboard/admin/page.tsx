@@ -97,7 +97,7 @@ export default function AdminDashboard() {
   }, [fetchAnalytics]);
 
   const TEMPLATES = [
-    { key: 'platformUpdate', label: 'May 2026 — Platform Update',    when: 'Now',    color: 'violet' },
+    { key: 'platformUpdate', label: 'v3.6.0 — Platform Update',      when: 'Now',    color: 'violet' },
     { key: 'getStarted',     label: 'Week 1 — Get started nudge',    when: 'Week 1', color: 'green'  },
     { key: 'checkIn',        label: 'Week 1 — Personal check-in',    when: 'Week 1', color: 'blue'   },
     { key: 'comingSoon',     label: 'Week 2 — What\'s coming next',  when: 'Week 2', color: 'amber'  },
