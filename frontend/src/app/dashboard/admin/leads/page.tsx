@@ -49,7 +49,7 @@ const TYPE_ICONS: Record<string, LucideIcon> = {
 
 const DM_TEMPLATE = (name: string, type: string) => {
   const portfolioRef = type === 'riad'
-    ? '• Riad Dar Kader : https://riadkader.vercel.app/fr\n• Emll : https://emll.vercel.app'
+    ? '• Riad Dar Kader : https://mbndemo.vercel.app/fr\n• Emll : https://emll.vercel.app'
     : type === 'boutique'
     ? '• TyyMaroc\n• Emll : https://emll.vercel.app'
     : '• Emll : https://emll.vercel.app';
