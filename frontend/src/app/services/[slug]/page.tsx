@@ -1,575 +1,99 @@
 'use client';
 
-import { notFound } from 'next/navigation';
 import { use } from 'react';
+import { notFound } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import {
-  Globe, ShoppingCart, Settings, Rocket, Wrench,
-  Check, ArrowRight, Star, Clock, Shield, Zap,
-  Code2, Palette, BarChart3, HeadphonesIcon, Package,
-  ChevronRight, MessageSquare, Flame, Tag, Trophy, TrendingDown,
-} from 'lucide-react';
+import { ArrowRight, ChevronRight, Check, Globe, ShoppingCart, Settings, Rocket, Wrench } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
-import Button from '@/components/ui/Button';
-import { useLanguage } from '@/contexts/LanguageContext';
 
-// ─── Service Data ──────────────────────────────────────────────────────────────
-// Market research: Upwork / Fiverr Pro / GoodFirms / Clutch — 2026
-// originalPrice = realistic freelancer market average for each service type
-
-const serviceData: Record<string, {
-  icon: React.ElementType;
+type ServiceDetail = {
+  icon: typeof Globe;
   title: string;
   tagline: string;
   description: string;
-  longDesc: string;
   features: string[];
-  process: { step: string; title: string; desc: string }[];
-  includes: { icon: React.ElementType; label: string; desc: string }[];
-  price: number;
-  originalPrice: number;
-  isMonthly?: boolean;
-  badge: string;
-  badgeIcon: React.ElementType;
-  badgeClass: string;
-  priceNote: string;
-  requestType: string;
-  color: string;
-  border: string;
-  accent: string;
-  faqs: { q: string; a: string }[];
-}> = {
+  requestType: string | null;
+};
+
+// Service possibilities, not an unconditional bundle. The accepted proposal
+// establishes included functionality, pricing, delivery and ongoing support.
+const services: Record<string, ServiceDetail> = {
   'custom-websites': {
     icon: Globe,
     title: 'Custom Websites',
-    tagline: 'Your brand, perfectly built.',
-    description: 'A website that truly represents your business — designed from scratch, built for performance, and made to convert.',
-    longDesc: `Your website is your digital storefront. We don't use templates — every pixel is crafted specifically for your brand, your audience, and your goals. Whether you're a local business or a growing startup, we build websites that look professional, load fast, and turn visitors into customers.`,
-    features: [
-      'Pixel-perfect responsive design',
-      'SEO-optimized page structure',
-      'Google PageSpeed score 90+',
-      'CMS integration (editable content)',
-      'Google Analytics & Search Console setup',
-      'Contact forms & lead capture',
-      'Custom domain & hosting guidance',
-      'Social media integration',
-      'Cookie consent & GDPR ready',
-      'Post-launch support included',
-    ],
-    process: [
-      { step: '01', title: 'Discovery Call',    desc: 'We learn about your business, goals, audience, and design preferences.' },
-      { step: '02', title: 'Design Mockup',     desc: 'We create a full design in Figma for your review before any code is written.' },
-      { step: '03', title: 'Development',       desc: 'We build your site with clean, fast code — responsive on every device.' },
-      { step: '04', title: 'Review & Launch',   desc: 'You review, request revisions, approve — then we launch live.' },
-    ],
-    includes: [
-      { icon: Palette,   label: 'Custom Design',    desc: 'Built from scratch for your brand' },
-      { icon: Code2,     label: 'Clean Code',        desc: 'Fast, maintainable codebase' },
-      { icon: BarChart3, label: 'SEO Foundation',    desc: 'Optimized for Google from day one' },
-      { icon: Shield,    label: 'Secure & Reliable', desc: 'HTTPS, secure forms, best practices' },
-    ],
-    price: 799,
-    originalPrice: 1499,
-    badge: 'Limited Offer',
-    badgeIcon: Flame,
-    badgeClass: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
-    priceNote: 'Final price depends on number of pages, features, and complexity.',
+    tagline: 'An online presence built around your brand.',
+    description: 'We can design and develop a business website based on your audience, content, visual identity and functional requirements.',
+    features: ['Responsive layouts', 'Brand-aligned design', 'Page and content planning', 'Search-friendly structure', 'Contact forms', 'Content management options', 'Hosting and domain guidance'],
     requestType: 'website',
-    color: 'from-primary-500/15 to-blue-500/5',
-    border: 'border-primary-500/30',
-    accent: 'text-primary-400',
-    faqs: [
-      { q: 'How long does it take?',         a: 'A standard 5-page website takes 7–14 days from design approval to launch.' },
-      { q: 'Can I edit content myself?',     a: 'Yes — we integrate a CMS so you can update text, images, and blog posts without code.' },
-      { q: 'Do you provide hosting?',        a: 'We guide you to set up hosting on Vercel or Netlify (often free) and connect your domain.' },
-      { q: 'What if I need changes later?',  a: 'Every project includes a revision period. Ongoing changes are covered by our Maintenance plan.' },
-    ],
   },
-
-  'ecommerce': {
+  ecommerce: {
     icon: ShoppingCart,
     title: 'E-Commerce Stores',
-    tagline: 'Sell smarter, scale faster.',
-    description: 'A full-featured online store that handles everything — from product listings to secure checkout and order management.',
-    longDesc: `Selling online requires more than just a product page. We build complete e-commerce solutions with secure payment gateways, smooth checkout flows, and admin dashboards that make managing your store effortless. From boutique shops to large catalogs, we scale with you.`,
-    features: [
-      'Stripe & PayPal payment integration',
-      'Product catalog with filtering & search',
-      'Cart & one-page checkout',
-      'Order management dashboard',
-      'Inventory & stock tracking',
-      'Automated order confirmation emails',
-      'Discount codes & promotions',
-      'Mobile-optimized shopping experience',
-      'Customer accounts & order history',
-      'Analytics & sales reporting',
-    ],
-    process: [
-      { step: '01', title: 'Store Planning',  desc: 'We map out your catalog structure, payment flow, and checkout experience.' },
-      { step: '02', title: 'Design & UX',     desc: 'We design product pages, cart, and checkout for maximum conversion.' },
-      { step: '03', title: 'Build & Integrate', desc: 'We connect Stripe/PayPal, build the admin panel, and set up inventory.' },
-      { step: '04', title: 'Test & Launch',   desc: 'Full payment testing in sandbox mode, then go live with confidence.' },
-    ],
-    includes: [
-      { icon: Package,        label: 'Product Management', desc: 'Easy catalog & inventory control' },
-      { icon: Shield,         label: 'Secure Payments',    desc: 'Stripe & PayPal certified integration' },
-      { icon: BarChart3,      label: 'Sales Analytics',    desc: 'Track revenue, orders, and conversion' },
-      { icon: HeadphonesIcon, label: 'Post-Launch Support', desc: '30 days of included support' },
-    ],
-    price: 1499,
-    originalPrice: 2999,
-    badge: 'Best Deal',
-    badgeIcon: Tag,
-    badgeClass: 'bg-primary-500/20 text-primary-300 border-primary-500/30',
-    priceNote: 'Price varies by catalog size, payment providers, and custom features needed.',
+    tagline: 'Your products and shopping experience, clearly presented.',
+    description: 'Plan a storefront with a product catalogue, order management and checkout options appropriate to your market and chosen providers.',
+    features: ['Product catalogue', 'Product search and filters', 'Cart and checkout design', 'Order management', 'Stock tracking options', 'Payment-provider assessment', 'Responsive shopping experience'],
     requestType: 'ecommerce',
-    color: 'from-blue-500/15 to-cyan-500/5',
-    border: 'border-blue-500/30',
-    accent: 'text-blue-400',
-    faqs: [
-      { q: 'Which payment methods do you support?', a: 'Stripe (cards), PayPal, and cash-on-delivery. We can add other providers on request.' },
-      { q: 'Can I manage products myself?',         a: 'Yes — the admin dashboard lets you add/edit/remove products, update stock, and process orders.' },
-      { q: 'Is it mobile-friendly?',               a: 'Absolutely. Over 60% of online shopping is mobile — we design mobile-first.' },
-      { q: 'Can I add more products later?',        a: 'Yes, there is no limit on products. The system is built to scale as your catalog grows.' },
-    ],
   },
-
   'web-applications': {
     icon: Settings,
     title: 'Web Applications',
-    tagline: 'Custom software, zero compromise.',
-    description: 'Tailored web applications built around your specific business workflow — from internal tools to customer-facing platforms.',
-    longDesc: `Off-the-shelf software rarely fits perfectly. We build custom web applications that do exactly what your business needs — whether it's a client portal, an internal tool, a booking system, or a complex multi-user platform. Built with modern tech, designed to scale.`,
-    features: [
-      'Custom business logic & workflows',
-      'User authentication & role management',
-      'Third-party API & service integration',
-      'File upload & document management',
-      'Real-time notifications',
-      'Reporting & data export',
-      'Multi-tenant architecture',
-      'REST or GraphQL API development',
-      'Admin dashboard & control panel',
-      'Scalable cloud deployment',
-    ],
-    process: [
-      { step: '01', title: 'Requirements Deep Dive', desc: 'We document every feature, user role, and workflow before writing a line of code.' },
-      { step: '02', title: 'Architecture Design',    desc: 'We plan the database schema, API structure, and tech stack for your use case.' },
-      { step: '03', title: 'Iterative Development',  desc: 'We build in sprints — you review progress every 1–2 weeks.' },
-      { step: '04', title: 'QA & Deployment',        desc: 'Full testing, staging environment review, then production deployment.' },
-    ],
-    includes: [
-      { icon: Code2,     label: 'Full-Stack Development', desc: 'Frontend + backend + database' },
-      { icon: Shield,    label: 'Auth & Security',        desc: 'JWT, roles, encrypted data' },
-      { icon: Zap,       label: 'Performance',            desc: 'Optimized queries & caching' },
-      { icon: BarChart3, label: 'Analytics & Reporting',  desc: 'Built-in data insights' },
-    ],
-    price: 1999,
-    originalPrice: 3999,
-    badge: 'Best Value',
-    badgeIcon: Trophy,
-    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    priceNote: 'Complex applications are scoped individually. Contact us for a custom estimate.',
+    tagline: 'Software tailored to the way your business works.',
+    description: 'Custom portals, booking interfaces and internal tools designed around a documented set of user roles, workflows and integrations.',
+    features: ['Requirements and architecture review', 'Account and role options', 'Business workflows', 'Database and API integration', 'Administration interfaces', 'Testing and handover planning'],
     requestType: 'custom',
-    color: 'from-orange-500/15 to-yellow-500/5',
-    border: 'border-orange-500/30',
-    accent: 'text-orange-400',
-    faqs: [
-      { q: 'What tech stack do you use?',            a: 'Next.js + TypeScript for frontend, Node.js/Express for backend, MongoDB or PostgreSQL for the database.' },
-      { q: 'Can you integrate with my existing tools?', a: 'Yes — we regularly integrate with Stripe, Twilio, SendGrid, Google APIs, and custom REST APIs.' },
-      { q: 'How do you handle my data?',             a: 'All sensitive data is encrypted at rest and in transit. We follow security best practices throughout.' },
-      { q: 'What if requirements change mid-project?', a: 'We work with flexible scopes. Changes are discussed, estimated, and added via a formal change request.' },
-    ],
   },
-
   'landing-pages': {
     icon: Rocket,
     title: 'Landing Pages',
-    tagline: 'Convert visitors into clients.',
-    description: 'High-converting single pages built to capture leads, promote a product, or launch a campaign — fast and focused.',
-    longDesc: `A landing page has one job: convert. Every section, headline, and button is engineered to guide your visitor toward a single action — signing up, buying, or contacting you. We combine psychology-backed copywriting structure with fast, beautiful design to maximize your ROI.`,
-    features: [
-      'Conversion-optimized section layout',
-      'Hero section with strong CTA',
-      'Social proof & testimonials section',
-      'Features / benefits breakdown',
-      'Lead capture form with email notification',
-      'Mobile-first, sub-2s load time',
-      'A/B testing ready structure',
-      'Pixel & analytics integration',
-      'Custom thank-you / confirmation page',
-      'Fast turnaround (3–5 days)',
-    ],
-    process: [
-      { step: '01', title: 'Goal & Audience', desc: 'We define the single conversion goal and the ideal visitor persona.' },
-      { step: '02', title: 'Copy & Structure', desc: 'We plan the section flow and headline messaging for maximum impact.' },
-      { step: '03', title: 'Design & Build',  desc: 'Pixel-perfect design built as a fast, fully responsive page.' },
-      { step: '04', title: 'Publish & Track', desc: 'We connect your analytics and publish — ready to run traffic to.' },
-    ],
-    includes: [
-      { icon: Rocket,    label: 'Fast Delivery',    desc: '3–5 business days turnaround' },
-      { icon: BarChart3, label: 'Conversion Focus', desc: 'Every element drives action' },
-      { icon: Zap,       label: 'Speed',            desc: 'Sub-2s load time guaranteed' },
-      { icon: Palette,   label: 'On-Brand Design',  desc: 'Matches your visual identity' },
-    ],
-    price: 499,
-    originalPrice: 899,
-    badge: 'Quick Launch',
-    badgeIcon: Zap,
-    badgeClass: 'bg-green-500/20 text-green-300 border-green-500/30',
-    priceNote: 'Price depends on number of sections, animations, and integrations needed.',
+    tagline: 'One clear page. One clear objective.',
+    description: 'Focused campaign and product pages with a clear message, accessible calls to action and lead-collection options as needed.',
+    features: ['Brand-aligned layout', 'Responsive sections', 'Call-to-action design', 'Lead form options', 'Analytics options', 'Publication and domain guidance'],
     requestType: 'website',
-    color: 'from-green-500/15 to-emerald-500/5',
-    border: 'border-green-500/30',
-    accent: 'text-green-400',
-    faqs: [
-      { q: 'How fast can you deliver?',               a: 'Most landing pages are live within 3–5 business days after design approval.' },
-      { q: 'Can I connect my email marketing tool?',  a: 'Yes — we integrate with Mailchimp, ConvertKit, ActiveCampaign, or any service with an API.' },
-      { q: 'Is the page hosted on my domain?',        a: 'Yes — we deploy to your existing domain or set up a new subdomain (e.g., offer.yourdomain.com).' },
-      { q: 'Can I edit the copy myself later?',       a: 'We can set it up as a CMS page so you can update text without touching code.' },
-    ],
   },
-
-  'maintenance': {
+  maintenance: {
     icon: Wrench,
     title: 'Maintenance & Support',
-    tagline: 'We stay after delivery.',
-    description: 'Ongoing technical care for your website or app — updates, security, performance, and peace of mind every month.',
-    longDesc: `Launching your website is just the beginning. Technology evolves, bugs emerge, and your business needs change. Our maintenance plans keep your site secure, fast, and up-to-date — so you can focus on running your business while we handle the technical side.`,
-    features: [
-      'Monthly performance & uptime monitoring',
-      'Security patches & dependency updates',
-      'Bug fixes & error resolution',
-      'Content & copy updates (up to 2h/mo)',
-      'Monthly health & analytics report',
-      'Backup management',
-      'Priority response time (<24h)',
-      'Feature add-ons at discounted rate',
-      'Hosting & domain renewal reminders',
-      'Dedicated support channel (WhatsApp/email)',
-    ],
-    process: [
-      { step: '01', title: 'Onboarding',     desc: 'We audit your existing site, set up monitoring tools, and create a baseline report.' },
-      { step: '02', title: 'Monthly Care',   desc: 'Security updates, performance checks, and your requested changes every month.' },
-      { step: '03', title: 'Monthly Report', desc: 'You receive a clear report: uptime, speed scores, updates applied, and next actions.' },
-      { step: '04', title: 'On-Demand Help', desc: 'Need something urgent? Reach us directly — priority response included.' },
-    ],
-    includes: [
-      { icon: Shield,         label: 'Security Updates',  desc: 'Patches applied as released' },
-      { icon: BarChart3,      label: 'Monthly Reports',   desc: 'Transparent, readable summaries' },
-      { icon: Clock,          label: 'Priority Support',  desc: 'Response within 24 hours' },
-      { icon: HeadphonesIcon, label: 'Dedicated Channel', desc: 'Direct WhatsApp or email line' },
-    ],
-    price: 149,
-    originalPrice: 299,
-    isMonthly: true,
-    badge: 'Flexible Plans',
-    badgeIcon: Shield,
-    badgeClass: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
-    priceNote: 'Billed monthly. Cancel anytime. Discounts for 6 or 12-month commitments.',
-    requestType: 'website',
-    color: 'from-slate-500/15 to-slate-600/5',
-    border: 'border-slate-500/30',
-    accent: 'text-slate-300',
-    faqs: [
-      { q: 'Do I need to be an existing client?', a: 'No — we can onboard any existing website or app, regardless of who built it.' },
-      { q: 'What counts as a "content update"?',  a: 'Updating text, swapping images, adding a team member, changing pricing — anything that doesn\'t require new features.' },
-      { q: 'Can I cancel anytime?',               a: 'Yes — our plans are month-to-month with no lock-in contracts.' },
-      { q: 'What if I need a big new feature?',   a: 'New features are quoted separately as a project. Maintenance clients get a 15% discount on all new work.' },
-    ],
+    tagline: 'Ongoing care with responsibilities defined in writing.',
+    description: 'Discuss a support arrangement that identifies the systems covered, response windows, available hours and any costs for additional work.',
+    features: ['Initial scope review', 'Dependency and security update options', 'Performance checks', 'Content changes by agreement', 'Backup responsibilities', 'A defined communication channel'],
+    requestType: null,
   },
 };
 
-function discountPct(original: number, current: number) {
-  return Math.round((1 - current / original) * 100);
-}
-
-// ─── Page ──────────────────────────────────────────────────────────────────────
-
 export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const service = serviceData[slug];
+  const service = services[slug];
   if (!service) notFound();
-
-  const { t } = useLanguage();
   const Icon = service.icon;
-  const BadgeIcon = service.badgeIcon;
-  const pct = discountPct(service.originalPrice, service.price);
-  const savings = service.originalPrice - service.price;
-  const priceLabel    = service.isMonthly ? `From $${service.price}/mo`         : `From $${service.price.toLocaleString()}`;
-  const origLabel     = service.isMonthly ? `$${service.originalPrice}/mo`      : `$${service.originalPrice.toLocaleString()}`;
-  const savingsLabel  = service.isMonthly ? `$${savings}/mo`                    : `$${savings.toLocaleString()}`;
+  const requestHref = service.requestType ? `/request?service=${encodeURIComponent(service.requestType)}` : '/contact';
 
   return (
     <PublicLayout>
-      {/* ── Hero ── */}
-      <section className="pt-32 pb-16 px-4 sm:px-6 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-primary-500/8 rounded-full blur-[120px] pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
-            <Link href="/" className="hover:text-slate-300 transition-colors">{t('nav.home')}</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/services" className="hover:text-slate-300 transition-colors">{t('nav.services')}</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-slate-300">{service.title}</span>
-          </div>
-
+      <section className="relative overflow-hidden px-4 sm:px-6 pt-32 pb-20">
+        <div className="absolute -top-28 left-1/2 -translate-x-1/2 w-[800px] h-[480px] bg-violet-600/[0.08] blur-[100px] rounded-full pointer-events-none" />
+        <div className="max-w-6xl mx-auto relative z-10">
+          <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-2 text-slate-500 text-sm mb-12"><Link href="/" className="hover:text-white">Home</Link><ChevronRight className="w-4 h-4" aria-hidden="true" /><Link href="/services" className="hover:text-white">Services</Link><ChevronRight className="w-4 h-4" aria-hidden="true" /><span className="text-slate-300">{service.title}</span></nav>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div className={`w-16 h-16 bg-gradient-to-br ${service.color} border ${service.border} rounded-2xl flex items-center justify-center mb-6`}>
-                <Icon className="w-8 h-8 text-white" />
-              </div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">
-                {service.title}
-              </h1>
-              <p className={`text-lg font-medium mb-4 ${service.accent}`}>{service.tagline}</p>
-              <p className="text-slate-400 leading-relaxed mb-8">{service.longDesc}</p>
-
-              {/* Market comparison trust chip */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full mb-6">
-                <TrendingDown className="w-3 h-3 text-green-400" />
-                <span className="text-green-400 text-xs">{t('services.slug.saveVsMarket').replace('{n}', savingsLabel)}</span>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <Link href={`/request?service=${service.requestType}`}>
-                  <Button size="lg" className="group">
-                    {t('services.slug.startProject')}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Link href="/contact">
-                  <Button size="lg" variant="outline">
-                    <MessageSquare className="w-4 h-4" /> {t('services.slug.askQuestion')}
-                  </Button>
-                </Link>
-              </div>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/25 to-blue-500/10 border border-violet-500/25 flex items-center justify-center mb-7"><Icon className="w-8 h-8 text-violet-300" aria-hidden="true" /></div>
+              <span className="section-label">MBN DEV / SERVICES</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mt-5 mb-4">{service.title}</h1>
+              <p className="text-violet-300 text-lg font-semibold mb-5">{service.tagline}</p>
+              <p className="text-slate-400 leading-relaxed mb-8 max-w-xl">{service.description}</p>
+              <div className="flex flex-wrap gap-3"><Link href={requestHref} className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl px-6 py-3.5">{service.requestType ? 'Start a project' : 'Discuss support'} <ArrowRight className="w-4 h-4" /></Link><Link href="/contact" className="inline-flex items-center gap-2 border border-white/15 hover:border-white/30 text-white font-semibold rounded-xl px-6 py-3.5">Ask a question</Link></div>
             </motion.div>
-
-            {/* Right — price card */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.15 }}
-            >
-              <div className={`glass rounded-2xl p-8 border ${service.border} bg-gradient-to-br ${service.color} relative overflow-hidden`}>
-                {/* Discount % pill */}
-                <div className="absolute top-4 right-4">
-                  <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-2.5 py-1 rounded-full">
-                    -{pct}% OFF
-                  </span>
-                </div>
-
-                {/* Promo badge */}
-                <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-5 ${service.badgeClass}`}>
-                  <BadgeIcon className="w-3 h-3" />
-                  {service.badge}
-                </div>
-
-                {/* Price */}
-                <div className="mb-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-slate-500 text-sm line-through">{origLabel}</span>
-                    <span className="text-slate-500 text-xs">{t('services.slug.marketAvg')}</span>
-                  </div>
-                  <span className="text-4xl font-black text-white">{priceLabel}</span>
-                </div>
-                <p className="text-green-400 text-sm font-semibold mb-1">
-                  {t('services.slug.youSave').replace('{n}', savingsLabel)}
-                </p>
-                <p className="text-slate-500 text-xs mb-6">{service.priceNote}</p>
-
-                <ul className="space-y-3 mb-8">
-                  {service.features.slice(0, 6).map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-slate-300">
-                      <div className="w-5 h-5 bg-primary-500/20 rounded-full flex items-center justify-center shrink-0">
-                        <Check className="w-3 h-3 text-primary-400" />
-                      </div>
-                      {f}
-                    </li>
-                  ))}
-                  {service.features.length > 6 && (
-                    <li className="text-xs text-slate-500 pl-7">{t('services.slug.moreFeatures').replace('{n}', String(service.features.length - 6))}</li>
-                  )}
-                </ul>
-
-                <Link href={`/request?service=${service.requestType}`} className="block">
-                  <Button size="lg" className="w-full group">
-                    {t('services.slug.getStarted')} — {priceLabel}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              </div>
+            <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12 }} className="glass rounded-3xl border border-violet-500/20 p-8 sm:p-10">
+              <span className="text-xs text-violet-400 font-bold uppercase tracking-widest">Possible features</span>
+              <h2 className="text-2xl font-black text-white mt-3 mb-4">Build the right scope.</h2>
+              <p className="text-slate-400 text-sm leading-relaxed mb-7">We choose the features that fit your requirements. This list is illustrative, not a promise that every feature is included in a base package.</p>
+              <ul className="space-y-4">{service.features.map((feature) => <li key={feature} className="flex items-start gap-3 text-sm text-slate-300"><Check className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" aria-hidden="true" />{feature}</li>)}</ul>
+              <div className="border-t border-white/10 mt-8 pt-6 text-sm text-slate-400">Price, delivery window, revisions, ownership and support are confirmed in your written proposal.</div>
             </motion.div>
           </div>
         </div>
       </section>
-
-      {/* ── What's Included ── */}
-      <section className="py-16 px-4 sm:px-6 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.included')}</h2>
-            <p className="text-slate-400">{t('services.slug.includedSub').replace('{name}', service.title)}</p>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-            {service.includes.map((item, i) => {
-              const IncIcon = item.icon;
-              return (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="glass rounded-xl p-5 border border-white/5 text-center"
-                >
-                  <div className="w-10 h-10 bg-primary-500/15 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <IncIcon className="w-5 h-5 text-primary-400" />
-                  </div>
-                  <div className="text-white font-semibold text-sm mb-1">{item.label}</div>
-                  <div className="text-slate-500 text-xs">{item.desc}</div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          <div className="glass rounded-2xl p-8 border border-white/5">
-            <h3 className="text-white font-semibold mb-6">{t('services.slug.featureList')}</h3>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {service.features.map((f) => (
-                <div key={f} className="flex items-center gap-3 text-sm text-slate-300">
-                  <div className="w-5 h-5 bg-primary-500/15 rounded-full flex items-center justify-center shrink-0">
-                    <Check className="w-3 h-3 text-primary-400" />
-                  </div>
-                  {f}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Process ── */}
-      <section className="py-16 px-4 sm:px-6 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.howItWorks')}</h2>
-            <p className="text-slate-400">{t('services.slug.howSub')}</p>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {service.process.map((p, i) => (
-              <motion.div
-                key={p.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative"
-              >
-                {i < service.process.length - 1 && (
-                  <div className="hidden lg:block absolute top-6 left-full w-full h-px bg-white/5 z-0" style={{ width: 'calc(100% - 3rem)', left: '3rem' }} />
-                )}
-                <div className="glass rounded-2xl p-6 border border-white/5 relative z-10">
-                  <div className="w-10 h-10 bg-primary-500/20 rounded-xl flex items-center justify-center mb-4">
-                    <span className="text-primary-400 font-bold text-sm">{p.step}</span>
-                  </div>
-                  <h4 className="text-white font-semibold mb-2">{p.title}</h4>
-                  <p className="text-slate-400 text-sm leading-relaxed">{p.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FAQ ── */}
-      <section className="py-16 px-4 sm:px-6 border-t border-white/5">
-        <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.faqTitle')}</h2>
-            <p className="text-slate-400">{t('services.slug.faqSub')}</p>
-          </motion.div>
-
-          <div className="space-y-4">
-            {service.faqs.map((faq, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                className="glass rounded-xl p-6 border border-white/5"
-              >
-                <h4 className="text-white font-semibold mb-2">{faq.q}</h4>
-                <p className="text-slate-400 text-sm leading-relaxed">{faq.a}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="py-16 px-4 sm:px-6 border-t border-white/5">
-        <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass rounded-3xl p-10 sm:p-14 text-center border border-primary-500/20 relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-blue-500/5 pointer-events-none" />
-            <div className="relative z-10">
-              <div className="w-14 h-14 bg-primary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <Icon className="w-7 h-7 text-primary-400" />
-              </div>
-              {/* Savings highlight in CTA */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full mb-4">
-                <TrendingDown className="w-3 h-3 text-green-400" />
-                <span className="text-green-400 text-xs font-medium">{t('services.slug.saveVsPct').replace('{n}', savingsLabel).replace('{pct}', String(pct))}</span>
-              </div>
-              <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.cta')}</h2>
-              <p className="text-slate-400 mb-8 max-w-md mx-auto">
-                {t('services.slug.ctaSub')}
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Link href={`/request?service=${service.requestType}`}>
-                  <Button size="lg" className="group">
-                    {t('services.slug.startYour')} {service.title} {t('services.slug.project')}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Link href="/contact">
-                  <Button size="lg" variant="outline">
-                    <MessageSquare className="w-4 h-4" /> {t('services.slug.contactFirst')}
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <section className="px-4 sm:px-6 pb-24"><div className="max-w-4xl mx-auto premium-surface-featured rounded-3xl text-center p-8 sm:p-12"><h2 className="text-white text-3xl font-black mb-4">Tell us what you need.</h2><p className="text-slate-400 max-w-xl mx-auto mb-7">Share your goals and requirements so we can propose an appropriate scope and transparent quote.</p><Link href={requestHref} className="inline-flex items-center gap-2 text-violet-300 hover:text-white font-semibold">{service.requestType ? 'Request a project' : 'Contact us'} <ArrowRight className="w-4 h-4" /></Link></div></section>
     </PublicLayout>
   );
 }
