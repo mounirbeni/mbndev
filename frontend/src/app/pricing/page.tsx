@@ -14,17 +14,13 @@ import AuthModal from '@/components/ui/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const BADGE_STYLES: Record<string, { icon: any; className: string }> = {
-  'Limited Offer': { icon: Flame,  className: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
-  'Best Deal':     { icon: Tag,    className: 'bg-primary-500/20 text-primary-300 border-primary-500/30' },
-  'Best Value':    { icon: Trophy, className: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+const BADGE_STYLES: Record<string, { icon: typeof Tag; className: string }> = {
+  'Limited Offer': { icon: Flame, className: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
+  'Best Deal': { icon: Tag, className: 'bg-primary-500/20 text-primary-300 border-primary-500/30' },
+  'Best Value': { icon: Trophy, className: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
 };
 
-function discountPct(original: number, current: number) {
-  return Math.round((1 - current / original) * 100);
-}
-
-const fallbackPackages = [
+const fallbackPackages: Package[] = [
   {
     _id: '1', name: 'Starter', slug: 'starter', price: 799, originalPrice: 1499, badge: 'Limited Offer', popular: false,
     description: 'Perfect for small businesses and personal projects.',
@@ -45,44 +41,32 @@ const fallbackPackages = [
   },
 ];
 
+const hasFeature = (pkg: Package | undefined, fragment: string): boolean =>
+  Boolean(pkg?.features?.some((feature) => feature.toLowerCase().includes(fragment.toLowerCase())));
+
+const getNumberFromFeature = (pkg: Package | undefined, fragment: string): number | undefined => {
+  const description = pkg?.features?.find((feature) => feature.toLowerCase().includes(fragment.toLowerCase()));
+  const match = description?.match(/\d+/);
+  return match ? Number(match[0]) : undefined;
+};
+
 export default function PricingPage() {
   const { user } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAnnual, setShowAnnual] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
-
-  const comparison = [
-    { feature: t('pricing.compare.pages'),      starter: 'Up to 5',  pro: 'Up to 10', premium: t('pricing.compare.unlimited') },
-    { feature: t('pricing.compare.responsive'), starter: true,       pro: true,        premium: true },
-    { feature: t('pricing.compare.seo'),        starter: t('pricing.compare.basic'), pro: t('pricing.compare.advanced'), premium: t('pricing.compare.advanced') },
-    { feature: t('pricing.compare.cms'),        starter: false,      pro: true,        premium: true },
-    { feature: t('pricing.compare.customFeat'), starter: false,      pro: false,       premium: true },
-    { feature: t('pricing.compare.revisions'),  starter: '1',        pro: '3',         premium: '6' },
-    { feature: t('pricing.compare.support'),    starter: false,      pro: true,        premium: true },
-    { feature: t('pricing.compare.source'),     starter: false,      pro: false,       premium: true },
-    { feature: t('pricing.compare.maint'),      starter: false,      pro: false,       premium: true },
-    { feature: t('pricing.compare.delivery'),   starter: '7 days',   pro: '14 days',   premium: '21 days' },
-  ];
-
-  const faqs = [
-    { q: t('pricing.faq.q1'), a: t('pricing.faq.a1') },
-    { q: t('pricing.faq.q2'), a: t('pricing.faq.a2') },
-    { q: t('pricing.faq.q3'), a: t('pricing.faq.a3') },
-    { q: t('pricing.faq.q4'), a: t('pricing.faq.a4') },
-  ];
 
   useEffect(() => {
     packageAPI.getAll()
       .then(({ data }) => setPackages(data.packages?.length ? data.packages : fallbackPackages))
-      .catch(() => setPackages(fallbackPackages as any))
+      .catch(() => setPackages(fallbackPackages))
       .finally(() => setLoading(false));
   }, []);
 
-  const choosePlan = (pkg: { slug: string; name: string }) => {
+  const choosePlan = (pkg: Package) => {
     localStorage.setItem('mbndev_selected_plan', pkg.slug);
     if (user) {
       router.push(`/request?package=${pkg.slug}`);
@@ -98,6 +82,54 @@ export default function PricingPage() {
   };
 
   const displayed = loading ? fallbackPackages : packages;
+  const plan = (slug: string) => displayed.find((pkg) => pkg.slug === slug);
+  const planValue = (getter: (pkg: Package | undefined) => string | boolean) => ({
+    starter: getter(plan('starter')),
+    pro: getter(plan('pro')),
+    premium: getter(plan('premium')),
+  });
+  const comparison = [
+    {
+      feature: t('pricing.compare.pages'),
+      ...planValue((pkg) => {
+        if (!pkg) return '—';
+        if (pkg.pages === 0 || hasFeature(pkg, 'Unlimited Pages')) return t('pricing.compare.unlimited');
+        const pages = pkg.pages ?? getNumberFromFeature(pkg, 'Pages');
+        return pages ? `Up to ${pages}` : '—';
+      }),
+    },
+    { feature: t('pricing.compare.responsive'), ...planValue((pkg) => hasFeature(pkg, 'Responsive Design')) },
+    {
+      feature: t('pricing.compare.seo'),
+      ...planValue((pkg) => hasFeature(pkg, 'Advanced SEO') ? t('pricing.compare.advanced') : hasFeature(pkg, 'Basic SEO') ? t('pricing.compare.basic') : '—'),
+    },
+    { feature: t('pricing.compare.cms'), ...planValue((pkg) => hasFeature(pkg, 'CMS')) },
+    { feature: t('pricing.compare.customFeat'), ...planValue((pkg) => hasFeature(pkg, 'Custom Features')) },
+    {
+      feature: t('pricing.compare.revisions'),
+      ...planValue((pkg) => {
+        const revisions = pkg?.revisions ?? getNumberFromFeature(pkg, 'Revisions');
+        return revisions === undefined ? '—' : String(revisions);
+      }),
+    },
+    { feature: t('pricing.compare.support'), ...planValue((pkg) => hasFeature(pkg, 'Priority Support')) },
+    { feature: t('pricing.compare.source'), ...planValue((pkg) => hasFeature(pkg, 'Source Code')) },
+    { feature: t('pricing.compare.maint'), ...planValue((pkg) => hasFeature(pkg, 'Maintenance')) },
+    {
+      feature: t('pricing.compare.delivery'),
+      ...planValue((pkg) => {
+        const days = pkg?.deliveryDays ?? getNumberFromFeature(pkg, 'Delivery');
+        return days === undefined ? '—' : `${days} days`;
+      }),
+    },
+  ];
+
+  const faqs = [
+    { q: t('pricing.faq.q1'), a: t('pricing.faq.a1') },
+    { q: t('pricing.faq.q2'), a: t('pricing.faq.a2') },
+    { q: t('pricing.faq.q3'), a: t('pricing.faq.a3') },
+    { q: t('pricing.faq.q4'), a: t('pricing.faq.a4') },
+  ];
 
   return (
     <PublicLayout>
@@ -113,7 +145,7 @@ export default function PricingPage() {
               {t('pricing.page.title1')}<br />{t('pricing.page.title2')} <span className="gradient-text">{t('pricing.page.titleBold')}</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-xl mx-auto">
-              {t('pricing.page.subtitle')} <span className="text-green-400 font-semibold">{t('pricing.page.subtitlePct')}</span> {t('pricing.page.subtitleEnd')}
+              Choose a package that fits your project. Scope and delivery dates are confirmed in your proposal.
             </p>
           </motion.div>
         </div>
@@ -124,12 +156,12 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-3 gap-6">
             {displayed.map((pkg, i) => {
-              const pct = pkg.originalPrice ? discountPct(pkg.originalPrice, pkg.price) : 0;
               const badgeCfg = pkg.badge ? BADGE_STYLES[pkg.badge] : null;
               const BadgeIcon = badgeCfg?.icon ?? Tag;
+              const validPrice = Number.isFinite(pkg.price) && pkg.price > 0;
               return (
                 <motion.div
-                  key={pkg._id}
+                  key={pkg._id ?? pkg.slug}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
@@ -139,23 +171,12 @@ export default function PricingPage() {
                       : 'border-white/10'
                   }`}
                 >
-                  {/* Most Popular pill */}
                   {pkg.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-primary-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full">
                       <Star className="w-3 h-3" /> {t('pricing.mostPopular')}
                     </div>
                   )}
 
-                  {/* Discount % pill — top right */}
-                  {pct > 0 && (
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-2 py-0.5 rounded-full">
-                        -{pct}%
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Promo badge */}
                   {badgeCfg && pkg.badge && (
                     <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-4 w-fit ${badgeCfg.className}`}>
                       <BadgeIcon className="w-3 h-3" />
@@ -168,23 +189,13 @@ export default function PricingPage() {
                     <p className="text-slate-400 text-sm">{pkg.description}</p>
                   </div>
 
-                  {/* Price block */}
                   <div className="mb-6">
-                    {pkg.originalPrice && (
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-slate-500 text-sm line-through">{formatCurrency(pkg.originalPrice)}</span>
-                        <span className="text-slate-500 text-xs">{t('pricing.marketAvgLabel')}</span>
-                      </div>
-                    )}
                     <div className="flex items-end gap-1.5">
-                      <span className="text-4xl font-black text-white">{formatCurrency(pkg.price)}</span>
-                      <span className="text-slate-500 text-sm mb-1">{t('pricing.perProjectLabel')}</span>
+                      <span className="text-4xl font-black text-white">
+                        {validPrice ? formatCurrency(pkg.price) : 'Request a quote'}
+                      </span>
+                      {validPrice && <span className="text-slate-500 text-sm mb-1">{t('pricing.perProjectLabel')}</span>}
                     </div>
-                    {pkg.originalPrice && (
-                      <p className="text-green-400 text-xs font-semibold mt-1.5">
-                        {t('pricing.youSaveLabel').replace('{amount}', formatCurrency(pkg.originalPrice - pkg.price))}
-                      </p>
-                    )}
                   </div>
 
                   <ul className="space-y-3 mb-8 flex-1">
@@ -202,9 +213,9 @@ export default function PricingPage() {
                     size="md"
                     variant={pkg.popular ? 'primary' : 'outline'}
                     className="w-full group"
-                    onClick={() => choosePlan(pkg)}
+                    onClick={() => validPrice ? choosePlan(pkg) : router.push('/contact')}
                   >
-                    {t('pricing.choosePlan')} {pkg.name}
+                    {validPrice ? `${t('pricing.choosePlan')} ${pkg.name}` : 'Request a quote'}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </motion.div>
@@ -221,8 +232,8 @@ export default function PricingPage() {
             <h2 className="text-3xl font-bold text-white mb-2">{t('pricing.compare.title')}</h2>
             <p className="text-slate-400">{t('pricing.compare.sub')}</p>
           </div>
-          <div className="glass rounded-2xl border border-white/5 overflow-hidden">
-            <table className="w-full">
+          <div className="glass rounded-2xl border border-white/5 overflow-x-auto">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/5">
                   <th className="text-left p-4 text-slate-400 font-medium text-sm w-1/2">{t('pricing.compare.feature')}</th>
@@ -236,7 +247,7 @@ export default function PricingPage() {
                   <tr key={row.feature} className={`border-b border-white/5 ${i % 2 === 0 ? '' : 'bg-white/[0.02]'}`}>
                     <td className="p-4 text-slate-400 text-sm">{row.feature}</td>
                     {(['starter', 'pro', 'premium'] as const).map((key) => {
-                      const val = row[key as keyof typeof row];
+                      const val = row[key];
                       return (
                         <td key={key} className="p-4 text-center">
                           {typeof val === 'boolean' ? (
