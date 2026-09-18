@@ -1,72 +1,64 @@
-# MBN Dev Platform
+# MBN DEV Platform
 
-A full-stack project management and client portal platform built to streamline the delivery of digital services. It provides a centralized space for clients to request projects, make payments, track progress, and communicate with the administration in real-time.
+A full-stack project-management and client portal for delivering web development services. Clients can request projects, submit payment evidence, track progress, access files and communicate with the administration.
 
-## 🚀 Tech Stack
+## Architecture
 
-### Frontend
-- **Framework:** Next.js 16 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS, Framer Motion
-- **Data Fetching:** Axios
-- **Real-time:** Server-Sent Events (SSE) via custom hooks
-- **Internationalization (i18n):** English-only. `t(key)` translation helper is kept in place for future locales, but there is no language switcher and no French/Arabic locale files currently.
+- Frontend: Next.js 16 App Router, TypeScript, Tailwind CSS and Framer Motion.
+- Backend: Express.js, Prisma ORM and PostgreSQL.
+- Authentication: JWT access tokens with refresh-cookie session renewal.
+- Real-time updates: Server-Sent Events (SSE); optional Redis fan-out for multiple instances.
+- Transactional email: Brevo API when `BREVO_API_KEY` is configured.
+- Hosting: Next.js and Express configured together through `vercel.json`.
+- Payments: CIH Bank, PayPal and TapTapSend submission flows with manual verification; see the current checkout for availability.
+
+## Local development
+
+Prerequisites: a supported Node.js version, PostgreSQL and npm. Use the environment examples in `backend/.env.example` and `frontend/.env.example`. Never commit real environment variables.
 
 ### Backend
-- **Framework:** Express.js (Node.js)
-- **Database:** PostgreSQL with Prisma ORM
-- **Authentication:** JWT (JSON Web Tokens)
-- **Real-time:** Server-Sent Events (SSE), with optional Redis fan-out for multi-instance production deployments
-- **Security:** Helmet, CORS, HPP, Rate Limiting
-- **Email:** Brevo Transactional Email API (configured through environment variables)
-
-## 🛠️ Local Development
-
-### Prerequisites
-- Node.js (v18+)
-- PostgreSQL Database
-- npm or yarn
-
-### Environment Variables
-You need to configure `backend/.env` from `backend/.env.example`. The frontend uses same-origin `/api` calls by default; `frontend/.env.example` documents the optional browser settings.
-
-### Running the Backend
 
 ```bash
 cd backend
-npm install
-npm run db:push      # Push Prisma schema to the database
-npm run db:generate  # Generate Prisma client
-npm run seed         # Seed database with initial admin/client data
-npm run dev          # Start the development server (default: port 5000)
+npm ci
+npm run db:generate
+npm run db:push
+npm run dev
 ```
 
-**Demo Credentials (after seeding):**
-- **Admin:** `admin@mbndev.com` / `admin123`
-- **Client:** `client@demo.com` / `client123`
-
-### Running the Frontend
+### Frontend
 
 ```bash
 cd frontend
-npm install
-npm run dev          # Start the Next.js dev server (default: port 3000)
+npm ci
+npm run dev
 ```
 
-## 🏗️ Architecture & Features
+### Safe initial data
 
-- **Monorepo-style Deployment:** Deployed together on Vercel (`vercel.json`) where `/api/*` requests are routed to the Express backend and all other requests serve the Next.js frontend.
-- **Roles & Permissions:** System separates users into `admin` and `client` roles with restricted access to specific dashboards and capabilities.
-- **Real-time Capabilities:** Implements Server-Sent Events (SSE) to push live chat messages, project status updates, and notifications without requiring page reloads.
-- **Project Lifecycle:** Tracks orders from payment to project completion: `pending → paid → in-progress → review → revision → completed | cancelled`.
-- **Custom Payment Flow:** Supports manual payment verification flows via various methods (CIH Bank, PayPal, TapTapSend).
+`npm run seed` is **additive**: it creates only missing default packages and never wipes customers, orders, projects, messages or payments. It refuses to run when `NODE_ENV=production`. It does not create an administrator unless both `SEED_ADMIN_EMAIL` and a strong `SEED_ADMIN_PASSWORD` (16+ characters) are supplied in the local environment. Existing accounts and package prices remain unchanged. Remove these temporary variables when setup is complete.
 
-## 📄 Important Files
-- `CLAUDE.md`: Contains advanced documentation and architecture guidelines.
-- `backend/prisma/schema.prisma`: The database schema definition.
+If an older version of this project was ever seeded using its historical default administrator credentials, rotate that account's password immediately using your authorized account-management procedure. Never use or share default passwords.
 
-## 🤝 Contributing
-1. Create a feature branch (`git checkout -b feature/my-feature`)
-2. Commit your changes (`git commit -m 'Add some feature'`)
-3. Push to the branch (`git push origin feature/my-feature`)
-4. Open a Pull Request
+## Checks
+
+```bash
+cd backend && npm run lint && npm test && npm run test:integration
+cd ../frontend && npm run lint && npm test && npm run build
+```
+
+Integration tests need an isolated throwaway database, **never production**. GitHub Actions workflow configuration: `.github/workflows/ci.yml`.
+
+## Roles and project lifecycle
+
+Clients and administrators have separate dashboards with backend role checks. Orders become projects after approved payment. Project statuses include pending, paid, in-progress, review, revision, completed and cancelled. Actual contract scope, payment status and delivery timing must be confirmed in the client's proposal.
+
+## Documentation
+
+- `CLAUDE.md` — implementation details and architecture notes (historical credentials, if mentioned there, are not valid setup instructions).
+- `backend/prisma/schema.prisma` — data model.
+- `backend/.env.example` and `frontend/.env.example` — environment examples.
+
+## Contributing
+
+Create a feature branch, run available checks and open a pull request. Review privacy/security and customer-facing wording before merging to `master` or promoting a deployment to production.
