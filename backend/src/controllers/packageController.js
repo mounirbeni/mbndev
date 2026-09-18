@@ -1,70 +1,62 @@
-// ─── Package CRUD (marketing/display content ONLY) ───────────────────────────
-// These rows populate the public pricing page and the landing page's pricing
-// section — nothing more. Actual order pricing is always computed
-// server-side by lib/pricing.js's calculatePrice(), from its own fixed
-// PACKAGE_INCLUSIONS/BASE_PRICES config, and never reads this table.
-// Editing a Package here changes what's advertised, not what an order costs.
-// If that ever needs to change, calculatePrice must be updated to read from
-// this table (with caching) instead — don't let the two drift into silently
-// disagreeing with each other.
-
+// Public package prices must match the authoritative server-side pricing
+// engine. Admin-editable Package rows are descriptive marketing content only.
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { parseOptionalNumber } = require('../lib/numberParsing');
+const { PACKAGE_INCLUSIONS } = require('../lib/pricing');
+
+function canonicalPrice(slug) {
+  return Object.prototype.hasOwnProperty.call(PACKAGE_INCLUSIONS, slug)
+    ? PACKAGE_INCLUSIONS[slug].price
+    : null;
+}
+
+function priceConflict(slug, price) {
+  const authoritative = canonicalPrice(slug);
+  return authoritative !== null && Number(price) !== authoritative;
+}
 
 exports.getPackages = async (req, res, next) => {
   try {
-    const packages = await prisma.package.findMany({
-      where: { isActive: true },
-      orderBy: { price: 'asc' },
+    const packages = await prisma.package.findMany({ where: { isActive: true }, orderBy: { price: 'asc' } });
+    const listed = packages.map((pkg) => {
+      const authoritative = canonicalPrice(pkg.slug);
+      return fmt(authoritative === null ? pkg : { ...pkg, price: authoritative });
     });
-    res.json({ success: true, packages: fmt(packages) });
-  } catch (err) {
-    next(err);
-  }
+    listed.sort((a, b) => Number(a.price) - Number(b.price));
+    return res.json({ success: true, packages: listed });
+  } catch (error) { next(error); }
 };
 
 exports.createPackage = async (req, res, next) => {
   try {
     const { name, slug, price, description, features, pages, revisions, deliveryDays, popular } = req.body;
-
-    if (!name || !slug) {
-      return res.status(400).json({ success: false, message: 'name and slug are required.' });
-    }
+    if (!name || !slug) return res.status(400).json({ success: false, message: 'name and slug are required.' });
     const numericPrice = Number(price);
-    if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+    if (price === undefined || !Number.isFinite(numericPrice) || numericPrice < 0) {
       return res.status(400).json({ success: false, message: 'price must be a non-negative number.' });
     }
-    const numericPages        = parseOptionalNumber(pages);
-    const numericRevisions    = parseOptionalNumber(revisions);
-    const numericDeliveryDays = parseOptionalNumber(deliveryDays);
-    if (numericPages === undefined || numericRevisions === undefined || numericDeliveryDays === undefined) {
+    if (priceConflict(slug, numericPrice)) {
+      return res.status(400).json({ success: false, message: 'This standard package has a fixed checkout price. Update the pricing engine in a reviewed code change before editing its advertised price.' });
+    }
+    const parsedPages = parseOptionalNumber(pages);
+    const parsedRevisions = parseOptionalNumber(revisions);
+    const parsedDelivery = parseOptionalNumber(deliveryDays);
+    if ([parsedPages, parsedRevisions, parsedDelivery].some((value) => value === undefined)) {
       return res.status(400).json({ success: false, message: 'pages, revisions, and deliveryDays must be numbers.' });
     }
-
-    const pkg = await prisma.package.create({
-      data: {
-        name,
-        slug,
-        price: numericPrice,
-        description,
-        features: features || [],
-        pages: numericPages,
-        revisions: numericRevisions,
-        deliveryDays: numericDeliveryDays,
-        popular: Boolean(popular),
-      },
-    });
-    res.status(201).json({ success: true, package: fmt(pkg) });
-  } catch (err) {
-    next(err);
-  }
+    const pkg = await prisma.package.create({ data: {
+      name, slug, price: numericPrice, description, features: features || [],
+      pages: parsedPages, revisions: parsedRevisions, deliveryDays: parsedDelivery,
+      popular: Boolean(popular),
+    } });
+    return res.status(201).json({ success: true, package: fmt(pkg) });
+  } catch (error) { next(error); }
 };
 
 exports.updatePackage = async (req, res, next) => {
   try {
     const { name, slug, price, description, features, pages, revisions, deliveryDays, popular } = req.body;
-
     let numericPrice;
     if (price !== undefined) {
       numericPrice = Number(price);
@@ -72,43 +64,45 @@ exports.updatePackage = async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'price must be a non-negative number.' });
       }
     }
-    const numericPages        = pages        !== undefined ? parseOptionalNumber(pages)        : null;
-    const numericRevisions    = revisions    !== undefined ? parseOptionalNumber(revisions)    : null;
-    const numericDeliveryDays = deliveryDays !== undefined ? parseOptionalNumber(deliveryDays) : null;
-    if (numericPages === undefined || numericRevisions === undefined || numericDeliveryDays === undefined) {
+    if (price !== undefined || slug !== undefined) {
+      const existing = await prisma.package.findUnique({ where: { id: req.params.id } });
+      if (!existing) return res.status(404).json({ success: false, message: 'Package not found' });
+      const updatedSlug = slug ?? existing.slug;
+      const updatedPrice = numericPrice ?? existing.price;
+      if (priceConflict(updatedSlug, updatedPrice)) {
+        return res.status(400).json({ success: false, message: 'This standard package has a fixed checkout price. Update the pricing engine in a reviewed code change before editing its advertised price.' });
+      }
+    }
+    const parsedPages = pages !== undefined ? parseOptionalNumber(pages) : null;
+    const parsedRevisions = revisions !== undefined ? parseOptionalNumber(revisions) : null;
+    const parsedDelivery = deliveryDays !== undefined ? parseOptionalNumber(deliveryDays) : null;
+    if ([parsedPages, parsedRevisions, parsedDelivery].some((value) => value === undefined)) {
       return res.status(400).json({ success: false, message: 'pages, revisions, and deliveryDays must be numbers.' });
     }
-
-    const pkg = await prisma.package.update({
-      where: { id: req.params.id },
-      data: {
-        ...(name !== undefined && { name }),
-        ...(slug !== undefined && { slug }),
-        ...(price !== undefined && { price: numericPrice }),
-        ...(description !== undefined && { description }),
-        ...(features !== undefined && { features }),
-        ...(pages !== undefined && { pages: numericPages }),
-        ...(revisions !== undefined && { revisions: numericRevisions }),
-        ...(deliveryDays !== undefined && { deliveryDays: numericDeliveryDays }),
-        ...(popular !== undefined && { popular: Boolean(popular) }),
-      },
-    });
-    res.json({ success: true, package: fmt(pkg) });
-  } catch (err) {
-    if (err.code === 'P2025') return res.status(404).json({ success: false, message: 'Package not found' });
-    next(err);
+    const pkg = await prisma.package.update({ where: { id: req.params.id }, data: {
+      ...(name !== undefined && { name }),
+      ...(slug !== undefined && { slug }),
+      ...(price !== undefined && { price: numericPrice }),
+      ...(description !== undefined && { description }),
+      ...(features !== undefined && { features }),
+      ...(pages !== undefined && { pages: parsedPages }),
+      ...(revisions !== undefined && { revisions: parsedRevisions }),
+      ...(deliveryDays !== undefined && { deliveryDays: parsedDelivery }),
+      ...(popular !== undefined && { popular: Boolean(popular) }),
+    } });
+    return res.json({ success: true, package: fmt(pkg) });
+  } catch (error) {
+    if (error.code === 'P2025') return res.status(404).json({ success: false, message: 'Package not found' });
+    next(error);
   }
 };
 
 exports.deletePackage = async (req, res, next) => {
   try {
-    await prisma.package.update({
-      where: { id: req.params.id },
-      data: { isActive: false },
-    });
-    res.json({ success: true, message: 'Package deactivated' });
-  } catch (err) {
-    if (err.code === 'P2025') return res.status(404).json({ success: false, message: 'Package not found' });
-    next(err);
+    await prisma.package.update({ where: { id: req.params.id }, data: { isActive: false } });
+    return res.json({ success: true, message: 'Package deactivated' });
+  } catch (error) {
+    if (error.code === 'P2025') return res.status(404).json({ success: false, message: 'Package not found' });
+    next(error);
   }
 };
