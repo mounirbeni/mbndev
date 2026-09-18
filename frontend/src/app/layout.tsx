@@ -8,6 +8,8 @@ import SplashScreen from '@/components/mobile/SplashScreen';
 import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 import './globals.css';
 
+const socialImage = '/opengraph-image'; // Existing app/opengraph-image.tsx generates this route.
+
 export const metadata: Metadata = {
   title: {
     default: 'MBN DEV — Custom Websites Built to Elevate Your Business',
@@ -48,21 +50,18 @@ export const metadata: Metadata = {
     url: 'https://mbndev.ma',
     siteName: 'MBN DEV',
     locale: 'en_US',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'MBN DEV — Custom Websites Built to Elevate Your Business',
-      },
-    ],
+    images: [{
+      url: socialImage,
+      width: 1200,
+      height: 630,
+      alt: 'MBN DEV — Custom Websites Built to Elevate Your Business',
+    }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'MBN DEV — Custom Websites & Web Apps',
-    description: 'Custom websites, SaaS platforms, and web apps built fast and professionally.',
-    creator: '@mbndev',
-    images: ['/og-image.png'],
+    description: 'Custom websites, SaaS platforms, and web apps built for your business.',
+    images: [socialImage],
   },
   verification: {
     google: '6iPR0xchv0BJth7bark-LIj4vvX1djZU9hS_oWjZPYA',
@@ -87,13 +86,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" dir="ltr" className="dark">
       <head>
-        {/* Browser and home-screen icons share the transparent official brand mark. */}
         <link rel="icon" type="image/webp" href="/brand-icon-transparent.webp" />
         <link rel="apple-touch-icon" sizes="128x128" href="/brand-icon-transparent.webp" />
-
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://mbndev.ma" />
-
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="MBN DEV" />
