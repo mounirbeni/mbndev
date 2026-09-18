@@ -4,191 +4,86 @@ import { LegalPageFooter } from '@/components/legal/LegalPageFooter';
 
 export const metadata: Metadata = {
   title: 'Terms of Service — MBN DEV',
-  description: 'Terms and conditions governing use of the MBN DEV platform and services.',
+  description: 'Terms for using the MBN DEV platform and requesting development services.',
 };
 
-const LAST_UPDATED = 'May 7, 2026';
+// Owner/legal review is required before publishing changes to contractual
+// terms, particularly refunds, withdrawal rights and intellectual property.
+const LAST_UPDATED = 'September 18, 2026';
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0d]">
       <LegalPageNav />
-
-      {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-white mb-2">Terms of Service</h1>
           <p className="text-slate-500 text-sm">Last updated: {LAST_UPDATED}</p>
         </div>
-
         <div className="space-y-8 text-slate-300 text-sm leading-relaxed">
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">1. Acceptance of Terms</h2>
-            <p>
-              By accessing or using the MBN DEV platform (&ldquo;Service&rdquo;), you agree to be bound by these Terms of Service.
-              If you do not agree to these terms, please do not use our platform.
-            </p>
-            <p className="mt-2">
-              These terms apply to all visitors, registered users, and clients of MBN DEV.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">1. Acceptance and Scope</h2>
+            <p>These terms govern use of the MBN DEV website and client portal. The specific development work, deliverables, revision allowance, price and schedule for each project are set out in the proposal accepted by both parties. Applicable mandatory legal rights are not excluded by these terms.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">2. Description of Service</h2>
-            <p>
-              MBN DEV is a web development platform that enables clients to:
-            </p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-slate-400">
-              <li>Request custom websites, web apps, and digital solutions</li>
-              <li>Track project progress in real-time</li>
-              <li>Communicate directly with the developer</li>
-              <li>Make secure payments for services</li>
-              <li>Access deliverables and project files</li>
-            </ul>
+            <h2 className="text-lg font-semibold text-white mb-3">2. Our Services</h2>
+            <p>MBN DEV offers website and web-application development. The platform supports project requests, progress updates, messages, payment-evidence submission and delivery files. Features and service availability may vary by project.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">3. User Accounts</h2>
-            <p>To use the platform you must:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-slate-400">
-              <li>Provide accurate and complete registration information</li>
-              <li>Maintain the security of your password</li>
-              <li>Notify us immediately of any unauthorized account access</li>
-              <li>Be at least 18 years of age or have parental consent</li>
-            </ul>
-            <p className="mt-3">
-              You are responsible for all activity that occurs under your account.
-              MBN DEV reserves the right to suspend or terminate accounts that violate these terms.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">3. Accounts</h2>
+            <p>Provide accurate account information, safeguard your credentials and tell us if you suspect unauthorized access. Accounts may be restricted for misuse, subject to applicable law and existing project obligations.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">4. Project Orders & Payments</h2>
-            <h3 className="text-white font-medium mb-2">4.1 Order Placement</h3>
-            <p>
-              When you submit a project order, you are making a formal request for services.
-              Orders become binding once payment has been processed and confirmed.
-            </p>
-            <h3 className="text-white font-medium mt-4 mb-2">4.2 Pricing</h3>
-            <p>
-              All prices are displayed in USD. Quoted prices are valid for 30 days from the date of quotation.
-              We reserve the right to revise pricing with reasonable notice.
-            </p>
-            <h3 className="text-white font-medium mt-4 mb-2">4.3 Payment</h3>
-            <p>
-              Payments are accepted via direct bank transfer (CIH Bank), PayPal, or TapTapSend. Each payment is
-              manually verified before the project is activated. All payments are non-refundable unless otherwise
-              agreed in writing, except where required by applicable law.
-            </p>
-            <h3 className="text-white font-medium mt-4 mb-2">4.4 Refunds</h3>
-            <p>
-              Refund requests must be submitted within 7 days of payment for work not yet started.
-              No refunds are issued for completed or substantially completed work.
-              Disputes are handled directly via{' '}
-              <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">
-                WhatsApp +212 705 914 424
-              </a>.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">4. Orders, Pricing and Payment</h2>
+            <p>Submitting a request starts the quotation process. Public package prices are displayed in USD where available; they do not replace an agreed project proposal. Any discounts, taxes, hosting, third-party services, payment milestones and quote-expiry period must be stated in the applicable written proposal.</p>
+            <p className="mt-2">Payment methods may include CIH Bank, PayPal and TapTapSend, subject to availability. Submitted transfer or payment evidence is manually reviewed. Sending a receipt does not itself establish that funds have been received. A project starts on the schedule agreed after the required payment has been verified.</p>
+            <h3 className="font-semibold text-white mt-4 mb-2">Refunds and cancellation requests</h3>
+            <p>For work not yet started, you can submit a refund request within seven days of payment, as described in our prior policy. Refunds and any applicable withdrawal rights are handled under the accepted proposal and mandatory law. For work already started, the parties will review completed work, any paid milestones and the agreed cancellation terms. These terms do not impose a blanket rule that all payments or deposits are non-refundable.</p>
+            <p className="mt-2">To raise a payment dispute, contact us at <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">WhatsApp +212 705 914 424</a>.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">5. Deliverables & Intellectual Property</h2>
-            <p>
-              Upon full payment, you receive full ownership and rights to the final deliverables (website, application, source code)
-              unless otherwise specified in a separate agreement.
-            </p>
-            <p className="mt-2">
-              MBN DEV retains the right to display completed work in our portfolio unless you request otherwise in writing.
-              Third-party assets (fonts, stock images, libraries) remain subject to their respective licenses.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">5. Schedule and Revisions</h2>
+            <p>Delivery dates begin from the start date confirmed in the proposal and depend on timely receipt of agreed content, approvals and access. Any change in scope or schedule should be documented with the client. Included revision rounds are those stated in the accepted proposal; extra work requires a separate agreement before additional charges are incurred.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">6. Client Responsibilities</h2>
-            <p>As a client, you agree to:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-slate-400">
-              <li>Provide accurate project requirements and feedback in a timely manner</li>
-              <li>Supply necessary content, assets, and access credentials as needed</li>
-              <li>Review and approve deliverables within agreed timeframes</li>
-              <li>Not use the platform for any illegal or harmful purposes</li>
-              <li>Not attempt to reverse-engineer, copy, or resell our platform</li>
-            </ul>
+            <h2 className="text-lg font-semibold text-white mb-3">6. Deliverables and Intellectual Property</h2>
+            <p>The proposal identifies which design files, source files, access credentials and other deliverables are included, and the rights to be transferred after applicable payment. Third-party assets, open-source libraries and separately licensed tools remain governed by their own licences. Do not assume every package includes source-code handover unless expressly included in the accepted scope.</p>
+            <p className="mt-2">Publication of client work in our portfolio requires appropriate permission and must respect confidentiality and third-party rights.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">7. Revisions</h2>
-            <p>
-              The number of revision rounds is determined by your selected package or agreed scope.
-              Revisions outside the agreed scope may incur additional charges.
-              Revision requests must be submitted through the platform&apos;s messaging system.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">7. Client Responsibilities</h2>
+            <p>Provide lawful material, accurate requirements and timely decisions. Share credentials through an agreed secure channel rather than public messages; ensure that any content supplied is yours to use. Do not misuse the platform or interfere with other users' accounts.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">8. Confidentiality</h2>
-            <p>
-              Both parties agree to keep confidential any sensitive business information shared during the project.
-              This includes business strategies, proprietary data, and technical specifications.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">8. Confidentiality and Privacy</h2>
+            <p>Project information shared in confidence should be used only for the agreed work or as otherwise permitted by law. Please also review our <a href="/privacy" className="text-primary-400 hover:text-primary-300">Privacy Policy</a> for information about personal data processing.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">9. Limitation of Liability</h2>
-            <p>
-              MBN DEV&apos;s total liability for any claim arising from these terms or the services provided shall not exceed
-              the total amount paid by the client for the specific project in question.
-            </p>
-            <p className="mt-2">
-              We are not liable for indirect, incidental, or consequential damages including loss of profits,
-              data, or business opportunities.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">9. Support and Third-Party Services</h2>
+            <p>Hosting, domain registration, ongoing maintenance and third-party subscriptions are provided only when included in the agreed proposal or a separate support agreement. Their charges and renewal responsibilities should be identified before purchase.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">10. Termination</h2>
-            <p>
-              Either party may terminate a project with written notice. Upon termination, you will be charged
-              for work completed up to the termination date. Deposits are non-refundable.
-            </p>
-            <p className="mt-2">
-              MBN DEV reserves the right to terminate access to the platform for violations of these terms,
-              abusive behavior, or fraudulent activity.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">10. Liability</h2>
+            <p>Liability and remedies are subject to the applicable agreement and any rights that cannot lawfully be limited. Please discuss project-specific risks, backups, security and continuity requirements before work starts.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">11. Governing Law</h2>
-            <p>
-              These terms are governed by the laws of the Kingdom of Morocco.
-              Any disputes shall first be attempted to be resolved amicably.
-              Failing that, disputes shall be subject to the jurisdiction of Moroccan courts.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">11. Ending a Project</h2>
+            <p>Either party may request termination in writing. Settlement of completed work, any advance payment and the handover of materials is determined by the agreed project terms and applicable law; no blanket non-refundable-deposit rule applies under this page.</p>
           </section>
-
           <section>
-            <h2 className="text-lg font-semibold text-white mb-3">12. Changes to Terms</h2>
-            <p>
-              We may revise these Terms of Service at any time. Significant changes will be communicated
-              via platform notification. Continued use of the platform after changes constitutes acceptance.
-            </p>
+            <h2 className="text-lg font-semibold text-white mb-3">12. Governing Law and Changes</h2>
+            <p>These terms are intended for a business operated in Morocco and are subject to applicable Moroccan law, including mandatory consumer protections where relevant. We will seek an amicable resolution of disputes before any formal proceedings. Updated terms will be dated, and material changes to an existing project require appropriate agreement rather than unilateral retroactive changes.</p>
           </section>
-
           <section>
             <h2 className="text-lg font-semibold text-white mb-3">13. Contact</h2>
-            <p>Questions or concerns? Reach us at:</p>
-            <div className="mt-3 p-4 bg-white/5 rounded-xl border border-white/8 space-y-1">
+            <div className="mt-3 p-4 bg-white/5 rounded-xl border border-white/10 space-y-1">
               <p><span className="text-slate-400">Platform:</span> <span className="text-white">MBN DEV</span></p>
-              <p><span className="text-slate-400">Founder:</span> <span className="text-white">Mounir Banni</span></p>
+              <p><span className="text-slate-400">Operator:</span> <span className="text-white">Mounir Banni</span></p>
               <p><span className="text-slate-400">Country:</span> <span className="text-white">Morocco</span></p>
-              <p>
-                <span className="text-slate-400">Phone / WhatsApp:</span>{' '}
-                <a href="tel:+212705914424" className="text-primary-400 hover:text-primary-300">+212 705 914 424</a>
-              </p>
+              <p><span className="text-slate-400">Phone / WhatsApp:</span> <a href="tel:+212705914424" className="text-primary-400 hover:text-primary-300">+212 705 914 424</a></p>
             </div>
           </section>
         </div>
-
         <LegalPageFooter />
       </div>
     </div>
