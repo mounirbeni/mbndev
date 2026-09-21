@@ -3,8 +3,9 @@ import { LegalPageNav } from '@/components/legal/LegalPageNav';
 import { LegalPageFooter } from '@/components/legal/LegalPageFooter';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — MBN DEV',
+  title: 'Terms of Service',
   description: 'Terms and conditions governing use of the MBN DEV platform and services.',
+  alternates: { canonical: 'https://mbndev.ma/terms' },
 };
 
 const LAST_UPDATED = 'May 7, 2026';

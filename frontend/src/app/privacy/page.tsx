@@ -3,8 +3,9 @@ import { LegalPageNav } from '@/components/legal/LegalPageNav';
 import { LegalPageFooter } from '@/components/legal/LegalPageFooter';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — MBN DEV',
+  title: 'Privacy Policy',
   description: 'How MBN DEV collects, uses, and protects your personal information.',
+  alternates: { canonical: 'https://mbndev.ma/privacy' },
 };
 
 const LAST_UPDATED = 'May 7, 2026';
