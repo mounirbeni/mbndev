@@ -1,5 +1,5 @@
 // Renders index.html frame by frame (deterministic GSAP seek) and encodes an MP4 with FFmpeg.
-// Usage: npm run render  [-- --fps 30 --from 0 --to 15 --out out/mbndev-ad-9x16.mp4]
+// Usage: npm run render  [-- --page index.html --fps 30 --from 0 --to 15 --out out/mbndev-ad-9x16.mp4]
 // Needs: Chromium (CHROME_PATH or Playwright's bundled one) and ffmpeg (FFMPEG_PATH or on PATH).
 import { chromium } from 'playwright-core';
 import { spawn } from 'node:child_process';
@@ -12,7 +12,9 @@ const args = Object.fromEntries(
   process.argv.slice(2).reduce((acc, a, i, arr) => (a.startsWith('--') ? [...acc, [a.slice(2), arr[i + 1]]] : acc), []),
 );
 const fps = Number(args.fps ?? 30);
-const out = resolve(here, args.out ?? 'out/mbndev-ad-9x16.mp4');
+const pageFile = args.page ?? 'index.html';
+const defaultOut = pageFile === 'index.html' ? 'out/mbndev-ad-9x16.mp4' : `out/mbndev-${pageFile.replace(/\.html$/, '')}-9x16.mp4`;
+const out = resolve(here, args.out ?? defaultOut);
 
 // The official transparent monogram only exists as an encoded source (frontend/branding); decode it, never redraw it.
 const assets = resolve(here, 'assets');
@@ -24,7 +26,7 @@ mkdirSync(dirname(out), { recursive: true });
 const executablePath = process.env.CHROME_PATH || (existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') ? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' : undefined);
 const browser = await chromium.launch({ executablePath, args: ['--allow-file-access-from-files', '--force-color-profile=srgb'] });
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
-await page.goto(pathToFileURL(resolve(here, 'index.html')).href);
+await page.goto(pathToFileURL(resolve(here, pageFile)).href);
 await page.evaluate(() => window.__ready);
 
 const duration = await page.evaluate(() => window.__duration);
