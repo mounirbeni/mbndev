@@ -1,0 +1,15 @@
+{
+  "name": "mbndev-brand-ad",
+  "private": true,
+  "type": "module",
+  "description": "MBN DEV 15s silent brand ad (9:16), coded motion rendered to MP4",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "gsap": "^3.13.0",
+    "playwright-core": "^1.56.1"
+  }
+}
