@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Client Portal Ad (9:16)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    "Control your project from your portal" — one phone, four real portal screens.
+    Features and labels are taken from the app: ProjectStageTracker stages, system
+    messages (lib/systemMessages.js), files, milestones, manual payment verification.
+    Layout (1080 × 1920), same system as the other ads:
+    ─ 96px side margins, optical centre y 920 for text-only moments and the logo.
+    ─ Header zone (top 300): constant eyebrow + one-line headline per feature.
+    ─ Phone: x 240 → 840, y 600 → 1640. The phone's own tab bar is the progress indicator.
+  */
+  :root {
+    --bg: #08080b;
+    --primary: #7c3aed;
+    --primary-light: #a855f7;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --dim: #64748b;
+    --hair: rgba(255, 255, 255, 0.07);
+    --cy: 920px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; background: var(--bg); overflow: hidden; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .abs { position: absolute; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); perspective: 2200px; }
+
+  #ambient { inset: -10%; opacity: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 64%, rgba(124,58,237,0.20) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 15% 25%, rgba(59,130,246,0.07) 0%, transparent 55%); }
+  #halo { left: 540px; top: 1120px; width: 1100px; height: 1100px; margin: -550px 0 0 -550px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 62%); opacity: 0; }
+
+  .w { display: inline-block; will-change: transform, opacity, filter; }
+  .hl { color: var(--primary-light); }
+  .h1 { font-weight: 800; font-size: 84px; line-height: 1.08; letter-spacing: -0.03em; color: #fff; }
+  .eyebrow { font-weight: 700; font-size: 26px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary-light); }
+  .center { left: 96px; width: 888px; top: var(--cy); transform: translateY(-50%); text-align: center; }
+  #eyebrow { left: 96px; width: 888px; top: 300px; text-align: center; }
+  .head { left: 96px; width: 888px; top: 352px; text-align: center; white-space: nowrap; }
+
+  /* Phone */
+  #phone { left: 240px; top: 600px; width: 600px; height: 1040px; border-radius: 88px; background: #050508; transform-style: preserve-3d;
+    border: 2px solid rgba(255,255,255,0.14);
+    box-shadow: 0 50px 140px rgba(0,0,0,0.75), 0 0 100px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.14); opacity: 0; }
+  #screen { left: 16px; top: 16px; width: 568px; height: 1008px; border-radius: 72px; overflow: hidden;
+    background: linear-gradient(170deg, #120a24 0%, #0a0a0e 45%, #08080b 100%); }
+  #island { left: 50%; top: 14px; width: 150px; height: 40px; margin-left: -75px; border-radius: 22px; background: #000; z-index: 20; }
+  #status { left: 0; top: 0; width: 568px; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 8px 54px 0; font-size: 21px; font-weight: 700; color: #fff; z-index: 10; }
+  #status .ic { display: flex; gap: 8px; align-items: center; }
+  #apphead { left: 0; top: 70px; width: 568px; height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 10; }
+  .logo-row { display: inline-flex; align-items: center; gap: 10px; }
+  .logo-row img { width: 40px; height: 40px; object-fit: contain; }
+  .wm { font-weight: 900; font-size: 22px; letter-spacing: -0.015em; }                  /* Logo3D.tsx spec */
+  .wm .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  .wm .b { color: #a855f7; margin-left: 7px; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  #bell { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--hair); display: grid; place-items: center; position: relative; }
+  #bell i { position: absolute; right: 9px; top: 9px; width: 10px; height: 10px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 8px #a855f7; display: block; opacity: 0; }
+
+  .scr { position: absolute; left: 0; top: 156px; width: 568px; height: 736px; padding: 0 28px; }
+  .scr h3 { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+  .scr .sub { margin-top: 6px; font-size: 20px; color: var(--muted); }
+  .card { position: relative; border-radius: 26px; background: rgba(18,18,25,0.88); border: 1px solid var(--hair); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 16px 40px rgba(0,0,0,0.35); }
+  .lbl { font-size: 17px; font-weight: 700; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
+
+  /* A · project tracker (labels from ProjectStageTracker.tsx) */
+  #trk { margin-top: 26px; padding: 30px 30px 18px; }
+  .stg { position: relative; display: flex; gap: 22px; height: 96px; }
+  .stg .node { position: relative; z-index: 2; width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.14); background: #0c0c12; display: grid; place-items: center; }
+  .stg .node svg { opacity: 0; }
+  .stg .fill { position: absolute; inset: -2px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #6d28d9); opacity: 0; }
+  .stg .ring { position: absolute; inset: -12px; border-radius: 50%; border: 2px solid rgba(168,85,247,0.7); opacity: 0; }
+  .stg b { display: block; font-size: 26px; font-weight: 700; color: #64748b; margin-top: 6px; }
+  .stg div > span { display: block; font-size: 19px; color: var(--dim); margin-top: 4px; opacity: 0; }
+  #line { position: absolute; left: 49px; top: 52px; width: 3px; height: 384px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  #line i { display: block; width: 100%; height: 100%; background: linear-gradient(180deg, #a855f7, #7c3aed); transform-origin: 50% 0; transform: scaleY(0); }
+  #prog { margin-top: 20px; padding: 24px 30px; }
+  #prog .row { display: flex; justify-content: space-between; align-items: baseline; }
+  #prog .row b { font-size: 22px; color: #fff; font-weight: 700; }
+  #prog .row em { font-style: normal; font-size: 26px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+  #prog .bar { margin-top: 14px; height: 12px; border-radius: 6px; background: rgba(255,255,255,0.07); overflow: hidden; }
+  #prog .bar i { display: block; height: 100%; width: 100%; border-radius: 6px; background: linear-gradient(90deg, #7c3aed, #a855f7); transform-origin: 0 50%; transform: scaleX(0); }
+
+  /* B · messages (system card = lib/systemMessages.js "Ready for your review") */
+  #sys { margin-top: 26px; padding: 22px 24px; display: flex; gap: 18px; align-items: flex-start; border-color: rgba(124,58,237,0.35); background: rgba(124,58,237,0.10); }
+  .sico { width: 52px; height: 52px; border-radius: 16px; background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.45); display: grid; place-items: center; flex-shrink: 0; }
+  #sys b { display: block; font-size: 23px; color: #fff; font-weight: 700; }
+  #sys span { display: block; margin-top: 6px; font-size: 19px; color: var(--muted); line-height: 1.4; }
+  .msg { position: absolute; font-size: 24px; line-height: 1.35; font-weight: 500; padding: 20px 24px; border-radius: 24px; max-width: 400px; }
+  #m1 { right: 28px; top: 300px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border-bottom-right-radius: 8px; }
+  #m1 small, #m2 small { display: block; margin-top: 6px; font-size: 15px; opacity: .7; text-align: right; }
+  #mav { left: 28px; top: 470px; width: 52px; height: 52px; border-radius: 50%; background: #0c0c12; border: 1px solid rgba(124,58,237,0.4); display: grid; place-items: center; }
+  #mav img { width: 36px; height: 36px; object-fit: contain; }
+  #m2 { left: 94px; top: 452px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); color: #fff; border-bottom-left-radius: 8px; min-width: 120px; min-height: 72px; }
+  #tdots { position: absolute; left: 26px; top: 28px; display: flex; gap: 9px; }
+  #tdots i { width: 12px; height: 12px; border-radius: 50%; background: #c4b5fd; display: block; }
+  #compose { position: absolute; left: 28px; right: 28px; bottom: 16px; height: 72px; border-radius: 36px; background: rgba(255,255,255,0.04); border: 1px solid var(--hair); display: flex; align-items: center; justify-content: space-between; padding: 0 12px 0 26px; font-size: 20px; color: var(--dim); }
+  #compose .send { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6d28d9); display: grid; place-items: center; }
+
+  /* C · files + milestones */
+  .sec { margin-top: 26px; }
+  .file { margin-top: 14px; padding: 18px 20px; display: flex; gap: 16px; align-items: center; }
+  .fic { width: 56px; height: 56px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 500; color: #fff; }
+  .file .nm { flex: 1; min-width: 0; }
+  .file b { display: block; font-size: 22px; color: #fff; font-weight: 700; }
+  .file span { display: block; margin-top: 4px; font-size: 17px; color: var(--muted); }
+  .file .up { margin-top: 10px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.07); overflow: hidden; }
+  .file .up i { display: block; height: 100%; background: linear-gradient(90deg, #7c3aed, #a855f7); transform-origin: 0 50%; transform: scaleX(0); }
+  .ok { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: rgba(16,185,129,0.14); border: 1px solid rgba(16,185,129,0.4); flex-shrink: 0; }
+  .ms { margin-top: 14px; padding: 8px 22px; }
+  .mi { display: flex; align-items: center; gap: 16px; height: 72px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .mi:last-child { border-bottom: 0; }
+  .mi .bx { width: 34px; height: 34px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.18); display: grid; place-items: center; position: relative; flex-shrink: 0; }
+  .mi .bx .f { position: absolute; inset: -2px; border-radius: 10px; background: linear-gradient(135deg, #a855f7, #6d28d9); opacity: 0; }
+  .mi .bx svg { position: relative; opacity: 0; }
+  .mi b { flex: 1; font-size: 22px; font-weight: 600; color: #fff; }
+  .mi em { font-style: normal; font-size: 17px; font-weight: 600; color: var(--dim); }
+
+  /* D · payments (methods from Payment model: cih_bank · paypal · taptapsend) */
+  #pay { margin-top: 26px; padding: 30px; }
+  #pay .amt { margin-top: 10px; font-size: 64px; font-weight: 900; letter-spacing: -0.03em; color: #fff; font-variant-numeric: tabular-nums; }
+  #pay .amt small { font-size: 28px; font-weight: 700; color: var(--muted); margin-left: 8px; letter-spacing: 0; }
+  .pill { position: relative; margin-top: 18px; height: 50px; display: inline-flex; align-items: center; }
+  .pill span { position: absolute; left: 0; top: 0; height: 50px; white-space: nowrap; display: inline-flex; align-items: center; gap: 10px; padding: 0 20px; border-radius: 999px; font-size: 19px; font-weight: 700; }
+  #pend { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.4); color: #fcd34d; }
+  #pend i { width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: block; }
+  #paid { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); color: #a7f3d0; opacity: 0; }
+  #meth { margin-top: 20px; padding: 24px 30px; }
+  .chips { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .chips span { height: 54px; padding: 0 20px; border-radius: 16px; display: inline-flex; align-items: center; font-size: 20px; font-weight: 600; color: var(--text); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); }
+  .chips span.on { border-color: rgba(168,85,247,0.7); background: rgba(124,58,237,0.16); color: #fff; box-shadow: 0 0 20px rgba(124,58,237,0.3); }
+  #hist { margin-top: 20px; padding: 24px 30px; }
+  .hrow { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .hrow b { display: block; font-size: 22px; color: #fff; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hrow em { display: block; margin-top: 4px; font-style: normal; font-size: 17px; color: var(--muted); }
+  .hrow .hr { text-align: right; } .hrow em.g { color: #34d399; font-weight: 600; }
+  #toast { left: 20px; top: 70px; width: 528px; padding: 18px 20px; border-radius: 26px; z-index: 30; display: flex; gap: 16px; align-items: center;
+    background: rgba(24,22,34,0.97); border: 1px solid rgba(124,58,237,0.45); box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(124,58,237,0.3); }
+  #toast b { display: block; font-size: 21px; color: #fff; font-weight: 700; line-height: 1.25; }
+  #toast span { display: block; margin-top: 3px; font-size: 16px; color: var(--muted); }
+
+  /* Tab bar = progress indicator */
+  #tabs { left: 0; top: 900px; width: 568px; height: 108px; display: flex; justify-content: space-around; align-items: flex-start; padding: 14px 20px 0; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(8,8,11,0.92); z-index: 10; }
+  #tabs .t { width: 110px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: var(--dim); position: relative; z-index: 2; }
+  #tabs .t svg { stroke: #64748b; }
+  #tabpill { left: 31px; top: 10px; width: 110px; height: 72px; border-radius: 20px; background: rgba(124,58,237,0.18); border: 1px solid rgba(124,58,237,0.4); z-index: 1; }
+
+  /* End card — official logo file at 1:1 (identical to index.html) */
+  #endglow { left: 540px; top: var(--cy); width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 62%); opacity: 0; }
+  .logo-part { left: 260px; width: 560px; height: 560px; top: 640px; background: url('../../frontend/public/brand-logo.webp') no-repeat 0 0 / 560px 560px; opacity: 0; }
+  #logoIcon {
+    -webkit-mask-image: linear-gradient(to right, transparent 110px, #000 160px, #000 400px, transparent 450px), linear-gradient(to bottom, transparent 55px, #000 100px, #000 352px, transparent 374px);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 110px, #000 160px, #000 400px, transparent 450px), linear-gradient(to bottom, transparent 55px, #000 100px, #000 352px, transparent 374px);
+    mask-composite: intersect; }
+  #logoWord {
+    -webkit-mask-image: linear-gradient(to right, transparent 60px, #000 96px, #000 463px, transparent 500px), linear-gradient(to bottom, transparent 366px, #000 381px, #000 424px, transparent 442px);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 60px, #000 96px, #000 463px, transparent 500px), linear-gradient(to bottom, transparent 366px, #000 381px, #000 424px, transparent 442px);
+    mask-composite: intersect; }
+  #sweep { left: 390px; top: 720px; width: 300px; height: 270px; overflow: hidden; opacity: 0; -webkit-mask: url('../../frontend/public/brand-logo.webp') no-repeat -130px -80px / 560px 560px; mask: url('../../frontend/public/brand-logo.webp') no-repeat -130px -80px / 560px 560px; mask-mode: luminance; }
+  #sweep i { position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent); transform: skewX(-18deg); display: block; }
+  #tagline { left: 96px; width: 888px; top: 1110px; text-align: center; font-size: 34px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); opacity: 0; }
+
+  #grain { inset: -50%; width: 200%; height: 200%; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 260px 260px; }
+  #vignette { inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 60% at 50% 50%, transparent 55%, rgba(0,0,0,0.65) 100%); }
+  #fade { inset: 0; background: #000; opacity: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+<div id="stage">
+  <div id="ambient" class="abs"></div>
+  <div id="halo" class="abs"></div>
+
+  <!-- Hook -->
+  <div id="hook" class="abs center h1">
+    <div><span class="w">Control</span> <span class="w">your</span> <span class="w">project</span></div>
+    <div><span class="w">from</span> <span class="w">your</span> <span class="w hl">portal.</span></div>
+  </div>
+
+  <!-- Header zone -->
+  <div id="eyebrow" class="abs eyebrow"><span class="w">MBN DEV Client Portal</span></div>
+  <div id="hA" class="abs head h1"><span class="w">Track</span> <span class="w">every</span> <span class="w hl">stage.</span></div>
+  <div id="hB" class="abs head h1"><span class="w">Chat</span> <span class="w">in</span> <span class="w hl">real</span> <span class="w hl">time.</span></div>
+  <div id="hC" class="abs head h1"><span class="w">Files</span> <span class="w">&amp;</span> <span class="w hl">milestones.</span></div>
+  <div id="hD" class="abs head h1"><span class="w">Payments,</span> <span class="w hl">verified.</span></div>
+
+  <!-- Phone -->
+  <div id="phone" class="abs">
+    <div id="island" class="abs"></div>
+    <div id="screen" class="abs">
+      <div id="status" class="abs"><span>9:41</span><span class="ic">
+        <svg width="26" height="18" viewBox="0 0 26 18"><rect x="0" y="12" width="4" height="6" rx="1" fill="#fff"/><rect x="7" y="8" width="4" height="10" rx="1" fill="#fff"/><rect x="14" y="4" width="4" height="14" rx="1" fill="#fff"/><rect x="21" y="0" width="4" height="18" rx="1" fill="#fff"/></svg>
+        <svg width="36" height="18" viewBox="0 0 36 18"><rect x="1" y="1" width="30" height="16" rx="5" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/><rect x="4" y="4" width="22" height="10" rx="3" fill="#fff"/><rect x="33" y="6" width="2.5" height="6" rx="1" fill="#fff" fill-opacity=".5"/></svg></span></div>
+      <div id="apphead" class="abs">
+        <span class="logo-row" role="img" aria-label="MBN DEV"><img src="assets/brand-icon-transparent.webp" alt="" /><span class="wm"><span class="a">MBN</span><span class="b">DEV</span></span></span>
+        <span id="bell"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i></i></span>
+      </div>
+
+      <!-- A · Project -->
+      <div id="sA" class="scr">
+        <h3>Your Store</h3><div class="sub">E-commerce website · Pro plan</div>
+        <div id="trk" class="card">
+          <div id="line"><i></i></div>
+          <div class="stg" id="g1"><span class="node"><span class="fill"></span><svg width="22" height="22" style="color:#fff;position:relative"><use href="#i-check"/></svg></span><div><b>Order Received</b><span>Confirmed &amp; queued</span></div></div>
+          <div class="stg" id="g2"><span class="node"><span class="fill"></span><svg width="22" height="22" style="color:#fff;position:relative"><use href="#i-check"/></svg></span><div><b>In Development</b><span>Actively being built</span></div></div>
+          <div class="stg" id="g3"><span class="node"><span class="ring"></span><span class="fill"></span></span><div><b>Review</b><span>Awaiting your feedback</span></div></div>
+          <div class="stg" id="g4"><span class="node"></span><div><b>Revision</b></div></div>
+          <div class="stg" id="g5" style="height:56px"><span class="node"></span><div><b>Delivered</b></div></div>
+        </div>
+        <div id="prog" class="card"><div class="row"><b>Progress</b><em><span id="pct">0</span>%</em></div><div class="bar"><i></i></div></div>
+      </div>
+
+      <!-- B · Messages -->
+      <div id="sB" class="scr">
+        <h3>Messages</h3><div class="sub">Your Store · with MBN DEV</div>
+        <div id="sys" class="card"><span class="sico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><div><b>Ready for your review</b><span>Your project is ready. Take a look and share feedback.</span></div></div>
+        <div id="m1" class="msg">Looks great! Can we make the header darker?<small>10:24 ✓✓</small></div>
+        <div id="mav" class="abs"><img src="assets/brand-icon-transparent.webp" alt="" /></div>
+        <div id="m2" class="msg"><div id="tdots"><i></i><i></i><i></i></div><span id="m2t">Done. It's updated, check it out.<small>10:25</small></span></div>
+        <div id="compose"><span>Write a message…</span><span class="send"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span></div>
+      </div>
+
+      <!-- C · Files & milestones -->
+      <div id="sC" class="scr">
+        <h3>Files</h3><div class="sub">Shared with your team</div>
+        <div class="card file" id="fl1"><span class="fic" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">PDF</span><div class="nm"><b>Homepage design.pdf</b><span>2.4 MB · Uploaded</span></div><span class="ok"><svg width="20" height="20" style="color:#34d399"><use href="#i-check"/></svg></span></div>
+        <div class="card file" id="fl2"><span class="fic" style="background:linear-gradient(135deg,#3b82f6,#1e3a8a)">ZIP</span><div class="nm"><b>Brand assets.zip</b><span id="upt">Uploading…</span><div class="up"><i></i></div></div><span class="ok" id="ok2" style="opacity:0"><svg width="20" height="20" style="color:#34d399"><use href="#i-check"/></svg></span></div>
+        <div class="sec lbl">Milestones</div>
+        <div class="card ms">
+          <div class="mi" id="mi1"><span class="bx"><span class="f"></span><svg width="20" height="20" style="color:#fff"><use href="#i-check"/></svg></span><b>Design</b><em>Complete</em></div>
+          <div class="mi" id="mi2"><span class="bx"><span class="f"></span><svg width="20" height="20" style="color:#fff"><use href="#i-check"/></svg></span><b>Development</b><em>Complete</em></div>
+          <div class="mi" id="mi3"><span class="bx"></span><b>Launch</b><em style="color:#a855f7">Next</em></div>
+        </div>
+      </div>
+
+      <!-- D · Payments -->
+      <div id="sD" class="scr">
+        <h3>Payments</h3><div class="sub">Your Store · Order #1042</div>
+        <div id="pay" class="card"><div class="lbl">Final payment</div><div class="amt">4,500<small>MAD</small></div>
+          <div class="pill"><span id="pend"><i></i>Pending verification</span><span id="paid"><svg width="20" height="20" style="color:#34d399"><use href="#i-check"/></svg>Paid</span></div></div>
+        <div id="meth" class="card"><div class="lbl">Method</div><div class="chips"><span class="on">CIH Bank</span><span>PayPal</span><span>TapTap Send</span></div></div>
+        <div id="hist" class="card"><div class="lbl">History</div><div class="hrow"><span><b>Deposit</b><em>Order #1042</em></span><span class="hr"><b>2,000 MAD</b><em class="g">Paid</em></span></div></div>
+      </div>
+
+      <div id="toast" class="abs"><span class="sico" style="background:rgba(16,185,129,0.16);border-color:rgba(16,185,129,0.45)"><svg width="26" height="26" style="color:#34d399"><use href="#i-check"/></svg></span><div><b>Payment verified — project is now live</b><span>MBN DEV · just now</span></div></div>
+
+      <!-- Tab bar -->
+      <div id="tabs" class="abs">
+        <div id="tabpill" class="abs"></div>
+        <span class="t" id="t1"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Project</span>
+        <span class="t" id="t2"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</span>
+        <span class="t" id="t3"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Files</span>
+        <span class="t" id="t4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Payments</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- End card -->
+  <div id="endglow" class="abs"></div>
+  <div id="logoIcon" class="abs logo-part"></div>
+  <div id="sweep" class="abs"><i></i></div>
+  <div id="logoWord" class="abs logo-part"></div>
+  <div id="tagline" class="abs">Your project. Your portal. · mbndev.ma</div>
+
+  <div id="grain" class="abs"></div>
+  <div id="vignette" class="abs"></div>
+  <div id="fade" class="abs"></div>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+  const EXPO = 'expo.out';          // == cubic-bezier(0.19,1,0.22,1), --ease-out-expo
+  const SMOOTH = 'power3.inOut';
+  gsap.defaults({ ease: EXPO });
+  const tl = gsap.timeline({ paused: true });
+  const IN = (targets, at, extra = {}) => tl.to(targets, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.08, ...extra }, at);
+  const OUT = (targets, at, extra = {}) => tl.to(targets, { opacity: 0, y: -40, filter: 'blur(12px)', duration: 0.4, ease: 'power2.in', stagger: 0, ...extra }, at);
+  const TAB_X = [31, 163, 295, 427];  // tab pill positions (tabs are space-around in 528px)
+  const TAB_ON = (n, at) => {
+    tl.to('#tabpill', { left: TAB_X[n - 1], duration: 0.6, ease: SMOOTH }, at);
+    [1, 2, 3, 4].forEach((i) => {
+      tl.to(`#t${i}`, { color: i === n ? '#ffffff' : '#64748b', duration: 0.3 }, at + 0.15)
+        .to(`#t${i} svg`, { stroke: i === n ? '#c4b5fd' : '#64748b', duration: 0.3 }, at + 0.15);
+    });
+  };
+  // App-style navigation: current screen slides out left, next slides in from the right.
+  const NAV = (from, to, at) => tl
+    .to(from, { x: -80, opacity: 0, filter: 'blur(8px)', duration: 0.45, ease: 'power2.in' }, at)
+    .fromTo(to, { x: 80, opacity: 0, filter: 'blur(8px)' }, { x: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7 }, at + 0.35);
+
+  gsap.set('.w', { opacity: 0, y: 40, filter: 'blur(12px)' });
+  gsap.set('#phone', { y: 120, rotationX: 14, filter: 'blur(14px)', transformPerspective: 2200, transformOrigin: '50% 100%' });
+  gsap.set('#sB, #sC, #sD', { opacity: 0 });
+  gsap.set('#trk, #prog', { opacity: 0, y: 30 });
+  gsap.set('#sys, #m1, #mav, #m2', { opacity: 0, y: 24 });
+  gsap.set('#m2t', { opacity: 0 });
+  gsap.set('#fl1, #fl2, #sC .lbl, #sC .ms', { opacity: 0, y: 24 });
+  gsap.set('#pay, #meth, #hist', { opacity: 0, y: 24 });
+  gsap.set('#toast', { opacity: 0, y: -60, scale: 0.96 });
+  gsap.set('#t1', { color: '#ffffff' }); gsap.set('#t1 svg', { stroke: '#c4b5fd' });
+  gsap.set('#logoWord', { y: 12 });
+  gsap.set('#logoIcon', { scale: 0.94, filter: 'blur(8px)' });
+
+  // ── Hook · 0–1.9 ────────────────────────────────────────────────────────────
+  tl.to('#fade', { opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+    .to('#ambient', { opacity: 0.6, duration: 1.4, ease: 'power2.out' }, 0.2);
+  IN('#hook .w', 0.25);
+  OUT('#hook .w', 1.6);
+
+  // ── A · Track every stage · 2.0–4.8 ─────────────────────────────────────────
+  IN('#eyebrow .w', 2.0);
+  IN('#hA .w', 2.1);
+  tl.to('#ambient', { opacity: 1, duration: 1.2 }, 2.0)
+    .to('#halo', { opacity: 1, duration: 1.4 }, 2.0)
+    .to('#phone', { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1.2 }, 2.0)
+    .to('#phone', { y: -12, duration: 10, ease: 'sine.inOut' }, 3.2)              // slow float
+    .to('#trk', { opacity: 1, y: 0, duration: 0.7 }, 2.5)
+    .to('#prog', { opacity: 1, y: 0, duration: 0.7 }, 2.62);
+  [['#g1', 2.85], ['#g2', 3.2]].forEach(([g, at]) => {
+    tl.to(`${g} .fill`, { opacity: 1, duration: 0.3, ease: 'power2.out' }, at)
+      .to(`${g} .node svg`, { opacity: 1, duration: 0.25 }, at + 0.1)
+      .to(`${g} b`, { color: '#ffffff', duration: 0.3 }, at);
+  });
+  tl.to('#line i', { scaleY: 0.5, duration: 0.9, ease: 'power2.inOut' }, 2.85)
+    .to('#g3 .fill', { opacity: 1, duration: 0.3 }, 3.55)
+    .to('#g3 b', { color: '#c4b5fd', duration: 0.3 }, 3.55)
+    .to('#g3 div > span', { opacity: 1, duration: 0.4 }, 3.6)
+    .fromTo('#g3 .ring', { opacity: 0.9, scale: 0.7 }, { opacity: 0, scale: 1.25, duration: 0.9, ease: 'power2.out', repeat: 1 }, 3.65)
+    .to('#prog .bar i', { scaleX: 0.6, duration: 1.2, ease: 'power3.out' }, 2.9)
+    .to({ v: 0 }, { v: 60, duration: 1.2, ease: 'power3.out', onUpdate() { document.getElementById('pct').textContent = Math.round(this.targets()[0].v); } }, 2.9);
+
+  // ── B · Chat in real time · 4.8–7.4 ────────────────────────────────────────
+  OUT('#hA .w', 4.8);
+  IN('#hB .w', 5.1);
+  TAB_ON(2, 4.8);
+  NAV('#sA', '#sB', 4.8);
+  tl.to('#bell i', { opacity: 1, duration: 0.2 }, 5.3)
+    .to('#sys', { opacity: 1, y: 0, duration: 0.7 }, 5.35)
+    .to('#m1', { opacity: 1, y: 0, duration: 0.7 }, 5.8)
+    .to('#mav, #m2', { opacity: 1, y: 0, duration: 0.6, stagger: 0.06 }, 6.25)
+    .fromTo('#tdots i', { y: 0 }, { y: -7, duration: 0.16, ease: 'sine.inOut', yoyo: true, repeat: 3, stagger: 0.07 }, 6.3)
+    .to('#tdots', { opacity: 0, duration: 0.12 }, 6.72)
+    .to('#m2t', { opacity: 1, duration: 0.3 }, 6.76);
+
+  // ── C · Files & milestones · 7.4–10.0 ──────────────────────────────────────
+  OUT('#hB .w', 7.4);
+  IN('#hC .w', 7.7);
+  TAB_ON(3, 7.4);
+  NAV('#sB', '#sC', 7.4);
+  tl.to('#fl1, #fl2', { opacity: 1, y: 0, duration: 0.7, stagger: 0.1 }, 7.9)
+    .to('#fl2 .up i', { scaleX: 1, duration: 1.0, ease: 'power2.inOut' }, 8.2)
+    .set('#upt', { textContent: '8.1 MB · Uploaded' }, 9.2)
+    .to('#fl2 .up', { opacity: 0, height: 0, marginTop: 0, duration: 0.3 }, 9.2)
+    .to('#ok2', { opacity: 1, duration: 0.3 }, 9.2)
+    .to('#sC .lbl, #sC .ms', { opacity: 1, y: 0, duration: 0.7, stagger: 0.1 }, 8.2)
+    .to('#mi1 .f', { opacity: 1, duration: 0.3 }, 8.7).to('#mi1 svg', { opacity: 1, duration: 0.2 }, 8.78)
+    .to('#mi2 .f', { opacity: 1, duration: 0.3 }, 9.0).to('#mi2 svg', { opacity: 1, duration: 0.2 }, 9.08);
+
+  // ── D · Payments, verified · 10.0–12.6 ─────────────────────────────────────
+  OUT('#hC .w', 10.0);
+  IN('#hD .w', 10.3);
+  TAB_ON(4, 10.0);
+  NAV('#sC', '#sD', 10.0);
+  tl.to('#pay, #meth, #hist', { opacity: 1, y: 0, duration: 0.7, stagger: 0.1 }, 10.5)
+    .to('#pend', { opacity: 0, y: -10, duration: 0.3, ease: 'power2.in' }, 11.25)
+    .fromTo('#paid', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 11.4)
+    .to('#toast', { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 11.6);
+
+  // ── End card · 12.6–15 ──────────────────────────────────────────────────────
+  OUT('#eyebrow .w, #hD .w', 12.6);
+  tl.to('#phone', { opacity: 0, y: '+=80', filter: 'blur(14px)', duration: 0.45, ease: 'power2.in' }, 12.6)
+    .to('#halo, #ambient', { opacity: 0, duration: 0.6 }, 12.6)
+    .to('#endglow', { opacity: 1, duration: 1.0, ease: 'power2.out' }, 13.15)
+    .to('#logoIcon', { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.9 }, 13.2)
+    .set('#sweep', { opacity: 1 }, 13.55)
+    .fromTo('#sweep i', { left: '-60%' }, { left: '130%', duration: 0.9, ease: 'power2.inOut' }, 13.55)
+    .to('#logoWord', { opacity: 1, y: 0, duration: 0.8 }, 13.42)
+    .to('#tagline', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 13.75)
+    .to('#endglow', { opacity: 0.6, duration: 0.55, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 13.9)
+    .to('#fade', { opacity: 0, duration: 0.01 }, 14.99);
+
+  window.__render = (t, frame) => {
+    tl.seek(t, false);
+    const r = (n) => ((Math.sin(frame * 12.9898 + n * 78.233) * 43758.5453) % 1);
+    gsap.set('#grain', { x: r(1) * 60, y: r(2) * 60 });
+  };
+  window.__duration = 15;
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>

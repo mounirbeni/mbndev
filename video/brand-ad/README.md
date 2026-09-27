@@ -8,6 +8,7 @@ cd video/brand-ad
 npm install
 npm run render                              # index.html   → out/mbndev-ad-9x16.mp4
 npm run render -- --page process.html       # process.html → out/mbndev-process-9x16.mp4
+npm run render -- --page portal.html        # portal.html  → out/mbndev-portal-9x16.mp4
 ```
 
 - Needs Chromium (`CHROME_PATH`, or Playwright's bundled one) and FFmpeg (`FFMPEG_PATH`, or on PATH).
@@ -40,3 +41,18 @@ with a 4-segment progress bar underneath.
 | 7.6–10.4s | 03 Build · each wireframe block fills in place (demo store "Your Brand") |
 | 10.4–12.8s | 04 Launch · browser bar, yourbrand.ma, LIVE, first order notification |
 | 12.8–15s | Official logo end card · "From idea to live · mbndev.ma" |
+
+## portal.html — "Control your project from your portal"
+
+One phone showing the real client-portal features (labels taken from the app:
+`ProjectStageTracker.tsx`, `lib/systemMessages.js`, payment methods from the Payment model).
+The phone's tab bar doubles as the progress indicator.
+
+| Time | Screen |
+|---|---|
+| 0–1.9s | "Control your project from your portal." |
+| 2.0–4.8s | Project · stage tracker fills Order Received → In Development → Review, progress 60% |
+| 4.8–7.4s | Messages · "Ready for your review" system card, client message, live reply |
+| 7.4–10.0s | Files · upload completes; milestones Design ✓ Development ✓ |
+| 10.0–12.6s | Payments · Pending verification → Paid, "Payment verified — project is now live" |
+| 12.6–15s | Official logo end card · "Your project. Your portal. · mbndev.ma" |
