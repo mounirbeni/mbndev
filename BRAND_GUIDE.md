@@ -65,10 +65,10 @@ To get the transparent PNG/WebP outside the app, run `node frontend/scripts/buil
 
 **Resolution note:** the largest approved raster files are 560 px (lockup) and 128 px (transparent icon). For 4K video or print, ask the owner for a higher-resolution or vector master. **Do not AI-upscale, redraw or re-generate the mark.** Until a master exists, keep the logo at 1:1 pixel size or smaller on screen.
 
-### 2.2 Deprecated / legacy files: do not use
-These files are still in the repo but are **not** part of the current identity and are not referenced by the app:
-- `frontend/public/images/logo.png` and `frontend/public/logo-app.jpeg`: old serif "MB" silver and purple monogram with a star
-- `frontend/public/favicon.png` and `frontend/public/favicon.svg`: old metallic-text favicon
+### 2.2 Deprecated / legacy marks: never use
+- **Old serif "MB" monogram** (silver M + purple B with a four-point star): **retired and deleted from the repository.** Never use, recreate or reference it in any material.
+- Old crystal/gem mark ("MBN DEV · Premium Web Solutions") in `frontend/public/logo-app.jpeg` and `frontend/public/OFLG.jpeg`: legacy, not the current identity
+- `frontend/public/favicon.svg`: old metallic-text favicon, not referenced by the app
 - The purple rounded square with a white "M" drawn in `frontend/src/app/opengraph-image.tsx`: a placeholder that should be replaced with the official monogram
 
 ### 2.3 Full lockup vs. icon only
@@ -103,7 +103,7 @@ These files are still in the repo but are **not** part of the current identity a
 
 ### 2.6 Prohibited
 - ❌ Generating, redrawing, tracing, "improving" or AI-recreating the logo. **Only the official files above may appear.**
-- ❌ Using the legacy MB serif monogram or the placeholder "M" square
+- ❌ Using the retired serif "MB" monogram, the crystal mark, or the placeholder "M" square
 - ❌ Recoloring (no single-color, gold, rainbow or inverted versions), changing the gradient, or adding outlines
 - ❌ Stretching, skewing, rotating, 3D-extruding or perspective-warping the flat mark
 - ❌ Adding extra glows, lens flares or drop shadows heavier than the built-in glow
