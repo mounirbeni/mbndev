@@ -1,5 +1,5 @@
 // Renders index.html frame by frame (deterministic GSAP seek) and encodes an MP4 with FFmpeg.
-// Usage: npm run render  [-- --page index.html --fps 30 --from 0 --to 15 --out out/mbndev-ad-9x16.mp4]
+// Usage: npm run render  [-- --page index.html --fps 30 --blur 4 --from 0 --to 15 --out out/mbndev-ad-9x16.mp4]
 // Needs: Chromium (CHROME_PATH or Playwright's bundled one) and ffmpeg (FFMPEG_PATH or on PATH).
 import { chromium } from 'playwright-core';
 import { spawn } from 'node:child_process';
@@ -34,19 +34,28 @@ const from = Number(args.from ?? 0);
 const to = Number(args.to ?? duration);
 const total = Math.round((to - from) * fps);
 
+// Motion blur (--blur N): N sub-frame samples per frame spread over a 180° shutter
+// (half the frame interval), averaged by FFmpeg's tmix — like a real camera.
+const blur = Math.max(1, Number(args.blur ?? 1));
+const shutter = 0.5;
+const vf = blur > 1 ? ['-vf', `tmix=frames=${blur},select='eq(mod(n\\,${blur})\\,${blur - 1})',setpts=N/(${fps}*TB)`, '-r', String(fps)] : [];
+
 const ffmpeg = spawn(process.env.FFMPEG_PATH || 'ffmpeg', [
-  '-y', '-f', 'image2pipe', '-framerate', String(fps), '-i', '-',
+  '-y', '-f', 'image2pipe', '-framerate', String(fps * blur), '-i', '-',
+  ...vf,
   '-c:v', 'libx264', '-preset', 'slow', '-crf', '14', '-tune', 'film',
   '-pix_fmt', 'yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709',
   '-movflags', '+faststart', '-an', out,
 ], { stdio: ['pipe', 'inherit', 'inherit'] });
 
 for (let f = 0; f < total; f++) {
-  const t = from + f / fps;
-  await page.evaluate(([tt, ff]) => window.__render(tt, ff), [t, f]);
-  const png = await page.screenshot({ type: 'png' });
-  if (!ffmpeg.stdin.write(png)) await new Promise((r) => ffmpeg.stdin.once('drain', r));
-  if (f % fps === 0) process.stdout.write(`\r${(t).toFixed(1)}s / ${to}s`);
+  for (let k = 0; k < blur; k++) {
+    const t = from + (f + (blur > 1 ? (k / blur - 0.5) * shutter : 0)) / fps;
+    await page.evaluate(([tt, ff]) => window.__render(Math.max(0, tt), ff), [t, f]);
+    const png = await page.screenshot({ type: 'png' });
+    if (!ffmpeg.stdin.write(png)) await new Promise((r) => ffmpeg.stdin.once('drain', r));
+  }
+  if (f % fps === 0) process.stdout.write(`\r${(from + f / fps).toFixed(1)}s / ${to}s`);
 }
 ffmpeg.stdin.end();
 await new Promise((r) => ffmpeg.on('close', r));

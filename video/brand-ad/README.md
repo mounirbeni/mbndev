@@ -9,9 +9,11 @@ npm install
 npm run render                              # index.html   → out/mbndev-ad-9x16.mp4
 npm run render -- --page process.html       # process.html → out/mbndev-process-9x16.mp4
 npm run render -- --page portal.html        # portal.html  → out/mbndev-portal-9x16.mp4
+npm run render -- --page film.html --blur 4 # film.html    → out/mbndev-film-9x16.mp4 (21s, motion blur)
 ```
 
 - Needs Chromium (`CHROME_PATH`, or Playwright's bundled one) and FFmpeg (`FFMPEG_PATH`, or on PATH).
+- `--blur N` adds real motion blur: N sub-frame samples per frame over a 180° shutter, averaged by FFmpeg (N× render time).
 - Preview a moment: `npm run render -- --from 12 --to 15 --out out/end.mp4`
 - Edit copy and timing in `index.html` (the GSAP timeline is commented by scene).
 - The "95" performance score is a placeholder; replace it with a real Lighthouse score before publishing.
@@ -56,3 +58,17 @@ The phone's tab bar doubles as the progress indicator.
 | 7.4–10.0s | Files · upload completes; milestones Design ✓ Development ✓ |
 | 10.0–12.6s | Payments · Pending verification → Paid, "Payment verified — project is now live" |
 | 12.6–15s | Official logo end card · "Your project. Your portal. · mbndev.ma" |
+
+## film.html — brand film "Crafted, not templated." (21s)
+
+Editorial layout: visual centred on y 800, caption always bottom-left (index row + headline),
+type revealed through line masks. Render with `--blur 4`.
+
+| Time | Scene |
+|---|---|
+| 0–3.2s | 01 Detail · a single line of light opens into a frame · "Every pixel has a purpose." |
+| 3.2–8.0s | 02 Design · exploded 3D view (grid, imagery, typography, components) locks into one page · "Designed in layers." |
+| 8.0–12.0s | 03 Responsive · the same page reflows 1440 → 768 → 390 px · "Built for every screen." |
+| 12.0–15.4s | 04 Principles · "Custom. Fast. Yours." set as an editorial spread |
+| 15.6–18.1s | "Custom Websites Built to Elevate Your Business." |
+| 18.2–21s | Official logo end card under a soft light beam · mbndev.ma |

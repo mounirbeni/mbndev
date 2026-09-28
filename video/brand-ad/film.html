@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Brand Film (9:16)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    Brand film — "Crafted, not templated." (21s, 9:16). Render with motion blur: --blur 4.
+    Editorial layout (1080 × 1920):
+    ─ Stage: the visual lives centred on y 800.
+    ─ Caption: bottom-left, x 96, index row at y 1320, headline below — the same slot every scene.
+    ─ Type is revealed through line masks (no fades); one scene on screen at a time.
+  */
+  :root {
+    --bg: #08080b;
+    --primary: #7c3aed;
+    --primary-light: #a855f7;
+    --lav: #c4b5fd;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --dim: #64748b;
+    --hair: rgba(255, 255, 255, 0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; background: var(--bg); overflow: hidden; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .abs { position: absolute; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+
+  /* Light */
+  #ambient { inset: -10%; opacity: 0;
+    background: radial-gradient(ellipse 60% 38% at 50% 42%, rgba(124,58,237,0.16) 0%, transparent 62%),
+                radial-gradient(ellipse 40% 26% at 80% 20%, rgba(59,130,246,0.07) 0%, transparent 60%); }
+  #key { left: 540px; top: 800px; width: 1500px; height: 1500px; margin: -750px 0 0 -750px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.22) 0%, rgba(124,58,237,0.06) 38%, transparent 66%); opacity: 0; }
+  #floor { left: 0; top: 1150px; width: 1080px; height: 420px; opacity: 0;
+    background: radial-gradient(ellipse 45% 30% at 50% 0%, rgba(124,58,237,0.20) 0%, transparent 70%); }
+
+  /* Editorial type: line masks */
+  .ln { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+  .in { display: inline-block; will-change: transform; }
+  .grad { background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #06b6d4 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hl { color: var(--primary-light); }
+
+  /* Caption slot (bottom-left) */
+  .idx { left: 96px; top: 1320px; height: 40px; display: flex; align-items: center; gap: 22px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; color: var(--lav); letter-spacing: 0.06em; }
+  .idx .rule { width: 90px; height: 2px; background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); transform-origin: 0 50%; transform: scaleX(0); }
+  .idx .lab { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .cap { left: 96px; top: 1392px; width: 888px; font-weight: 800; font-size: 96px; line-height: 1.02; letter-spacing: -0.035em; color: #fff; }
+
+  /* S1 · light line */
+  #beam { left: 140px; top: 799px; width: 800px; height: 2px; transform-origin: 0 50%; transform: scaleX(0);
+    background: linear-gradient(90deg, transparent, #c4b5fd 20%, #fff 50%, #c4b5fd 80%, transparent);
+    box-shadow: 0 0 18px 2px rgba(168,85,247,0.8), 0 0 60px 8px rgba(124,58,237,0.4); }
+  #frame { left: 160px; top: 540px; width: 760px; height: 520px; border-radius: 28px; border: 1.5px solid rgba(196,181,253,0.55);
+    box-shadow: 0 0 40px rgba(124,58,237,0.35), inset 0 0 40px rgba(124,58,237,0.15); transform: scaleY(0.004); opacity: 0; }
+
+  /* S2/S3 · the layered page */
+  #cam { inset: 0; perspective: 2400px; perspective-origin: 540px 800px; }
+  #rig { left: 160px; top: 540px; width: 760px; height: 520px; transform-style: preserve-3d; }
+  .ly { position: absolute; inset: 0; border-radius: 28px; transform-style: flat; }
+  .tag { position: absolute; left: 0; top: -44px; font-family: 'JetBrains Mono', monospace; font-size: 20px; letter-spacing: 0.12em; color: var(--lav); white-space: nowrap; }
+  .tag::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 10px #a855f7; margin-right: 12px; vertical-align: 1px; }
+  #ly-bg { background: linear-gradient(160deg, #150a2b 0%, #0c0a14 55%, #09090c 100%); border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 60px 140px rgba(0,0,0,0.7), 0 0 90px rgba(124,58,237,0.22), inset 0 1px 0 rgba(255,255,255,0.10); overflow: hidden; }
+  #ly-bg .sheen { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.07) 47%, transparent 58%); background-size: 260% 100%; background-position: 140% 0; }
+  #notch { left: 50%; top: 12px; width: 110px; height: 30px; margin-left: -55px; border-radius: 16px; background: #000; opacity: 0; }
+  #ly-grid { border: 1px dashed rgba(196,181,253,0.28); overflow: hidden;
+    background:
+      repeating-linear-gradient(90deg, rgba(196,181,253,0.16) 0 1px, transparent 1px 63px),
+      repeating-linear-gradient(0deg, rgba(196,181,253,0.08) 0 1px, transparent 1px 63px),
+      rgba(124,58,237,0.03); }
+  #ly-type .t1 { position: absolute; font-weight: 900; letter-spacing: -0.035em; line-height: 1.02; color: #fff; }
+  #ly-type .sub { position: absolute; display: grid; gap: 12px; }
+  #ly-type .sub i { display: block; height: 12px; border-radius: 6px; background: rgba(255,255,255,0.12); }
+  #ly-type .sub i + i { width: 72%; }
+  #ly-img .orb { position: absolute; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #e9d5ff 0%, #a855f7 28%, #6d28d9 58%, #1e0b40 100%);
+    box-shadow: 0 0 80px rgba(124,58,237,0.65), inset -20px -30px 60px rgba(0,0,0,0.45); }
+  #ly-img .ring { position: absolute; border-radius: 50%; border: 1.5px solid rgba(196,181,253,0.35); }
+  #ly-ui .nav { position: absolute; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+  #ly-ui .nav b { font-weight: 900; font-size: 18px; letter-spacing: 0.14em; color: #fff; white-space: nowrap; }
+  #ly-ui .nav .links { display: flex; gap: 18px; font-size: 15px; color: var(--muted); font-weight: 500; }
+  #ly-ui .nav .bg { display: grid; gap: 5px; width: 24px; } #ly-ui .nav .bg i { display: block; height: 2.5px; border-radius: 2px; background: #cbd5e1; }
+  #ly-ui .btn { position: absolute; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; font-weight: 700; font-size: 18px; box-shadow: 0 10px 30px rgba(124,58,237,0.5); white-space: nowrap; }
+  #ly-ui .cd { position: absolute; border-radius: 16px; background: rgba(18,18,25,0.92); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); overflow: hidden; }
+  #ly-ui .cd i { position: absolute; left: 16px; top: 16px; width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #a855f7, #6d28d9); }
+  #ly-ui .cd s { position: absolute; left: 60px; top: 20px; right: 16px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.12); text-decoration: none; }
+  #ly-ui .cd s + s { top: 38px; right: 70px; background: rgba(255,255,255,0.07); }
+  #vw { left: 96px; width: 888px; top: 360px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 500; letter-spacing: 0.08em; color: var(--muted); opacity: 0; }
+  #vw b { color: #fff; font-weight: 500; }
+
+  /* S4 · principles */
+  .big { left: 96px; width: 888px; font-weight: 900; font-size: 190px; line-height: 1; letter-spacing: -0.05em; color: #fff; }
+  #p1 { top: 470px; } #p2 { top: 720px; } #p3 { top: 970px; }
+  .prule { left: 96px; width: 888px; height: 1.5px; background: linear-gradient(90deg, rgba(196,181,253,0.5), rgba(196,181,253,0.05)); transform-origin: 0 50%; transform: scaleX(0); }
+  #r1 { top: 690px; } #r2 { top: 940px; } #r3 { top: 1190px; }
+  .pn { right: 96px; font-family: 'JetBrains Mono', monospace; font-size: 24px; color: var(--dim); letter-spacing: 0.06em; opacity: 0; }
+  #n1 { top: 650px; } #n2 { top: 900px; } #n3 { top: 1150px; }
+
+  /* S5 · promise */
+  #promise { left: 96px; width: 888px; top: 700px; text-align: center; font-weight: 800; font-size: 100px; line-height: 1.04; letter-spacing: -0.035em; color: #fff; }
+
+  /* S6 · official logo file at 1:1 (same treatment as the other ads) */
+  #rays { left: 190px; top: 0; width: 700px; height: 1250px; opacity: 0; filter: blur(24px);
+    background: linear-gradient(180deg, rgba(168,85,247,0.22) 0%, rgba(124,58,237,0.10) 55%, transparent 100%);
+    clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
+  #endglow { left: 540px; top: 900px; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 62%); opacity: 0; }
+  .logo-part { left: 260px; width: 560px; height: 560px; top: 620px; background: url('../../frontend/public/brand-logo.webp') no-repeat 0 0 / 560px 560px; opacity: 0; }
+  #logoIcon {
+    -webkit-mask-image: linear-gradient(to right, transparent 110px, #000 160px, #000 400px, transparent 450px), linear-gradient(to bottom, transparent 55px, #000 100px, #000 352px, transparent 374px);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 110px, #000 160px, #000 400px, transparent 450px), linear-gradient(to bottom, transparent 55px, #000 100px, #000 352px, transparent 374px);
+    mask-composite: intersect; }
+  #logoWord {
+    -webkit-mask-image: linear-gradient(to right, transparent 60px, #000 96px, #000 463px, transparent 500px), linear-gradient(to bottom, transparent 366px, #000 381px, #000 424px, transparent 442px);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 60px, #000 96px, #000 463px, transparent 500px), linear-gradient(to bottom, transparent 366px, #000 381px, #000 424px, transparent 442px);
+    mask-composite: intersect; }
+  #sweep { left: 390px; top: 700px; width: 300px; height: 270px; overflow: hidden; opacity: 0; -webkit-mask: url('../../frontend/public/brand-logo.webp') no-repeat -130px -80px / 560px 560px; mask: url('../../frontend/public/brand-logo.webp') no-repeat -130px -80px / 560px 560px; mask-mode: luminance; }
+  #sweep i { position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent); transform: skewX(-18deg); display: block; }
+  #url { left: 96px; width: 888px; top: 1090px; text-align: center; font-size: 34px; font-weight: 500; letter-spacing: 0.04em; color: var(--muted); }
+
+  #grain { inset: -50%; width: 200%; height: 200%; opacity: 0.05; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 260px 260px; }
+  #vignette { inset: 0; pointer-events: none; background: radial-gradient(ellipse 72% 58% at 50% 46%, transparent 52%, rgba(0,0,0,0.72) 100%); }
+  #fade { inset: 0; background: #000; opacity: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ambient" class="abs"></div>
+  <div id="key" class="abs"></div>
+  <div id="floor" class="abs"></div>
+  <div id="rays" class="abs"></div>
+
+  <!-- S1 -->
+  <div id="beam" class="abs"></div>
+  <div id="frame" class="abs"></div>
+
+  <!-- S2/S3 -->
+  <div id="vw" class="abs"><b id="vwn">1440</b> px</div>
+  <div id="cam" class="abs">
+    <div id="rig" class="abs">
+      <div id="ly-bg" class="ly"><div class="sheen"></div><div id="notch" class="abs"></div></div>
+      <div id="ly-grid" class="ly"><span class="tag">GRID</span></div>
+      <div id="ly-img" class="ly"><span class="tag" style="left:auto;right:0;top:-44px">IMAGERY</span><div class="ring" id="ring"></div><div class="orb" id="orb"></div></div>
+      <div id="ly-type" class="ly"><span class="tag" style="left:-24px;top:140px;transform:translateX(-100%)">TYPOGRAPHY</span><div class="t1" id="t1">Elevate<br>your brand.</div><div class="sub" id="sub"><i></i><i></i></div></div>
+      <div id="ly-ui" class="ly"><span class="tag" style="top:auto;bottom:-44px">COMPONENTS</span>
+        <div class="nav" id="nav"><b>YOUR BRAND</b><span class="links" id="links"><span>Work</span><span>Studio</span><span>Contact</span></span><span class="bg" id="burger"><i></i><i></i><i></i></span></div>
+        <div class="btn" id="btn">Get started</div>
+        <div class="cd" id="c1"><i></i><s></s><s></s></div>
+        <div class="cd" id="c2"><i></i><s></s><s></s></div>
+        <div class="cd" id="c3"><i></i><s></s><s></s></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div id="p1" class="abs big"><span class="ln"><span class="in">Custom.</span></span></div>
+  <div id="p2" class="abs big"><span class="ln"><span class="in">Fast.</span></span></div>
+  <div id="p3" class="abs big"><span class="ln"><span class="in grad">Yours.</span></span></div>
+  <div id="r1" class="abs prule"></div><div id="r2" class="abs prule"></div><div id="r3" class="abs prule"></div>
+  <div id="n1" class="abs pn">No templates</div><div id="n2" class="abs pn">Performance-first</div><div id="n3" class="abs pn">Built around you</div>
+
+  <!-- S5 -->
+  <div id="promise" class="abs">
+    <span class="ln"><span class="in">Custom Websites</span></span>
+    <span class="ln"><span class="in">Built to <span class="grad">Elevate</span></span></span>
+    <span class="ln"><span class="in">Your Business.</span></span>
+  </div>
+
+  <!-- Caption slot: index rows + headlines -->
+  <div id="i1" class="abs idx"><span class="ln"><span class="in">01</span></span><span class="rule"></span><span class="ln"><span class="in lab">Detail</span></span></div>
+  <div id="i2" class="abs idx"><span class="ln"><span class="in">02</span></span><span class="rule"></span><span class="ln"><span class="in lab">Design</span></span></div>
+  <div id="i3" class="abs idx"><span class="ln"><span class="in">03</span></span><span class="rule"></span><span class="ln"><span class="in lab">Responsive</span></span></div>
+  <div id="i4" class="abs idx"><span class="ln"><span class="in">04</span></span><span class="rule"></span><span class="ln"><span class="in lab">Principles</span></span></div>
+  <div id="c-1" class="abs cap"><span class="ln"><span class="in">Every pixel</span></span><span class="ln"><span class="in">has a <span class="hl">purpose.</span></span></span></div>
+  <div id="c-2" class="abs cap"><span class="ln"><span class="in">Designed</span></span><span class="ln"><span class="in">in <span class="hl">layers.</span></span></span></div>
+  <div id="c-3" class="abs cap"><span class="ln"><span class="in">Built for</span></span><span class="ln"><span class="in">every <span class="hl">screen.</span></span></span></div>
+
+  <!-- S6 -->
+  <div id="endglow" class="abs"></div>
+  <div id="logoIcon" class="abs logo-part"></div>
+  <div id="sweep" class="abs"><i></i></div>
+  <div id="logoWord" class="abs logo-part"></div>
+  <div id="url" class="abs"><span class="ln"><span class="in">mbndev.ma</span></span></div>
+
+  <div id="grain" class="abs"></div>
+  <div id="vignette" class="abs"></div>
+  <div id="fade" class="abs"></div>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+  const EXPO = 'expo.out';           // == cubic-bezier(0.19,1,0.22,1), --ease-out-expo
+  const SMOOTH = 'power3.inOut';
+  gsap.defaults({ ease: EXPO });
+  const tl = gsap.timeline({ paused: true });
+
+  // Editorial reveal vocabulary: lines rise out of a mask; exits lift into it.
+  const REVEAL = (sel, at, stagger = 0.09) => tl.to(`${sel} .in`, { yPercent: 0, duration: 1.0, stagger }, at);
+  const HIDE = (sel, at) => tl.to(`${sel} .in`, { yPercent: -110, duration: 0.5, stagger: 0.04, ease: 'power3.in' }, at);
+  const INDEX = (n, at, out) => {
+    tl.to(`#i${n} .in`, { yPercent: 0, duration: 0.9, stagger: 0.12 }, at)
+      .to(`#i${n} .rule`, { scaleX: 1, duration: 0.9 }, at + 0.1)
+      .to(`#i${n} .in`, { yPercent: -110, duration: 0.45, stagger: 0.03, ease: 'power3.in' }, out)
+      .to(`#i${n} .rule`, { scaleX: 0, transformOrigin: '100% 50%', duration: 0.45, ease: 'power3.in' }, out);
+  };
+  gsap.set('.in', { yPercent: 110 });
+
+  // ── Responsive layouts (rig-relative px) ────────────────────────────────────
+  const L = {
+    D: { rig: { left: 160, top: 540, width: 760, height: 520 }, r: 28,
+         nav: { left: 28, top: 24, width: 704, height: 56 }, t1: { left: 40, top: 118, fontSize: 60 }, sub: { left: 40, top: 262, width: 300 },
+         btn: { left: 40, top: 316, width: 190, height: 56 }, orb: { left: 468, top: 104, width: 236, height: 236 }, ring: { left: 438, top: 74, width: 296, height: 296 },
+         c1: { left: 28, top: 404, width: 220, height: 88 }, c2: { left: 270, top: 404, width: 220, height: 88 }, c3: { left: 512, top: 404, width: 220, height: 88 } },
+    T: { rig: { left: 260, top: 420, width: 560, height: 760 }, r: 32,
+         nav: { left: 24, top: 22, width: 512, height: 56 }, t1: { left: 32, top: 116, fontSize: 52 }, sub: { left: 32, top: 248, width: 250 },
+         btn: { left: 32, top: 300, width: 180, height: 54 }, orb: { left: 332, top: 112, width: 190, height: 190 }, ring: { left: 307, top: 87, width: 240, height: 240 },
+         c1: { left: 24, top: 394, width: 248, height: 160 }, c2: { left: 288, top: 394, width: 248, height: 160 }, c3: { left: 24, top: 572, width: 512, height: 160 } },
+    P: { rig: { left: 360, top: 430, width: 360, height: 740 }, r: 56,
+         nav: { left: 18, top: 52, width: 324, height: 50 }, t1: { left: 22, top: 318, fontSize: 44 }, sub: { left: 22, top: 424, width: 240 },
+         btn: { left: 22, top: 470, width: 316, height: 54 }, orb: { left: 95, top: 124, width: 170, height: 170 }, ring: { left: 70, top: 99, width: 220, height: 220 },
+         c1: { left: 22, top: 544, width: 316, height: 52 }, c2: { left: 22, top: 608, width: 316, height: 52 }, c3: { left: 22, top: 672, width: 316, height: 52 } },
+  };
+  const PARTS = ['nav', 't1', 'sub', 'btn', 'orb', 'ring', 'c1', 'c2', 'c3'];
+  const LAYOUT = (k, at, dur) => {
+    const l = L[k];
+    tl.to('#rig', { ...l.rig, duration: dur, ease: SMOOTH }, at)
+      .to('.ly', { borderRadius: l.r, duration: dur, ease: SMOOTH }, at);
+    PARTS.forEach((p) => tl.to(`#${p}`, { ...l[p], duration: dur, ease: SMOOTH }, at));
+  };
+  PARTS.forEach((p) => gsap.set(`#${p}`, L.D[p]));
+  gsap.set('#burger', { opacity: 0 });
+
+  // Exploded view: layers spread along Z, the rig seen from above-left.
+  const Z = { '#ly-bg': -260, '#ly-grid': -130, '#ly-img': 0, '#ly-type': 130, '#ly-ui': 260 };
+  gsap.set('.ly', { opacity: 0 });
+  gsap.set('.tag', { opacity: 0 });
+  Object.entries(Z).forEach(([s, z]) => gsap.set(s, { z: z + 500 }));
+  gsap.set('#rig', { rotationY: -38, rotationX: 24, rotationZ: -6, scale: 0.82 });
+
+  // ── S1 · 0–3.2 · a single line of light becomes a frame ────────────────────
+  tl.to('#fade', { opacity: 0, duration: 0.6, ease: 'power2.out' }, 0)
+    .to('#ambient', { opacity: 0.55, duration: 2.0, ease: 'power2.out' }, 0.2)
+    .to('#beam', { scaleX: 1, duration: 1.4 }, 0.25);
+  INDEX(1, 0.7, 2.75);
+  REVEAL('#c-1', 0.8);
+  HIDE('#c-1', 2.8);
+  tl.set('#frame', { opacity: 1 }, 2.2)
+    .to('#frame', { scaleY: 1, duration: 1.0, ease: SMOOTH }, 2.2)
+    .to('#beam', { opacity: 0, duration: 0.5, ease: 'power2.out' }, 2.3)
+    .to('#key', { opacity: 1, duration: 1.6, ease: 'power2.out' }, 2.3)
+
+  // ── S2 · 3.2–8.0 · exploded layers, then they lock together ───────────────
+    .to('#frame', { opacity: 0, duration: 0.6, ease: 'power2.out' }, 3.3);
+  Object.entries(Z).forEach(([s, z], i) => {
+    tl.to(s, { opacity: 1, z, duration: 1.1 }, 3.2 + i * 0.12);
+  });
+  tl.to('.tag', { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out' }, 3.9)
+    .to('#rig', { rotationY: -24, rotationX: 18, rotationZ: -4, scale: 0.86, duration: 3.2, ease: 'sine.inOut' }, 3.2)   // slow orbit
+    .to('.tag', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 6.35);
+  Object.keys(Z).forEach((s) => tl.to(s, { z: 0, duration: 1.2, ease: SMOOTH }, 6.45));
+  tl.to('#rig', { rotationY: 0, rotationX: 0, rotationZ: 0, scale: 1, duration: 1.2, ease: SMOOTH }, 6.45)
+    .to('#ly-grid', { opacity: 0, duration: 0.6, ease: 'power2.out' }, 7.1)
+    .to('#ly-bg .sheen', { backgroundPosition: '-60% 0', duration: 1.1, ease: 'power2.inOut' }, 7.5)
+    .to('#floor', { opacity: 1, duration: 1.2 }, 7.0);
+  INDEX(2, 3.4, 7.55);
+  REVEAL('#c-2', 3.5);
+  HIDE('#c-2', 7.6);
+
+  // ── S3 · 8.0–12.0 · the same page reflows: desktop → tablet → phone ───────
+  tl.to('#vw', { opacity: 1, duration: 0.5, ease: 'power2.out' }, 8.0);
+  LAYOUT('T', 8.3, 1.0);
+  tl.to({ v: 1440 }, { v: 768, duration: 1.0, ease: SMOOTH, onUpdate() { document.getElementById('vwn').textContent = Math.round(this.targets()[0].v); } }, 8.3)
+    .to('#links', { opacity: 0, duration: 0.3 }, 9.6)
+    .to('#burger', { opacity: 1, duration: 0.3 }, 9.8);
+  LAYOUT('P', 9.8, 1.0);
+  tl.to({ v: 768 }, { v: 390, duration: 1.0, ease: SMOOTH, onUpdate() { document.getElementById('vwn').textContent = Math.round(this.targets()[0].v); } }, 9.8)
+    .to('#notch', { opacity: 1, duration: 0.4 }, 10.5)
+    .to('#ly-bg .sheen', { backgroundPosition: '140% 0', duration: 0.01 }, 10.6)
+    .to('#ly-bg .sheen', { backgroundPosition: '-60% 0', duration: 1.0, ease: 'power2.inOut' }, 10.7);
+  INDEX(3, 8.2, 11.55);
+  REVEAL('#c-3', 8.3);
+  HIDE('#c-3', 11.6);
+
+  // ── S4 · 12.0–15.4 · principles, set like an editorial spread ─────────────
+  tl.to('#rig', { y: -140, opacity: 0, filter: 'blur(14px)', duration: 0.6, ease: 'power3.in' }, 11.75)
+    .to('#vw', { opacity: 0, duration: 0.4 }, 11.75)
+    .to('#floor, #key', { opacity: 0, duration: 0.8 }, 11.8);
+  INDEX(4, 12.1, 14.95);
+  [['#p1', '#r1', '#n1'], ['#p2', '#r2', '#n2'], ['#p3', '#r3', '#n3']].forEach(([p, r, n], i) => {
+    const at = 12.2 + i * 0.55;
+    tl.to(`${p} .in`, { yPercent: 0, duration: 1.0 }, at)
+      .to(r, { scaleX: 1, duration: 1.1 }, at + 0.15)
+      .fromTo(n, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.8 }, at + 0.35);
+  });
+  tl.to('#p1 .in, #p2 .in, #p3 .in', { yPercent: -110, duration: 0.5, stagger: 0.05, ease: 'power3.in' }, 15.0);
+  tl.to('.prule', { scaleX: 0, transformOrigin: '100% 50%', duration: 0.5, ease: 'power3.in' }, 15.0)
+    .to('.pn', { opacity: 0, duration: 0.3 }, 15.0)
+
+  // ── S5 · 15.6–18.1 · the promise ───────────────────────────────────────────
+    .to('#key', { opacity: 0.7, duration: 1.2, ease: 'power2.out' }, 15.5);
+  REVEAL('#promise', 15.6, 0.12);
+  HIDE('#promise', 17.6);
+  tl.to('#key, #ambient', { opacity: 0, duration: 0.7 }, 17.6)
+
+  // ── S6 · 18.2–21.0 · official logo end card ────────────────────────────────
+    .to('#rays', { opacity: 1, duration: 1.4, ease: 'power2.out' }, 18.1)
+    .to('#endglow', { opacity: 1, duration: 1.0, ease: 'power2.out' }, 18.2)
+    .fromTo('#logoIcon', { opacity: 0, scale: 0.94, filter: 'blur(8px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.0 }, 18.3)
+    .set('#sweep', { opacity: 1 }, 18.7)
+    .fromTo('#sweep i', { left: '-60%' }, { left: '130%', duration: 1.0, ease: 'power2.inOut' }, 18.7)
+    .fromTo('#logoWord', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.9 }, 18.55);
+  REVEAL('#url', 18.9);
+  tl.to('#endglow', { opacity: 0.6, duration: 0.7, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 19.3)
+    .to('#fade', { opacity: 0, duration: 0.01 }, 20.99);
+
+  window.__render = (t, frame) => {
+    tl.seek(t, false);
+    const r = (n) => ((Math.sin(frame * 12.9898 + n * 78.233) * 43758.5453) % 1);
+    gsap.set('#grain', { x: r(1) * 60, y: r(2) * 60 });
+  };
+  window.__duration = 21;
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>
