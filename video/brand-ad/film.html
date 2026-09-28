@@ -114,18 +114,13 @@
     background: linear-gradient(180deg, rgba(168,85,247,0.22) 0%, rgba(124,58,237,0.10) 55%, transparent 100%);
     clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
   #endglow { left: 540px; top: 900px; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 62%); opacity: 0; }
-  .logo-part { left: 260px; width: 560px; height: 560px; top: 620px; background: url('../../frontend/public/brand-logo.webp') no-repeat 0 0 / 560px 560px; opacity: 0; }
-  #logoIcon {
-    -webkit-mask-image: linear-gradient(to right, transparent 110px, #000 160px, #000 400px, transparent 450px), linear-gradient(to bottom, transparent 55px, #000 100px, #000 352px, transparent 374px);
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to right, transparent 110px, #000 160px, #000 400px, transparent 450px), linear-gradient(to bottom, transparent 55px, #000 100px, #000 352px, transparent 374px);
-    mask-composite: intersect; }
-  #logoWord {
-    -webkit-mask-image: linear-gradient(to right, transparent 60px, #000 96px, #000 463px, transparent 500px), linear-gradient(to bottom, transparent 366px, #000 381px, #000 424px, transparent 442px);
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to right, transparent 60px, #000 96px, #000 463px, transparent 500px), linear-gradient(to bottom, transparent 366px, #000 381px, #000 424px, transparent 442px);
-    mask-composite: intersect; }
-  #sweep { left: 390px; top: 700px; width: 300px; height: 270px; overflow: hidden; opacity: 0; -webkit-mask: url('../../frontend/public/brand-logo.webp') no-repeat -130px -80px / 560px 560px; mask: url('../../frontend/public/brand-logo.webp') no-repeat -130px -80px / 560px 560px; mask-mode: luminance; }
+  /* Official logo, no background: transparent monogram (frontend/branding/approved-icon.webp.b64)
+     + live wordmark exactly as Logo3D.tsx renders it. Nothing is redrawn or blended. */
+  #logoIcon { left: 452px; top: 690px; width: 176px; height: 176px; object-fit: contain; opacity: 0; }
+  #logoWord { left: 96px; width: 888px; top: 890px; text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 76px; line-height: 1; letter-spacing: -0.015em; opacity: 0; }
+  #logoWord .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  #logoWord .b { color: #a855f7; margin-left: 0.33em; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  #sweep { left: 452px; top: 690px; width: 176px; height: 176px; overflow: hidden; opacity: 0; -webkit-mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; }
   #sweep i { position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent); transform: skewX(-18deg); display: block; }
   #url { left: 96px; width: 888px; top: 1090px; text-align: center; font-size: 34px; font-weight: 500; letter-spacing: 0.04em; color: var(--muted); }
 
@@ -190,9 +185,9 @@
 
   <!-- S6 -->
   <div id="endglow" class="abs"></div>
-  <div id="logoIcon" class="abs logo-part"></div>
+  <img id="logoIcon" class="abs" src="assets/brand-icon-transparent.webp" alt="MBN DEV" />
   <div id="sweep" class="abs"><i></i></div>
-  <div id="logoWord" class="abs logo-part"></div>
+  <div id="logoWord" class="abs"><span class="a">MBN</span><span class="b">DEV</span></div>
   <div id="url" class="abs"><span class="ln"><span class="in">mbndev.ma</span></span></div>
 
   <div id="grain" class="abs"></div>

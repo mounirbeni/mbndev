@@ -55,15 +55,17 @@ The official mark is the **faceted, ribbon-style "MBN" monogram** in violet-to-i
 | File | What it is | Use it for |
 |---|---|---|
 | `frontend/branding/approved-icon.webp.b64` | **Master source** of the approved transparent monogram (base64 WebP, 128×128, RGBA) | Source only. `npm run dev` / `npm run build` decode it into the file below |
-| `frontend/public/brand-icon-transparent.webp` | Generated at build time: monogram on a **transparent** background, 128×128 | Web UI, favicon, PWA icon, small overlays |
+| `frontend/public/brand-icon-transparent.webp` | Generated at build time: **the official logo, no background** (transparent), 128×128 | Web UI, favicon, PWA icon, **video end cards, posts, any overlay** |
 | `frontend/public/brand-icon.webp` | Monogram on **black** (#030003), 256×256 | Avatars, profile pictures, square app tiles |
-| `frontend/public/brand-logo.webp` | **Full lockup**: monogram + "MBN DEV" wordmark on black, 560×560 | Splash screens, end cards, post signatures, decks |
+| `frontend/public/brand-logo.webp` | Full lockup **with a baked-in black background**, 560×560 | Only where the surface is solid black (e.g. a square tile). **Not for video, posts or decks:** the black backing shows as a box. |
 | `frontend/src/components/ui/Logo3D.tsx` | Coded lockup: transparent monogram + live-text wordmark | All logo placements in the web app |
 
 To get the transparent PNG/WebP outside the app, run `node frontend/scripts/build-brand-assets.mjs`, or decode it directly with
 `base64 -d frontend/branding/approved-icon.webp.b64 > mbn-icon.webp`.
 
-**Resolution note:** the largest approved raster files are 560 px (lockup) and 128 px (transparent icon). For 4K video or print, ask the owner for a higher-resolution or vector master. **Do not AI-upscale, redraw or re-generate the mark.** Until a master exists, keep the logo at 1:1 pixel size or smaller on screen.
+**The logo has no background.** Always use the transparent monogram (`brand-icon-transparent.webp`) plus the live-text wordmark (spec below, as `Logo3D.tsx` does). Never place a logo file that carries its own black backing over another background.
+
+**Resolution note:** the transparent monogram exists only at 128 px. Show it at 1:1 where possible; in 1080p video it may be scaled up to ~1.4× (≈176 px), which is the maximum before it softens. For larger use, 4K or print, the owner must supply a higher-resolution transparent PNG or a vector (SVG) master. **Do not AI-upscale, redraw or re-generate the mark.**
 
 ### 2.2 Deprecated / legacy marks: never use
 - **Old serif "MB" monogram** (silver M + purple B with a four-point star): **retired and deleted from the repository.** Never use, recreate or reference it in any material.
@@ -87,7 +89,7 @@ To get the transparent PNG/WebP outside the app, run `node frontend/scripts/buil
 - "DEV" = `#a855f7` with glow `0 0 9px rgba(168,85,247,0.27)`
 - Gap between MBN and DEV = **0.33 × font size**
 - Gap between icon and text ≈ **0.35 × icon size**. Icon height ≈ **1.9 × font size** (e.g. `xl`: icon 60 px, text 31 px, gap 11 px)
-- The wordmark in `brand-logo.webp` is set wide and stacked under the icon. Use that file as-is for stacked lockups. Do not re-typeset it.
+- **Stacked lockup** (video end cards, covers): transparent monogram on top, wordmark centred below it at ≈ 0.43 × icon height, gap ≈ 0.14 × icon height (e.g. icon 176 px, wordmark 76 px, gap 24 px).
 
 ### 2.4 Clear space and minimum size
 - **Clear space:** keep a margin of at least **½ the monogram height** on every side. No text, UI, edges or other logos may enter it.
@@ -347,7 +349,7 @@ Motion should feel **calm, weighted and precise**, like a premium product film. 
 3. The wordmark follows 150–250 ms later: "MBN" then "DEV", fading up 12 px.
 4. Optional tagline or URL in Inter 500, slate `#94a3b8`, 300 ms later.
 5. Hold for **≥ 1.5 s**. The glow breathes once (0.3 → 0.5 opacity). Then fade to black.
-6. Use `brand-logo.webp` or `<Logo3D />`. **Never** assemble the mark from generated shapes, particles, or a redrawn vector.
+6. Use the transparent monogram `brand-icon-transparent.webp` with the live wordmark (the stacked lockup in §2.3), as in `video/brand-ad/*.html`. Never use `brand-logo.webp` here: its black backing shows as a box. **Never** assemble the mark from generated shapes, particles, or a redrawn vector.
 
 ### 7.5 Formats
 | Ratio | Size | Use | Safe area |
@@ -380,7 +382,7 @@ COMPOSITION: {aspect ratio}, single focal point, generous negative space in the 
 
 DO NOT: draw or invent any logo, letters, monogram or brand text; no watermarks; no bright or white backgrounds; no neon overload, lens flares or clutter.
 
-POST-PRODUCTION: composite the official logo file (frontend/public/brand-logo.webp or brand-icon-transparent.webp) and set text in Inter (headline 800–900 white, accent word #a855f7).
+POST-PRODUCTION: composite the official transparent logo (frontend/public/brand-icon-transparent.webp + the MBN DEV wordmark in Inter 900) and set text in Inter (headline 800–900 white, accent word #a855f7).
 ```
 
 ### 8.2 Short video
@@ -398,7 +400,7 @@ STRUCTURE:
 1. Hook (0–2s): {hook line}
 2. Body: {2–3 scenes: real project mockups / process / benefits}
 3. CTA: {e.g. "Get your custom website — mbndev.ma"}
-4. End card: official MBN DEV logo from frontend/public/brand-logo.webp fades in (0.9s, scale 0.94→1, blur→sharp), wordmark follows, hold ≥1.5s on #08080b.
+4. End card: official transparent MBN DEV monogram (frontend/public/brand-icon-transparent.webp, no background) with the MBN DEV wordmark fades in (0.9s, scale 0.94→1, blur→sharp), wordmark follows, hold ≥1.5s on #08080b.
 
 DO NOT generate, redraw or animate a substitute logo. Only the official file may be used, unaltered.
 ```
@@ -415,7 +417,7 @@ IDENTITY (mandatory):
 - Inter only: headline 800–900 white (#ffffff), one highlighted word in #a855f7 (or gradient #a855f7→#3b82f6→#06b6d4); body 400 #e2e8f0; eyebrow 700, +0.15em tracking, #a855f7.
 - Liquid-glass cards: rgba(18,18,25,0.85), blur, 1px rgba(255,255,255,0.07) border, radius 20px.
 - Margins ≥ 80px; ≤ 25 words per slide; readable at phone size; contrast ≥ 4.5:1.
-- Logo: official monogram (frontend/public/brand-icon-transparent.webp) in a corner, or full lockup (brand-logo.webp) on the final slide, with clear space = ½ monogram height.
+- Logo: official monogram (frontend/public/brand-icon-transparent.webp) in a corner, or the stacked lockup (transparent monogram + wordmark) on the final slide, with clear space = ½ monogram height.
 
 AVOID: other colors, white backgrounds, emoji clusters, excessive glow, long text, invented or redrawn logos.
 ```
