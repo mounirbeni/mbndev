@@ -1,0 +1,13 @@
+{
+  "series": "TEMPLATE VS CUSTOM",
+  "vsLeft": "Template",
+  "vsRight": "Custom",
+  "slides": [
+    { "kind": "cover", "kicker": "Before you pick a theme", "title": "Template or <span class=\"grad\">custom website?</span>" },
+    { "kind": "vs", "topic": "Design", "title": "Does it look like <span class=\"hl\">you?</span>", "left": "Looks like thousands of other sites.", "right": "Designed around your brand and your clients." },
+    { "kind": "vs", "topic": "Speed", "title": "How fast does it <span class=\"hl\">load?</span>", "left": "Heavy themes and plugins slow it down.", "right": "Clean code, built to load fast on mobile." },
+    { "kind": "vs", "topic": "Growth", "title": "Can it grow with <span class=\"hl\">you?</span>", "left": "Hard to change once it's live.", "right": "New features added as your business grows." },
+    { "kind": "vs", "topic": "Google", "title": "Can people <span class=\"hl\">find it?</span>", "left": "Generic structure, SEO left for later.", "right": "SEO set up from day one." },
+    { "kind": "cta", "title": "Ready for a site that's <span class=\"hl\">yours?</span>", "body": "Custom websites for businesses in Morocco and worldwide.", "button": "DM us “SITE” · mbndev.ma" }
+  ]
+}

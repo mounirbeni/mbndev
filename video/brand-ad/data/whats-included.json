@@ -1,0 +1,12 @@
+{
+  "series": "MBN DEV PACKAGES",
+  "slides": [
+    { "kind": "cover", "kicker": "No surprises", "title": "What you get with <span class=\"grad\">every MBN DEV</span> website." },
+    { "kind": "tip", "title": "Responsive design.", "body": "Built to look and work perfectly on phones, tablets and desktops.", "card": "Every plan · <em>mobile-first</em>", "icon": "menu" },
+    { "kind": "tip", "title": "SEO and hosting included.", "body": "Your site is set up for Google and hosted, from the Starter plan up.", "card": "Starter, Pro, Premium · <em>included</em>", "icon": "pin" },
+    { "kind": "tip", "title": "Revisions built in.", "body": "Two to six rounds of revisions depending on your plan, until it's right.", "card": "Starter 2 · Pro 3 · <em>Premium 6</em>", "icon": "star" },
+    { "kind": "tip", "title": "Your own client portal.", "body": "Track every stage, chat with us, share files and follow payments in one place.", "card": "Stages · chat · files · <em>payments</em>", "icon": "chat" },
+    { "kind": "tip", "title": "A clear delivery date.", "body": "You know when your site goes live before we start.", "card": "Starter 14 · Pro 21 · <em>Premium 30 days</em>", "icon": "bag" },
+    { "kind": "cta", "title": "Pick your plan at <span class=\"hl\">mbndev.ma</span>", "body": "Starter, Pro or Premium, or a custom quote for bigger projects.", "button": "See plans · mbndev.ma/pricing" }
+  ]
+}

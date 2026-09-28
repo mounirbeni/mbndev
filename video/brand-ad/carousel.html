@@ -15,7 +15,7 @@
   /*
     Instagram carousel template, 1080 × 1350 (4:5). Export: node snap.mjs --page carousel.html [--data data/<carousel>.json]
     Grid: 96px margins · header row y 96 · content block · footer row y 1206 (logo + page counter).
-    Slide kinds: "cover", "tip", "cta".
+    Slide kinds: "cover", "tip", "vs", "cta".
   */
   :root { --bg: #08080b; --primary-light: #a855f7; --lav: #c4b5fd; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.08); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,6 +64,19 @@
   .cta h2 { left: 96px; width: 888px; top: 380px; font-weight: 900; font-size: 108px; line-height: 1; letter-spacing: -0.05em; color: #fff; }
   .cta p { left: 96px; width: 820px; top: 740px; font-size: 38px; line-height: 1.4; font-weight: 500; color: var(--muted); }
   .cta .btn { left: 96px; top: 930px; display: inline-flex; align-items: center; gap: 14px; height: 108px; padding: 0 52px; border-radius: 999px; font-size: 38px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.25); }
+  /* vs: side-by-side comparison (left = the usual way, right = the MBN DEV way) */
+  .vs .topic { left: 96px; top: 230px; font-size: 28px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary-light); }
+  .vs h2 { left: 96px; width: 888px; top: 280px; font-weight: 900; font-size: 80px; line-height: 1.02; letter-spacing: -0.04em; color: #fff; }
+  .vs .col { top: 560px; width: 432px; height: 580px; border-radius: 30px; padding: 40px 36px; }
+  .vs .l { left: 96px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); }
+  .vs .r { left: 552px; background: linear-gradient(160deg, rgba(124,58,237,0.20), rgba(18,18,25,0.92) 60%); border: 1px solid rgba(168,85,247,0.45); box-shadow: 0 0 60px rgba(124,58,237,0.2), inset 0 1px 0 rgba(255,255,255,0.08); }
+  .vs .col .k { display: flex; align-items: center; gap: 14px; font-size: 24px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .vs .l .k { color: var(--dim); } .vs .r .k { color: var(--lav); }
+  .vs .col .mk { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+  .vs .l .mk { background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.35); }
+  .vs .r .mk { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); }
+  .vs .col p { margin-top: 36px; font-size: 38px; line-height: 1.3; font-weight: 700; letter-spacing: -0.015em; }
+  .vs .l p { color: #64748b; } .vs .r p { color: #fff; }
 </style>
 </head>
 <body>
@@ -103,6 +116,9 @@
       <span class="abs swipe">Swipe <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>${finish}</section>`;
     if (s.kind === 'tip') { tipNo += 1; return `<section class="slide tip">${frame}<div class="abs num">${String(tipNo).padStart(2, '0')}</div><h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p>
       <div class="abs card"><span class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[s.icon] || ICONS.star}</svg></span><span>${s.card}</span></div>${finish}</section>`; }
+    if (s.kind === 'vs') return `<section class="slide vs">${frame}<div class="abs topic">${s.topic}</div><h2 class="abs">${s.title}</h2>
+      <div class="abs col l"><div class="k"><span class="mk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>${D.vsLeft || 'Template'}</div><p>${s.left}</p></div>
+      <div class="abs col r"><div class="k"><span class="mk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${D.vsRight || 'Custom'}</div><p>${s.right}</p></div>${finish}</section>`;
     return `<section class="slide cta">${frame}<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>${finish}</section>`;
   }).join('');
   window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));

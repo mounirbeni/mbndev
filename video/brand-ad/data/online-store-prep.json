@@ -1,0 +1,12 @@
+{
+  "series": "E-COMMERCE GUIDE",
+  "slides": [
+    { "kind": "cover", "kicker": "Launching an online store?", "title": "Prepare these <span class=\"grad\">5 things</span> first." },
+    { "kind": "tip", "title": "Your logo and brand colors.", "body": "Your store should feel like your brand from the first second.", "card": "Logo · colors · <em>fonts</em>", "icon": "star" },
+    { "kind": "tip", "title": "Clean product photos.", "body": "Same background, good light, several angles. Photos sell more than words.", "card": "3+ photos · <em>per product</em>", "icon": "menu" },
+    { "kind": "tip", "title": "Your product list.", "body": "Names, prices, sizes and colors in one sheet. It makes the build much faster.", "card": "One spreadsheet · <em>all products</em>", "icon": "bag" },
+    { "kind": "tip", "title": "Delivery zones and fees.", "body": "Which cities, how long, how much. Customers want to know before they order.", "card": "Cities · delays · <em>fees</em>", "icon": "pin" },
+    { "kind": "tip", "title": "How customers will pay.", "body": "Cash on delivery, bank transfer or card: decide what you accept.", "card": "COD · transfer · <em>card</em>", "icon": "chat" },
+    { "kind": "cta", "title": "We build the <span class=\"hl\">rest.</span>", "body": "Custom online stores, built to sell in Morocco and worldwide.", "button": "DM us “STORE” · mbndev.ma" }
+  ]
+}

@@ -84,6 +84,7 @@ type revealed through line masks. Render with `--blur 4`.
 - **Case study:** copy `data/yed-lmiima.json`, fill in the project (values from `frontend/src/app/portfolio/page.tsx`), and put a
   1440×1080 screenshot of the live site in `shots/`. Note: the images in `frontend/public/images/portfolio/` are truncated PNGs
   in the repository (commit `4effca2`), so they cannot be used until they are re-exported.
-- **Carousel:** slides are `cover`, `tip` (auto-numbered, icon: menu/chat/pin/bag/star) and `cta`; the default content is the
-  "5 things every restaurant website needs" guide.
+- **Carousel:** slides are `cover`, `tip` (auto-numbered, icon: menu/chat/pin/bag/star), `vs` (template vs custom columns, labels
+  via `vsLeft`/`vsRight`) and `cta`. Default content: "5 things every restaurant website needs". Ready-made decks in `data/`:
+  `template-vs-custom.json`, `whats-included.json` (plan facts from `backend/src/lib/pricing.js`), `online-store-prep.json`.
 - **Covers:** one entry per reel: `label` + 2–3 words, `<span class="v">` for the violet word.
