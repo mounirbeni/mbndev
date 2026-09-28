@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Reel covers (1080×1920)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    Reel cover template, 1080 × 1920. Export: node snap.mjs --page covers.html [--data data/<covers>.json]
+    The profile grid shows the centre 1080 × 1440 (y 240 → 1680); everything important sits inside
+    y 380 → 1540 so covers read as one consistent series in the grid.
+    One cover = series label + 2–3 huge words (one in violet) + official logo.
+  */
+  :root { --bg: #08080b; --primary-light: #a855f7; --lav: #c4b5fd; --muted: #94a3b8; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1080px; background: #000; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .slide { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  .abs { position: absolute; }
+  .glow { inset: 0; background: radial-gradient(ellipse 65% 36% at 50% 44%, rgba(124,58,237,0.24) 0%, transparent 62%), radial-gradient(ellipse 40% 22% at 85% 30%, rgba(59,130,246,0.07) 0%, transparent 60%); }
+  .grain { inset: 0; opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 260px 260px; }
+  .vig { inset: 0; background: radial-gradient(ellipse 80% 55% at 50% 48%, transparent 55%, rgba(0,0,0,0.65) 100%); }
+  .label { left: 96px; right: 96px; top: 420px; display: flex; justify-content: center; align-items: center; gap: 18px; font-family: 'JetBrains Mono', monospace; font-size: 30px; font-weight: 500; letter-spacing: 0.14em; color: var(--lav); }
+  .label i { width: 70px; height: 2px; display: block; }
+  .label i:first-child { background: linear-gradient(90deg, rgba(168,85,247,0.1), #a855f7); }
+  .label i:last-child { background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); }
+  .words { left: 60px; right: 60px; top: 960px; transform: translateY(-50%); text-align: center; font-weight: 900; font-size: 150px; line-height: 0.98; letter-spacing: -0.055em; color: #fff; }
+  .words .v { color: var(--primary-light); }
+  .words .g { background: linear-gradient(135deg, #a855f7 0%, #3b82f6 55%, #06b6d4 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  /* Official logo, no background: transparent monogram + Logo3D wordmark */
+  .lock { left: 0; right: 0; top: 1430px; display: flex; justify-content: center; align-items: center; gap: 14px; }
+  .lock img { width: 60px; height: 60px; object-fit: contain; }
+  .lock b { font-weight: 900; font-size: 32px; letter-spacing: -0.015em; }
+  .lock .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  .lock .b { color: #a855f7; margin-left: 10px; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+<script>
+  // One entry per reel. `words`: use <br> for line breaks, <span class="v">…</span> for the violet word.
+  const D = Object.assign({
+    covers: [
+      { label: 'BRAND FILM', words: 'Crafted,<br>not <span class="g">templated.</span>' },
+      { label: 'CLIENT PORTAL', words: 'Control<br>your <span class="v">project.</span>' },
+      { label: 'PROCESS', words: 'From idea<br>to <span class="v">live.</span>' },
+      { label: 'MBN DEV', words: 'More than<br>a <span class="v">template.</span>' },
+      { label: 'CASE STUDY', words: 'Yed<br><span class="v">Lmiima.</span>' },
+      { label: 'WEB GUIDE', words: 'Restaurant<br>website <span class="v">tips.</span>' },
+    ],
+  }, window.__DATA || {});
+  const lock = '<div class="abs lock"><img src="assets/brand-icon-transparent.webp" alt="MBN DEV" /><b><span class="a">MBN</span><span class="b">DEV</span></b></div>';
+  document.getElementById('deck').innerHTML = D.covers.map((c) => `<section class="slide"><div class="abs glow"></div>
+    <div class="abs label"><i></i>${c.label}<i></i></div><div class="abs words">${c.words}</div>${lock}
+    <div class="abs grain"></div><div class="abs vig"></div></section>`).join('');
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>

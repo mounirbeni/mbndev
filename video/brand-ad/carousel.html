@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Carousel template (1080×1350)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    Instagram carousel template, 1080 × 1350 (4:5). Export: node snap.mjs --page carousel.html [--data data/<carousel>.json]
+    Grid: 96px margins · header row y 96 · content block · footer row y 1206 (logo + page counter).
+    Slide kinds: "cover", "tip", "cta".
+  */
+  :root { --bg: #08080b; --primary-light: #a855f7; --lav: #c4b5fd; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.08); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1080px; background: #000; font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); }
+  .abs { position: absolute; }
+  .glow { inset: 0; background: radial-gradient(ellipse 70% 45% at 70% 30%, rgba(124,58,237,0.20) 0%, transparent 62%), radial-gradient(ellipse 45% 30% at 10% 90%, rgba(59,130,246,0.07) 0%, transparent 60%); }
+  .grid { inset: 0; background-image: linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px); background-size: 60px 60px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 55% at 65% 35%, #000 0%, transparent 75%); mask-image: radial-gradient(ellipse 70% 55% at 65% 35%, #000 0%, transparent 75%); }
+  .grain { inset: 0; opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 260px 260px; }
+  .vig { inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 60%, rgba(0,0,0,0.6) 100%); }
+
+  .head { left: 96px; right: 96px; top: 96px; display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; letter-spacing: 0.1em; color: var(--lav); }
+  .head .series { display: flex; align-items: center; gap: 18px; }
+  .head .series i { width: 70px; height: 2px; background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); display: block; }
+  .head .count { color: var(--dim); }
+  .foot { left: 96px; right: 96px; top: 1206px; height: 48px; display: flex; justify-content: space-between; align-items: center; }
+  /* Official logo, no background: transparent monogram + Logo3D wordmark */
+  .lock { display: inline-flex; align-items: center; gap: 12px; }
+  .lock img { width: 44px; height: 44px; object-fit: contain; }
+  .lock b { font-weight: 900; font-size: 24px; letter-spacing: -0.015em; }
+  .lock .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  .lock .b { color: #a855f7; margin-left: 8px; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 10px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.14); display: block; }
+  .dots i.on { width: 34px; background: linear-gradient(90deg, #7c3aed, #a855f7); }
+
+  /* cover */
+  .cover .kicker { left: 96px; top: 420px; font-size: 28px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary-light); }
+  .cover h1 { left: 96px; width: 888px; top: 480px; font-weight: 900; font-size: 116px; line-height: 0.98; letter-spacing: -0.05em; color: #fff; }
+  .cover .swipe { left: 96px; top: 1080px; display: inline-flex; align-items: center; gap: 14px; height: 64px; padding: 0 28px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); font-size: 24px; font-weight: 600; color: #fff; }
+  .hl { color: var(--primary-light); }
+  .grad { background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #06b6d4 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* tip */
+  .tip .num { left: 96px; top: 220px; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 220px; line-height: 1; letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 2px rgba(196,181,253,0.55); }
+  .tip h2 { left: 96px; width: 888px; top: 510px; font-weight: 900; font-size: 84px; line-height: 1.02; letter-spacing: -0.04em; color: #fff; }
+  .tip p { left: 96px; width: 820px; top: 770px; font-size: 38px; line-height: 1.4; font-weight: 500; color: var(--muted); }
+  .tip .card { left: 96px; width: 888px; top: 1000px; height: 150px; border-radius: 26px; background: rgba(18,18,25,0.9); border: 1px solid var(--hair); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); display: flex; align-items: center; gap: 22px; padding: 0 32px; }
+  .tip .card .ic { width: 64px; height: 64px; border-radius: 18px; background: rgba(124,58,237,0.18); border: 1px solid rgba(124,58,237,0.45); display: grid; place-items: center; flex-shrink: 0; }
+  .tip .card span { font-size: 30px; font-weight: 700; color: #fff; }
+  .tip .card em { font-style: normal; color: var(--primary-light); }
+
+  /* cta */
+  .cta h2 { left: 96px; width: 888px; top: 380px; font-weight: 900; font-size: 108px; line-height: 1; letter-spacing: -0.05em; color: #fff; }
+  .cta p { left: 96px; width: 820px; top: 740px; font-size: 38px; line-height: 1.4; font-weight: 500; color: var(--muted); }
+  .cta .btn { left: 96px; top: 930px; display: inline-flex; align-items: center; gap: 14px; height: 108px; padding: 0 52px; border-radius: 999px; font-size: 38px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.25); }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+<script>
+  // ── Content (override with --data data/<carousel>.json using the same shape) ──
+  const D = Object.assign({
+    series: 'WEB GUIDE',
+    slides: [
+      { kind: 'cover', kicker: 'For restaurants & cafés', title: '5 things every <span class="grad">restaurant website</span> needs.' },
+      { kind: 'tip', title: 'A menu that loads in seconds.', body: 'Dishes, photos and prices, readable on a phone. No PDF, no zooming.', card: 'Mobile menu · <em>under 2s</em>', icon: 'menu' },
+      { kind: 'tip', title: 'One tap to WhatsApp or call.', body: 'Most of your customers are on their phone. Contacting you should take one tap.', card: 'WhatsApp button · <em>always visible</em>', icon: 'chat' },
+      { kind: 'tip', title: 'Location and opening hours.', body: 'An embedded map and clear hours, so nobody arrives to a closed door.', card: 'Google Maps · <em>hours on every page</em>', icon: 'pin' },
+      { kind: 'tip', title: 'Order or book online.', body: 'Let customers order or reserve a table without calling. You get the details in writing.', card: 'Online ordering · <em>reservations</em>', icon: 'bag' },
+      { kind: 'tip', title: 'Real photos, real reviews.', body: 'Your dishes and your guests’ words sell better than any stock image.', card: 'Your photos · <em>your reviews</em>', icon: 'star' },
+      { kind: 'cta', title: 'Want this for your <span class="hl">restaurant?</span>', body: 'We design and build custom websites for restaurants in Morocco and worldwide.', button: 'DM us “SITE” · mbndev.ma' },
+    ],
+  }, window.__DATA || {});
+
+  const ICONS = {
+    menu: '<path d="M4 6h16M4 12h16M4 18h10"/>',
+    chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    pin: '<path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',
+    bag: '<path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/>',
+    star: '<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/>',
+  };
+  const n = D.slides.length;
+  const lock = '<span class="lock"><img src="assets/brand-icon-transparent.webp" alt="MBN DEV" /><b><span class="a">MBN</span><span class="b">DEV</span></b></span>';
+  const dots = (i) => `<span class="dots">${D.slides.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</span>`;
+  let tipNo = 0;
+  document.getElementById('deck').innerHTML = D.slides.map((s, i) => {
+    const frame = `<div class="abs glow"></div><div class="abs grid"></div>
+      <div class="abs head"><span class="series">${D.series}<i></i></span><span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span></div>
+      <div class="abs foot">${lock}${dots(i)}</div>`;
+    const finish = '<div class="abs grain"></div><div class="abs vig"></div>';
+    if (s.kind === 'cover') return `<section class="slide cover">${frame}<div class="abs kicker">${s.kicker}</div><h1 class="abs">${s.title}</h1>
+      <span class="abs swipe">Swipe <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>${finish}</section>`;
+    if (s.kind === 'tip') { tipNo += 1; return `<section class="slide tip">${frame}<div class="abs num">${String(tipNo).padStart(2, '0')}</div><h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p>
+      <div class="abs card"><span class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[s.icon] || ICONS.star}</svg></span><span>${s.card}</span></div>${finish}</section>`; }
+    return `<section class="slide cta">${frame}<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>${finish}</section>`;
+  }).join('');
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>

@@ -72,3 +72,18 @@ type revealed through line masks. Render with `--blur 4`.
 | 12.0–15.4s | 04 Principles · "Custom. Fast. Yours." set as an editorial spread |
 | 15.6–18.1s | "Custom Websites Built to Elevate Your Business." |
 | 18.2–21s | Official logo end card under a soft light beam · mbndev.ma |
+
+## Social templates
+
+| Template | Output | Command |
+|---|---|---|
+| `case-study.html` | 15s 9:16 case-study reel from one project | `npm run render -- --page case-study.html --data data/<project>.json` |
+| `carousel.html` | 1080×1350 carousel slides (PNG) | `node snap.mjs --page carousel.html [--data data/<carousel>.json]` |
+| `covers.html` | 1080×1920 reel covers (PNG), grid-safe centre 1080×1440 | `node snap.mjs --page covers.html [--data data/<covers>.json]` |
+
+- **Case study:** copy `data/yed-lmiima.json`, fill in the project (values from `frontend/src/app/portfolio/page.tsx`), and put a
+  1440×1080 screenshot of the live site in `shots/`. Note: the images in `frontend/public/images/portfolio/` are truncated PNGs
+  in the repository (commit `4effca2`), so they cannot be used until they are re-exported.
+- **Carousel:** slides are `cover`, `tip` (auto-numbered, icon: menu/chat/pin/bag/star) and `cta`; the default content is the
+  "5 things every restaurant website needs" guide.
+- **Covers:** one entry per reel: `label` + 2–3 words, `<span class="v">` for the violet word.

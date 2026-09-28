@@ -13,7 +13,10 @@ const args = Object.fromEntries(
 );
 const fps = Number(args.fps ?? 30);
 const pageFile = args.page ?? 'index.html';
-const defaultOut = pageFile === 'index.html' ? 'out/mbndev-ad-9x16.mp4' : `out/mbndev-${pageFile.replace(/\.html$/, '')}-9x16.mp4`;
+// --data file.json feeds a template (e.g. case-study.html) with one project's content.
+const dataFile = args.data ? resolve(process.cwd(), args.data) : null;
+const dataName = dataFile ? '-' + dataFile.split('/').pop().replace(/\.json$/, '') : '';
+const defaultOut = pageFile === 'index.html' ? 'out/mbndev-ad-9x16.mp4' : `out/mbndev-${pageFile.replace(/\.html$/, '')}${dataName}-9x16.mp4`;
 const out = resolve(here, args.out ?? defaultOut);
 
 // The official transparent monogram only exists as an encoded source (frontend/branding); decode it, never redraw it.
@@ -26,6 +29,7 @@ mkdirSync(dirname(out), { recursive: true });
 const executablePath = process.env.CHROME_PATH || (existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') ? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' : undefined);
 const browser = await chromium.launch({ executablePath, args: ['--allow-file-access-from-files', '--force-color-profile=srgb'] });
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
+if (dataFile) await page.addInitScript(`window.__DATA = ${readFileSync(dataFile, 'utf8')};`);
 await page.goto(pathToFileURL(resolve(here, pageFile)).href);
 await page.evaluate(() => window.__ready);
 

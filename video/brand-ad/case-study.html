@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Case Study (9:16)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    Case-study template (15s, 9:16). One project per render, fed by --data data/<project>.json
+    (defaults below = Yed Lmiima, copied from frontend/src/app/portfolio/page.tsx).
+    Layout: eyebrow top 250 · real screenshot in a browser frame y 400→1130 · caption slot from y 1230.
+  */
+  :root { --bg: #08080b; --primary-light: #a855f7; --lav: #c4b5fd; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.08); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; background: var(--bg); overflow: hidden; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .abs { position: absolute; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+
+  #ambient { inset: -10%; opacity: 0;
+    background: radial-gradient(ellipse 60% 34% at 50% 38%, rgba(124,58,237,0.18) 0%, transparent 62%),
+                radial-gradient(ellipse 40% 24% at 85% 15%, rgba(59,130,246,0.07) 0%, transparent 60%); }
+  .ln { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+  .in { display: inline-block; will-change: transform; }
+  .hl { color: var(--primary-light); }
+
+  /* Eyebrow */
+  #eyebrow { left: 96px; top: 250px; display: flex; align-items: center; gap: 20px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; letter-spacing: 0.1em; color: var(--lav); }
+  #eyebrow .rule { width: 90px; height: 2px; background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); transform-origin: 0 50%; transform: scaleX(0); }
+  #eyebrow .cat { color: var(--muted); }
+
+  /* Browser frame with the real screenshot */
+  #win { left: 96px; top: 330px; width: 888px; height: 722px; border-radius: 26px; overflow: hidden; background: #0b0b10;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 50px 120px rgba(0,0,0,0.7), 0 0 90px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.1); opacity: 0; }
+  #bar { left: 0; top: 0; width: 888px; height: 56px; display: flex; align-items: center; gap: 9px; padding: 0 20px; background: rgba(14,14,20,0.98); border-bottom: 1px solid rgba(255,255,255,0.07); z-index: 2; }
+  #bar .tl { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.14); }
+  #addr { margin-left: 18px; flex: 1; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 10px; padding: 0 14px; font-family: 'JetBrains Mono', monospace; font-size: 18px; color: #cbd5e1; }
+  #shotwrap { left: 0; top: 56px; width: 888px; height: 666px; overflow: hidden; }
+  #shot { width: 888px; height: 666px; object-fit: cover; object-position: top center; transform-origin: 50% 20%; display: block; }
+  #sheen { inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.10) 47%, transparent 58%); background-size: 260% 100%; background-position: 140% 0; }
+  #reflect { left: 96px; top: 1052px; width: 888px; height: 120px; opacity: 0; background: radial-gradient(ellipse 50% 60% at 50% 0%, rgba(124,58,237,0.25) 0%, transparent 70%); }
+
+  /* Caption slot */
+  .cap { left: 96px; top: 1230px; width: 888px; }
+  #c1 .title { font-weight: 900; font-size: 112px; line-height: 1; letter-spacing: -0.045em; color: #fff; }
+  #c1 .type { margin-top: 22px; font-size: 38px; font-weight: 500; color: var(--muted); letter-spacing: -0.01em; }
+  #c1 .url { margin-top: 36px; display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 24px; border-radius: 999px; background: rgba(124,58,237,0.14); border: 1px solid rgba(168,85,247,0.45); font-family: 'JetBrains Mono', monospace; font-size: 24px; color: #fff; opacity: 0; }
+  #c1 .url i { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; display: block; }
+  #c2 .lab { font-size: 22px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+  #stats { margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .st { height: 190px; border-radius: 24px; padding: 28px 26px; background: rgba(18,18,25,0.9); border: 1px solid var(--hair); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); opacity: 0; }
+  .st b { display: block; font-size: 44px; font-weight: 900; letter-spacing: -0.03em; color: #fff; line-height: 1.05; }
+  .st span { display: block; margin-top: 14px; font-size: 20px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary-light); }
+  #tags { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .tag { height: 54px; padding: 0 22px; border-radius: 14px; display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 21px; color: var(--text); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); opacity: 0; }
+  #c3 .q { font-weight: 800; font-size: 64px; line-height: 1.08; letter-spacing: -0.03em; color: #fff; }
+  #c3 .q .mk { color: var(--primary-light); }
+
+  /* CTA */
+  #cta { left: 96px; width: 888px; top: 900px; transform: translateY(-50%); text-align: center; }
+  #cta .t { font-weight: 800; font-size: 96px; line-height: 1.04; letter-spacing: -0.035em; color: #fff; }
+  #ctaBtn { margin-top: 48px; display: inline-flex; align-items: center; gap: 14px; height: 108px; padding: 0 56px; border-radius: 999px; font-size: 38px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.7), 0 0 80px rgba(124,58,237,0.3), inset 0 1px 0 rgba(255,255,255,0.25); opacity: 0; }
+
+  /* End card — official logo, no background (see BRAND_GUIDE.md §2 and §7.4) */
+  #endglow { left: 540px; top: 900px; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 62%); opacity: 0; }
+  #logoIcon { left: 452px; top: 700px; width: 176px; height: 176px; object-fit: contain; opacity: 0; }
+  #logoWord { left: 96px; width: 888px; top: 900px; text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 76px; line-height: 1; letter-spacing: -0.015em; opacity: 0; }
+  #logoWord .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  #logoWord .b { color: #a855f7; margin-left: 0.33em; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  #sweep { left: 452px; top: 700px; width: 176px; height: 176px; overflow: hidden; opacity: 0; -webkit-mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; }
+  #sweep i { position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent); transform: skewX(-18deg); display: block; }
+  #url2 { left: 96px; width: 888px; top: 1110px; text-align: center; font-size: 34px; font-weight: 500; letter-spacing: 0.04em; color: var(--muted); opacity: 0; }
+
+  #grain { inset: -50%; width: 200%; height: 200%; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 260px 260px; }
+  #vignette { inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 60% at 50% 45%, transparent 55%, rgba(0,0,0,0.65) 100%); }
+  #fade { inset: 0; background: #000; opacity: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ambient" class="abs"></div>
+
+  <div id="eyebrow" class="abs"><span class="ln"><span class="in">CASE STUDY</span></span><span class="rule"></span><span class="ln"><span class="in cat" id="cat"></span></span></div>
+
+  <div id="win" class="abs">
+    <div id="bar" class="abs"><i class="tl"></i><i class="tl"></i><i class="tl"></i>
+      <div id="addr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="addrT"></span></div></div>
+    <div id="shotwrap" class="abs"><img id="shot" alt="" /><div id="sheen" class="abs"></div></div>
+  </div>
+  <div id="reflect" class="abs"></div>
+
+  <div id="c1" class="abs cap">
+    <div class="title"><span class="ln"><span class="in" id="title"></span></span></div>
+    <div class="type"><span class="ln"><span class="in" id="type"></span></span></div>
+    <div class="url"><i></i><span id="urlT"></span></div>
+  </div>
+  <div id="c2" class="abs cap">
+    <div class="lab"><span class="ln"><span class="in">The project</span></span></div>
+    <div id="stats"></div>
+    <div id="tags"></div>
+  </div>
+  <div id="c3" class="abs cap"><div class="q" id="quote"></div></div>
+
+  <div id="cta" class="abs">
+    <div class="t"><span class="ln"><span class="in" id="ctaT"></span></span></div>
+    <span id="ctaBtn">Start yours at mbndev.ma</span>
+  </div>
+
+  <div id="endglow" class="abs"></div>
+  <img id="logoIcon" class="abs" src="assets/brand-icon-transparent.webp" alt="MBN DEV" />
+  <div id="sweep" class="abs"><i></i></div>
+  <div id="logoWord" class="abs"><span class="a">MBN</span><span class="b">DEV</span></div>
+  <div id="url2" class="abs">mbndev.ma</div>
+
+  <div id="grain" class="abs"></div>
+  <div id="vignette" class="abs"></div>
+  <div id="fade" class="abs"></div>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+  // ── Project data (override with: npm run render -- --page case-study.html --data data/<project>.json) ──
+  const D = Object.assign({
+    title: 'Yed Lmiima',
+    type: 'Moroccan Cuisine Ordering',
+    category: 'E-Commerce',
+    url: 'yedlmiima.com',
+    image: '../../frontend/public/images/portfolio/yed-lmiima.png',
+    stats: [{ label: 'Cuisine', value: 'Moroccan' }, { label: 'City', value: 'Marrakech' }, { label: 'Delivery', value: 'Free' }],
+    tags: ['Next.js', 'Online Ordering'],
+    highlight: 'Authentic Moroccan dishes ordered online with free delivery',
+    cta: 'Your project next?',
+  }, window.__DATA || {});
+
+  const $ = (id) => document.getElementById(id);
+  $('cat').textContent = D.category.toUpperCase();
+  $('addrT').textContent = D.url; $('urlT').textContent = D.url;
+  $('title').textContent = D.title; $('type').textContent = D.type;
+  $('shot').src = D.image;
+  $('stats').innerHTML = D.stats.slice(0, 3).map((s) => `<div class="st"><b>${s.value}</b><span>${s.label}</span></div>`).join('');
+  $('tags').innerHTML = D.tags.map((t) => `<span class="tag">${t}</span>`).join('');
+  // Quote: one line per ~3 words, masked; last word in violet.
+  const words = D.highlight.split(' ');
+  const lines = []; for (let i = 0; i < words.length; i += 3) lines.push(words.slice(i, i + 3));
+  $('quote').innerHTML = lines.map((l, i) => `<span class="ln"><span class="in">${i === 0 ? '<span class="mk">“</span>' : ''}${
+    i === lines.length - 1 ? l.slice(0, -1).join(' ') + (l.length > 1 ? ' ' : '') + `<span class="hl">${l[l.length - 1]}</span><span class="mk">”</span>` : l.join(' ')}</span></span>`).join('');
+  $('ctaT').textContent = D.cta;
+
+  const EXPO = 'expo.out', SMOOTH = 'power3.inOut';
+  gsap.defaults({ ease: EXPO });
+  const tl = gsap.timeline({ paused: true });
+  const REVEAL = (sel, at, stagger = 0.09) => tl.to(`${sel} .in`, { yPercent: 0, duration: 1.0, stagger }, at);
+  const HIDE = (sel, at) => tl.to(`${sel} .in`, { yPercent: -110, duration: 0.5, stagger: 0.04, ease: 'power3.in' }, at);
+  gsap.set('.in', { yPercent: 110 });
+  gsap.set('#win', { y: 80, rotationX: 10, transformPerspective: 2000, transformOrigin: '50% 100%', filter: 'blur(12px)' });
+  gsap.set('#c1 .url', { y: 20 });
+  gsap.set('.st, .tag', { y: 30 });
+  gsap.set('#ctaBtn', { y: 30 });
+
+  // ── 0–4.0 · project reveal ────────────────────────────────────────────────
+  tl.to('#fade', { opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+    .to('#ambient', { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.1)
+    .to('#win', { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1.3 }, 0.2)
+    .to('#reflect', { opacity: 1, duration: 1.2 }, 0.6)
+    .fromTo('#shot', { scale: 1.0, yPercent: 0 }, { scale: 1.1, yPercent: -3, duration: 11, ease: 'sine.inOut' }, 0.2)   // slow Ken Burns
+    .to('#sheen', { backgroundPosition: '-60% 0', duration: 1.2, ease: 'power2.inOut' }, 1.4)
+    .to('#eyebrow .rule', { scaleX: 1, duration: 0.9 }, 0.5);
+  REVEAL('#eyebrow', 0.4, 0.15);
+  REVEAL('#c1', 0.7, 0.12);
+  tl.to('#c1 .url', { opacity: 1, y: 0, duration: 0.8 }, 1.3);
+  HIDE('#c1', 3.7);
+  tl.to('#c1 .url', { opacity: 0, y: -20, duration: 0.4, ease: 'power3.in' }, 3.7);
+
+  // ── 4.1–7.6 · the project: stats + stack ─────────────────────────────────
+  REVEAL('#c2', 4.1);
+  tl.to('.st', { opacity: 1, y: 0, duration: 0.8, stagger: 0.1 }, 4.25)
+    .to('.tag', { opacity: 1, y: 0, duration: 0.7, stagger: 0.07 }, 4.7);
+  HIDE('#c2', 7.3);
+  tl.to('.st, .tag', { opacity: 0, y: -24, duration: 0.4, stagger: 0.02, ease: 'power3.in' }, 7.3);
+
+  // ── 7.8–10.6 · highlight quote ────────────────────────────────────────────
+  REVEAL('#c3', 7.8, 0.1);
+  HIDE('#c3', 10.3);
+
+  // ── 10.7–12.8 · CTA ───────────────────────────────────────────────────────
+  HIDE('#eyebrow', 10.3);
+  tl.to('#eyebrow .rule', { scaleX: 0, transformOrigin: '100% 50%', duration: 0.45, ease: 'power3.in' }, 10.3)
+    .to('#win', { opacity: 0, y: -60, scale: 0.94, filter: 'blur(14px)', duration: 0.55, ease: 'power3.in' }, 10.3)
+    .to('#reflect', { opacity: 0, duration: 0.4 }, 10.3);
+  REVEAL('#cta', 10.8);
+  tl.to('#ctaBtn', { opacity: 1, y: 0, duration: 0.8 }, 11.05);
+  HIDE('#cta', 12.6);
+  tl.to('#ctaBtn', { opacity: 0, y: -24, duration: 0.4, ease: 'power3.in' }, 12.6)
+    .to('#ambient', { opacity: 0.2, duration: 0.6 }, 12.6)
+
+  // ── 13.0–15 · official logo end card ───────────────────────────────────────
+    .to('#endglow', { opacity: 1, duration: 1.0, ease: 'power2.out' }, 13.0)
+    .fromTo('#logoIcon', { opacity: 0, scale: 0.94, filter: 'blur(8px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.9 }, 13.05)
+    .set('#sweep', { opacity: 1 }, 13.4)
+    .fromTo('#sweep i', { left: '-60%' }, { left: '130%', duration: 0.9, ease: 'power2.inOut' }, 13.4)
+    .fromTo('#logoWord', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.8 }, 13.27)
+    .to('#url2', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 13.6)
+    .to('#fade', { opacity: 0, duration: 0.01 }, 14.99);
+
+  window.__render = (t, frame) => {
+    tl.seek(t, false);
+    const r = (n) => ((Math.sin(frame * 12.9898 + n * 78.233) * 43758.5453) % 1);
+    gsap.set('#grain', { x: r(1) * 60, y: r(2) * 60 });
+  };
+  window.__duration = 15;
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>

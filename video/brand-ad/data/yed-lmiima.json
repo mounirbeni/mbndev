@@ -1,0 +1,15 @@
+{
+  "title": "Yed Lmiima",
+  "type": "Moroccan Cuisine Ordering",
+  "category": "E-Commerce",
+  "url": "yedlmiima.com",
+  "image": "shots/yed-lmiima.png",
+  "stats": [
+    { "label": "Cuisine", "value": "Moroccan" },
+    { "label": "City", "value": "Marrakech" },
+    { "label": "Delivery", "value": "Free" }
+  ],
+  "tags": ["Next.js", "Online Ordering"],
+  "highlight": "Authentic Moroccan dishes ordered online with free delivery",
+  "cta": "Your project next?"
+}
