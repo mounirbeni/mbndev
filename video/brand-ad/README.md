@@ -90,6 +90,31 @@ slow push-in). Header zone: constant eyebrow + "The ___." Scene counter (mono) a
 | 16.2–19.0s | 06 Password · dots pop, strength meter fills, lock clicks shut |
 | 19.0–22s | Official logo end card · "Details that feel right · mbndev.ma" |
 
+## experience.html — premium brand film "It feels right." (≈59s, 4K, sound design)
+
+Twenty scenes of real UI micro-interactions (button, loading, responsive reflow, mobile gestures,
+navigation, live search, smart form, lead capture, WhatsApp, booking, payment, real-time sync,
+dashboard, upload, notifications, micro-interaction montage, 60 FPS scroll, before/after, the
+full ecosystem) and the official logo end card. Timeline lives in `experience.js`.
+
+Sound is part of the timeline: every interaction registers a cue (`window.__sfx`), and `sfx.py`
+synthesises the whole mix from scratch (no samples, no music): tactile presses, soft clicks,
+glass taps, whooshes, digital pulses, keyboard, notification chimes, low impacts, a light
+digital bed, and a glass resonance on the logo. Narration cues (`window.__vo`) are optional:
+drop `vo/vo1.wav … vo4.wav` in and pass `--vo-dir vo`.
+
+```bash
+# 1 · picture — 4K (2160×3840), motion blur, 4 parallel chunks
+node render-par.mjs --page experience.html --scale 2 --blur 2 --jobs 4 --duration 59.5 --out out/mbndev-experience-4k-silent.mp4
+# 2 · sound — export cues, synthesise the mix
+node cues.mjs --page experience.html && python3 sfx.py out/experience-cues.json out/experience-mix.wav [--vo-dir vo]
+# 3 · mux
+ffmpeg -i out/mbndev-experience-4k-silent.mp4 -i out/experience-mix.wav -c:v copy -c:a aac -b:a 256k -shortest out/mbndev-experience-4k.mp4
+```
+
+`render.mjs --scale 2` renders any template at 4K; frames are captured through CDP (≈10× faster
+than `page.screenshot` at 4K).
+
 ## Social templates
 
 | Template | Output | Command |
