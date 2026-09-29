@@ -92,7 +92,8 @@ type revealed through line masks. Render with `--blur 4`.
   `template-vs-custom.json`, `whats-included.json` (plan facts from `backend/src/lib/pricing.js`), `online-store-prep.json`,
   `losing-clients.json`, `riads-direct-booking.json`, `how-we-work.json` (stages from `ProjectStageTracker.tsx`). A `tip` slide
   with `"num": false` hides its number. `photo` shows a full image (never cropped) over its blurred copy with a caption;
-  `photocover` is a 3×3 image mosaic under the title.
+  `photocover` is a 3×3 image mosaic under the title. "If your website were a grocery store": `data/grocery.json`
+  with original AI-generated photos in `shots/grocery/`.
 - **Covers:** one entry per reel: `label` + 2–3 words, `<span class="v">` for the violet word.
 
 ### Real screenshots (`shots/`)

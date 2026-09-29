@@ -80,13 +80,14 @@
   /* photo: a full image (never cropped: labels are baked in) in a glowing card over its own blurred copy */
   .photo .bg { left: 0; top: 0; width: 1080px; height: 1350px; background-size: cover; background-position: center; filter: blur(40px) brightness(0.45) saturate(1.2); transform: scale(1.15); }
   .photo .bgfade { left: 0; top: 0; width: 1080px; height: 1350px; background: linear-gradient(180deg, rgba(8,8,11,0.35) 0%, rgba(8,8,11,0) 25%, rgba(8,8,11,0.75) 60%, #08080b 72%, #08080b 100%); }
-  .photo .card { left: 188px; top: 70px; width: 704px; height: 880px; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.14);
+  .photo .card { left: 204px; top: 64px; width: 672px; height: 840px; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.14);
     box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(124,58,237,0.3); }
   .photo .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo .no { left: 96px; top: 984px; display: flex; align-items: center; gap: 16px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; letter-spacing: 0.1em; color: var(--lav); }
+  .photo .cap { left: 96px; top: 938px; width: 888px; display: flex; flex-direction: column; gap: 14px; }
+  .photo .no { position: static; display: flex; align-items: center; gap: 16px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; letter-spacing: 0.1em; color: var(--lav); }
   .photo .no i { width: 60px; height: 2px; background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); display: block; }
-  .photo h2 { left: 96px; width: 888px; top: 1024px; font-weight: 900; font-size: 64px; line-height: 1; letter-spacing: -0.04em; color: #fff; }
-  .photo p { left: 96px; width: 888px; top: 1104px; font-size: 30px; line-height: 1.32; font-weight: 500; color: var(--muted); }
+  .photo h2 { position: static; text-wrap: balance; font-weight: 900; font-size: 56px; line-height: 1; letter-spacing: -0.04em; color: #fff; }
+  .photo p { position: static; font-size: 28px; line-height: 1.32; font-weight: 500; color: var(--muted); }
   /* photocover: 3×3 mosaic of the series' images under a big title */
   .photocover .mosaic { inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 6px; }
   .photocover .mosaic div { background-size: cover; background-position: center; filter: brightness(0.42) saturate(1.05); }
@@ -143,7 +144,7 @@
       <div class="abs foot">${lock}${dots(i)}</div>${finish}</section>`;
     if (s.kind === 'photo') return `<section class="slide photo"><div class="abs bg" style="background-image:url('${s.img}')"></div><div class="abs bgfade"></div>
       <div class="abs card"><img src="${s.img}" alt="${s.label}" /></div>
-      <div class="abs no">${String(i).padStart(2, '0')}<i></i>${s.label}</div><h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p>
+      <div class="abs cap"><div class="no">${String(i).padStart(2, '0')}<i></i>${s.label}</div><h2>${s.title}</h2><p>${s.body}</p></div>
       <div class="abs foot">${lock}${dots(i)}</div>${finish}</section>`;
     return `<section class="slide cta">${frame}<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>${finish}</section>`;
   }).join('');

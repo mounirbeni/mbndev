@@ -1,0 +1,18 @@
+{
+  "series": "TECH ON THE SHELF",
+  "slides": [
+    { "kind": "photocover", "kicker": "Web development, explained simply", "title": "If your website were a <span class=\"grad\">grocery store.</span>",
+      "images": ["shots/grocery/01-frontend.jpg", "shots/grocery/02-backend.jpg", "shots/grocery/03-api.jpg", "shots/grocery/08-database.jpg", "shots/grocery/07-auth.jpg", "shots/grocery/04-fullstack.jpg", "shots/grocery/05-qa.jpg", "shots/grocery/09-bugs.jpg", "shots/grocery/10-deploy.jpg"] },
+    { "kind": "photo", "img": "shots/grocery/01-frontend.jpg", "label": "FRONTEND", "title": "Frontend is the <span class=\"hl\">shop floor.</span>", "body": "Clean shelves, clear prices, easy to find. Everything your customers see and touch." },
+    { "kind": "photo", "img": "shots/grocery/02-backend.jpg", "label": "BACKEND", "title": "Backend is the <span class=\"hl\">stockroom.</span>", "body": "Nobody sees it, but it's where every order is packed and every product is kept in check." },
+    { "kind": "photo", "img": "shots/grocery/03-api.jpg", "label": "API", "title": "The API is the <span class=\"hl\">runner.</span>", "body": "Carries requests from the shop floor to the stockroom and brings back exactly what was asked for." },
+    { "kind": "photo", "img": "shots/grocery/08-database.jpg", "label": "DATABASE", "title": "The database is the <span class=\"hl\">warehouse.</span>", "body": "Every product labeled, counted and in its place, so anything can be found in seconds." },
+    { "kind": "photo", "img": "shots/grocery/07-auth.jpg", "label": "AUTHENTICATION", "title": "Authentication is the <span class=\"hl\">badge check.</span>", "body": "Staff-only doors stay staff-only. No badge, no entry." },
+    { "kind": "photo", "img": "shots/grocery/04-fullstack.jpg", "label": "FULL-STACK", "title": "Full-stack is the owner on a <span class=\"hl\">busy day.</span>", "body": "Till, shelves and stockroom at the same time, and still smiling." },
+    { "kind": "photo", "img": "shots/grocery/06-pm.jpg", "label": "PROJECT MANAGER", "title": "The PM is the <span class=\"hl\">store manager.</span>", "body": "Tasks, stock and people on one tablet. The doors open on time." },
+    { "kind": "photo", "img": "shots/grocery/05-qa.jpg", "label": "QA TESTING", "title": "QA is the <span class=\"hl\">quality check.</span>", "body": "Expiry, packaging, price and quality, one by one, before anything reaches the shelf." },
+    { "kind": "photo", "img": "shots/grocery/09-bugs.jpg", "label": "BUG FIXING", "title": "Bug fixing is the <span class=\"hl\">cleanup crew.</span>", "body": "A shelf breaks, something spills. We fix it before customers even notice." },
+    { "kind": "photo", "img": "shots/grocery/10-deploy.jpg", "label": "DEPLOYMENT", "title": "Deployment is <span class=\"hl\">opening day.</span>", "body": "Doors open, team ready, first customers in. Your website is live." },
+    { "kind": "cta", "title": "We build the <span class=\"hl\">whole store.</span>", "body": "Shop floor to stockroom: design, development and launch, all in one place.", "button": "DM us “STORE” · mbndev.ma" }
+  ]
+}
