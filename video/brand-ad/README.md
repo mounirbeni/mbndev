@@ -10,6 +10,7 @@ npm run render                              # index.html   → out/mbndev-ad-9x1
 npm run render -- --page process.html       # process.html → out/mbndev-process-9x16.mp4
 npm run render -- --page portal.html        # portal.html  → out/mbndev-portal-9x16.mp4
 npm run render -- --page film.html --blur 4 # film.html    → out/mbndev-film-9x16.mp4 (21s, motion blur)
+npm run render -- --page asmr.html --blur 4 # asmr.html    → out/mbndev-asmr-9x16.mp4 (22s, motion blur)
 ```
 
 - Needs Chromium (`CHROME_PATH`, or Playwright's bundled one) and FFmpeg (`FFMPEG_PATH`, or on PATH).
@@ -72,6 +73,22 @@ type revealed through line masks. Render with `--blur 4`.
 | 12.0–15.4s | 04 Principles · "Custom. Fast. Yours." set as an editorial spread |
 | 15.6–18.1s | "Custom Websites Built to Elevate Your Business." |
 | 18.2–21s | Official logo end card under a soft light beam · mbndev.ma |
+
+## asmr.html — "Website ASMR" (22s, silent)
+
+Six satisfying UI micro-interactions, one per 2.8s, in macro close-up (object centred on y 1040,
+slow push-in). Header zone: constant eyebrow + "The ___." Scene counter (mono) at y 1600. Render with `--blur 4`.
+
+| Time | Scene |
+|---|---|
+| 0–2.2s | Hook · "Website ASMR." · "Tiny details you can almost hear." |
+| 2.2–5.0s | 01 Toggle · three switches flip on with squash & stretch |
+| 5.0–7.8s | 02 Button · cursor hover, press, ripple, morph to spinner, "Sent ✓" |
+| 7.8–10.6s | 03 Loader · brand-gradient ring fills 0 → 100%, "Live ✓" pulse |
+| 10.6–13.4s | 04 Checklist · four boxes tick and strike through |
+| 13.4–16.2s | 05 Load-in · skeleton shimmer resolves into a real card |
+| 16.2–19.0s | 06 Password · dots pop, strength meter fills, lock clicks shut |
+| 19.0–22s | Official logo end card · "Details that feel right · mbndev.ma" |
 
 ## Social templates
 
