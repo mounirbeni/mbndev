@@ -213,9 +213,8 @@ Glass surfaces (from `globals.css`):
 | **JetBrains Mono** | Code, technical labels, numbers-as-data, terminal snippets | 400, 500 |
 
 Fallback stacks: `Inter, system-ui, sans-serif` and `'JetBrains Mono', monospace`.
-**Arabic / Darija copy:** Inter has no Arabic glyphs, so Arabic text uses **Noto Kufi Arabic** (400/700/900), a geometric Kufi that matches Inter's weight and rhythm. Use it only for Arabic script, never for Latin text.
 Inter stylistic sets used site-wide: `font-feature-settings: 'cv02','cv03','cv04','cv11'`. Enable them in design tools when possible.
-**No other typefaces** (besides Noto Kufi Arabic for Arabic script). No serif, script or display fonts.
+**No other typefaces.** No serif, script or display fonts.
 
 ### 4.2 Weights and roles
 | Role | Weight | Tracking | Line height |

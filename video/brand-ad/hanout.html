@@ -1,25 +1,24 @@
 <!doctype html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>MBN DEV — لو كان السيت ديالك حانوت (1080×1350)</title>
-<!-- Inter + JetBrains Mono (brand) + Noto Kufi Arabic for Arabic/Darija copy (Inter has no Arabic glyphs) -->
+<title>MBN DEV — If your website were a hanout (1080×1350)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
 <link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
 <link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
 <link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
-<link rel="stylesheet" href="node_modules/@fontsource/noto-kufi-arabic/400.css" />
-<link rel="stylesheet" href="node_modules/@fontsource/noto-kufi-arabic/700.css" />
-<link rel="stylesheet" href="node_modules/@fontsource/noto-kufi-arabic/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
 <style>
   /*
-    Original humor series: "لو كان السيت ديالك حانوت" — web development explained with a Moroccan hanout.
+    Original humor series: "If your website were a hanout" — web development explained with a Moroccan corner shop.
     All illustrations are hand-drawn neon SVG line art (no stock or third-party images).
-    1080 × 1350 · 96px margins · header y 96 · neon stage y 170→760 · copy (RTL) from y 800 · footer y 1206.
+    1080 × 1350 · 96px margins · header y 96 · neon stage y 170→760 · copy from y 800 · footer y 1206.
   */
   :root { --bg: #08080b; --v: #a855f7; --lav: #c4b5fd; --muted: #94a3b8; --dim: #64748b; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { width: 1080px; background: #000; -webkit-font-smoothing: antialiased; }
-  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); font-family: 'Noto Kufi Arabic', 'Inter', sans-serif; }
+  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; }
   .abs { position: absolute; }
   .glow { inset: 0; background: radial-gradient(ellipse 65% 38% at 50% 34%, rgba(124,58,237,0.22) 0%, transparent 62%), radial-gradient(ellipse 45% 30% at 90% 95%, rgba(59,130,246,0.07) 0%, transparent 60%); }
   .grain { inset: 0; opacity: 0.05; mix-blend-mode: overlay;
@@ -50,27 +49,27 @@
   .neon .w { stroke: #f4f0ff; filter: drop-shadow(0 0 5px #c4b5fd); }
   .neon .c { stroke: #67e8f9; filter: drop-shadow(0 0 6px #06b6d4); }
   .neon .thin { stroke-width: 4; }
-  .neon text { fill: #f4f0ff; stroke: none; font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 900; }
+  .neon text { fill: #f4f0ff; stroke: none; font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: 0.04em; }
 
-  /* Copy (RTL) */
-  .tag { right: 96px; top: 800px; direction: ltr; display: inline-flex; align-items: center; gap: 12px; height: 50px; padding: 0 20px; border-radius: 999px; background: rgba(124,58,237,0.14); border: 1px solid rgba(168,85,247,0.45); font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: 0.08em; color: #fff; }
+  /* Copy */
+  .tag { left: 96px; top: 800px; display: inline-flex; align-items: center; gap: 12px; height: 50px; padding: 0 20px; border-radius: 999px; background: rgba(124,58,237,0.14); border: 1px solid rgba(168,85,247,0.45); font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: 0.08em; color: #fff; }
   .tag i { width: 8px; height: 8px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 8px #a855f7; display: block; }
-  .t { right: 96px; width: 888px; top: 872px; direction: rtl; text-align: right; font-weight: 900; font-size: 64px; line-height: 1.35; color: #fff; }
-  .p { right: 96px; width: 888px; top: 975px; direction: rtl; text-align: right; font-weight: 400; font-size: 34px; line-height: 1.75; color: var(--muted); }
+  .t { left: 96px; width: 888px; top: 874px; font-weight: 900; font-size: 76px; line-height: 1.02; letter-spacing: -0.045em; color: #fff; }
+  .p { left: 96px; width: 860px; top: 975px; font-weight: 500; font-size: 34px; line-height: 1.45; color: var(--muted); }
   .p b { color: #fff; font-weight: 700; }
   .hl { color: var(--v); }
 
   /* Cover */
   .cover .stage { top: 170px; height: 560px; }
   .cover .kick { left: 96px; right: 96px; top: 770px; direction: ltr; text-align: center; font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--v); }
-  .cover h1 { left: 60px; right: 60px; top: 820px; direction: rtl; text-align: center; font-weight: 900; font-size: 96px; line-height: 1.3; color: #fff; }
-  .cover .swipe { left: 50%; top: 1100px; transform: translateX(-50%); direction: rtl; display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 28px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); font-size: 24px; font-weight: 700; color: #fff; }
+  .cover h1 { left: 60px; right: 60px; top: 820px; text-align: center; font-weight: 900; font-size: 104px; line-height: 1; letter-spacing: -0.05em; color: #fff; }
+  .cover .swipe { left: 50%; top: 1080px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 28px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); font-size: 24px; font-weight: 700; color: #fff; }
   .grad { background: linear-gradient(135deg, #a855f7 0%, #3b82f6 55%, #06b6d4 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
   /* CTA */
-  .cta .t { top: 790px; font-size: 64px; }
+  .cta .t { top: 800px; font-size: 76px; }
   .cta .p { top: 975px; }
-  .cta .btn { right: 96px; top: 1110px; direction: ltr; display: inline-flex; align-items: center; height: 84px; padding: 0 40px; border-radius: 999px; font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.25); }
+  .cta .btn { left: 96px; top: 1092px; display: inline-flex; align-items: center; height: 84px; padding: 0 40px; border-radius: 999px; font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.25); }
 </style>
 </head>
 <body>
@@ -83,7 +82,7 @@
     <path d="M512 212 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 L70 150"/>
     <path class="thin" d="M125.5 150 L112 212 M181 150 L168 212 M236.5 150 L224 212 M292 150 L292 212 M347.5 150 L360 212 M403 150 L416 212 M458.5 150 L472 212"/>
     <rect x="200" y="60" width="200" height="66" rx="14" class="w"/>
-    <text x="300" y="106" font-size="34" text-anchor="middle">حانوت</text>
+    <text x="300" y="105" font-size="30" text-anchor="middle">HANOUT</text>
     <rect x="130" y="258" width="170" height="140" rx="8"/>
     <path class="thin" d="M130 305 H300 M130 352 H300"/>
     <path class="c thin" d="M150 300 v-26 M170 300 v-20 M192 300 v-30 M215 300 v-22 M240 347 v-24 M262 347 v-30 M284 347 v-18"/>
@@ -117,7 +116,7 @@
       <path d="M300 100 C 360 70 450 70 510 95 V430 C 450 405 360 405 300 435"/>
       <path class="thin w" d="M130 160 H260 M130 210 H260 M130 260 H240 M130 310 H260 M130 360 H220"/>
       <path class="thin" d="M340 160 H470 M340 210 H450 M340 260 H470 M340 310 H430"/>
-      <text x="400" y="395" font-size="34" text-anchor="middle" class="c" style="fill:#67e8f9">50 درهم</text>
+      <text x="400" y="395" font-size="34" text-anchor="middle" class="c" style="fill:#67e8f9">-50 DH</text>
       <circle cx="225" cy="160" r="0.1"/>
       <path class="c" d="M470 40 L520 90 M520 40 L470 90" style="opacity:0"/>`,
     lock: `
@@ -151,7 +150,7 @@
       <path class="w thin" d="M226 110 c -10 -18 10 -26 0 -44 M256 110 c -10 -18 10 -26 0 -44"/>
       <path class="c" d="M72 300 L82 380 H128 L138 300 Z"/><path class="c thin" d="M78 330 H132"/>
       <path class="c thin" d="M455 120 l30 -30 M500 170 l40 -8 M92 150 l-30 -26"/>
-      <rect x="380" y="330" width="170" height="86" rx="14" class="w"/><text x="465" y="386" font-size="38" text-anchor="middle">مفتوح</text>
+      <rect x="380" y="330" width="170" height="86" rx="14" class="w"/><text x="465" y="386" font-size="38" text-anchor="middle">OPEN</text>
       <path class="thin" d="M408 330 L465 292 L522 330"/>`,
   };
 
@@ -159,16 +158,16 @@
   const D = Object.assign({
     series: 'WEB DEV · HANOUT',
     slides: [
-      { kind: 'cover', art: 'shop', kicker: 'Web dev, the Moroccan way', title: 'لو كان السيت ديالك <span class="grad">حانوت</span>' },
-      { kind: 'bit', art: 'front', tag: 'FRONTEND', title: 'الواجهة ديال الحانوت', text: 'أول حاجة كيشوفها الكليان. إلا كانت <b>مغبرة وخايبة</b>، كيدوز نيشان للحانوت اللي حداك.' },
-      { kind: 'bit', art: 'store', tag: 'BACKEND', title: 'المخزن اللور', text: 'حتى واحد ما كيشوفو. ولكن إلا <b>تلفات فيه السلعة</b>، الحانوت كامل كيوقف.' },
-      { kind: 'bit', art: 'bike', tag: 'API', title: 'الدرّي ديال الكورسات', text: 'كتقولو "جيب زوج ديال الحليب"، كيمشي وكيرجع <b>بزوج بالضبط</b>. ماشي بثلاثة، وماشي بالياغورت.' },
-      { kind: 'bit', art: 'book', tag: 'DATABASE', title: 'كناش الكريدي', text: 'فيه كلشي: شكون شرا، شنو شرا، <b>وشحال باقي عليه</b>. المهم ما يضيعش.' },
-      { kind: 'bit', art: 'lock', tag: 'AUTHENTICATION', title: 'مول الحانوت', text: 'كيعرف الكليان ديالو بالوجه. اللي ما عرفوش… <b>ما كيعطيهش بالكريدي.</b>' },
-      { kind: 'bit', art: 'scale', tag: 'BUG', title: 'الميزان المخسّر', text: 'كيبان ليك كيلو وهو <b>900 غرام</b>. والكليان ديما كيحسو بيه قبل منك.' },
-      { kind: 'bit', art: 'cloud', tag: 'BACKUP', title: 'نسخة الكناش فالدار', text: 'إلا طاح الكناش فأتاي… <b>الكريدي ما كيضيعش.</b> عندك نسخة محفوظة.' },
-      { kind: 'bit', art: 'open', tag: 'DEPLOYMENT', title: 'نهار الافتتاح', text: 'الأتاي واجد، الحلوى فوق الطبلة، والباب محلول. <b>السيت ديالك أونلاين.</b>' },
-      { kind: 'cta', art: 'shop', title: 'بغيتي <span class="hl">حانوت رقمي</span> بحال هكا؟', text: 'MBN DEV كتصاوب ليك الواجهة، المخزن، والكناش. <b>كلشي فبلاصة وحدة.</b>', button: 'DM us “HANOUT” · mbndev.ma' },
+      { kind: 'cover', art: 'shop', kicker: 'Web dev, the Moroccan way', title: 'If your website were a <span class="grad">hanout.</span>' },
+      { kind: 'bit', art: 'front', tag: 'FRONTEND', title: 'The shopfront.', text: 'The first thing customers see. If it looks <b>dusty and dull</b>, they walk straight to the shop next door.' },
+      { kind: 'bit', art: 'store', tag: 'BACKEND', title: 'The back storeroom.', text: 'Nobody ever sees it. But if the stock <b>goes missing</b>, the whole shop stops.' },
+      { kind: 'bit', art: 'bike', tag: 'API', title: 'The delivery boy.', text: 'You ask for two bottles of milk. He comes back with <b>exactly two</b>. Not three. Not yogurt.' },
+      { kind: 'bit', art: 'book', tag: 'DATABASE', title: 'The kredit notebook.', text: 'Who bought what, and <b>who still owes how much</b>. Just don’t lose it.' },
+      { kind: 'bit', art: 'lock', tag: 'AUTHENTICATION', title: 'The shop owner.', text: 'Knows every regular by face. Strangers? <b>No kredit for you.</b>' },
+      { kind: 'bit', art: 'scale', tag: 'BUG', title: 'The dodgy scale.', text: 'Shows 1 kg, weighs <b>900 g</b>. And customers always notice before you do.' },
+      { kind: 'bit', art: 'cloud', tag: 'BACKUP', title: 'A copy of the notebook.', text: 'Mint tea spilled all over the notebook? <b>Nobody’s kredit is lost.</b> There’s a copy at home.' },
+      { kind: 'bit', art: 'open', tag: 'DEPLOYMENT', title: 'Opening day.', text: 'Mint tea poured, doors wide open. <b>Your website is live.</b>' },
+      { kind: 'cta', art: 'shop', title: 'Want a <span class="hl">digital hanout</span> like this?', text: 'MBN DEV builds the shopfront, the storeroom and the notebook. <b>All in one place.</b>', button: 'DM us “HANOUT” · mbndev.ma' },
     ],
   }, window.__DATA || {});
 
@@ -180,7 +179,7 @@
     const frame = `<div class="abs glow"></div><div class="abs head"><span class="series">${D.series}<i></i></span><span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span></div>`;
     const end = `<div class="abs foot">${lock}${dots(i)}</div><div class="abs grain"></div><div class="abs vig"></div>`;
     if (s.kind === 'cover') return `<section class="slide cover">${frame}${stage(s.art)}<div class="abs kick">${s.kicker}</div><h1 class="abs">${s.title}</h1>
-      <span class="abs swipe">دوّز <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></span>${end}</section>`;
+      <span class="abs swipe">Swipe <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>${end}</section>`;
     if (s.kind === 'cta') return `<section class="slide cta">${frame}${stage(s.art)}<div class="abs t">${s.title}</div><div class="abs p">${s.text}</div><span class="abs btn">${s.button}</span>${end}</section>`;
     return `<section class="slide">${frame}${stage(s.art)}<span class="abs tag"><i></i>${s.tag}</span><div class="abs t">${s.title}</div><div class="abs p">${s.text}</div>${end}</section>`;
   }).join('');

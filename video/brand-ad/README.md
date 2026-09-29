@@ -81,7 +81,7 @@ type revealed through line masks. Render with `--blur 4`.
 | `carousel.html` | 1080×1350 carousel slides (PNG) | `node snap.mjs --page carousel.html [--data data/<carousel>.json]` |
 | `posts.html` | 1080×1350 single-image posts (PNG): statement, myth vs fact, checklist, A/B poll | `node snap.mjs --page posts.html [--data data/<posts>.json]` |
 | `showcase.html` | 1080×1350 real-project carousel: desktop + phone screenshots, features, CTA | `node snap.mjs --page showcase.html --data data/showcase-<project>.json` |
-| `hanout.html` | Original humor carousel "لو كان السيت ديالك حانوت": neon SVG illustrations, Darija copy (Noto Kufi Arabic) | `node snap.mjs --page hanout.html` |
+| `hanout.html` | Original humor carousel "If your website were a hanout": neon SVG illustrations | `node snap.mjs --page hanout.html` |
 | `covers.html` | 1080×1920 reel covers (PNG), grid-safe centre 1080×1440 | `node snap.mjs --page covers.html [--data data/<covers>.json]` |
 
 - **Case study:** copy `data/yed-lmiima.json`, fill in the project (values from `frontend/src/app/portfolio/page.tsx`), and put a
