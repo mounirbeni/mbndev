@@ -1,0 +1,12 @@
+{
+  "series": "WEBSITE PRICING",
+  "slides": [
+    { "kind": "cover", "kicker": "The honest answer", "title": "What really decides <span class=\"grad\">the price of a website?</span>" },
+    { "kind": "tip", "title": "How many pages you need.", "body": "A one-page site and a 20-page site are not the same job.", "card": "Scope · <em>pages and sections</em>", "icon": "menu" },
+    { "kind": "tip", "title": "Custom design or a template.", "body": "A design made for your brand takes more work — and makes you stand out.", "card": "Design · <em>made for you</em>", "icon": "star" },
+    { "kind": "tip", "title": "The features behind it.", "body": "Booking, payments, an online store or a client portal add real value — and real work.", "card": "Features · <em>booking, payments, store</em>", "icon": "bag" },
+    { "kind": "tip", "title": "Who writes the content.", "body": "Texts and photos ready on day one, or written and shot for you?", "card": "Content · <em>yours or ours</em>", "icon": "chat" },
+    { "kind": "tip", "title": "Care after launch.", "body": "Hosting, updates, backups and support keep your site fast and safe.", "card": "Maintenance · <em>monthly care</em>", "icon": "lock" },
+    { "kind": "cta", "title": "Want a price for <span class=\"hl\">your project?</span>", "body": "Tell us what you need. We'll send a clear quote, no surprises.", "button": "DM us “PRICE” · mbndev.ma" }
+  ]
+}

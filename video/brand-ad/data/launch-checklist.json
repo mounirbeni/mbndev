@@ -1,0 +1,14 @@
+{
+  "series": "LAUNCH CHECKLIST",
+  "slides": [
+    { "kind": "cover", "kicker": "Before you go live", "title": "7 checks before <span class=\"grad\">your website launches.</span>" },
+    { "kind": "tip", "title": "Domain and SSL are set.", "body": "Your own domain, and the padlock in the browser. No padlock, no trust.", "card": "https:// · <em>secure from day one</em>", "icon": "lock" },
+    { "kind": "tip", "title": "Tested on real phones.", "body": "Open every page on an iPhone and an Android. Tap every button.", "card": "Mobile test · <em>every page</em>", "icon": "menu" },
+    { "kind": "tip", "title": "Every form actually sends.", "body": "Send a test message from each form and check it really arrives.", "card": "Contact · <em>tested end to end</em>", "icon": "chat" },
+    { "kind": "tip", "title": "Google can find it.", "body": "Titles, descriptions and a sitemap submitted to Google Search Console.", "card": "SEO basics · <em>indexed</em>", "icon": "search" },
+    { "kind": "tip", "title": "It loads fast.", "body": "Compressed images and clean code. Check the speed on mobile data, not Wi-Fi.", "card": "Speed test · <em>on mobile</em>", "icon": "rocket" },
+    { "kind": "tip", "title": "Analytics are on.", "body": "Know how many people visit, where they come from and what they click.", "card": "Analytics · <em>from launch day</em>", "icon": "star" },
+    { "kind": "tip", "title": "Backups are running.", "body": "If something breaks, you should be one click away from yesterday's version.", "card": "Daily backups · <em>peace of mind</em>", "icon": "calendar" },
+    { "kind": "cta", "title": "We check all seven <span class=\"hl\">for you.</span>", "body": "Every MBN DEV launch goes through this list.", "button": "DM us “LAUNCH” · mbndev.ma" }
+  ]
+}

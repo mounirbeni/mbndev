@@ -1,0 +1,13 @@
+{
+  "series": "BEFORE YOU HIRE",
+  "slides": [
+    { "kind": "cover", "kicker": "Save this for later", "title": "6 questions to ask <span class=\"grad\">before you hire a web developer.</span>" },
+    { "kind": "tip", "title": "Will I own my site and domain?", "body": "Your domain, your content and your access should be in your name — not theirs.", "card": "Full ownership · <em>from day one</em>", "icon": "lock" },
+    { "kind": "tip", "title": "Will it work perfectly on phones?", "body": "Most of your visitors are on mobile. Ask to see real sites on a phone, not screenshots.", "card": "Mobile first · <em>tested on real devices</em>", "icon": "menu" },
+    { "kind": "tip", "title": "Can I update it myself?", "body": "Changing a price or a photo shouldn't mean waiting for a developer.", "card": "Easy editing · <em>no code needed</em>", "icon": "chat" },
+    { "kind": "tip", "title": "What exactly is included?", "body": "Design, pages, hosting, SEO, emails? Get it in writing before you start.", "card": "Clear quote · <em>no surprises</em>", "icon": "money" },
+    { "kind": "tip", "title": "How long until it's live?", "body": "A clear timeline with milestones tells you they have a real process.", "card": "Timeline · <em>milestones you can track</em>", "icon": "calendar" },
+    { "kind": "tip", "title": "What happens after launch?", "body": "Bugs, updates, questions. Know who you call — and how fast they answer.", "card": "Support · <em>after the launch</em>", "icon": "star" },
+    { "kind": "cta", "title": "We answer all six <span class=\"hl\">in writing.</span>", "body": "Send us your project and get a clear proposal.", "button": "DM us “QUOTE” · mbndev.ma" }
+  ]
+}

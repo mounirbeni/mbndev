@@ -1,0 +1,14 @@
+{
+  "series": "MYTH VS FACT",
+  "vsLeft": "Myth",
+  "vsRight": "Fact",
+  "slides": [
+    { "kind": "cover", "kicker": "Stop believing these", "title": "5 website myths that <span class=\"grad\">cost you clients.</span>" },
+    { "kind": "vs", "topic": "Social media", "title": "“Instagram is <span class=\"hl\">enough.</span>”", "left": "My page is my website.", "right": "You rent Instagram. You own your website — and Google can find it." },
+    { "kind": "vs", "topic": "Price", "title": "“It's too <span class=\"hl\">expensive.</span>”", "left": "Only big companies can afford one.", "right": "Start with what you need today, add features as you grow." },
+    { "kind": "vs", "topic": "After launch", "title": "“Once it's live, <span class=\"hl\">it's done.</span>”", "left": "Build it once and forget it.", "right": "Updates, security and fresh content keep it working for you." },
+    { "kind": "vs", "topic": "Size", "title": "“I'm too small for <span class=\"hl\">a website.</span>”", "left": "Websites are for big brands.", "right": "Small businesses gain the most: they look as serious as the big ones." },
+    { "kind": "vs", "topic": "DIY", "title": "“I'll build it in <span class=\"hl\">a weekend.</span>”", "left": "Anyone can drag and drop a page.", "right": "A page is easy. A page that brings clients takes strategy." },
+    { "kind": "cta", "title": "Which myth did you <span class=\"hl\">believe?</span>", "body": "Tell us in the comments — then let's build the real thing.", "button": "DM us “FACT” · mbndev.ma" }
+  ]
+}
