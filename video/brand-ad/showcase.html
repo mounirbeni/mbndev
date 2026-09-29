@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Project showcase carousel (1080×1350)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    Real-project showcase carousel, 1080 × 1350. Export: node snap.mjs --page showcase.html --data data/showcase-<project>.json
+    Screenshots live in shots/ (taken from the live site). Same grid as carousel.html:
+    96px margins · header y 96 · footer y 1206 (official logo + dots).
+    Slide kinds: "cover" (desktop + phone) · "shot" (browser frame) · "phone" · "features" · "cta".
+  */
+  :root { --bg: #08080b; --primary-light: #a855f7; --lav: #c4b5fd; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.08); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1080px; background: #000; font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); }
+  .abs { position: absolute; }
+  .glow { inset: 0; background: radial-gradient(ellipse 70% 40% at 55% 62%, rgba(124,58,237,0.22) 0%, transparent 62%), radial-gradient(ellipse 45% 30% at 10% 10%, rgba(59,130,246,0.06) 0%, transparent 60%); }
+  .grain { inset: 0; opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 260px 260px; }
+  .vig { inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 50%, transparent 62%, rgba(0,0,0,0.55) 100%); }
+  .head { left: 96px; right: 96px; top: 96px; display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; letter-spacing: 0.1em; color: var(--lav); }
+  .head .series { display: flex; align-items: center; gap: 18px; }
+  .head .series i { width: 70px; height: 2px; background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); display: block; }
+  .head .count { color: var(--dim); }
+  .foot { left: 96px; right: 96px; top: 1206px; height: 48px; display: flex; justify-content: space-between; align-items: center; }
+  /* Official logo, no background: transparent monogram + Logo3D wordmark */
+  .lock { display: inline-flex; align-items: center; gap: 12px; }
+  .lock img { width: 44px; height: 44px; object-fit: contain; }
+  .lock b { font-weight: 900; font-size: 24px; letter-spacing: -0.015em; }
+  .lock .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  .lock .b { color: #a855f7; margin-left: 8px; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 10px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.14); display: block; }
+  .dots i.on { width: 34px; background: linear-gradient(90deg, #7c3aed, #a855f7); }
+  .hl { color: var(--primary-light); }
+  .kick { font-size: 26px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary-light); }
+
+  /* Device frames */
+  .browser { border-radius: 22px; overflow: hidden; background: #0b0b10; border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.65), 0 0 80px rgba(124,58,237,0.22), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .browser .bar { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: rgba(14,14,20,0.98); border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .browser .bar i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,0.14); display: block; }
+  .browser .bar span { margin-left: 14px; flex: 1; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 8px; padding: 0 12px; font-family: 'JetBrains Mono', monospace; font-size: 15px; color: #cbd5e1; }
+  .browser img { display: block; width: 100%; object-fit: cover; object-position: top center; }
+  .phone { border-radius: 52px; padding: 12px; background: #050508; border: 2px solid rgba(255,255,255,0.16);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 70px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.14); }
+  .phone img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; border-radius: 40px; }
+
+  /* cover */
+  .cover .kick { left: 96px; top: 200px; }
+  .cover h1 { left: 96px; width: 888px; top: 244px; font-weight: 900; font-size: 100px; line-height: 1; letter-spacing: -0.05em; color: #fff; }
+  .cover .type { left: 96px; width: 820px; top: 360px; font-size: 32px; line-height: 1.35; font-weight: 500; color: var(--muted); }
+  .cover .browser { left: 96px; top: 500px; width: 760px; }
+  .cover .browser img { height: 475px; }
+  .cover .phone { left: 716px; top: 560px; width: 268px; height: 580px; }
+
+  /* shot */
+  .shot h2 { left: 96px; width: 888px; top: 200px; font-weight: 900; font-size: 72px; line-height: 1.02; letter-spacing: -0.045em; color: #fff; }
+  .shot p { left: 96px; width: 860px; top: 370px; font-size: 32px; line-height: 1.4; font-weight: 500; color: var(--muted); }
+  .shot .browser { left: 96px; top: 540px; width: 888px; }
+  .shot .browser img { height: 555px; }
+
+  /* phone */
+  .phoneslide .phone { left: 96px; top: 200px; width: 440px; height: 952px; }
+  .phoneslide .kick { left: 590px; top: 430px; }
+  .phoneslide h2 { left: 590px; width: 400px; top: 480px; font-weight: 900; font-size: 64px; line-height: 1.02; letter-spacing: -0.045em; color: #fff; }
+  .phoneslide p { left: 590px; width: 394px; top: 720px; font-size: 30px; line-height: 1.4; font-weight: 500; color: var(--muted); }
+
+  /* features */
+  .features h2 { left: 96px; width: 888px; top: 200px; font-weight: 900; font-size: 84px; line-height: 1.02; letter-spacing: -0.045em; color: #fff; }
+  .features .grid { left: 96px; width: 888px; top: 400px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .features .f { height: 220px; border-radius: 26px; padding: 30px 28px; background: rgba(18,18,25,0.9); border: 1px solid var(--hair); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); display: flex; flex-direction: column; justify-content: space-between; }
+  .features .f .n { font-family: 'JetBrains Mono', monospace; font-size: 22px; color: var(--lav); }
+  .features .f b { font-size: 36px; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+
+  /* cta */
+  .cta h2 { left: 96px; width: 888px; top: 380px; font-weight: 900; font-size: 108px; line-height: 1; letter-spacing: -0.05em; color: #fff; }
+  .cta p { left: 96px; width: 820px; top: 740px; font-size: 38px; line-height: 1.4; font-weight: 500; color: var(--muted); }
+  .cta .btn { left: 96px; top: 930px; display: inline-flex; align-items: center; height: 108px; padding: 0 52px; border-radius: 999px; font-size: 38px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.25); }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+<script>
+  const D = Object.assign({ series: 'CASE STUDY', project: 'Project', kicker: '', type: '', url: '', slides: [] }, window.__DATA || {});
+  const n = D.slides.length;
+  const lock = '<span class="lock"><img src="assets/brand-icon-transparent.webp" alt="MBN DEV" /><b><span class="a">MBN</span><span class="b">DEV</span></b></span>';
+  const dots = (i) => `<span class="dots">${D.slides.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</span>`;
+  const lockIcon = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.6" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  const browser = (img) => `<div class="abs browser"><div class="bar"><i></i><i></i><i></i><span>${lockIcon}${D.url}</span></div><img src="${img}" alt="" /></div>`;
+  const phone = (img) => `<div class="abs phone"><img src="${img}" alt="" /></div>`;
+  const body = (s) => {
+    if (s.kind === 'cover') return `<div class="abs kick">${D.kicker}</div><h1 class="abs">${D.project}</h1><p class="abs type">${D.type}</p>${browser(s.desktop)}${phone(s.mobile)}`;
+    if (s.kind === 'shot') return `<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p>${browser(s.img)}`;
+    if (s.kind === 'phone') return `${phone(s.img)}<div class="abs kick">${s.kicker || 'Mobile'}</div><h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p>`;
+    if (s.kind === 'features') return `<h2 class="abs">${s.title}</h2><div class="abs grid">${s.items.map((t, k) => `<div class="f"><span class="n">${String(k + 1).padStart(2, '0')}</span><b>${t}</b></div>`).join('')}</div>`;
+    return `<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>`;
+  };
+  const cls = { cover: 'cover', shot: 'shot', phone: 'phoneslide', features: 'features', cta: 'cta' };
+  document.getElementById('deck').innerHTML = D.slides.map((s, i) => `<section class="slide ${cls[s.kind]}"><div class="abs glow"></div>
+    <div class="abs head"><span class="series">${D.series}<i></i></span><span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span></div>
+    ${body(s)}<div class="abs foot">${lock}${dots(i)}</div><div class="abs grain"></div><div class="abs vig"></div></section>`).join('');
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>

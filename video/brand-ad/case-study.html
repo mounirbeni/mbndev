@@ -90,7 +90,7 @@
 <div id="stage">
   <div id="ambient" class="abs"></div>
 
-  <div id="eyebrow" class="abs"><span class="ln"><span class="in">CASE STUDY</span></span><span class="rule"></span><span class="ln"><span class="in cat" id="cat"></span></span></div>
+  <div id="eyebrow" class="abs"><span class="ln"><span class="in" id="eyeT">CASE STUDY</span></span><span class="rule"></span><span class="ln"><span class="in cat" id="cat"></span></span></div>
 
   <div id="win" class="abs">
     <div id="bar" class="abs"><i class="tl"></i><i class="tl"></i><i class="tl"></i>
@@ -143,6 +143,7 @@
   }, window.__DATA || {});
 
   const $ = (id) => document.getElementById(id);
+  $('eyeT').textContent = (D.eyebrow || 'CASE STUDY').toUpperCase();
   $('cat').textContent = D.category.toUpperCase();
   $('addrT').textContent = D.url; $('urlT').textContent = D.url;
   $('title').textContent = D.title; $('type').textContent = D.type;

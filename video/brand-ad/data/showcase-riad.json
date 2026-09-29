@@ -1,0 +1,15 @@
+{
+  "series": "PROJECT",
+  "project": "Riad Dar Kader",
+  "kicker": "Concept · Riad website",
+  "type": "A direct-booking website concept for a riad in the Marrakech Medina.",
+  "url": "mbndemo.vercel.app",
+  "slides": [
+    { "kind": "cover", "desktop": "shots/riad-hero.jpg", "mobile": "shots/riad-mobile.jpg" },
+    { "kind": "shot", "img": "shots/riad-hero.jpg", "title": "Book direct, <span class=\"hl\">no commission.</span>", "body": "Dates and availability right in the first screen, so guests can book in seconds." },
+    { "kind": "shot", "img": "shots/riad-rooms.jpg", "title": "Rooms that <span class=\"hl\">sell themselves.</span>", "body": "Every room with its own photos, a short story and a starting price." },
+    { "kind": "phone", "img": "shots/riad-mobile.jpg", "kicker": "Mobile", "title": "Made for the <span class=\"hl\">phone first.</span>", "body": "Booking form up front and an app-style bottom menu for rooms, experiences and directions." },
+    { "kind": "features", "title": "What's <span class=\"hl\">inside.</span>", "items": ["Direct booking form", "Rooms with prices", "Experiences & extras", "WhatsApp button", "French & English", "App-style mobile menu"] },
+    { "kind": "cta", "title": "Want this for your <span class=\"hl\">riad?</span>", "body": "We build direct-booking websites for riads and hotels in Morocco.", "button": "DM us “RIAD” · mbndev.ma" }
+  ]
+}

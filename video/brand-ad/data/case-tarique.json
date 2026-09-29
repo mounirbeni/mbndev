@@ -1,0 +1,15 @@
+{
+  "title": "Tarique",
+  "type": "Cars & motorcycles marketplace",
+  "category": "Marketplace",
+  "url": "tarique.ma",
+  "image": "shots/tarique-hero.jpg",
+  "stats": [
+    { "label": "Market", "value": "Morocco" },
+    { "label": "Vehicles", "value": "Cars/Motos" },
+    { "label": "Language", "value": "Darija" }
+  ],
+  "tags": ["Next.js", "Marketplace", "PostgreSQL"],
+  "highlight": "Buy a car or a motorbike knowing everything before you pay",
+  "cta": "Building a platform?"
+}

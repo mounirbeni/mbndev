@@ -1,0 +1,15 @@
+{
+  "series": "CASE STUDY",
+  "project": "Tarique · طريق",
+  "kicker": "Marketplace · Morocco",
+  "type": "A marketplace for buying and selling used cars and motorcycles across Morocco.",
+  "url": "tarique.ma",
+  "slides": [
+    { "kind": "cover", "desktop": "shots/tarique-hero.jpg", "mobile": "shots/tarique-mobile.jpg" },
+    { "kind": "shot", "img": "shots/tarique-hero.jpg", "title": "Built in <span class=\"hl\">Darija,</span> for Morocco.", "body": "A right-to-left Arabic interface with one clear promise: buy a car or a motorbike knowing everything." },
+    { "kind": "shot", "img": "shots/tarique-trust.jpg", "title": "Trust built into <span class=\"hl\">every listing.</span>", "body": "A trust score, a reference price from the market, verified sellers and an instant valuation tool." },
+    { "kind": "phone", "img": "shots/tarique-mobile.jpg", "kicker": "Mobile", "title": "An app on <span class=\"hl\">every phone.</span>", "body": "Installable on the home screen, with a bottom bar for search, selling and favorites." },
+    { "kind": "features", "title": "What's <span class=\"hl\">inside.</span>", "items": ["Cars & motorcycles", "Trust score per listing", "Market reference price", "Vehicle valuation", "Verified sellers", "Installable web app"] },
+    { "kind": "cta", "title": "Building a <span class=\"hl\">platform?</span>", "body": "Marketplaces, listings, accounts and trust features, built for your market.", "button": "DM us “PLATFORM” · mbndev.ma" }
+  ]
+}

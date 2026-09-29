@@ -80,6 +80,7 @@ type revealed through line masks. Render with `--blur 4`.
 | `case-study.html` | 15s 9:16 case-study reel from one project | `npm run render -- --page case-study.html --data data/<project>.json` |
 | `carousel.html` | 1080×1350 carousel slides (PNG) | `node snap.mjs --page carousel.html [--data data/<carousel>.json]` |
 | `posts.html` | 1080×1350 single-image posts (PNG): statement, myth vs fact, checklist, A/B poll | `node snap.mjs --page posts.html [--data data/<posts>.json]` |
+| `showcase.html` | 1080×1350 real-project carousel: desktop + phone screenshots, features, CTA | `node snap.mjs --page showcase.html --data data/showcase-<project>.json` |
 | `covers.html` | 1080×1920 reel covers (PNG), grid-safe centre 1080×1440 | `node snap.mjs --page covers.html [--data data/<covers>.json]` |
 
 - **Case study:** copy `data/yed-lmiima.json`, fill in the project (values from `frontend/src/app/portfolio/page.tsx`), and put a
@@ -91,3 +92,10 @@ type revealed through line masks. Render with `--blur 4`.
   `losing-clients.json`, `riads-direct-booking.json`, `how-we-work.json` (stages from `ProjectStageTracker.tsx`). A `tip` slide
   with `"num": false` hides its number.
 - **Covers:** one entry per reel: `label` + 2–3 words, `<span class="v">` for the violet word.
+
+### Real screenshots (`shots/`)
+Taken from the live sites with headless Chrome (popups closed, page scrolled so reveal animations run):
+`riad-hero.jpg`, `riad-rooms.jpg`, `riad-mobile.jpg` (mbndemo.vercel.app, a demo/concept site — label it as a concept),
+`tarique-hero.jpg`, `tarique-trust.jpg`, `tarique-mobile.jpg` (tarique.ma). Desktop 1440×900, mobile 1170×2532.
+Ready data: `data/showcase-riad.json`, `data/showcase-tarique.json`, `data/case-riad.json`, `data/case-tarique.json`.
+`case-study.html` accepts an optional `eyebrow` (defaults to "CASE STUDY").

@@ -1,0 +1,16 @@
+{
+  "eyebrow": "Concept",
+  "title": "Riad Dar Kader",
+  "type": "Direct-booking website concept",
+  "category": "Hospitality",
+  "url": "mbndemo.vercel.app",
+  "image": "shots/riad-hero.jpg",
+  "stats": [
+    { "label": "City", "value": "Marrakech" },
+    { "label": "Booking", "value": "Direct" },
+    { "label": "Languages", "value": "FR / EN" }
+  ],
+  "tags": ["Next.js", "Prisma", "Framer Motion"],
+  "highlight": "Guests book direct with no platform commission",
+  "cta": "Want this for your riad?"
+}
