@@ -75,10 +75,10 @@
   .hl { color:var(--pl); }
 
   /* S02 */
-  #b2 { left:540px; top:880px; width:820px; height:236px; border-radius:118px; overflow:hidden;
+  #b2 { left:540px; top:900px; width:900px; height:220px; border-radius:110px; overflow:hidden;
     background:linear-gradient(180deg, rgba(168,85,247,0.62) 0%, rgba(109,40,217,0.62) 100%); border:2px solid rgba(216,180,254,0.38);
     box-shadow:0 0 60px rgba(124,58,237,0.45), 0 40px 90px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.35), inset 0 -10px 30px rgba(49,10,101,0.5); backdrop-filter:blur(20px); }
-  #b2 .t { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:22px; font-size:86px; font-weight:700; letter-spacing:-0.02em; color:#fff; white-space:nowrap; }
+  #b2 .t { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:22px; font-size:70px; font-weight:700; letter-spacing:-0.02em; color:#fff; white-space:nowrap; }
   #b2 .wave { position:absolute; top:-20%; bottom:-20%; left:-60%; width:45%; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent); transform:skewX(-18deg); display:block; }
   #b2spin { position:absolute; left:50%; top:50%; width:120px; height:120px; margin:-60px 0 0 -60px; opacity:0; }
   #b2ok { opacity:0; }
@@ -143,6 +143,7 @@
   .srv { height:150px; margin-top:22px; border-radius:26px; background:rgba(255,255,255,0.045); border:1px solid var(--hair); display:flex; align-items:center; gap:26px; padding:0 30px; }
   .srv i { width:84px; height:84px; border-radius:24px; display:block; background:linear-gradient(135deg, rgba(168,85,247,0.6), rgba(59,130,246,0.5)); }
   .srv b { font-size:32px; color:#fff; } .srv em { display:block; font-style:normal; font-size:22px; color:var(--muted); margin-top:6px; }
+  .rl { position:absolute; left:22px; bottom:18px; z-index:2; font-size:28px; font-weight:800; color:#fff; }
   .fld { height:96px; margin-top:20px; border-radius:24px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; padding:0 28px; font-size:26px; color:var(--dim); }
 
   /* S07 */
@@ -287,9 +288,9 @@
     <div class="orb" style="left:540px;top:880px"></div>
     <div id="b2" class="abs">
       <i class="wave"></i>
-      <span id="b2t" class="t">Book now</span>
+      <span id="b2t" class="t">Check availability</span>
       <svg id="b2spin" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="4.5"/><circle cx="25" cy="25" r="20" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="36 200"/></svg>
-      <span id="b2ok" class="t"><svg width="74" height="74" style="color:#fff"><use href="#chk"/></svg>Booked</span>
+      <span id="b2ok" class="t"><svg width="64" height="64" style="color:#fff"><use href="#chk"/></svg>Available</span>
     </div>
     <div class="line" data-t="Every click answers back."></div>
   </div></section>
@@ -307,7 +308,7 @@
       <div class="rv h" style="left:34px;top:482px;font-size:52px">Sunset Suite</div>
       <div class="rv" style="left:34px;top:560px;font-size:28px;color:var(--muted)"><b style="color:#fcd34d;letter-spacing:4px">★★★★★</b>&nbsp; 4.9 · 128 reviews</div>
       <div class="rv" style="left:34px;top:612px;font-size:38px;font-weight:800;color:#fff">1,450 MAD <span style="font-size:24px;color:var(--muted);font-weight:600">/ night</span></div>
-      <div class="rv btnP" style="left:30px;top:696px;width:680px;height:104px;font-size:36px">Book now</div>
+      <div class="rv btnP" style="left:30px;top:696px;width:680px;height:104px;font-size:34px">Check availability</div>
       <div id="perf" class="abs pill mono"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="#c4b5fd"/></svg><span id="perfN">0.0s</span></div>
     </div>
     <div class="line" data-t="No blank screens. No waiting."></div>
@@ -339,7 +340,7 @@
   <!-- 05 · Mobile experience -->
   <section id="s5" class="sc"><div class="cam">
     <div class="orb" style="left:540px;top:900px"></div>
-    <div id="ph5" class="phone" style="left:200px;top:290px;width:680px;height:1250px"><div class="island"></div>
+    <div id="ph5" class="phone" style="left:200px;top:260px;width:680px;height:1250px"><div class="island"></div>
       <div class="screen">
         <div class="abs h" style="left:32px;top:92px;font-size:52px">Discover</div>
         <div id="car5" class="abs">
@@ -374,17 +375,17 @@
     <div class="orb" style="left:540px;top:900px"></div>
     <div id="nav6" class="win" style="left:90px;top:360px;width:900px;height:1080px">
       <div class="bar"><i></i><i></i><i></i><span>riaddarkader.ma</span></div>
-      <div class="links"><span id="n6a">Home</span><span id="n6b">Services</span><span id="n6c">Portfolio</span><span id="n6d">Contact</span></div>
+      <div class="links"><span id="n6a">Home</span><span id="n6b">Experiences</span><span id="n6c">Rooms</span><span id="n6d">Contact</span></div>
       <div id="ul6" class="abs"></div>
       <div id="p6a" class="pg"><div class="h">Welcome to<br/>Dar Kader.</div><div class="img" style="left:0;right:0;top:170px;height:600px"></div></div>
-      <div id="p6b" class="pg" style="opacity:0"><div class="h">Services</div>
+      <div id="p6b" class="pg" style="opacity:0"><div class="h">Experiences</div>
         <div class="srv"><i></i><div><b>Suites &amp; rooms</b><em>Seven rooms, each unique</em></div></div>
         <div class="srv"><i style="background:linear-gradient(135deg,rgba(236,72,153,.55),rgba(168,85,247,.5))"></i><div><b>Hammam &amp; spa</b><em>Traditional rituals</em></div></div>
         <div class="srv"><i style="background:linear-gradient(135deg,rgba(6,182,212,.55),rgba(59,130,246,.5))"></i><div><b>Rooftop dining</b><em>Sunset, every night</em></div></div>
         <div class="srv"><i></i><div><b>Private tours</b><em>Medina &amp; desert</em></div></div></div>
-      <div id="p6c" class="pg" style="opacity:0"><div class="h">Portfolio</div>
-        <div class="img" style="left:0;top:110px;width:400px;height:320px"></div><div class="img v2" style="left:420px;top:110px;width:400px;height:320px"></div>
-        <div class="img v3" style="left:0;top:450px;width:400px;height:320px"></div><div class="img" style="left:420px;top:450px;width:400px;height:320px;filter:hue-rotate(40deg)"></div></div>
+      <div id="p6c" class="pg" style="opacity:0"><div class="h">Rooms</div>
+        <div class="img" style="left:0;top:110px;width:400px;height:320px"><b class="rl">Sunset Suite</b></div><div class="img v2" style="left:420px;top:110px;width:400px;height:320px"><b class="rl">Garden Room</b></div>
+        <div class="img v3" style="left:0;top:450px;width:400px;height:320px"><b class="rl">Pool Villa</b></div><div class="img" style="left:420px;top:450px;width:400px;height:320px;filter:hue-rotate(40deg)"><b class="rl">Rooftop Loft</b></div></div>
       <div id="p6d" class="pg" style="opacity:0"><div class="h">Contact</div>
         <div class="fld" style="margin-top:40px">Your name</div><div class="fld">Email address</div><div class="fld" style="height:200px;align-items:flex-start;padding-top:30px">Message</div>
         <div class="btnP" style="height:100px;margin-top:26px;font-size:32px">Send message</div></div>
@@ -407,7 +408,7 @@
   <section id="s8" class="sc"><div class="cam">
     <div class="orb" style="left:540px;top:860px"></div>
     <div id="f8" class="glass">
-      <div class="h" style="font-size:48px">Get in touch</div>
+      <div class="h" style="font-size:48px">Ask us anything</div>
       <div class="fl" style="top:130px"><div class="lbl">Name</div><div class="inp"><span id="i8n"></span><i class="ck"><svg width="24" height="24" style="color:#6ee7b7"><use href="#chk"/></svg></i></div></div>
       <div class="fl" style="top:290px"><div class="lbl">Email</div><div id="em8" class="inp"><span id="i8e"></span><span id="i8e2" style="position:absolute;left:28px;opacity:0">sara@gmail.com</span><i class="ck"><svg width="24" height="24" style="color:#6ee7b7"><use href="#chk"/></svg></i></div>
         <div id="hint8">Did you mean <b>sara@gmail.com</b>?</div></div>
@@ -416,12 +417,12 @@
       <div id="send8" class="btnP"><span id="s8a">Send message</span><span id="s8b" style="opacity:0"><svg width="40" height="40" viewBox="0 0 50 50" id="s8spin"><circle cx="25" cy="25" r="19" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="5"/><circle cx="25" cy="25" r="19" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-dasharray="34 200"/></svg>Sending…</span><span id="s8c" style="opacity:0">Message sent <svg width="40" height="40" style="color:#fff"><use href="#chk"/></svg></span></div>
     </div>
     <div id="lead9" class="glass">
-      <div class="row" style="justify-content:space-between"><div class="h" style="font-size:40px">Leads</div><span class="pill pu mono" style="height:48px;padding:0 20px;font-size:20px">Dashboard</span></div>
-      <div id="ld9new" class="ld" style="border-color:rgba(168,85,247,0.55);background:rgba(124,58,237,0.12)"><i>S</i><div style="flex:1"><b>Sara El Amrani</b><em>Website request · just now</em></div><span class="pill pu" style="height:44px;padding:0 18px;font-size:19px">New</span></div>
-      <div class="ld"><i style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">Y</i><div><b>Youssef B.</b><em>Online store · 2h ago</em></div></div>
-      <div class="ld"><i style="background:linear-gradient(135deg,#ec4899,#8b5cf6)">L</i><div><b>Leila K.</b><em>Booking site · yesterday</em></div></div>
+      <div class="row" style="justify-content:space-between"><div class="h" style="font-size:40px">Requests</div><span class="pill pu mono" style="height:48px;padding:0 20px;font-size:20px">Dashboard</span></div>
+      <div id="ld9new" class="ld" style="border-color:rgba(168,85,247,0.55);background:rgba(124,58,237,0.12)"><i>S</i><div style="flex:1"><b>Sara El Amrani</b><em>Airport pickup · just now</em></div><span class="pill pu" style="height:44px;padding:0 18px;font-size:19px">New</span></div>
+      <div class="ld"><i style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">Y</i><div><b>Youssef B.</b><em>Late check-in · 2h ago</em></div></div>
+      <div class="ld"><i style="background:linear-gradient(135deg,#ec4899,#8b5cf6)">L</i><div><b>Leila K.</b><em>Group booking · yesterday</em></div></div>
     </div>
-    <div id="toast9" class="toast" style="left:150px;top:380px;width:780px;opacity:0"><span class="ic"><svg width="32" height="32" style="color:#e9d5ff"><use href="#bell"/></svg></span><div><b>New lead received</b><em>Sara El Amrani · Website request</em></div></div>
+    <div id="toast9" class="toast" style="left:150px;top:380px;width:780px;opacity:0"><span class="ic"><svg width="32" height="32" style="color:#e9d5ff"><use href="#bell"/></svg></span><div><b>New request received</b><em>Sara El Amrani · Airport pickup</em></div></div>
     <div id="l8" class="line" data-t="Even mistakes feel considered."></div>
     <div id="l9" class="line" data-t="Every lead lands where it should."></div>
   </div></section>
@@ -429,7 +430,7 @@
   <!-- 10 · WhatsApp -->
   <section id="s10" class="sc"><div class="cam">
     <div class="orb" style="left:540px;top:900px"></div>
-    <div class="phone" style="left:200px;top:290px;width:680px;height:1250px"><div class="island"></div>
+    <div class="phone" style="left:200px;top:260px;width:680px;height:1250px"><div class="island"></div>
       <div class="screen">
         <div class="img" style="left:0;right:0;top:0;height:560px;border-radius:0"></div>
         <div class="abs h" style="left:36px;top:600px;font-size:54px">Dar Kader</div>
@@ -558,7 +559,7 @@
   <!-- 15 · File upload -->
   <section id="s15" class="sc"><div class="cam">
     <div class="orb" style="left:540px;top:760px"></div>
-    <div class="abs lbl" style="left:130px;top:460px">Client workspace · Riad Dar Kader</div>
+    <div class="abs lbl" style="left:130px;top:460px">Your workspace · MBN DEV × Dar Kader</div>
     <div id="dz15" class="abs"><svg width="64" height="64" style="color:#c4b5fd"><use href="#up"/></svg><span>Drop files here</span></div>
     <div id="file15" class="abs"><span class="fic">JPG</span><div><b style="display:block;font-size:26px;color:#fff">rooftop.jpg</b><em style="display:block;font-style:normal;font-size:20px;color:var(--muted);margin-top:4px">8.4 MB</em></div></div>
     <div id="prog15" class="abs"><div class="row" style="justify-content:space-between;font-size:28px;font-weight:700;color:#fff"><span id="pt15">Uploading…</span><span id="pn15" class="mono">0%</span></div><div class="bar"><i id="pb15"></i></div></div>
@@ -573,7 +574,7 @@
   <!-- 16 · Notifications -->
   <section id="s16" class="sc"><div class="cam">
     <div class="orb" style="left:540px;top:900px"></div>
-    <div class="phone" style="left:200px;top:290px;width:680px;height:1250px"><div class="island"></div>
+    <div class="phone" style="left:200px;top:260px;width:680px;height:1250px"><div class="island"></div>
       <div class="screen">
         <div id="home16" class="abs" style="inset:0">
           <div class="abs h" style="left:36px;top:120px;font-size:50px">Today</div>
@@ -582,11 +583,11 @@
           <div class="tile" style="left:36px;top:630px;width:580px;height:190px"><div class="lbl">Messages</div><div class="n">27</div></div>
         </div>
         <div id="conv16" class="abs" style="inset:0;background:#0c0b12;opacity:0">
-          <div class="ch-h" style="background:rgba(24,20,36,0.98)"><i></i><div><b>Sara El Amrani</b><em style="color:var(--muted)">Client · Website project</em></div></div>
-          <div class="bub in" style="top:250px;background:rgba(255,255,255,0.07)">Love the new homepage! Can we add the spa section?<small>09:12</small></div>
-          <div class="bub out" style="top:470px;background:linear-gradient(135deg,#7c3aed,#6d28d9)">On it — preview by tonight.<small>09:13</small></div>
+          <div class="ch-h" style="background:rgba(24,20,36,0.98)"><i></i><div><b>Sara El Amrani</b><em style="color:var(--muted)">Guest · Sunset Suite</em></div></div>
+          <div class="bub in" style="top:250px;background:rgba(255,255,255,0.07)">Can we check in a little early on the 12th?<small>09:12</small></div>
+          <div class="bub out" style="top:470px;background:linear-gradient(135deg,#7c3aed,#6d28d9)">Of course — your suite will be ready at 11.<small>09:13</small></div>
         </div>
-        <div id="nt16a" class="toast" style="left:20px;right:20px;top:80px;opacity:0"><span class="ic"><svg width="30" height="30" style="color:#e9d5ff"><use href="#chat"/></svg></span><div><b>New client message</b><em>Sara: Love the new homepage!</em></div></div>
+        <div id="nt16a" class="toast" style="left:20px;right:20px;top:80px;opacity:0"><span class="ic"><svg width="30" height="30" style="color:#e9d5ff"><use href="#chat"/></svg></span><div><b>New guest message</b><em>Sara: Can we check in early?</em></div></div>
         <div id="nt16b" class="toast" style="left:20px;right:20px;top:80px;opacity:0"><span class="ic" style="background:rgba(52,211,153,0.14);border-color:rgba(52,211,153,0.45)"><svg width="30" height="30" style="color:#6ee7b7"><use href="#chk"/></svg></span><div><b>Payment verified</b><em>#1042 · 5,800 MAD</em></div></div>
         <div id="nt16c" class="toast" style="left:20px;right:20px;top:80px;opacity:0"><span class="ic"><svg width="30" height="30" style="color:#e9d5ff"><use href="#bell"/></svg></span><div><b>Booking confirmed</b><em>Sunset Suite · 12–16 Oct</em></div></div>
       </div>

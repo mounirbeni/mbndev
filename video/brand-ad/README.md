@@ -90,12 +90,15 @@ slow push-in). Header zone: constant eyebrow + "The ___." Scene counter (mono) a
 | 16.2–19.0s | 06 Password · dots pop, strength meter fills, lock clicks shut |
 | 19.0–22s | Official logo end card · "Details that feel right · mbndev.ma" |
 
-## experience.html — premium brand film "It feels right." (≈59s, 4K, sound design)
+## experience.html — premium brand film "It feels right." (≈106s, 4K, sound design)
 
-Twenty scenes of real UI micro-interactions (button, loading, responsive reflow, mobile gestures,
-navigation, live search, smart form, lead capture, WhatsApp, booking, payment, real-time sync,
-dashboard, upload, notifications, micro-interaction montage, 60 FPS scroll, before/after, the
-full ecosystem) and the official logo end card. Timeline lives in `experience.js`.
+One continuous story in twenty scenes: a guest searches, lands on the riad's site, loads the
+Sunset Suite, checks availability, moves to her phone, books and pays, while the owner sees every
+move land live (real-time sync, WhatsApp, requests, dashboard, notifications, uploads), then the
+micro-interaction montage, the 60 FPS scroll, before/after, the full ecosystem and the logo.
+Scenes are 4–6s each and flow into each other (continuous vertical camera + match zooms:
+card → its button, small phone → big phone). Timeline lives in `experience.js`; every scene is
+timed relative to its own start, so scenes can be reordered or lengthened freely.
 
 Sound is part of the timeline: every interaction registers a cue (`window.__sfx`), and `sfx.py`
 synthesises the whole mix from scratch (no samples, no music): tactile presses, soft clicks,
@@ -105,7 +108,7 @@ drop `vo/vo1.wav … vo4.wav` in and pass `--vo-dir vo`.
 
 ```bash
 # 1 · picture — 4K (2160×3840), motion blur, 4 parallel chunks
-node render-par.mjs --page experience.html --scale 2 --blur 2 --jobs 4 --duration 59.5 --out out/mbndev-experience-4k-silent.mp4
+node render-par.mjs --page experience.html --scale 2 --blur 2 --jobs 4 --duration 105.8 --out out/mbndev-experience-4k-silent.mp4
 # 2 · sound — export cues, synthesise the mix
 node cues.mjs --page experience.html && python3 sfx.py out/experience-cues.json out/experience-mix.wav [--vo-dir vo]
 # 3 · mux
