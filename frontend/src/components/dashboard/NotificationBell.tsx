@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { Bell, Check, CheckCheck, X, Loader2, BellOff } from 'lucide-react';
+import { Bell, BellRing, Check, CheckCheck, X, Loader2, BellOff } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn, makeTimeAgo } from '@/lib/utils';
@@ -38,9 +38,19 @@ export default function NotificationBell() {
   const [notifs,  setNotifs]  = useState<Notif[]>([]);
   const [unread,  setUnread]  = useState(0);
   const [loading, setLoading] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const openRef = useRef(open);
   useEffect(() => { openRef.current = open; }, [open]);
+
+  useEffect(() => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    navigator.serviceWorker.ready
+      .then((registration) => registration.pushManager.getSubscription())
+      .then((subscription) => setPushEnabled(Boolean(subscription)))
+      .catch(() => undefined);
+  }, []);
 
   const fetchCount = useCallback(() =>
     notificationAPI.getUnread()
@@ -106,6 +116,26 @@ export default function NotificationBell() {
     setUnread(0);
   };
 
+  const enablePush = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    setPushBusy(true);
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
+      const { data } = await notificationAPI.pushConfig();
+      if (!data.configured || !data.publicKey) return;
+      const registration = await navigator.serviceWorker.ready;
+      const base64 = data.publicKey.replace(/-/g, '+').replace(/_/g, '/');
+      const key = Uint8Array.from(
+        atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')),
+        (char) => char.charCodeAt(0)
+      );
+      const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+      await notificationAPI.subscribePush(subscription.toJSON());
+      setPushEnabled(true);
+    } catch {} finally { setPushBusy(false); }
+  };
+
   return (
     <div ref={ref} className="relative">
       {/* Bell button */}
@@ -158,6 +188,11 @@ export default function NotificationBell() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
               <div className="flex items-center gap-2">
+                {!pushEnabled && typeof window !== 'undefined' && 'PushManager' in window && (
+                  <button onClick={enablePush} disabled={pushBusy} className="text-[11px] text-slate-400 hover:text-primary-300 flex items-center gap-1.5 transition-colors disabled:opacity-50">
+                    <BellRing className="w-3.5 h-3.5" /> {pushBusy ? 'Enabling…' : 'Enable push'}
+                  </button>
+                )}
                 <span className="text-white font-bold text-sm">{t('notif.title')}</span>
                 {unread > 0 && (
                   <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-primary-500/20 border border-primary-500/30

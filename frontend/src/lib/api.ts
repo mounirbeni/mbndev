@@ -380,6 +380,9 @@ export const notificationAPI = {
   getUnread:   ()           => api.get('/notifications/unread-count'),
   markRead:    (id: string) => api.put(`/notifications/${id}/read`),
   markAllRead: ()           => api.put('/notifications/read-all'),
+  pushConfig:   ()          => api.get('/notifications/push/config'),
+  subscribePush:(subscription: PushSubscriptionJSON) => api.post('/notifications/push/subscribe', subscription),
+  unsubscribePush:(endpoint: string) => api.delete('/notifications/push/subscribe', { data: { endpoint } }),
 };
 
 export const packageAPI = {
