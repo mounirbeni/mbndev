@@ -114,7 +114,7 @@
     const finish = '<div class="abs grain"></div><div class="abs vig"></div>';
     if (s.kind === 'cover') return `<section class="slide cover">${frame}<div class="abs kicker">${s.kicker}</div><h1 class="abs">${s.title}</h1>
       <span class="abs swipe">Swipe <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>${finish}</section>`;
-    if (s.kind === 'tip') { tipNo += 1; return `<section class="slide tip">${frame}<div class="abs num">${String(tipNo).padStart(2, '0')}</div><h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p>
+    if (s.kind === 'tip') { tipNo += 1; return `<section class="slide tip">${frame}${s.num === false ? '' : `<div class="abs num">${String(tipNo).padStart(2, '0')}</div>`}<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p>
       <div class="abs card"><span class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[s.icon] || ICONS.star}</svg></span><span>${s.card}</span></div>${finish}</section>`; }
     if (s.kind === 'vs') return `<section class="slide vs">${frame}<div class="abs topic">${s.topic}</div><h2 class="abs">${s.title}</h2>
       <div class="abs col l"><div class="k"><span class="mk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>${D.vsLeft || 'Template'}</div><p>${s.left}</p></div>

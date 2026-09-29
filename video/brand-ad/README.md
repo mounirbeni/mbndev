@@ -79,6 +79,7 @@ type revealed through line masks. Render with `--blur 4`.
 |---|---|---|
 | `case-study.html` | 15s 9:16 case-study reel from one project | `npm run render -- --page case-study.html --data data/<project>.json` |
 | `carousel.html` | 1080×1350 carousel slides (PNG) | `node snap.mjs --page carousel.html [--data data/<carousel>.json]` |
+| `posts.html` | 1080×1350 single-image posts (PNG): statement, myth vs fact, checklist, A/B poll | `node snap.mjs --page posts.html [--data data/<posts>.json]` |
 | `covers.html` | 1080×1920 reel covers (PNG), grid-safe centre 1080×1440 | `node snap.mjs --page covers.html [--data data/<covers>.json]` |
 
 - **Case study:** copy `data/yed-lmiima.json`, fill in the project (values from `frontend/src/app/portfolio/page.tsx`), and put a
@@ -86,5 +87,7 @@ type revealed through line masks. Render with `--blur 4`.
   in the repository (commit `4effca2`), so they cannot be used until they are re-exported.
 - **Carousel:** slides are `cover`, `tip` (auto-numbered, icon: menu/chat/pin/bag/star), `vs` (template vs custom columns, labels
   via `vsLeft`/`vsRight`) and `cta`. Default content: "5 things every restaurant website needs". Ready-made decks in `data/`:
-  `template-vs-custom.json`, `whats-included.json` (plan facts from `backend/src/lib/pricing.js`), `online-store-prep.json`.
+  `template-vs-custom.json`, `whats-included.json` (plan facts from `backend/src/lib/pricing.js`), `online-store-prep.json`,
+  `losing-clients.json`, `riads-direct-booking.json`, `how-we-work.json` (stages from `ProjectStageTracker.tsx`). A `tip` slide
+  with `"num": false` hides its number.
 - **Covers:** one entry per reel: `label` + 2–3 words, `<span class="v">` for the violet word.

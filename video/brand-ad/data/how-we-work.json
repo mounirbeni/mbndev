@@ -1,0 +1,12 @@
+{
+  "series": "HOW WE WORK",
+  "slides": [
+    { "kind": "cover", "kicker": "No guesswork", "title": "Your website in <span class=\"grad\">5 clear stages.</span>" },
+    { "kind": "tip", "title": "Order received.", "body": "You choose a plan or ask for a quote. Your project is confirmed and queued.", "card": "Stage 1 · <em>confirmed & queued</em>", "icon": "bag" },
+    { "kind": "tip", "title": "In development.", "body": "We design and build your site, and you can follow every step from your portal.", "card": "Stage 2 · <em>actively being built</em>", "icon": "menu" },
+    { "kind": "tip", "title": "Review.", "body": "You get a live preview and tell us what you think, directly in the project chat.", "card": "Stage 3 · <em>awaiting your feedback</em>", "icon": "chat" },
+    { "kind": "tip", "title": "Revision.", "body": "We apply your changes. Revisions are included in every plan.", "card": "Stage 4 · <em>applying changes</em>", "icon": "star" },
+    { "kind": "tip", "title": "Delivered.", "body": "Your site goes live. You get everything you need to run it.", "card": "Stage 5 · <em>project complete</em>", "icon": "pin" },
+    { "kind": "cta", "title": "Start at stage <span class=\"hl\">one.</span>", "body": "Tell us about your project and get a clear plan and delivery date.", "button": "Get a quote · mbndev.ma" }
+  ]
+}

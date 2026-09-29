@@ -1,0 +1,13 @@
+{
+  "series": "WEBSITE CHECK",
+  "slides": [
+    { "kind": "cover", "kicker": "Be honest", "title": "6 signs your website is <span class=\"grad\">losing you clients.</span>" },
+    { "kind": "tip", "title": "It's slow on mobile.", "body": "If it takes too long to load, visitors leave before they see anything.", "card": "Test it · <em>on your own phone</em>", "icon": "menu" },
+    { "kind": "tip", "title": "Nobody can find how to contact you.", "body": "No visible phone, WhatsApp or form means no message.", "card": "Contact · <em>on every page</em>", "icon": "chat" },
+    { "kind": "tip", "title": "It looks outdated.", "body": "Old design makes people wonder if your business is still open.", "card": "Design · <em>builds trust</em>", "icon": "star" },
+    { "kind": "tip", "title": "It doesn't show up on Google.", "body": "If people search your service and don't see you, they find a competitor.", "card": "SEO · <em>from day one</em>", "icon": "pin" },
+    { "kind": "tip", "title": "It doesn't say what you do.", "body": "Visitors should understand your offer in the first screen.", "card": "Clear headline · <em>clear offer</em>", "icon": "menu" },
+    { "kind": "tip", "title": "There's no clear next step.", "body": "Every page should end with one action: call, order, book or ask for a quote.", "card": "One page · <em>one action</em>", "icon": "bag" },
+    { "kind": "cta", "title": "Recognized a few <span class=\"hl\">signs?</span>", "body": "We redesign and rebuild websites that bring clients back.", "button": "DM us “CHECK” · mbndev.ma" }
+  ]
+}

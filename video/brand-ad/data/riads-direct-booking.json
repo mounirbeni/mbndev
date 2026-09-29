@@ -1,0 +1,13 @@
+{
+  "series": "FOR RIADS & HOTELS",
+  "vsLeft": "Platforms only",
+  "vsRight": "Your own site",
+  "slides": [
+    { "kind": "cover", "kicker": "Riads, guesthouses, hotels", "title": "Why your riad needs <span class=\"grad\">direct bookings.</span>" },
+    { "kind": "vs", "topic": "Commission", "title": "Who keeps the <span class=\"hl\">money?</span>", "left": "A commission on every single booking.", "right": "Direct bookings: no platform commission." },
+    { "kind": "vs", "topic": "Guests", "title": "Whose guest is <span class=\"hl\">it?</span>", "left": "The platform owns the relationship.", "right": "You keep the contact and invite them back." },
+    { "kind": "vs", "topic": "Brand", "title": "How do you <span class=\"hl\">look?</span>", "left": "One listing among hundreds.", "right": "Your rooms, your story, your photos." },
+    { "kind": "tip", "num": false, "title": "Keep the platforms. Add your site.", "body": "Use platforms to be discovered, and your own site to turn returning guests into direct bookings.", "card": "Platforms + <em>your own booking site</em>", "icon": "pin" },
+    { "kind": "cta", "title": "Get your riad's <span class=\"hl\">booking site.</span>", "body": "We build direct-booking websites for riads and hotels in Morocco.", "button": "DM us “RIAD” · mbndev.ma" }
+  ]
+}
