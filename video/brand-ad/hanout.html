@@ -43,13 +43,21 @@
   .stage { left: 96px; top: 170px; width: 888px; height: 590px; border-radius: 32px; overflow: hidden;
     background: radial-gradient(ellipse 60% 60% at 50% 55%, rgba(124,58,237,0.12) 0%, rgba(12,10,20,0.9) 70%), #0b0a12;
     border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 30px 80px rgba(0,0,0,0.5); }
-  .stage::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 48px 48px; }
-  .stage svg { position: absolute; left: 144px; top: 45px; width: 600px; height: 500px; overflow: visible; }
-  .neon { fill: none; stroke: #c084fc; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 4px #a855f7) drop-shadow(0 0 16px rgba(124,58,237,0.9)); }
-  .neon .w { stroke: #f4f0ff; filter: drop-shadow(0 0 5px #c4b5fd); }
-  .neon .c { stroke: #67e8f9; filter: drop-shadow(0 0 6px #06b6d4); }
-  .neon .thin { stroke-width: 4; }
-  .neon text { fill: #f4f0ff; stroke: none; font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: 0.04em; }
+  .stage::before { content: ''; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23c4b5fd' stroke-opacity='0.07' stroke-width='1.5'%3E%3Cpath d='M48 14 L58 38 L82 48 L58 58 L48 82 L38 58 L14 48 L38 38 Z'/%3E%3Crect x='30' y='30' width='36' height='36' transform='rotate(45 48 48)'/%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3C/g%3E%3C/svg%3E"); background-size: 96px 96px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 20%, transparent 85%); mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 20%, transparent 85%); }
+  .stage::after { content: ''; position: absolute; left: 14%; right: 14%; bottom: -60px; height: 170px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(168,85,247,0.35) 0%, rgba(124,58,237,0.12) 45%, transparent 72%); }
+  .stage svg { position: absolute; left: 144px; top: 45px; width: 600px; height: 500px; overflow: visible; z-index: 1; }
+  /* Neon tube = wide coloured glow (.tube) + thin white-hot core (.core), same drawing twice */
+  .neon { fill: none; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 22px rgba(124,58,237,0.55)); }
+  .neon .tube { stroke: #a855f7; stroke-width: 13; opacity: 0.85; filter: blur(3.5px); }
+  .neon .tube .c { stroke: #06b6d4; } .neon .tube .w { stroke: #c084fc; }
+  .neon .tube .thin { stroke-width: 8; }
+  .neon .tube .f { fill: rgba(168,85,247,0.16); } .neon .tube .f.c { fill: rgba(6,182,212,0.14); }
+  .neon .core { stroke: #f3e8ff; stroke-width: 3.4; }
+  .neon .core .c { stroke: #cffafe; } .neon .core .w { stroke: #ffffff; }
+  .neon .core .thin { stroke-width: 2.2; }
+  .neon .tube text { fill: #a855f7; } .neon .core text { fill: #fff; }
+  .neon text { stroke: none; font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: 0.04em; }
 
   /* Copy */
   .tag { left: 96px; top: 800px; display: inline-flex; align-items: center; gap: 12px; height: 50px; padding: 0 20px; border-radius: 999px; background: rgba(124,58,237,0.14); border: 1px solid rgba(168,85,247,0.45); font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: 0.08em; color: #fff; }
@@ -77,17 +85,20 @@
 <script>
   // ── Neon line illustrations (600 × 500 viewBox), all original ─────────────────
   const shop = (extra = '') => `
-    <rect x="95" y="150" width="410" height="310" rx="10"/>
+    <rect x="95" y="150" width="410" height="310" rx="10" class="f"/>
     <path d="M70 150 H530 L512 212"/>
     <path d="M512 212 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 L70 150"/>
     <path class="thin" d="M125.5 150 L112 212 M181 150 L168 212 M236.5 150 L224 212 M292 150 L292 212 M347.5 150 L360 212 M403 150 L416 212 M458.5 150 L472 212"/>
-    <rect x="200" y="60" width="200" height="66" rx="14" class="w"/>
+    <rect x="200" y="60" width="200" height="66" rx="14" class="w f"/>
     <text x="300" y="105" font-size="30" text-anchor="middle">HANOUT</text>
     <rect x="130" y="258" width="170" height="140" rx="8"/>
     <path class="thin" d="M130 305 H300 M130 352 H300"/>
-    <path class="c thin" d="M150 300 v-26 M170 300 v-20 M192 300 v-30 M215 300 v-22 M240 347 v-24 M262 347 v-30 M284 347 v-18"/>
+    <path class="c thin" d="M146 300 v-20 q0 -6 5 -8 v-8 h5 v8 q5 2 5 8 v20 z M172 300 v-20 q0 -6 5 -8 v-8 h5 v8 q5 2 5 8 v20 z M198 300 v-20 q0 -6 5 -8 v-8 h5 v8 q5 2 5 8 v20 z M226 300 v-20 q0 -6 5 -8 v-8 h5 v8 q5 2 5 8 v20 z"/><path class="w thin" d="M236 347 v-18 h22 v18 z M234 329 h26 M266 347 v-18 h22 v18 z M264 329 h26"/><path class="c thin" d="M150 347 v-16 M160 347 v-24 M170 347 v-12 M180 347 v-20 M190 347 v-14 M200 347 v-22"/>
     <rect x="340" y="258" width="130" height="202" rx="8"/>
     <circle cx="450" cy="362" r="6" class="w"/>
+    <path class="thin" d="M540 150 V178"/><path class="c" d="M526 178 H554 L560 190 L552 226 H528 L520 190 Z"/><path class="c thin" d="M540 226 V236 M530 196 H550"/>
+    <rect x="120" y="418" width="150" height="42" rx="6" class="f"/><path class="thin" d="M120 432 H270 M160 418 V460 M230 418 V460"/>
+    <circle cx="143" cy="406" r="12" class="c"/><circle cx="170" cy="400" r="12" class="c"/><circle cx="197" cy="406" r="12" class="c"/><circle cx="224" cy="400" r="12" class="c"/><circle cx="249" cy="406" r="12" class="c"/>
     <path d="M60 460 H540"/>${extra}`;
   const sparkle = (x, y, s = 1) => `<path class="w thin" d="M${x} ${y - 22 * s} V${y + 22 * s} M${x - 22 * s} ${y} H${x + 22 * s}"/><path class="w thin" d="M${x - 11 * s} ${y - 11 * s} L${x + 11 * s} ${y + 11 * s} M${x + 11 * s} ${y - 11 * s} L${x - 11 * s} ${y + 11 * s}"/>`;
   const ART = {
@@ -112,16 +123,16 @@
       <path class="c thin" d="M40 250 H110 M20 300 H100 M50 350 H100"/>
       <circle cx="400" cy="160" r="30" class="w"/><path class="w" d="M400 190 L385 235"/>`,
     book: `
-      <path d="M300 100 C 240 70 150 70 90 95 V430 C 150 405 240 405 300 435 Z"/>
+      <path d="M300 100 C 240 70 150 70 90 95 V430 C 150 405 240 405 300 435 Z" class="f"/>
       <path d="M300 100 C 360 70 450 70 510 95 V430 C 450 405 360 405 300 435"/>
       <path class="thin w" d="M130 160 H260 M130 210 H260 M130 260 H240 M130 310 H260 M130 360 H220"/>
       <path class="thin" d="M340 160 H470 M340 210 H450 M340 260 H470 M340 310 H430"/>
       <text x="400" y="395" font-size="34" text-anchor="middle" class="c" style="fill:#67e8f9">-50 DH</text>
-      <circle cx="225" cy="160" r="0.1"/>
+      <ellipse cx="530" cy="450" rx="34" ry="11" class="w"/><path class="w thin" d="M496 450 v-12 M564 450 v-12"/><ellipse cx="530" cy="438" rx="34" ry="11" class="w"/><ellipse cx="545" cy="414" rx="30" ry="10" class="c"/>
       <path class="c" d="M470 40 L520 90 M520 40 L470 90" style="opacity:0"/>`,
     lock: `
       <path d="M200 230 V170 a100 100 0 0 1 200 0 V230"/>
-      <rect x="150" y="230" width="300" height="230" rx="28"/>
+      <rect x="150" y="230" width="300" height="230" rx="28" class="f"/>
       <circle cx="300" cy="320" r="26" class="w"/><path class="w" d="M300 346 V390"/>
       <path class="c" d="M232 418 c 20 -26 50 -26 68 -6 c 18 -20 48 -20 68 6 c -26 4 -48 -2 -68 -14 c -20 12 -42 18 -68 14 z"/>
       <circle cx="245" cy="285" r="8" class="w"/><circle cx="355" cy="285" r="8" class="w"/>
@@ -136,13 +147,13 @@
       <ellipse cx="455" cy="205" rx="30" ry="22" class="c"/><path class="c thin" d="M455 183 V227 M425 195 l-18 -10 M425 215 l-18 10 M485 195 l18 -10 M485 215 l18 10 M445 185 l-8 -16 M465 185 l8 -16"/>
       <text x="300" y="60" font-size="34" text-anchor="middle" class="c" style="fill:#67e8f9">900g ?!</text>`,
     cloud: `
-      <path d="M150 380 a80 80 0 0 1 20 -157 a115 115 0 0 1 220 -30 a95 95 0 0 1 60 187 z"/>
+      <path d="M150 380 a80 80 0 0 1 20 -157 a115 115 0 0 1 220 -30 a95 95 0 0 1 60 187 z" class="f"/>
       <path class="w" d="M240 300 l45 45 l85 -95"/>
       <path class="thin c" d="M160 450 h90 v-40 h-90 z M180 430 h50"/>
       <path class="thin c" d="M350 450 h90 v-40 h-90 z M370 430 h50"/>
       <path class="thin" d="M205 410 V390 M395 410 V390"/>`,
     open: `
-      <path d="M190 340 C150 340 138 268 172 232 C192 212 204 196 206 180 H274 C276 196 288 212 308 232 C342 268 330 340 290 340 Z"/>
+      <path d="M190 340 C150 340 138 268 172 232 C192 212 204 196 206 180 H274 C276 196 288 212 308 232 C342 268 330 340 290 340 Z" class="f"/>
       <path d="M198 340 H282 L294 362 H186 Z"/>
       <path d="M196 180 H284"/><path d="M208 180 C212 146 268 146 272 180"/><circle cx="240" cy="132" r="9" class="w"/>
       <path d="M302 270 C352 262 368 214 402 160"/><path class="thin" d="M402 160 l14 -8"/>
@@ -174,7 +185,7 @@
   const n = D.slides.length;
   const lock = '<span class="lock"><img src="assets/brand-icon-transparent.webp" alt="MBN DEV" /><b><span class="a">MBN</span><span class="b">DEV</span></b></span>';
   const dots = (i) => `<span class="dots">${D.slides.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</span>`;
-  const stage = (a) => `<div class="abs stage"><svg viewBox="0 0 600 500" class="neon">${ART[a]}</svg></div>`;
+  const stage = (a) => `<div class="abs stage"><svg viewBox="0 0 600 500" class="neon"><g class="tube">${ART[a]}</g><g class="core">${ART[a]}</g></svg></div>`;
   document.getElementById('deck').innerHTML = D.slides.map((s, i) => {
     const frame = `<div class="abs glow"></div><div class="abs head"><span class="series">${D.series}<i></i></span><span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span></div>`;
     const end = `<div class="abs foot">${lock}${dots(i)}</div><div class="abs grain"></div><div class="abs vig"></div>`;
