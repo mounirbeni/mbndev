@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ar">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — لو كان السيت ديالك حانوت (1080×1350)</title>
+<!-- Inter + JetBrains Mono (brand) + Noto Kufi Arabic for Arabic/Darija copy (Inter has no Arabic glyphs) -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/noto-kufi-arabic/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/noto-kufi-arabic/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/noto-kufi-arabic/900.css" />
+<style>
+  /*
+    Original humor series: "لو كان السيت ديالك حانوت" — web development explained with a Moroccan hanout.
+    All illustrations are hand-drawn neon SVG line art (no stock or third-party images).
+    1080 × 1350 · 96px margins · header y 96 · neon stage y 170→760 · copy (RTL) from y 800 · footer y 1206.
+  */
+  :root { --bg: #08080b; --v: #a855f7; --lav: #c4b5fd; --muted: #94a3b8; --dim: #64748b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1080px; background: #000; -webkit-font-smoothing: antialiased; }
+  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); font-family: 'Noto Kufi Arabic', 'Inter', sans-serif; }
+  .abs { position: absolute; }
+  .glow { inset: 0; background: radial-gradient(ellipse 65% 38% at 50% 34%, rgba(124,58,237,0.22) 0%, transparent 62%), radial-gradient(ellipse 45% 30% at 90% 95%, rgba(59,130,246,0.07) 0%, transparent 60%); }
+  .grain { inset: 0; opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 260px 260px; }
+  .vig { inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 62%, rgba(0,0,0,0.6) 100%); }
+  .head { left: 96px; right: 96px; top: 96px; direction: ltr; display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; letter-spacing: 0.1em; color: var(--lav); }
+  .head .series { display: flex; align-items: center; gap: 18px; }
+  .head .series i { width: 70px; height: 2px; background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); display: block; }
+  .head .count { color: var(--dim); }
+  .foot { left: 96px; right: 96px; top: 1206px; height: 48px; direction: ltr; display: flex; justify-content: space-between; align-items: center; }
+  /* Official logo, no background: transparent monogram + Logo3D wordmark */
+  .lock { display: inline-flex; align-items: center; gap: 12px; font-family: 'Inter', sans-serif; }
+  .lock img { width: 44px; height: 44px; object-fit: contain; }
+  .lock b { font-weight: 900; font-size: 24px; letter-spacing: -0.015em; }
+  .lock .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  .lock .b { color: #a855f7; margin-left: 8px; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 10px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.14); display: block; }
+  .dots i.on { width: 34px; background: linear-gradient(90deg, #7c3aed, #a855f7); }
+
+  /* Neon stage */
+  .stage { left: 96px; top: 170px; width: 888px; height: 590px; border-radius: 32px; overflow: hidden;
+    background: radial-gradient(ellipse 60% 60% at 50% 55%, rgba(124,58,237,0.12) 0%, rgba(12,10,20,0.9) 70%), #0b0a12;
+    border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 30px 80px rgba(0,0,0,0.5); }
+  .stage::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 48px 48px; }
+  .stage svg { position: absolute; left: 144px; top: 45px; width: 600px; height: 500px; overflow: visible; }
+  .neon { fill: none; stroke: #c084fc; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 4px #a855f7) drop-shadow(0 0 16px rgba(124,58,237,0.9)); }
+  .neon .w { stroke: #f4f0ff; filter: drop-shadow(0 0 5px #c4b5fd); }
+  .neon .c { stroke: #67e8f9; filter: drop-shadow(0 0 6px #06b6d4); }
+  .neon .thin { stroke-width: 4; }
+  .neon text { fill: #f4f0ff; stroke: none; font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 900; }
+
+  /* Copy (RTL) */
+  .tag { right: 96px; top: 800px; direction: ltr; display: inline-flex; align-items: center; gap: 12px; height: 50px; padding: 0 20px; border-radius: 999px; background: rgba(124,58,237,0.14); border: 1px solid rgba(168,85,247,0.45); font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: 0.08em; color: #fff; }
+  .tag i { width: 8px; height: 8px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 8px #a855f7; display: block; }
+  .t { right: 96px; width: 888px; top: 872px; direction: rtl; text-align: right; font-weight: 900; font-size: 64px; line-height: 1.35; color: #fff; }
+  .p { right: 96px; width: 888px; top: 975px; direction: rtl; text-align: right; font-weight: 400; font-size: 34px; line-height: 1.75; color: var(--muted); }
+  .p b { color: #fff; font-weight: 700; }
+  .hl { color: var(--v); }
+
+  /* Cover */
+  .cover .stage { top: 170px; height: 560px; }
+  .cover .kick { left: 96px; right: 96px; top: 770px; direction: ltr; text-align: center; font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--v); }
+  .cover h1 { left: 60px; right: 60px; top: 820px; direction: rtl; text-align: center; font-weight: 900; font-size: 96px; line-height: 1.3; color: #fff; }
+  .cover .swipe { left: 50%; top: 1100px; transform: translateX(-50%); direction: rtl; display: inline-flex; align-items: center; gap: 12px; height: 60px; padding: 0 28px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); font-size: 24px; font-weight: 700; color: #fff; }
+  .grad { background: linear-gradient(135deg, #a855f7 0%, #3b82f6 55%, #06b6d4 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* CTA */
+  .cta .t { top: 790px; font-size: 64px; }
+  .cta .p { top: 975px; }
+  .cta .btn { right: 96px; top: 1110px; direction: ltr; display: inline-flex; align-items: center; height: 84px; padding: 0 40px; border-radius: 999px; font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.25); }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+<script>
+  // ── Neon line illustrations (600 × 500 viewBox), all original ─────────────────
+  const shop = (extra = '') => `
+    <rect x="95" y="150" width="410" height="310" rx="10"/>
+    <path d="M70 150 H530 L512 212"/>
+    <path d="M512 212 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 a28 24 0 0 1 -55.5 0 L70 150"/>
+    <path class="thin" d="M125.5 150 L112 212 M181 150 L168 212 M236.5 150 L224 212 M292 150 L292 212 M347.5 150 L360 212 M403 150 L416 212 M458.5 150 L472 212"/>
+    <rect x="200" y="60" width="200" height="66" rx="14" class="w"/>
+    <text x="300" y="106" font-size="34" text-anchor="middle">حانوت</text>
+    <rect x="130" y="258" width="170" height="140" rx="8"/>
+    <path class="thin" d="M130 305 H300 M130 352 H300"/>
+    <path class="c thin" d="M150 300 v-26 M170 300 v-20 M192 300 v-30 M215 300 v-22 M240 347 v-24 M262 347 v-30 M284 347 v-18"/>
+    <rect x="340" y="258" width="130" height="202" rx="8"/>
+    <circle cx="450" cy="362" r="6" class="w"/>
+    <path d="M60 460 H540"/>${extra}`;
+  const sparkle = (x, y, s = 1) => `<path class="w thin" d="M${x} ${y - 22 * s} V${y + 22 * s} M${x - 22 * s} ${y} H${x + 22 * s}"/><path class="w thin" d="M${x - 11 * s} ${y - 11 * s} L${x + 11 * s} ${y + 11 * s} M${x + 11 * s} ${y - 11 * s} L${x - 11 * s} ${y + 11 * s}"/>`;
+  const ART = {
+    shop: shop(),
+    front: shop(sparkle(215, 230, 0.8) + sparkle(520, 100, 1) + sparkle(78, 300, 0.7)),
+    store: `
+      <rect x="90" y="40" width="420" height="420" rx="10"/>
+      <path d="M90 170 H510 M90 300 H510"/>
+      <rect x="120" y="92" width="80" height="78" rx="4" class="c"/><path class="c thin" d="M160 92 v30"/>
+      <rect x="215" y="112" width="60" height="58" rx="4"/><rect x="290" y="80" width="95" height="90" rx="4" class="w"/><path class="w thin" d="M337 80 v34"/>
+      <rect x="400" y="120" width="80" height="50" rx="4"/>
+      <rect x="130" y="230" width="110" height="70" rx="4"/><path class="thin" d="M185 230 v26"/>
+      <rect x="258" y="248" width="70" height="52" rx="4" class="c"/><rect x="345" y="210" width="130" height="90" rx="4"/><path class="thin" d="M410 210 v34"/>
+      <path class="w" d="M150 460 L205 330 M235 460 L290 330 M160 435 H245 M170 410 H255 M182 382 H267 M194 355 H279"/>
+      <circle cx="455" cy="385" r="34" class="w"/><path class="w" d="M455 365 v20 l14 10"/>`,
+    bike: `
+      <circle cx="170" cy="380" r="70"/><circle cx="430" cy="380" r="70"/>
+      <path d="M170 380 L250 270 H370 L430 380 M250 270 L300 380 H170 M370 270 L300 380 M370 270 L385 225 H420 M250 270 L240 240 H200"/>
+      <rect x="160" y="180" width="130" height="80" rx="6" class="c"/>
+      <rect x="180" y="130" width="36" height="50" rx="6" class="w"/><path class="w thin" d="M186 130 l12 -18 l12 18"/>
+      <rect x="232" y="130" width="36" height="50" rx="6" class="w"/><path class="w thin" d="M238 130 l12 -18 l12 18"/>
+      <path class="c thin" d="M40 250 H110 M20 300 H100 M50 350 H100"/>
+      <circle cx="400" cy="160" r="30" class="w"/><path class="w" d="M400 190 L385 235"/>`,
+    book: `
+      <path d="M300 100 C 240 70 150 70 90 95 V430 C 150 405 240 405 300 435 Z"/>
+      <path d="M300 100 C 360 70 450 70 510 95 V430 C 450 405 360 405 300 435"/>
+      <path class="thin w" d="M130 160 H260 M130 210 H260 M130 260 H240 M130 310 H260 M130 360 H220"/>
+      <path class="thin" d="M340 160 H470 M340 210 H450 M340 260 H470 M340 310 H430"/>
+      <text x="400" y="395" font-size="34" text-anchor="middle" class="c" style="fill:#67e8f9">50 درهم</text>
+      <circle cx="225" cy="160" r="0.1"/>
+      <path class="c" d="M470 40 L520 90 M520 40 L470 90" style="opacity:0"/>`,
+    lock: `
+      <path d="M200 230 V170 a100 100 0 0 1 200 0 V230"/>
+      <rect x="150" y="230" width="300" height="230" rx="28"/>
+      <circle cx="300" cy="320" r="26" class="w"/><path class="w" d="M300 346 V390"/>
+      <path class="c" d="M232 418 c 20 -26 50 -26 68 -6 c 18 -20 48 -20 68 6 c -26 4 -48 -2 -68 -14 c -20 12 -42 18 -68 14 z"/>
+      <circle cx="245" cy="285" r="8" class="w"/><circle cx="355" cy="285" r="8" class="w"/>
+      <path class="w thin" d="M225 265 l36 8 M375 265 l-36 8"/>`,
+    scale: `
+      <path d="M190 460 H410 M300 460 V120"/>
+      <path d="M130 170 L470 120" />
+      <circle cx="300" cy="110" r="14" class="w"/>
+      <path d="M130 170 L90 290 M130 170 L170 290 M470 120 L430 240 M470 120 L510 240"/>
+      <path d="M70 290 a60 26 0 0 0 120 0 z"/><path d="M410 240 a60 26 0 0 0 120 0 z"/>
+      <rect x="95" y="240" width="70" height="50" rx="6" class="w"/><text x="130" y="276" font-size="24" text-anchor="middle">1kg</text>
+      <ellipse cx="455" cy="205" rx="30" ry="22" class="c"/><path class="c thin" d="M455 183 V227 M425 195 l-18 -10 M425 215 l-18 10 M485 195 l18 -10 M485 215 l18 10 M445 185 l-8 -16 M465 185 l8 -16"/>
+      <text x="300" y="60" font-size="34" text-anchor="middle" class="c" style="fill:#67e8f9">900g ?!</text>`,
+    cloud: `
+      <path d="M150 380 a80 80 0 0 1 20 -157 a115 115 0 0 1 220 -30 a95 95 0 0 1 60 187 z"/>
+      <path class="w" d="M240 300 l45 45 l85 -95"/>
+      <path class="thin c" d="M160 450 h90 v-40 h-90 z M180 430 h50"/>
+      <path class="thin c" d="M350 450 h90 v-40 h-90 z M370 430 h50"/>
+      <path class="thin" d="M205 410 V390 M395 410 V390"/>`,
+    open: `
+      <path d="M190 340 C150 340 138 268 172 232 C192 212 204 196 206 180 H274 C276 196 288 212 308 232 C342 268 330 340 290 340 Z"/>
+      <path d="M198 340 H282 L294 362 H186 Z"/>
+      <path d="M196 180 H284"/><path d="M208 180 C212 146 268 146 272 180"/><circle cx="240" cy="132" r="9" class="w"/>
+      <path d="M302 270 C352 262 368 214 402 160"/><path class="thin" d="M402 160 l14 -8"/>
+      <path d="M180 222 C128 222 126 306 186 312"/>
+      <path class="w thin" d="M226 110 c -10 -18 10 -26 0 -44 M256 110 c -10 -18 10 -26 0 -44"/>
+      <path class="c" d="M72 300 L82 380 H128 L138 300 Z"/><path class="c thin" d="M78 330 H132"/>
+      <path class="c thin" d="M455 120 l30 -30 M500 170 l40 -8 M92 150 l-30 -26"/>
+      <rect x="380" y="330" width="170" height="86" rx="14" class="w"/><text x="465" y="386" font-size="38" text-anchor="middle">مفتوح</text>
+      <path class="thin" d="M408 330 L465 292 L522 330"/>`,
+  };
+
+  // ── Content ───────────────────────────────────────────────────────────────────
+  const D = Object.assign({
+    series: 'WEB DEV · HANOUT',
+    slides: [
+      { kind: 'cover', art: 'shop', kicker: 'Web dev, the Moroccan way', title: 'لو كان السيت ديالك <span class="grad">حانوت</span>' },
+      { kind: 'bit', art: 'front', tag: 'FRONTEND', title: 'الواجهة ديال الحانوت', text: 'أول حاجة كيشوفها الكليان. إلا كانت <b>مغبرة وخايبة</b>، كيدوز نيشان للحانوت اللي حداك.' },
+      { kind: 'bit', art: 'store', tag: 'BACKEND', title: 'المخزن اللور', text: 'حتى واحد ما كيشوفو. ولكن إلا <b>تلفات فيه السلعة</b>، الحانوت كامل كيوقف.' },
+      { kind: 'bit', art: 'bike', tag: 'API', title: 'الدرّي ديال الكورسات', text: 'كتقولو "جيب زوج ديال الحليب"، كيمشي وكيرجع <b>بزوج بالضبط</b>. ماشي بثلاثة، وماشي بالياغورت.' },
+      { kind: 'bit', art: 'book', tag: 'DATABASE', title: 'كناش الكريدي', text: 'فيه كلشي: شكون شرا، شنو شرا، <b>وشحال باقي عليه</b>. المهم ما يضيعش.' },
+      { kind: 'bit', art: 'lock', tag: 'AUTHENTICATION', title: 'مول الحانوت', text: 'كيعرف الكليان ديالو بالوجه. اللي ما عرفوش… <b>ما كيعطيهش بالكريدي.</b>' },
+      { kind: 'bit', art: 'scale', tag: 'BUG', title: 'الميزان المخسّر', text: 'كيبان ليك كيلو وهو <b>900 غرام</b>. والكليان ديما كيحسو بيه قبل منك.' },
+      { kind: 'bit', art: 'cloud', tag: 'BACKUP', title: 'نسخة الكناش فالدار', text: 'إلا طاح الكناش فأتاي… <b>الكريدي ما كيضيعش.</b> عندك نسخة محفوظة.' },
+      { kind: 'bit', art: 'open', tag: 'DEPLOYMENT', title: 'نهار الافتتاح', text: 'الأتاي واجد، الحلوى فوق الطبلة، والباب محلول. <b>السيت ديالك أونلاين.</b>' },
+      { kind: 'cta', art: 'shop', title: 'بغيتي <span class="hl">حانوت رقمي</span> بحال هكا؟', text: 'MBN DEV كتصاوب ليك الواجهة، المخزن، والكناش. <b>كلشي فبلاصة وحدة.</b>', button: 'DM us “HANOUT” · mbndev.ma' },
+    ],
+  }, window.__DATA || {});
+
+  const n = D.slides.length;
+  const lock = '<span class="lock"><img src="assets/brand-icon-transparent.webp" alt="MBN DEV" /><b><span class="a">MBN</span><span class="b">DEV</span></b></span>';
+  const dots = (i) => `<span class="dots">${D.slides.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</span>`;
+  const stage = (a) => `<div class="abs stage"><svg viewBox="0 0 600 500" class="neon">${ART[a]}</svg></div>`;
+  document.getElementById('deck').innerHTML = D.slides.map((s, i) => {
+    const frame = `<div class="abs glow"></div><div class="abs head"><span class="series">${D.series}<i></i></span><span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span></div>`;
+    const end = `<div class="abs foot">${lock}${dots(i)}</div><div class="abs grain"></div><div class="abs vig"></div>`;
+    if (s.kind === 'cover') return `<section class="slide cover">${frame}${stage(s.art)}<div class="abs kick">${s.kicker}</div><h1 class="abs">${s.title}</h1>
+      <span class="abs swipe">دوّز <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></span>${end}</section>`;
+    if (s.kind === 'cta') return `<section class="slide cta">${frame}${stage(s.art)}<div class="abs t">${s.title}</div><div class="abs p">${s.text}</div><span class="abs btn">${s.button}</span>${end}</section>`;
+    return `<section class="slide">${frame}${stage(s.art)}<span class="abs tag"><i></i>${s.tag}</span><div class="abs t">${s.title}</div><div class="abs p">${s.text}</div>${end}</section>`;
+  }).join('');
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>
