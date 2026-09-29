@@ -97,7 +97,7 @@ export default function ProjectAnalytics({ project }: Props) {
             {expectedProgress !== null && <line x1="0" x2="100" y1="100" y2={100 - expectedProgress} stroke="rgba(52,211,153,.35)" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />}
             <motion.polyline initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: .8 }} points={points} fill="none" stroke="url(#project-progress)" strokeWidth="2.5" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <div className="flex justify-between text-[10px] text-slate-600 mt-1"><span>Started {formatDate(project.createdAt)}</span><span>{deadline ? `Due ${formatDate(deadline)}` : 'Flexible timeline'}</span></div>
+          <div className="flex justify-between text-[10px] text-slate-600 mt-1"><span>Started {formatDate(project.createdAt)}</span><span>{deadline ? `Due ${formatDate(deadline.toISOString())}` : 'Flexible timeline'}</span></div>
         </div>
       </div>
 
