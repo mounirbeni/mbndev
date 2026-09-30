@@ -1,0 +1,17 @@
+{
+  "series": "IF YOUR WEBSITE WERE A… — EP. 03",
+  "slides": [
+    { "kind": "photocover", "kicker": "Episode 03 · Web development, explained simply", "title": "If your website were a <span class=\"grad\">riad.</span>",
+      "images": ["shots/riad/01-door.jpg", "shots/riad/02-courtyard.jpg", "shots/riad/03-kitchen.jpg", "shots/riad/04-host.jpg", "shots/riad/05-register.jpg", "shots/riad/06-keys.jpg", "shots/riad/07-housekeeping.jpg", "shots/riad/08-rooftop.jpg", "shots/riad/09-opening.jpg"] },
+    { "kind": "photo", "img": "shots/riad/01-door.jpg", "label": "FIRST IMPRESSION", "title": "The homepage is the <span class=\"hl\">front door.</span>", "body": "Carved, clean and welcoming. Guests decide in seconds whether to knock." },
+    { "kind": "photo", "img": "shots/riad/02-courtyard.jpg", "label": "FRONTEND", "title": "Frontend is the <span class=\"hl\">courtyard.</span>", "body": "Everything guests see and feel: light, tiles, fountain, the path to every room." },
+    { "kind": "photo", "img": "shots/riad/03-kitchen.jpg", "label": "BACKEND", "title": "Backend is the <span class=\"hl\">kitchen.</span>", "body": "Guests never see it, but every breakfast and every tagine comes out of it on time." },
+    { "kind": "photo", "img": "shots/riad/04-host.jpg", "label": "API", "title": "The API is the <span class=\"hl\">host.</span>", "body": "Takes the guest's request, walks it to the kitchen and brings back exactly what was asked." },
+    { "kind": "photo", "img": "shots/riad/05-register.jpg", "label": "DATABASE", "title": "The database is the <span class=\"hl\">guest register.</span>", "body": "Every booking, name and date written down, found again in seconds." },
+    { "kind": "photo", "img": "shots/riad/06-keys.jpg", "label": "SECURITY", "title": "Security is the <span class=\"hl\">key to each room.</span>", "body": "Each guest opens only their own door. No key, no entry." },
+    { "kind": "photo", "img": "shots/riad/07-housekeeping.jpg", "label": "MAINTENANCE", "title": "Maintenance is <span class=\"hl\">housekeeping.</span>", "body": "Every morning, quietly: fresh sheets, fixed taps, nothing broken when guests return." },
+    { "kind": "photo", "img": "shots/riad/08-rooftop.jpg", "label": "PERFORMANCE", "title": "Speed is the <span class=\"hl\">rooftop view.</span>", "body": "The moment guests arrive and everything is already there, effortless." },
+    { "kind": "photo", "img": "shots/riad/09-opening.jpg", "label": "DEPLOYMENT", "title": "Launch is the <span class=\"hl\">first guest arriving.</span>", "body": "Lanterns lit, mint tea poured, the door opens. Your website is live." },
+    { "kind": "cta", "title": "We build the <span class=\"hl\">whole riad.</span>", "body": "Front door to kitchen: design, development and launch, all in one place.", "button": "DM us “RIAD” · mbndev.ma" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "series": "ONE DETAIL",
+  "single": true,
+  "slides": [
+    { "kind": "detail", "series": "ONE DETAIL — #01", "no": "01", "macro": "whatsapp", "title": "The WhatsApp button.", "body": "Most visitors won't fill a form. One tap to WhatsApp turns a visit into a conversation." },
+    { "kind": "detail", "series": "ONE DETAIL — #02", "no": "02", "macro": "headline", "title": "The first sentence.", "body": "Say what you do and what to do next — in five seconds. “Welcome to our website” says neither." },
+    { "kind": "detail", "series": "ONE DETAIL — #03", "no": "03", "macro": "speed", "title": "The first second.", "body": "Before design, before words: speed. Compressed images, clean code and good hosting make it load before they leave." }
+  ]
+}

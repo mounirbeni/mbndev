@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Recurring series (1080×1350)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    The two recurring series. Every post in a series uses the SAME layout — only the content changes.
+    Export: node snap.mjs --page series.html --data data/<post>.json
+
+    ONE DETAIL (weekly single post)
+      header "ONE DETAIL — #NN" · macro frame y 190→880 (the detail, close-up) ·
+      title y 930 · one-line why y 1090 · footer.
+    BEFORE / AFTER (carousel, one business type per episode)
+      01 split cover · 02 before (red markers) · 03 after (purple markers) · 04 what changed · 05 CTA.
+  */
+  :root { --bg: #08080b; --pl: #a855f7; --lav: #c4b5fd; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.08); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1080px; background: #000; font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); }
+  .abs { position: absolute; }
+  .glow { inset: 0; background: radial-gradient(ellipse 70% 40% at 50% 38%, rgba(124,58,237,0.22) 0%, transparent 62%), radial-gradient(ellipse 45% 30% at 10% 95%, rgba(59,130,246,0.07) 0%, transparent 60%); }
+  .grain { inset: 0; opacity: 0.05; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 260px 260px; }
+  .vig { inset: 0; pointer-events: none; background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 60%, rgba(0,0,0,0.6) 100%); }
+  .head { left: 96px; right: 96px; top: 96px; display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 500; letter-spacing: 0.1em; color: var(--lav); z-index: 5; }
+  .head .series { display: flex; align-items: center; gap: 18px; }
+  .head .series i { width: 70px; height: 2px; background: linear-gradient(90deg, #a855f7, rgba(168,85,247,0.1)); display: block; }
+  .head .count { color: var(--dim); }
+  .foot { left: 96px; right: 96px; top: 1206px; height: 48px; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
+  .lock { display: inline-flex; align-items: center; gap: 12px; }
+  .lock img { width: 44px; height: 44px; object-fit: contain; }
+  .lock b { font-weight: 900; font-size: 24px; letter-spacing: -0.015em; }
+  .lock .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  .lock .b { color: #a855f7; margin-left: 8px; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 10px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.14); display: block; }
+  .dots i.on { width: 34px; background: linear-gradient(90deg, #7c3aed, #a855f7); }
+  .hl { color: var(--pl); }
+  .grad { background: linear-gradient(90deg, #a855f7, #3b82f6 55%, #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* ── ONE DETAIL ─────────────────────────────────────────── */
+  .macro { left: 96px; right: 96px; top: 190px; height: 690px; border-radius: 40px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 90px rgba(124,58,237,0.18), inset 0 1px 0 rgba(255,255,255,0.1); background: #0d0c14; }
+  .d-no { left: 96px; top: 924px; font-family: 'JetBrains Mono', monospace; font-size: 24px; letter-spacing: 0.14em; color: var(--lav); }
+  .d-t { left: 96px; width: 888px; top: 962px; font-weight: 900; font-size: 76px; line-height: 1.02; letter-spacing: -0.045em; color: #fff; }
+  .d-b { left: 96px; width: 860px; top: 1060px; font-size: 30px; line-height: 1.42; color: var(--muted); font-weight: 500; text-wrap: pretty; }
+
+  /* macro: WhatsApp button */
+  .m-wa .page { position: absolute; inset: 0; filter: blur(2.5px) saturate(0.9); opacity: 0.8; }
+  .m-wa .hero { position: absolute; left: -60px; top: -40px; width: 900px; height: 420px; border-radius: 0 0 40px 0;
+    background: radial-gradient(ellipse 70% 90% at 80% 10%, rgba(251,146,60,0.7) 0%, transparent 60%), linear-gradient(160deg, #7c2d12 0%, #1e3a8a 70%, #0e7490 100%); }
+  .m-wa .ln { position: absolute; height: 22px; border-radius: 11px; background: rgba(255,255,255,0.14); }
+  .m-wa .bez { position: absolute; right: -2px; bottom: -2px; width: 120%; height: 120%; border-radius: 0 0 150px 0; border-right: 26px solid #050508; border-bottom: 26px solid #050508; pointer-events: none; }
+  .m-wa .btn { position: absolute; right: 90px; bottom: 90px; width: 230px; height: 230px; border-radius: 50%; background: #25d366; display: grid; place-items: center; box-shadow: 0 30px 70px rgba(37,211,102,0.45), 0 0 0 18px rgba(37,211,102,0.14), 0 0 0 40px rgba(37,211,102,0.06); }
+  .m-wa .tip { position: absolute; right: 360px; bottom: 170px; padding: 24px 32px; border-radius: 28px 28px 8px 28px; background: #fff; color: #111; font-size: 34px; font-weight: 800; box-shadow: 0 20px 50px rgba(0,0,0,0.5); white-space: nowrap; }
+  .m-wa .tip small { display: block; font-size: 22px; font-weight: 500; color: #555; margin-top: 4px; }
+
+  /* macro: headline */
+  .m-h { background: linear-gradient(170deg, #150b2b 0%, #0b0a12 70%); }
+  .m-h .hold { position: absolute; left: 70px; top: 80px; font-family: 'Times New Roman', Times, serif; font-size: 58px; color: #6b7280; }
+  .m-h .hold::after { content: ''; position: absolute; left: -10px; right: -10px; top: 52%; height: 6px; background: #ef4444; transform: rotate(-2deg); border-radius: 3px; }
+  .m-h .hnew { position: absolute; left: 70px; top: 200px; width: 760px; font-size: 80px; font-weight: 900; letter-spacing: -0.045em; line-height: 1; color: #fff; }
+  .m-h .hnew em { font-style: normal; background: linear-gradient(transparent 62%, rgba(168,85,247,0.55) 62%); }
+  .m-h .cta { position: absolute; left: 70px; top: 520px; height: 84px; padding: 0 40px; border-radius: 999px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; font-size: 30px; font-weight: 800; display: flex; align-items: center; box-shadow: 0 0 36px rgba(124,58,237,0.5); }
+  .m-h .tag { position: absolute; right: 60px; top: 534px; height: 56px; padding: 0 22px; border-radius: 999px; display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 22px; color: #a7f3d0; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.45); }
+
+  /* macro: speed */
+  .m-s { background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(124,58,237,0.25) 0%, transparent 65%), #0b0a12; }
+  .m-s .ring { position: absolute; left: 50%; top: 70px; width: 400px; height: 400px; margin-left: -200px; }
+  .m-s .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 150px; font-weight: 900; color: #fff; letter-spacing: -0.05em; }
+  .m-s .lab { position: absolute; left: 0; right: 0; top: 490px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 26px; letter-spacing: 0.14em; color: var(--lav); }
+  .m-s .chips { position: absolute; left: 0; right: 0; top: 560px; display: flex; justify-content: center; gap: 16px; }
+  .m-s .chips span { height: 62px; padding: 0 26px; border-radius: 999px; display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 700; color: #fff; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+  .m-s .chips span b { color: #a7f3d0; font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+  /* ── BEFORE / AFTER ─────────────────────────────────────── */
+  .ba-k { left: 96px; top: 190px; font-size: 28px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pl); }
+  .ba-t { left: 96px; width: 888px; top: 236px; font-weight: 900; font-size: 88px; line-height: 1; letter-spacing: -0.05em; color: #fff; text-wrap: balance; }
+  .win { left: 96px; right: 96px; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.13); box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 80px rgba(124,58,237,0.16); background: #111118; }
+  .win .bar { height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 22px; background: #17171f; border-bottom: 1px solid rgba(255,255,255,0.07); position: relative; z-index: 2; }
+  .win .bar i { width: 13px; height: 13px; border-radius: 50%; background: rgba(255,255,255,0.16); display: block; }
+  .win .bar span { margin-left: 12px; flex: 1; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 16px; font-size: 19px; color: var(--muted); }
+  .win .vp { position: absolute; left: 0; right: 0; top: 58px; bottom: 0; overflow: hidden; }
+  .badge { position: absolute; z-index: 6; height: 54px; padding: 0 22px; border-radius: 999px; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: 0.12em; }
+  .badge.b { background: #ef4444; color: #fff; } .badge.a { background: #a855f7; color: #fff; box-shadow: 0 0 24px rgba(168,85,247,0.6); }
+  .mk { position: absolute; z-index: 7; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; font-weight: 900; color: #fff; border: 4px solid #fff; }
+  .mk.b { background: #ef4444; box-shadow: 0 0 0 8px rgba(239,68,68,0.25); } .mk.a { background: #a855f7; box-shadow: 0 0 0 8px rgba(168,85,247,0.3), 0 0 30px rgba(168,85,247,0.7); }
+  .notes { left: 96px; right: 96px; top: 1004px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .notes div { display: flex; gap: 12px; align-items: flex-start; font-size: 22px; line-height: 1.35; color: #e2e8f0; font-weight: 600; }
+  .notes i { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 18px; font-weight: 900; color: #fff; }
+  .notes.b i { background: #ef4444; } .notes.a i { background: #a855f7; }
+  .sl { position: absolute; top: 0; bottom: 0; left: 50%; width: 5px; margin-left: -2.5px; background: #fff; box-shadow: 0 0 24px rgba(196,181,253,0.9); z-index: 8; }
+  .slh { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 0 30px rgba(168,85,247,0.8); z-index: 9; }
+  .chg { left: 96px; right: 96px; top: 470px; display: flex; flex-direction: column; gap: 22px; }
+  .chg .c { display: grid; grid-template-columns: 1fr 60px 1fr; align-items: center; gap: 14px; padding: 26px 30px; border-radius: 28px; background: rgba(255,255,255,0.04); border: 1px solid var(--hair); }
+  .chg .c .x { font-size: 26px; color: #fca5a5; text-decoration: line-through; text-decoration-color: rgba(239,68,68,0.7); line-height: 1.3; }
+  .chg .c .y { font-size: 28px; color: #fff; font-weight: 700; line-height: 1.3; }
+  .cta h2 { left: 96px; width: 888px; top: 380px; font-weight: 900; font-size: 108px; line-height: 1; letter-spacing: -0.05em; color: #fff; text-wrap: balance; }
+  .cta p { left: 96px; width: 820px; top: 740px; font-size: 38px; line-height: 1.4; font-weight: 500; color: var(--muted); }
+  .cta .btn { left: 96px; top: 930px; display: inline-flex; align-items: center; height: 108px; padding: 0 52px; border-radius: 999px; font-size: 38px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 80px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.25); }
+
+  /* restaurant mockups (888 wide viewport) */
+  .old { position: absolute; inset: 0; background: #fffbe6; font-family: 'Times New Roman', Times, serif; color: #000; }
+  .old .top { height: 70px; background: #0b3d91; color: #ffff66; font-size: 30px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+  .old .mq { height: 38px; background: #ffcc00; font-size: 22px; display: flex; align-items: center; padding: 0 14px; white-space: nowrap; overflow: hidden; }
+  .old .nv { text-align: center; font-size: 22px; margin: 10px 0; color: #0000ee; text-decoration: underline; }
+  .old .row { display: flex; gap: 16px; padding: 0 20px; }
+  .old .pic { width: 220px; height: 150px; background: #9ca3af; border: 3px inset #fff; display: grid; place-items: center; font-size: 18px; color: #333; flex-shrink: 0; }
+  .old .txt { font-size: 21px; line-height: 1.25; }
+  .old .pdf { margin: 18px 20px 0; padding: 12px; border: 2px dashed #b91c1c; font-size: 22px; color: #b91c1c; }
+  .old .tel { margin: 16px 20px 0; font-size: 20px; }
+  .old .ctr { margin-top: 16px; text-align: center; font-size: 17px; color: #555; }
+  .new { position: absolute; inset: 0; background: #0b0a0f; font-family: 'Inter', sans-serif; }
+  .new .nav { position: absolute; left: 0; right: 0; top: 0; height: 74px; display: flex; align-items: center; justify-content: space-between; padding: 0 34px; z-index: 2; }
+  .new .nav b { font-size: 26px; font-weight: 900; color: #fff; letter-spacing: -0.02em; } .new .nav span { font-size: 18px; color: #cbd5e1; display: flex; gap: 22px; }
+  .new .hero { position: absolute; left: 0; right: 0; top: 0; height: 470px;
+    background: linear-gradient(180deg, rgba(11,10,15,0.1) 0%, rgba(11,10,15,0.25) 55%, #0b0a0f 100%), radial-gradient(ellipse 60% 70% at 78% 30%, rgba(251,146,60,0.85) 0%, transparent 60%), radial-gradient(ellipse 60% 60% at 20% 90%, rgba(14,116,144,0.9) 0%, transparent 60%), linear-gradient(160deg, #7c2d12 0%, #1e3a8a 60%, #0e7490 100%); }
+  .new .sun { position: absolute; right: 150px; top: 110px; width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, #fde68a 0%, #fb923c 60%, transparent 72%); }
+  .new h3 { position: absolute; left: 34px; top: 200px; width: 720px; font-size: 58px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; color: #fff; }
+  .new .bts { position: absolute; left: 34px; top: 360px; display: flex; gap: 12px; }
+  .new .bts span { height: 60px; padding: 0 26px; border-radius: 999px; display: flex; align-items: center; font-size: 21px; font-weight: 800; color: #fff; }
+  .new .menu { position: absolute; left: 34px; right: 34px; top: 480px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .new .menu div { border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); padding: 16px; }
+  .new .menu i { display: block; height: 110px; border-radius: 14px; margin-bottom: 12px; }
+  .new .menu b { display: block; font-size: 21px; color: #fff; } .new .menu em { display: block; font-style: normal; font-size: 18px; color: #fdba74; margin-top: 4px; font-weight: 700; }
+  .new .info { position: absolute; left: 34px; right: 34px; top: 745px; display: flex; gap: 12px; }
+  .new .info span { height: 52px; padding: 0 20px; border-radius: 999px; display: flex; align-items: center; gap: 8px; font-size: 19px; color: #e2e8f0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+<script>
+  const D = Object.assign({ series: 'MBN DEV', slides: [] }, window.__DATA || {});
+  const n = D.slides.length;
+  const lock = '<span class="lock"><img src="assets/brand-icon-transparent.webp" alt="MBN DEV" /><b><span class="a">MBN</span><span class="b">DEV</span></b></span>';
+  const dots = (i) => `<span class="dots">${D.slides.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</span>`;
+  const svg = (d, c = '#fff', w = 40, sw = 2.6) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const CHAT = '<path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/>';
+  const CHK = '<path d="M5 12.5l4.5 4.5L19 7.5"/>';
+  const ARROW = '<path d="M5 12h14M13 6l6 6-6 6"/>';
+
+  // ── ONE DETAIL macros ──
+  const MACRO = {
+    whatsapp: () => `<div class="abs macro m-wa"><div class="page"><div class="hero"></div>
+        <i class="ln" style="left:40px;top:470px;width:420px"></i><i class="ln" style="left:40px;top:510px;width:560px"></i><i class="ln" style="left:40px;top:550px;width:360px"></i></div>
+        <div class="tip">Chat with us<small>Usually replies in minutes</small></div>
+        <div class="btn">${svg(CHAT, '#fff', 120, 1.8)}</div><div class="bez"></div></div>`,
+    headline: () => `<div class="abs macro m-h"><div class="hold">Welcome to our website</div>
+        <div class="hnew">Fresh fish, grilled daily. <em>Book a table.</em></div><div class="cta">Book a table</div>
+        <div class="tag">${svg(CHK, '#6ee7b7', 26, 3)}5-second test</div></div>`,
+    speed: () => `<div class="abs macro m-s"><svg class="ring" viewBox="0 0 400 400"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a855f7"/><stop offset=".55" stop-color="#3b82f6"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+        <circle cx="200" cy="200" r="170" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="26"/><circle cx="200" cy="200" r="170" fill="none" stroke="url(#rg)" stroke-width="26" stroke-linecap="round" stroke-dasharray="1068" stroke-dashoffset="21" transform="rotate(-90 200 200)" style="filter:drop-shadow(0 0 16px rgba(168,85,247,0.6))"/></svg>
+        <div class="ring" style="pointer-events:none"><b>0.8s</b></div><div class="lab">FULLY LOADED · ON MOBILE DATA</div>
+        <div class="chips"><span>Images <b>compressed</b></span><span>Code <b>minimal</b></span><span>Hosting <b>fast</b></span></div></div>`,
+  };
+
+  // ── Restaurant mockups ──
+  const OLD = `<div class="old"><div class="top">~ Welcome to Sardina Restaurant ~</div><div class="mq">*** NEW!!! *** Fresh fish every day *** Call us for reservation *** NEW!!! ***</div>
+      <div class="nv">Home | About Us | Menu | Photos | Contact | Guestbook</div>
+      <div class="row"><div class="pic">[ restaurant.jpg ]</div><div class="txt">Welcome to our website!!! We are a restaurant in Essaouira since 1998. We serve fish and other food. Our restaurant is very good. Please call us to make a reservation or for more information about our menu and prices.</div></div>
+      <div class="pdf">&#128196; Download our MENU (PDF, 14 MB)</div>
+      <div class="tel">Tel: 05 24 xx xx xx (from 9h to 12h only) — Fax: 05 24 xx xx xx</div>
+      <div class="row" style="margin-top:14px"><div class="pic" style="width:150px;height:110px">[ fish1.jpg ]</div><div class="pic" style="width:150px;height:110px">[ fish2.jpg ]</div><div class="pic" style="width:150px;height:110px">[ fish3.jpg ]</div></div>
+      <div class="ctr">You are visitor n° 004821 · Best viewed with Internet Explorer 6 · © 2011</div></div>`;
+  const NEW = `<div class="new"><div class="hero"></div><div class="sun"></div>
+      <div class="nav"><b>Sardina</b><span><em style="font-style:normal">Menu</em><em style="font-style:normal">Book</em><em style="font-style:normal">Find us</em></span></div>
+      <h3>Grilled today, straight from the port.</h3>
+      <div class="bts"><span style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);box-shadow:0 0 26px rgba(124,58,237,0.5)">Book a table</span><span style="background:#25d366;color:#052e16">WhatsApp</span></div>
+      <div class="menu">
+        <div><i style="background:linear-gradient(135deg,#fb923c,#7c2d12)"></i><b>Grilled sardines</b><em>60 MAD</em></div>
+        <div><i style="background:linear-gradient(135deg,#0e7490,#1e3a8a)"></i><b>Seafood tagine</b><em>110 MAD</em></div>
+        <div><i style="background:linear-gradient(135deg,#a855f7,#1e3a8a)"></i><b>Catch of the day</b><em>Market price</em></div></div>
+      <div class="info"><span>&#9679; Open now · until 23:00</span><span>&#9906; Port of Essaouira</span><span>★ 4.8 · 612 reviews</span></div></div>`;
+  const win = (inner, top, h, url) => `<div class="abs win" style="top:${top}px;height:${h}px"><div class="bar"><i></i><i></i><i></i><span>${url}</span></div><div class="vp">${inner}</div></div>`;
+  const marks = (list, cls, top) => list.map(([x, y], k) => `<span class="mk ${cls}" style="left:${96 + x}px;top:${top + 58 + y}px">${k + 1}</span>`).join('');
+
+  const render = (s, i) => {
+    if (s.kind === 'detail') return `${MACRO[s.macro]()}<div class="abs d-no">DETAIL #${s.no}</div><div class="abs d-t">${s.title}</div><div class="abs d-b">${s.body}</div>`;
+    if (s.kind === 'bacover') return `<div class="abs ba-k">${s.kicker}</div><div class="abs ba-t">${s.title}</div>
+      <div class="abs win" style="top:470px;height:700px"><div class="bar"><i></i><i></i><i></i><span>${s.url}</span></div>
+        <div class="vp"><div style="position:absolute;inset:0;clip-path:inset(0 50% 0 0)">${OLD}</div><div style="position:absolute;inset:0;clip-path:inset(0 0 0 50%)">${NEW}</div><i class="sl"></i><span class="slh">${svg('<path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/>', '#6d28d9', 44, 2.6)}</span>
+        <span class="badge b" style="left:22px;bottom:22px">BEFORE</span><span class="badge a" style="right:22px;bottom:22px">AFTER</span></div></div>`;
+    if (s.kind === 'before') return `${win(OLD, 190, 790, s.url)}<span class="badge b" style="right:120px;top:212px;height:44px;font-size:19px">BEFORE</span>${marks(s.marks, 'b', 190)}
+      <div class="abs notes b">${s.notes.map((t, k) => `<div><i>${k + 1}</i>${t}</div>`).join('')}</div>`;
+    if (s.kind === 'after') return `${win(NEW, 190, 790, s.url)}<span class="badge a" style="right:120px;top:212px;height:44px;font-size:19px">AFTER</span>${marks(s.marks, 'a', 190)}
+      <div class="abs notes a">${s.notes.map((t, k) => `<div><i>${k + 1}</i>${t}</div>`).join('')}</div>`;
+    if (s.kind === 'changed') return `<div class="abs ba-k">${s.kicker}</div><div class="abs ba-t">${s.title}</div>
+      <div class="abs chg">${s.rows.map(([x, y]) => `<div class="c"><span class="x">${x}</span>${svg(ARROW, '#a855f7', 44, 2.6)}<span class="y">${y}</span></div>`).join('')}</div>`;
+    return `<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>`;
+  };
+
+  document.getElementById('deck').innerHTML = D.slides.map((s, i) => {
+    const count = D.single ? `<span class="count">mbndev.ma</span>` : `<span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>`;
+    return `<section class="slide ${s.kind}"><div class="abs glow"></div>
+      <div class="abs head"><span class="series">${s.series || D.series}<i></i></span>${count}</div>
+      ${render(s, i)}
+      <div class="abs foot">${lock}${D.single ? '' : dots(i)}</div><div class="abs grain"></div><div class="abs vig"></div></section>`;
+  }).join('');
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((im) => im.decode().catch(() => {}))));
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+{
+  "series": "BEFORE / AFTER — #01",
+  "slides": [
+    {
+      "kind": "bacover",
+      "kicker": "Episode 01 · Restaurant",
+      "title": "Same restaurant. <span class=\"grad\">New first impression.</span>",
+      "url": "sardina-essaouira.ma"
+    },
+    {
+      "kind": "before",
+      "url": "sardina-essaouira.ma",
+      "marks": [
+        [
+          790,
+          180
+        ],
+        [
+          790,
+          322
+        ],
+        [
+          790,
+          384
+        ]
+      ],
+      "notes": [
+        "Nobody knows what to do first.",
+        "A 14 MB PDF menu on a phone.",
+        "Bookings by phone, 9h to 12h only."
+      ]
+    },
+    {
+      "kind": "after",
+      "url": "sardina-essaouira.ma",
+      "marks": [
+        [
+          800,
+          130
+        ],
+        [
+          400,
+          368
+        ],
+        [
+          790,
+          500
+        ]
+      ],
+      "notes": [
+        "One clear promise, in one line.",
+        "Book or WhatsApp in one tap.",
+        "The menu is the website — with prices."
+      ]
+    },
+    {
+      "kind": "changed",
+      "kicker": "What changed",
+      "title": "Three fixes. <span class=\"hl\">One goal: more tables.</span>",
+      "rows": [
+        [
+          "Welcome to our website!!!",
+          "Grilled today, straight from the port."
+        ],
+        [
+          "Download our menu (PDF, 14 MB)",
+          "Dishes, photos and prices on the page"
+        ],
+        [
+          "Call from 9h to 12h only",
+          "Book or WhatsApp — day and night"
+        ],
+        [
+          "Visitor counter & guestbook",
+          "Open hours, map and 612 reviews"
+        ]
+      ]
+    },
+    {
+      "kind": "cta",
+      "title": "Want your <span class=\"hl\">after?</span>",
+      "body": "Send us your website. We'll show you what it could become.",
+      "button": "DM us “AFTER” · mbndev.ma"
+    }
+  ]
+}
