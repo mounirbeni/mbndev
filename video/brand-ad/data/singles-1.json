@@ -1,0 +1,15 @@
+{
+  "series": "MBN DEV",
+  "single": true,
+  "slides": [
+    { "kind": "e404", "series": "ERROR", "title": "Clients not found.", "body": "If people can't find you on Google, they find someone else. Let's get you found.", "button": "DM us “FOUND” · mbndev.ma" },
+    { "kind": "loading", "series": "PATIENCE", "title": "Your clients won't wait for <span class=\"hl\">this.</span>", "url": "yourbusiness.ma", "toast": "Visitor left", "body": "A slow website loses people before they see anything. We build sites that load in under a second." },
+    { "kind": "code", "series": "SIMPLE LOGIC", "title": "It really is <span class=\"hl\">this simple.</span>",
+      "code": "<span class=\"k\">const</span> site = <span class=\"f\">yourBusiness</span>.website;\n\n<span class=\"k\">if</span> (site.isSlow || !site.worksOnPhone) {\n  clients.<span class=\"f\">leave</span>();  <span class=\"c\">// every day</span>\n} <span class=\"k\">else</span> {\n  clients.<span class=\"f\">book</span>();   <span class=\"c\">// every day</span>\n}\n\n<span class=\"c\">// built by</span> <span class=\"s\">\"MBN DEV\"</span>", "titleTop": 890 },
+    { "kind": "split", "series": "GLOW UP", "left": "old", "right": "new", "leftLabel": "2014", "rightLabel": "2026", "title": "Same business. <span class=\"hl\">New first impression.</span>" },
+    { "kind": "lock", "series": "3:07 AM", "tone": "good", "tag": "While you were asleep", "title": "Your website just got you a booking.",
+      "body": "Booking, payment and confirmation — no calls, no waiting.",
+      "notifs": [ { "t": "New booking", "b": "Sunset Suite · 2 nights", "w": "now" }, { "t": "Payment received", "b": "2,900 MAD", "w": "now" } ] },
+    { "kind": "quote", "series": "FIRST IMPRESSIONS", "text": "Your website is your <span class=\"hl\">front door.</span> Don't let it be the reason people walk away.", "by": "— MBN DEV" }
+  ]
+}

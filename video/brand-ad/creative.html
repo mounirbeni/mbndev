@@ -15,7 +15,7 @@
   /*
     Creative carousel formats, 1080 × 1350 (4:5). Export: node snap.mjs --page creative.html --data data/<carousel>.json
     Same grid as carousel.html: 96px margins · header y 96 · footer y 1206 (official logo + dots).
-    Slide kinds: "cover" (visual: chat | receipt | cards | serp | lock | report) · "chat" · "receipt" · "quote" · "profile" · "match" · "serp" · "lock" · "report" · "cta".
+    Slide kinds: "cover" (visual: chat | receipt | cards | serp | lock | report) · "chat" · "receipt" · "quote" · "profile" · "match" · "serp" · "lock" · "report" · "e404" · "loading" · "code" · "split" · "cta". Set "single": true for one-image posts (no counter/dots).
   */
   :root { --bg: #08080b; --pl: #a855f7; --lav: #c4b5fd; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.08); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -180,18 +180,18 @@
   .serp .cap { top: 1062px; font-size: 56px; }
 
   /* lock screen */
-  .lk { left: 96px; top: 170px; width: 500px; height: 1000px; border-radius: 76px; background: #050508; border: 2px solid rgba(255,255,255,0.14); box-shadow: 0 50px 120px rgba(0,0,0,0.7), 0 0 90px rgba(124,58,237,0.25); }
-  .lk .sc { position: absolute; inset: 12px; border-radius: 64px; overflow: hidden; background: radial-gradient(ellipse 90% 60% at 30% 10%, rgba(124,58,237,0.55), transparent 60%), radial-gradient(ellipse 80% 50% at 90% 100%, rgba(59,130,246,0.35), transparent 60%), #0b0916; }
-  .lk .isl { position: absolute; left: 50%; top: 16px; width: 130px; height: 38px; margin-left: -65px; border-radius: 20px; background: #000; }
-  .lk .tm { position: absolute; left: 0; right: 0; top: 90px; text-align: center; font-size: 120px; font-weight: 600; letter-spacing: -0.03em; color: #f5f3ff; line-height: 1; }
-  .lk .dt { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font-size: 24px; font-weight: 600; color: #ddd6fe; }
-  .lk .ns { position: absolute; left: 18px; right: 18px; top: 260px; display: flex; flex-direction: column; gap: 12px; }
+  .lkph { left: 96px; top: 170px; width: 500px; height: 1000px; border-radius: 76px; background: #050508; border: 2px solid rgba(255,255,255,0.14); box-shadow: 0 50px 120px rgba(0,0,0,0.7), 0 0 90px rgba(124,58,237,0.25); }
+  .lkph .sc { position: absolute; inset: 12px; border-radius: 64px; overflow: hidden; background: radial-gradient(ellipse 90% 60% at 30% 10%, rgba(124,58,237,0.55), transparent 60%), radial-gradient(ellipse 80% 50% at 90% 100%, rgba(59,130,246,0.35), transparent 60%), #0b0916; }
+  .lkph .isl { position: absolute; left: 50%; top: 16px; width: 130px; height: 38px; margin-left: -65px; border-radius: 20px; background: #000; }
+  .lkph .tm { position: absolute; left: 0; right: 0; top: 90px; text-align: center; font-size: 120px; font-weight: 600; letter-spacing: -0.03em; color: #f5f3ff; line-height: 1; }
+  .lkph .dt { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font-size: 24px; font-weight: 600; color: #ddd6fe; }
+  .lkph .ns { position: absolute; left: 18px; right: 18px; top: 260px; display: flex; flex-direction: column; gap: 12px; }
   .nt { display: flex; gap: 14px; align-items: center; padding: 16px 18px; border-radius: 26px; background: rgba(40,36,58,0.82); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); }
   .nt .ai { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; background: #0b0b10; flex-shrink: 0; }
   .nt .ai img { width: 36px; height: 36px; object-fit: contain; }
   .nt .tx { flex: 1; min-width: 0; } .nt b { display: block; font-size: 20px; color: #fff; } .nt em { display: block; font-style: normal; font-size: 18px; color: #cbd5e1; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .nt i { font-style: normal; font-size: 15px; color: #a5a3b8; align-self: flex-start; }
-  .lk .none { position: absolute; left: 0; right: 0; top: 520px; text-align: center; font-size: 26px; color: rgba(221,214,254,0.45); }
+  .lkph .none { position: absolute; left: 0; right: 0; top: 520px; text-align: center; font-size: 26px; color: rgba(221,214,254,0.45); }
   .lock .tag { left: 650px; top: 400px; }
   .lock .side { left: 650px; width: 340px; top: 490px; font-weight: 900; font-size: 58px; line-height: 1.04; letter-spacing: -0.04em; color: #fff; text-wrap: balance; }
   .lock .sub { left: 650px; width: 330px; top: 860px; font-size: 26px; line-height: 1.45; color: var(--muted); }
@@ -209,6 +209,32 @@
   .rc .cm b { font-style: normal; font-size: 18px; letter-spacing: 0.12em; color: #78716c; display: block; margin-bottom: 4px; }
   .ov { position: absolute; right: 44px; top: 34px; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; font-size: 80px; font-weight: 900; transform: rotate(-10deg); border: 7px solid currentColor; }
   .ov.bad { color: #dc2626; } .ov.good { color: #7c3aed; box-shadow: 0 0 40px rgba(124,58,237,0.25); }
+
+
+  /* single-post formats */
+  .big404 { left: 0; right: 0; top: 250px; text-align: center; font-size: 360px; font-weight: 900; letter-spacing: -0.06em; line-height: 1; color: transparent; -webkit-text-stroke: 4px rgba(196,181,253,0.8); text-shadow: 0 0 80px rgba(168,85,247,0.35); }
+  .e404b { left: 96px; right: 96px; top: 660px; text-align: center; font-size: 84px; font-weight: 900; letter-spacing: -0.045em; color: #fff; line-height: 1.02; text-wrap: balance; }
+  .ctr { left: 150px; right: 150px; text-align: center; font-size: 34px; line-height: 1.45; color: var(--muted); font-weight: 500; text-wrap: balance; }
+  .pillbtn { left: 50%; transform: translateX(-50%); height: 96px; padding: 0 44px; border-radius: 999px; display: inline-flex; align-items: center; gap: 14px; font-size: 32px; font-weight: 700; color: #fff; white-space: nowrap; background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 0 40px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.25); }
+  .bw { left: 96px; right: 96px; border-radius: 30px; overflow: hidden; background: #111118; border: 1px solid rgba(255,255,255,0.13); box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 80px rgba(124,58,237,0.16); }
+  .bw .bar { height: 64px; display: flex; align-items: center; gap: 10px; padding: 0 24px; background: #17171f; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .bw .bar i { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.16); display: block; }
+  .bw .bar span { margin-left: 12px; flex: 1; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 16px; font-size: 20px; color: var(--muted); }
+  .ld .body { height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; }
+  .ld .spin { width: 90px; height: 90px; border-radius: 50%; border: 8px solid rgba(255,255,255,0.08); border-top-color: #a855f7; }
+  .ld .pb { width: 560px; height: 18px; border-radius: 9px; background: rgba(255,255,255,0.07); overflow: hidden; }
+  .ld .pb i { display: block; width: 12%; height: 100%; border-radius: 9px; background: linear-gradient(90deg, #7c3aed, #a855f7); }
+  .ld .pc { font-family: 'JetBrains Mono', monospace; font-size: 28px; color: var(--lav); }
+  .leftToast { right: 70px; top: 700px; transform: rotate(4deg); display: flex; align-items: center; gap: 16px; padding: 22px 28px; border-radius: 26px; background: rgba(40,16,20,0.95); border: 1px solid rgba(248,113,113,0.5); box-shadow: 0 24px 60px rgba(0,0,0,0.6); font-size: 26px; font-weight: 700; color: #fecaca; }
+  .code .body { padding: 34px 40px; font-family: 'JetBrains Mono', monospace; font-size: 31px; line-height: 1.62; color: #e2e8f0; white-space: pre; }
+  .code .body .k { color: #c084fc; } .code .body .f { color: #60a5fa; } .code .body .c { color: #64748b; } .code .body .s { color: #6ee7b7; } .code .body .n { color: #94a3b8; }
+  .big { left: 96px; width: 888px; font-weight: 900; font-size: 84px; line-height: 1.02; letter-spacing: -0.045em; color: #fff; text-wrap: balance; }
+  .splitbox { left: 96px; right: 96px; top: 210px; height: 600px; border-radius: 34px; overflow: hidden; border: 1px solid rgba(255,255,255,0.13); box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 80px rgba(124,58,237,0.18); }
+  .splitbox .half { position: absolute; top: 0; bottom: 0; overflow: hidden; }
+  .splitbox .half .ms { width: 888px; }
+  .splitbox .yr { position: absolute; bottom: 24px; height: 50px; padding: 0 20px; border-radius: 999px; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; z-index: 3; }
+  .splitbox .ln { position: absolute; top: 0; bottom: 0; left: 50%; width: 5px; margin-left: -2.5px; background: #fff; box-shadow: 0 0 24px rgba(196,181,253,0.9); z-index: 4; }
+  .splitbox .hd { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 0 30px rgba(168,85,247,0.8); z-index: 5; }
 
   /* cta */
   .cta h2 { left: 96px; width: 888px; top: 380px; font-weight: 900; font-size: 108px; line-height: 1; letter-spacing: -0.05em; color: #fff; text-wrap: balance; }
@@ -294,7 +320,7 @@
       ${s.page ? `<div class="abs pages">${[1, 2, 3, 4, 5].map((k) => `<span class="${k === s.page ? 'on' : ''}">${k}</span>`).join('')}<span style="width:auto">Next ›</span></div>` : ''}
       <div class="abs cap">${s.caption}</div>`;
   const APP = '<img src="assets/brand-icon-transparent.webp" alt="" />';
-  const lockPhone = (notifs, style = '') => `<div class="abs lk" style="${style}"><div class="sc"><div class="isl"></div>
+  const lockPhone = (notifs, style = '') => `<div class="abs lkph" style="${style}"><div class="sc"><div class="isl"></div>
       <div class="dt">Tuesday, 12 October</div><div class="tm">9:41</div>
       ${notifs.length ? `<div class="ns">${notifs.map((x) => `<div class="nt"><span class="ai">${APP}</span><div class="tx"><b>${x.t}</b><em>${x.b}</em></div><i>${x.w || 'now'}</i></div>`).join('')}</div>` : '<div class="none">No notifications</div>'}</div></div>`;
   const lockSlide = (s) => `${lockPhone(s.notifs)}<div class="abs tag ${s.tone}"><i></i>${s.tag}</div><div class="abs side">${s.title}</div><div class="abs sub">${s.body}</div>`;
@@ -303,10 +329,25 @@
       <div class="cm"><b>TEACHER'S COMMENT</b>${s.comment}</div>
       <div class="ov ${s.tone}">${s.overall}</div></div>`;
 
+
+  const e404 = (s) => `<div class="abs big404">404</div><div class="abs e404b">${s.title}</div><div class="abs ctr" style="top:${s.bodyTop || 900}px">${s.body}</div><span class="abs pillbtn" style="top:1060px">${s.button}</span>`;
+  const loading = (s) => `<div class="abs big" style="top:190px">${s.title}</div>
+      <div class="abs bw ld" style="top:500px"><div class="bar"><i></i><i></i><i></i><span>${s.url}</span></div><div class="body"><div class="spin"></div><div class="pb"><i></i></div><div class="pc">Loading… 12%</div></div></div>
+      <div class="abs leftToast">${svg(X, '#f87171', 30, 3)}${s.toast}</div>
+      <div class="abs ctr" style="top:1040px;left:96px;right:96px;text-align:left">${s.body}</div>`;
+  const code = (s) => `<div class="abs bw code" style="top:190px"><div class="bar"><i></i><i></i><i></i><span>business.js</span></div><div class="body">${s.code}</div></div>
+      <div class="abs big" style="top:${s.titleTop || 900}px">${s.title}</div>`;
+  const split = (s) => `<div class="abs splitbox">
+      <div class="half" style="left:0;width:50%">${mini(s.left)}</div>
+      <div class="half" style="left:50%;right:0"><div style="position:absolute;top:0;bottom:0;left:0;width:888px">${mini(s.right)}</div></div>
+      <span class="yr" style="left:24px;background:#000080;color:#fff">${s.leftLabel}</span><span class="yr" style="right:24px;background:#a855f7;color:#fff">${s.rightLabel}</span>
+      <i class="ln"></i><span class="hd">${svg('<path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/>', '#6d28d9', 44, 2.6)}</span></div>
+      <div class="abs big" style="top:880px">${s.title}</div>`;
+
   document.getElementById('deck').innerHTML = D.slides.map((s, i) => {
     const back = `<div class="abs glow"></div><div class="abs grid"></div>
-      <div class="abs head"><span class="series">${D.series}<i></i></span><span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span></div>`;
-    const front = `<div class="abs foot">${lock}${dots(i)}</div><div class="abs grain"></div><div class="abs vig"></div>`;
+      <div class="abs head"><span class="series">${s.series || D.series}<i></i></span>${D.single ? '<span class="count">mbndev.ma</span>' : `<span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>`}</div>`;
+    const front = `<div class="abs foot">${lock}${D.single ? '' : dots(i)}</div><div class="abs grain"></div><div class="abs vig"></div>`;
     let body = '';
     if (s.kind === 'cover') body = `<div class="abs kicker">${s.kicker}</div><h1 class="abs">${s.title}</h1>${visual(s)}`;
     else if (s.kind === 'chat') body = chat(s);
@@ -315,6 +356,10 @@
     else if (s.kind === 'profile') body = profile(s);
     else if (s.kind === 'match') body = match(s);
     else if (s.kind === 'serp') body = serp(s);
+    else if (s.kind === 'e404') body = e404(s);
+    else if (s.kind === 'loading') body = loading(s);
+    else if (s.kind === 'code') body = code(s);
+    else if (s.kind === 'split') body = split(s);
     else if (s.kind === 'lock') body = lockSlide(s);
     else if (s.kind === 'report') body = report(s);
     else body = `<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>`;
