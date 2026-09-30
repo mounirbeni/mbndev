@@ -1,0 +1,34 @@
+{
+  "series": "SEARCH CHECK",
+  "slides": [
+    { "kind": "cover", "visual": "serp", "kicker": "Try it right now", "title": "Search your business. <span class=\"grad\">Where do you show up?</span>" },
+    { "kind": "serp", "query": "riad marrakech medina", "page": 1,
+      "results": [
+        { "name": "Riad Amira", "url": "riadamira.ma", "title": "Riad Amira — Boutique Riad in the Medina", "stars": "4.8", "text": "Rooftop pool, hammam, book direct for the best rate." },
+        { "name": "Dar Nour", "url": "darnour.com", "title": "Dar Nour | Book your stay in Marrakech", "stars": "4.9", "text": "7 rooms, 2 minutes from Jemaa el-Fna. Free breakfast." },
+        { "name": "Riad Salam", "url": "riadsalam.ma", "title": "Riad Salam — Calm in the heart of the city", "text": "Traditional riad, modern comfort. Instant booking." }
+      ],
+      "caption": "Page 1: your competitors." },
+    { "kind": "serp", "query": "riad marrakech medina", "page": 5, "info": "Page 5 of about 1,240,000 results",
+      "results": [
+        { "name": "Some directory", "url": "list-of-riads.info", "title": "Riads in Morocco — list (2014)", "text": "A list of riads. Some links may be broken.", "faded": true },
+        { "name": "Your business", "url": "yourbusiness.ma", "title": "Welcome to our website!!!", "text": "We are a riad. Please call us for prices. Best viewed in Internet Explorer.", "faded": true, "tag": "YOU ARE HERE" }
+      ],
+      "caption": "Page 5: nobody ever comes here." },
+    { "kind": "quote", "text": "The best place to hide something? <span class=\"hl\">Page 2 of Google.</span>", "by": "— AN OLD SEO JOKE" },
+    { "kind": "serp", "query": "how to get to page 1", "info": "What actually moves you up",
+      "results": [
+        { "name": "Speed", "icon": "1", "url": "fast on mobile", "title": "A site that loads fast on phones", "text": "Slow pages lose visitors — and Google notices." },
+        { "name": "Clarity", "icon": "2", "url": "titles & content", "title": "Clear titles that match real searches", "text": "Say what you do and where, in the words clients type." },
+        { "name": "Trust", "icon": "3", "url": "reviews & profile", "title": "A complete business profile with reviews", "text": "Photos, hours, map and real reviews build trust." }
+      ],
+      "caption": "No tricks. Just a well-built site." },
+    { "kind": "serp", "query": "riad marrakech medina", "page": 1,
+      "results": [
+        { "name": "Your business", "url": "yourbusiness.ma", "title": "Your Riad — Book direct in the Medina", "stars": "4.9", "text": "Fast, beautiful, bookable in one tap.", "you": true, "tag": "YOU" },
+        { "name": "Riad Amira", "url": "riadamira.ma", "title": "Riad Amira — Boutique Riad in the Medina", "stars": "4.8", "text": "Rooftop pool, hammam, book direct for the best rate." }
+      ],
+      "caption": "Page 1. Right where clients look." },
+    { "kind": "cta", "title": "Ready to leave <span class=\"hl\">page 5?</span>", "body": "Websites built fast, clear and ready for Google from day one.", "button": "DM us “SEARCH” · mbndev.ma" }
+  ]
+}

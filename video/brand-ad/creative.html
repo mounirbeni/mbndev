@@ -15,7 +15,7 @@
   /*
     Creative carousel formats, 1080 × 1350 (4:5). Export: node snap.mjs --page creative.html --data data/<carousel>.json
     Same grid as carousel.html: 96px margins · header y 96 · footer y 1206 (official logo + dots).
-    Slide kinds: "cover" (visual: chat | receipt | cards) · "chat" · "receipt" · "quote" · "profile" · "match" · "cta".
+    Slide kinds: "cover" (visual: chat | receipt | cards | serp | lock | report) · "chat" · "receipt" · "quote" · "profile" · "match" · "serp" · "lock" · "report" · "cta".
   */
   :root { --bg: #08080b; --pl: #a855f7; --lav: #c4b5fd; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.08); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -157,6 +157,59 @@
   .match .lb { position: absolute; top: 830px; width: 330px; text-align: center; font-size: 28px; font-weight: 800; color: #fff; }
   .match .p { left: 150px; width: 780px; top: 930px; text-align: center; font-size: 36px; line-height: 1.4; font-weight: 500; color: var(--muted); text-wrap: balance; }
 
+
+  /* search results (serp) */
+  .sbox { left: 96px; right: 96px; top: 190px; height: 96px; border-radius: 48px; background: #1f1f26; border: 1px solid #3a3a44; display: flex; align-items: center; gap: 20px; padding: 0 34px; font-size: 32px; color: #e8eaed; }
+  .sinfo { left: 96px; top: 312px; font-size: 22px; color: #9aa0a6; }
+  .res { left: 96px; right: 96px; top: 372px; display: flex; flex-direction: column; gap: 30px; }
+  .r { position: relative; padding: 0 4px; }
+  .r .site { display: flex; align-items: center; gap: 14px; }
+  .r .fav { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: #2a2a33; font-size: 20px; font-weight: 800; color: #e8eaed; flex-shrink: 0; }
+  .r .site b { display: block; font-size: 23px; color: #e8eaed; font-weight: 600; } .r .site em { display: block; font-style: normal; font-size: 19px; color: #9aa0a6; }
+  .r h3 { margin-top: 10px; font-size: 35px; font-weight: 600; color: #8ab4f8; letter-spacing: -0.01em; }
+  .r p { margin-top: 6px; font-size: 24px; line-height: 1.4; color: #bdc1c6; }
+  .r .stars { color: #fbbf24; letter-spacing: 3px; }
+  .r.you { padding: 24px 26px; border-radius: 28px; border: 2px solid rgba(168,85,247,0.7); background: rgba(124,58,237,0.12); box-shadow: 0 0 50px rgba(124,58,237,0.3); }
+  .r.you .fav { background: linear-gradient(135deg, #8b5cf6, #3b82f6); }
+  .r.faded { opacity: 0.5; }
+  .r .you-tag { position: absolute; right: 22px; top: 20px; height: 44px; padding: 0 18px; border-radius: 999px; background: #a855f7; color: #fff; font-size: 19px; font-weight: 800; letter-spacing: 0.1em; display: flex; align-items: center; }
+  .r.faded .you-tag { background: #ef4444; }
+  .pages { left: 96px; right: 96px; top: 975px; display: flex; align-items: center; gap: 26px; font-size: 28px; font-weight: 600; color: #8ab4f8; }
+  .pages span { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; }
+  .pages span.on { background: #a855f7; color: #fff; box-shadow: 0 0 24px rgba(168,85,247,0.6); }
+  .serp .cap { top: 1062px; font-size: 56px; }
+
+  /* lock screen */
+  .lk { left: 96px; top: 170px; width: 500px; height: 1000px; border-radius: 76px; background: #050508; border: 2px solid rgba(255,255,255,0.14); box-shadow: 0 50px 120px rgba(0,0,0,0.7), 0 0 90px rgba(124,58,237,0.25); }
+  .lk .sc { position: absolute; inset: 12px; border-radius: 64px; overflow: hidden; background: radial-gradient(ellipse 90% 60% at 30% 10%, rgba(124,58,237,0.55), transparent 60%), radial-gradient(ellipse 80% 50% at 90% 100%, rgba(59,130,246,0.35), transparent 60%), #0b0916; }
+  .lk .isl { position: absolute; left: 50%; top: 16px; width: 130px; height: 38px; margin-left: -65px; border-radius: 20px; background: #000; }
+  .lk .tm { position: absolute; left: 0; right: 0; top: 90px; text-align: center; font-size: 120px; font-weight: 600; letter-spacing: -0.03em; color: #f5f3ff; line-height: 1; }
+  .lk .dt { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font-size: 24px; font-weight: 600; color: #ddd6fe; }
+  .lk .ns { position: absolute; left: 18px; right: 18px; top: 260px; display: flex; flex-direction: column; gap: 12px; }
+  .nt { display: flex; gap: 14px; align-items: center; padding: 16px 18px; border-radius: 26px; background: rgba(40,36,58,0.82); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); }
+  .nt .ai { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; background: #0b0b10; flex-shrink: 0; }
+  .nt .ai img { width: 36px; height: 36px; object-fit: contain; }
+  .nt .tx { flex: 1; min-width: 0; } .nt b { display: block; font-size: 20px; color: #fff; } .nt em { display: block; font-style: normal; font-size: 18px; color: #cbd5e1; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nt i { font-style: normal; font-size: 15px; color: #a5a3b8; align-self: flex-start; }
+  .lk .none { position: absolute; left: 0; right: 0; top: 520px; text-align: center; font-size: 26px; color: rgba(221,214,254,0.45); }
+  .lock .tag { left: 650px; top: 400px; }
+  .lock .side { left: 650px; width: 340px; top: 490px; font-weight: 900; font-size: 58px; line-height: 1.04; letter-spacing: -0.04em; color: #fff; text-wrap: balance; }
+  .lock .sub { left: 650px; width: 330px; top: 860px; font-size: 26px; line-height: 1.45; color: var(--muted); }
+
+  /* report card */
+  .rc { left: 150px; width: 780px; top: 180px; padding: 50px 54px 44px; border-radius: 10px; background: #f8f6f0; color: #1c1917; transform: rotate(-1.5deg); box-shadow: 0 50px 110px rgba(0,0,0,0.65), 0 0 90px rgba(124,58,237,0.16); }
+  .rc .t { font-size: 44px; font-weight: 900; letter-spacing: 0.14em; }
+  .rc .m { margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 20px; color: #57534e; }
+  .rc hr { border: 0; border-top: 3px solid #1c1917; margin: 24px 0 8px; }
+  .rc .row { display: flex; align-items: center; justify-content: space-between; height: 78px; border-bottom: 1px solid #d6d3d1; font-size: 30px; font-weight: 600; }
+  .rc .row span:first-child em { font-style: normal; display: block; font-size: 19px; font-weight: 500; color: #78716c; margin-top: 2px; }
+  .gr { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 32px; font-weight: 900; border: 3px solid currentColor; }
+  .gr.F { color: #dc2626; } .gr.D { color: #ea580c; } .gr.C { color: #ca8a04; } .gr.A { color: #7c3aed; }
+  .rc .cm { margin-top: 22px; font-size: 26px; font-style: italic; color: #44403c; line-height: 1.45; background: repeating-linear-gradient(transparent 0 36px, #e7e5e4 36px 38px); padding-top: 2px; }
+  .rc .cm b { font-style: normal; font-size: 18px; letter-spacing: 0.12em; color: #78716c; display: block; margin-bottom: 4px; }
+  .ov { position: absolute; right: 44px; top: 34px; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; font-size: 80px; font-weight: 900; transform: rotate(-10deg); border: 7px solid currentColor; }
+  .ov.bad { color: #dc2626; } .ov.good { color: #7c3aed; box-shadow: 0 0 40px rgba(124,58,237,0.25); }
+
   /* cta */
   .cta h2 { left: 96px; width: 888px; top: 380px; font-weight: 900; font-size: 108px; line-height: 1; letter-spacing: -0.05em; color: #fff; text-wrap: balance; }
   .cta p { left: 96px; width: 820px; top: 740px; font-size: 38px; line-height: 1.4; font-weight: 500; color: var(--muted); }
@@ -198,6 +251,11 @@
       ${[['old', -12, 150, 60], ['ghost', 0, 360, 20], ['new', 12, 570, 60]].map(([k, r, x, y], j) => `<div class="abs card" style="left:${x}px;top:${y}px;width:360px;height:450px;border-radius:30px;transform:rotate(${r}deg);z-index:${j === 2 ? 3 : j}"><div class="ph" style="height:450px">${mini(k)}</div>
         <div class="abs" style="left:24px;bottom:22px;z-index:2;font-size:34px;font-weight:900;color:#fff">${['Oldie', 'Ghost', 'Dar Kader'][j]}</div>
         ${j === 2 ? '<div class="vstamp like" style="font-size:44px;top:30px;right:20px;border-width:5px;padding:4px 14px">LIKE</div>' : '<div class="vstamp nope" style="font-size:44px;top:30px;left:20px;border-width:5px;padding:4px 14px">NOPE</div>'}</div>`).join('')}</div>`;
+    if (s.visual === 'serp') return `<div class="abs cv"><div class="abs sbox" style="top:30px">${svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>', '#9aa0a6', 34, 2.4)}riad marrakech medina</div>
+      <div class="abs res" style="top:170px"><div class="r faded"><div class="site"><span class="fav">Y</span><div><b>Your business</b><em>yourbusiness.ma</em></div></div><h3>Welcome to our website!!!</h3><p>Page 5 of 5 · Last updated 2016</p><span class="you-tag">PAGE 5</span></div></div></div>`;
+    if (s.visual === 'lock') return `<div class="abs cv">${lockPhone([{ t: 'New booking', b: 'Sunset Suite · 12–16 Oct' }, { t: 'Payment received', b: '5,800 MAD' }, { t: 'New review ★★★★★', b: '“Perfect stay!”' }], 'left:290px;top:0px;width:500px;height:1000px;transform:scale(0.5);transform-origin:50% 0')}</div>`;
+    if (s.visual === 'report') return `<div class="abs cv" style="-webkit-mask-image:linear-gradient(#000 60%,transparent 98%);mask-image:linear-gradient(#000 60%,transparent 98%)"><div class="abs rc" style="top:40px;transform:rotate(3deg)"><div class="t">REPORT CARD</div><div class="m">Student: Your website · Term 2026</div><hr/>
+      <div class="row"><span>Speed</span><span class="gr F">F</span></div><div class="row"><span>Mobile</span><span class="gr D">D</span></div><div class="row"><span>Google</span><span class="gr F">F</span></div><div class="ov bad">F</div></div></div>`;
     return '';
   };
   const receipt = (s) => `<div class="abs paper ${s.variant}">
@@ -226,6 +284,25 @@
       <div class="lb" style="left:230px">${s.left}</div><div class="lb" style="left:520px">${s.right}</div>
       <div class="abs p">${s.body}</div>`;
 
+
+  const SEARCH = '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>';
+  const serp = (s) => `<div class="abs sbox">${svg(SEARCH, '#9aa0a6', 34, 2.4)}${s.query}</div>
+      <div class="abs sinfo">${s.info || 'About 1,240,000 results'}</div>
+      <div class="abs res">${s.results.map((r) => `<div class="r ${r.you ? 'you' : ''} ${r.faded ? 'faded' : ''}">
+        <div class="site"><span class="fav">${r.icon || r.name[0]}</span><div><b>${r.name}</b><em>${r.url}</em></div></div>
+        <h3>${r.title}</h3><p>${r.stars ? `<span class="stars">★★★★★</span> ${r.stars} · ` : ''}${r.text}</p>${r.tag ? `<span class="you-tag">${r.tag}</span>` : ''}</div>`).join('')}</div>
+      ${s.page ? `<div class="abs pages">${[1, 2, 3, 4, 5].map((k) => `<span class="${k === s.page ? 'on' : ''}">${k}</span>`).join('')}<span style="width:auto">Next ›</span></div>` : ''}
+      <div class="abs cap">${s.caption}</div>`;
+  const APP = '<img src="assets/brand-icon-transparent.webp" alt="" />';
+  const lockPhone = (notifs, style = '') => `<div class="abs lk" style="${style}"><div class="sc"><div class="isl"></div>
+      <div class="dt">Tuesday, 12 October</div><div class="tm">9:41</div>
+      ${notifs.length ? `<div class="ns">${notifs.map((x) => `<div class="nt"><span class="ai">${APP}</span><div class="tx"><b>${x.t}</b><em>${x.b}</em></div><i>${x.w || 'now'}</i></div>`).join('')}</div>` : '<div class="none">No notifications</div>'}</div></div>`;
+  const lockSlide = (s) => `${lockPhone(s.notifs)}<div class="abs tag ${s.tone}"><i></i>${s.tag}</div><div class="abs side">${s.title}</div><div class="abs sub">${s.body}</div>`;
+  const report = (s) => `<div class="abs rc"><div class="t">REPORT CARD</div><div class="m">Student: ${s.student} · Term 2026</div><hr/>
+      ${s.rows.map((r) => `<div class="row"><span>${r.s}<em>${r.n}</em></span><span class="gr ${r.g[0]}">${r.g}</span></div>`).join('')}
+      <div class="cm"><b>TEACHER'S COMMENT</b>${s.comment}</div>
+      <div class="ov ${s.tone}">${s.overall}</div></div>`;
+
   document.getElementById('deck').innerHTML = D.slides.map((s, i) => {
     const back = `<div class="abs glow"></div><div class="abs grid"></div>
       <div class="abs head"><span class="series">${D.series}<i></i></span><span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span></div>`;
@@ -237,6 +314,9 @@
     else if (s.kind === 'quote') body = `<div class="abs mark">“</div><div class="abs q">${s.text}</div><div class="abs by">${s.by || ''}</div>`;
     else if (s.kind === 'profile') body = profile(s);
     else if (s.kind === 'match') body = match(s);
+    else if (s.kind === 'serp') body = serp(s);
+    else if (s.kind === 'lock') body = lockSlide(s);
+    else if (s.kind === 'report') body = report(s);
     else body = `<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>`;
     return `<section class="slide ${s.kind}">${back}${body}${front}</section>`;
   }).join('');

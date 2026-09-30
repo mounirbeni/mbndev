@@ -1,0 +1,13 @@
+{
+  "series": "REPORT CARD",
+  "slides": [
+    { "kind": "cover", "visual": "report", "kicker": "Grading season", "title": "What grade would <span class=\"grad\">your website get?</span>" },
+    { "kind": "report", "tone": "bad", "student": "Your website", "overall": "F",
+      "rows": [ { "s": "Speed", "n": "9 seconds to load", "g": "F" }, { "s": "Mobile", "n": "Pinch, zoom, give up", "g": "D" }, { "s": "Google", "n": "Page 5", "g": "F" }, { "s": "Design", "n": "Last updated 2014", "g": "C" }, { "s": "Contact", "n": "Hidden in the footer", "g": "D" }, { "s": "Security", "n": "No padlock", "g": "F" } ],
+      "comment": "Has potential. Needs to try much harder." },
+    { "kind": "report", "tone": "good", "student": "Your website by MBN DEV", "overall": "A+",
+      "rows": [ { "s": "Speed", "n": "Loads in under a second", "g": "A+" }, { "s": "Mobile", "n": "Designed for phones first", "g": "A+" }, { "s": "Google", "n": "SEO from day one", "g": "A" }, { "s": "Design", "n": "Made for your brand", "g": "A+" }, { "s": "Contact", "n": "WhatsApp in one tap", "g": "A+" }, { "s": "Security", "n": "SSL, backups, updates", "g": "A" } ],
+      "comment": "Top of the class. A pleasure to visit." },
+    { "kind": "cta", "title": "Want your website <span class=\"hl\">graded?</span>", "body": "Send us your link. We'll tell you where it scores — and how to fix it.", "button": "DM us “GRADE” · mbndev.ma" }
+  ]
+}

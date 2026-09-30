@@ -1,0 +1,19 @@
+{
+  "series": "NOTIFICATIONS",
+  "slides": [
+    { "kind": "cover", "visual": "lock", "kicker": "Your phone, tomorrow morning", "title": "What does your website <span class=\"grad\">send you?</span>" },
+    { "kind": "lock", "tone": "bad", "tag": "Broken website", "notifs": [], "title": "Silence.", "body": "No bookings, no messages, no leads. Just a website that exists." },
+    { "kind": "lock", "tone": "good", "tag": "Working website", "title": "It works while you sleep.",
+      "body": "Bookings, payments, reviews and messages — straight to your phone.",
+      "notifs": [
+        { "t": "New booking", "b": "Sunset Suite · 12–16 Oct", "w": "2m" },
+        { "t": "Payment received", "b": "5,800 MAD · Sara El Amrani", "w": "2m" },
+        { "t": "New review ★★★★★", "b": "“The most beautiful stay of our trip.”", "w": "1h" },
+        { "t": "New message", "b": "Can we check in a little early?", "w": "3h" },
+        { "t": "New request", "b": "Airport pickup · 2 guests", "w": "5h" },
+        { "t": "Weekly report", "b": "1,284 visitors · 23 bookings", "w": "7h" }
+      ] },
+    { "kind": "quote", "text": "Your website is your only employee who <span class=\"hl\">never sleeps.</span>", "by": "— MBN DEV" },
+    { "kind": "cta", "title": "Want to wake up to <span class=\"hl\">notifications?</span>", "body": "We build websites with booking, payments and a dashboard that keep you posted.", "button": "DM us “NOTIFY” · mbndev.ma" }
+  ]
+}
