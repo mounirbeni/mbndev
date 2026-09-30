@@ -1,0 +1,14 @@
+{
+  "series": "THE HIDDEN RECEIPT",
+  "slides": [
+    { "kind": "cover", "visual": "receipt", "kicker": "Before you pick the cheapest option", "title": "Every cheap website comes with <span class=\"grad\">a hidden receipt.</span>" },
+    { "kind": "receipt", "variant": "bad", "store": "CHEAP WEBSITE CO.", "sub": "Receipt #000419 · No refunds",
+      "items": [ { "l": "Website (template)", "r": "1,500 MAD" }, { "l": "Looks like 1,000 others", "r": "-Trust", "neg": true }, { "l": "Slow on mobile", "r": "-Visitors", "neg": true }, { "l": "Not on Google", "r": "-Clients", "neg": true }, { "l": "No WhatsApp, no booking", "r": "-Messages", "neg": true }, { "l": "Rebuild in a year", "r": "Pay again", "neg": true } ],
+      "total": "More than you saved", "stamp": "PAID TWICE", "thanks": "Thank you for your visit." },
+    { "kind": "quote", "text": "Cheap is what you pay once. <span class=\"hl\">Expensive</span> is what you lose every day.", "by": "— THE HIDDEN RECEIPT" },
+    { "kind": "receipt", "variant": "good", "store": "MBN DEV", "sub": "Receipt #000420 · Built to last",
+      "items": [ { "l": "Custom design", "r": "Yours only" }, { "l": "Fast on every phone", "r": "Included" }, { "l": "SEO from day one", "r": "Included" }, { "l": "WhatsApp + booking", "r": "Included" }, { "l": "Support after launch", "r": "Included" }, { "l": "Grows with you", "r": "Always" } ],
+      "total": "An investment that pays back", "stamp": "WORTH IT", "thanks": "Thank you. See you at launch." },
+    { "kind": "cta", "title": "Ask for the <span class=\"hl\">real receipt.</span>", "body": "Tell us what you need. We'll send a clear, itemized quote — no hidden lines.", "button": "DM us “RECEIPT” · mbndev.ma" }
+  ]
+}

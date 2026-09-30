@@ -1,0 +1,16 @@
+{
+  "series": "SWIPE CHECK",
+  "slides": [
+    { "kind": "cover", "visual": "cards", "kicker": "Be honest", "title": "Would your clients <span class=\"grad\">swipe right</span> on your website?" },
+    { "kind": "profile", "verdict": "nope", "photo": "old", "name": "Oldie,", "age": "14", "loc": "Last updated: 2012",
+      "bio": "Loves pop-ups, flashing text and “Under construction” banners.", "chips": ["Loads in 9s", "Not on mobile", "No padlock"] },
+    { "kind": "profile", "verdict": "nope", "photo": "ghost", "name": "Ghost,", "age": "?", "loc": "Location unknown",
+      "bio": "Never answers. No phone, no WhatsApp, no form. Just vibes.", "chips": ["No contact", "No map", "No hours"] },
+    { "kind": "profile", "verdict": "nope", "photo": "clone", "name": "Clone,", "age": "2", "loc": "Seen it everywhere",
+      "bio": "Same template as a thousand other businesses. Nice, but forgettable.", "chips": ["Generic", "Stock photos", "Zero personality"] },
+    { "kind": "profile", "verdict": "like", "photo": "new", "name": "Dar Kader,", "age": "new", "loc": "Marrakech · 0.8s away",
+      "bio": "Fast, clear and always replies. Books you in one tap.", "chips": ["Loads in 0.8s", "Mobile-first", "WhatsApp", "Online booking"] },
+    { "kind": "match", "title": "It's a match!", "left": "Your business", "right": "Your clients", "body": "When your website feels right, clients stay, book — and come back." },
+    { "kind": "cta", "title": "Let's make your clients <span class=\"hl\">swipe right.</span>", "body": "We design websites people actually want to stay on.", "button": "DM us “MATCH” · mbndev.ma" }
+  ]
+}

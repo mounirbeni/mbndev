@@ -1,0 +1,25 @@
+{
+  "series": "IF YOUR WEBSITE COULD TEXT",
+  "slides": [
+    { "kind": "cover", "visual": "chat", "kicker": "Imagine this for a second", "title": "If your website could <span class=\"grad\">text your clients…</span>" },
+    { "kind": "chat", "tone": "bad", "tag": "A slow website", "status": "last seen a while ago",
+      "msgs": [ { "from": "v", "t": "Hi! Any rooms free this weekend?" }, { "from": "typing" }, { "from": "sys", "t": "9 seconds later", "red": false }, { "from": "sys", "t": "Visitor left the chat", "red": true } ],
+      "caption": "Slow site. Conversation over." },
+    { "kind": "chat", "tone": "good", "tag": "A fast website", "status": "online · replies instantly",
+      "msgs": [ { "from": "v", "t": "Hi! Any rooms free this weekend?" }, { "from": "w", "t": "Yes! 2 rooms left for Sat–Sun. Want me to hold one?" }, { "from": "v", "t": "Yes please." }, { "from": "w", "t": "Done. Confirmation sent to your email." } ],
+      "caption": "Fast answers. Real bookings." },
+    { "kind": "chat", "tone": "bad", "tag": "Hidden contact", "status": "last seen a while ago",
+      "msgs": [ { "from": "v", "t": "How can I reach you?" }, { "from": "w", "t": "Scroll to the footer, find “Contact”, fill 9 fields and wait 3–5 business days." }, { "from": "v", "t": "…never mind." } ],
+      "caption": "Every extra step loses someone." },
+    { "kind": "chat", "tone": "good", "tag": "One-tap contact", "status": "online · replies instantly",
+      "msgs": [ { "from": "v", "t": "How can I reach you?" }, { "from": "w", "t": "Right here. WhatsApp, call or email — whatever you prefer." }, { "from": "btn", "t": "Open WhatsApp" } ],
+      "caption": "One tap. That's the whole journey." },
+    { "kind": "chat", "tone": "bad", "tag": "Not built for phones", "status": "last seen a while ago",
+      "msgs": [ { "from": "v", "t": "Why is everything so tiny on my phone?" }, { "from": "w", "t": "Please zoom in. Or try on a computer." }, { "from": "sys", "t": "Visitor left the chat", "red": true } ],
+      "caption": "Your clients are on their phones. Is your site?" },
+    { "kind": "chat", "tone": "good", "tag": "Built for phones", "status": "online · replies instantly",
+      "msgs": [ { "from": "v", "t": "Wow, this looks great on my phone." }, { "from": "w", "t": "I was designed for it. Every screen, every size." } ],
+      "caption": "Mobile first. Not mobile later." },
+    { "kind": "cta", "title": "Want a website that <span class=\"hl\">talks back?</span>", "body": "Fast, mobile-first websites that turn visitors into clients.", "button": "DM us “TEXT” · mbndev.ma" }
+  ]
+}
