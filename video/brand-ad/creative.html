@@ -236,6 +236,67 @@
   .splitbox .ln { position: absolute; top: 0; bottom: 0; left: 50%; width: 5px; margin-left: -2.5px; background: #fff; box-shadow: 0 0 24px rgba(196,181,253,0.9); z-index: 4; }
   .splitbox .hd { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 0 30px rgba(168,85,247,0.8); z-index: 5; }
 
+
+  /* ── object formats ── */
+  .hdl { left: 96px; width: 888px; top: 190px; font-weight: 900; font-size: 84px; line-height: 1.02; letter-spacing: -0.045em; color: #fff; text-wrap: balance; }
+  .ctr2 { left: 96px; right: 96px; text-align: center; font-size: 30px; line-height: 1.45; color: var(--muted); font-weight: 500; }
+  /* boarding pass */
+  .bp { left: 96px; width: 888px; top: 440px; height: 560px; border-radius: 34px; background: #f5f3ff; color: #1e1033; transform: rotate(-2.5deg); box-shadow: 0 50px 110px rgba(0,0,0,0.65), 0 0 90px rgba(124,58,237,0.25); overflow: hidden; }
+  .bp .top { height: 96px; background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 36px; font-family: 'JetBrains Mono', monospace; font-size: 22px; letter-spacing: 0.14em; }
+  .bp .main { position: absolute; left: 0; top: 96px; bottom: 0; width: 620px; padding: 30px 36px; }
+  .bp .stub { position: absolute; left: 620px; right: 0; top: 96px; bottom: 0; padding: 30px 30px; border-left: 3px dashed #c4b5fd; }
+  .bp .cut { position: absolute; left: 602px; width: 36px; height: 36px; border-radius: 50%; background: #08080b; }
+  .bp .lbl { font-family: 'JetBrains Mono', monospace; font-size: 17px; letter-spacing: 0.12em; color: #7c6f99; }
+  .bp .big { white-space: nowrap; font-size: 62px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; margin-top: 6px; color: #1e1033; position: static; width: auto; }
+  .bp .route { display: flex; align-items: center; justify-content: space-between; }
+  .bp .fields { display: grid; grid-template-columns: 1.35fr 1fr 0.8fr; gap: 18px 16px; margin-top: 30px; }
+  .bp .fields b { display: block; white-space: nowrap; font-size: 26px; font-weight: 800; margin-top: 4px; color: #1e1033; }
+  .bp .code { height: 110px; margin-top: 26px; background: repeating-linear-gradient(90deg, #1e1033 0 3px, transparent 3px 6px, #1e1033 6px 10px, transparent 10px 12px, #1e1033 12px 13px, transparent 13px 17px); }
+  /* weather */
+  .wx { left: 96px; right: 96px; top: 390px; height: 700px; border-radius: 44px; padding: 44px 48px; background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)); border: 1px solid rgba(255,255,255,0.12); box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 40px 100px rgba(0,0,0,0.5), 0 0 80px rgba(124,58,237,0.15); }
+  .wx .loc { font-size: 28px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .wx .now { display: flex; align-items: center; gap: 30px; margin-top: 10px; }
+  .wx .deg { font-size: 210px; font-weight: 800; letter-spacing: -0.06em; color: #fff; line-height: 1; }
+  .wx .cond { font-size: 30px; color: #cbd5e1; margin-top: 4px; }
+  .wx .days { position: absolute; left: 48px; right: 48px; bottom: 44px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .wx .day { height: 230px; border-radius: 28px; background: rgba(255,255,255,0.04); border: 1px solid var(--hair); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 22px 0; }
+  .wx .day.on { background: rgba(124,58,237,0.18); border-color: rgba(168,85,247,0.6); box-shadow: 0 0 34px rgba(124,58,237,0.35); }
+  .wx .day b { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 500; color: var(--muted); letter-spacing: 0.1em; }
+  .wx .day span { font-size: 34px; font-weight: 800; color: #fff; }
+  .wx .day em { font-style: normal; font-size: 16px; color: var(--lav); font-weight: 700; letter-spacing: 0.08em; }
+  /* movie poster */
+  .pst-glow { left: 540px; top: 660px; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(220,38,38,0.28) 0%, rgba(124,58,237,0.2) 35%, transparent 65%); }
+  .pst-ring { left: 540px; top: 560px; width: 380px; height: 380px; margin: -190px 0 0 -190px; border-radius: 50%; border: 22px solid rgba(255,255,255,0.06); border-top-color: #ef4444; border-right-color: rgba(239,68,68,0.45); box-shadow: 0 0 80px rgba(239,68,68,0.45), inset 0 0 60px rgba(239,68,68,0.25); transform: rotate(-30deg); }
+  .pst-pre { left: 0; right: 0; top: 190px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 22px; letter-spacing: 0.4em; color: #fca5a5; }
+  .pst-pct { left: 0; right: 0; top: 520px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 64px; color: #fecaca; }
+  .pst-t { left: 60px; right: 60px; top: 745px; text-align: center; font-size: 132px; font-weight: 900; letter-spacing: -0.05em; line-height: 0.9; color: #fff; text-shadow: 0 0 40px rgba(239,68,68,0.5); }
+  .pst-tag { left: 96px; right: 96px; top: 1000px; text-align: center; font-size: 28px; font-style: italic; color: #fca5a5; }
+  .pst-cred { left: 96px; right: 96px; top: 1070px; text-align: center; font-size: 17px; line-height: 1.5; letter-spacing: 0.12em; text-transform: uppercase; color: #94a3b8; }
+  .pst-cred b { color: #e2e8f0; font-weight: 800; }
+  /* nutrition label */
+  .nf { left: 280px; width: 520px; top: 420px; padding: 22px 26px 24px; background: #fff; color: #000; border: 6px solid #000; transform: rotate(2deg); box-shadow: 0 50px 110px rgba(0,0,0,0.65), 0 0 90px rgba(124,58,237,0.25); font-family: 'Inter', sans-serif; }
+  .nf h4 { font-size: 58px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; }
+  .nf .sv { font-size: 20px; margin-top: 6px; } .nf .sv b { font-weight: 800; }
+  .nf .r1 { height: 16px; background: #000; margin: 10px 0 6px; } .nf .r2 { height: 7px; background: #000; margin: 6px 0; } .nf .r3 { height: 2px; background: #000; margin: 4px 0; }
+  .nf .amt { font-size: 18px; font-weight: 800; }
+  .nf .cal { display: flex; justify-content: space-between; align-items: baseline; font-size: 40px; font-weight: 900; }
+  .nf .row { display: flex; justify-content: space-between; font-size: 21px; padding: 6px 0; border-top: 1.5px solid #000; }
+  .nf .row b { font-weight: 800; } .nf .row.in { padding-left: 22px; }
+  .nf .ft { font-size: 16px; line-height: 1.4; margin-top: 8px; }
+  .nf-side { left: 96px; top: 190px; width: 888px; }
+  /* battery */
+  .bat { position: absolute; left: 190px; width: 640px; height: 250px; border-radius: 50px; border: 10px solid rgba(255,255,255,0.8); padding: 14px; }
+  .bat::after { content: ''; position: absolute; right: -44px; top: 72px; width: 26px; height: 86px; border-radius: 0 16px 16px 0; background: rgba(255,255,255,0.8); }
+  .bat i { display: block; height: 100%; border-radius: 34px; }
+  .bat-l { position: absolute; left: 190px; font-size: 30px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 14px; }
+  .bat-l span { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 26px; }
+  /* keyboard keys */
+  .kc { position: absolute; top: 330px; height: 300px; border-radius: 46px; display: grid; place-items: center; font-size: 110px; font-weight: 800; color: #f5f3ff; letter-spacing: -0.02em;
+    background: linear-gradient(180deg, #2a2440 0%, #17142a 100%); border: 2px solid rgba(196,181,253,0.35);
+    box-shadow: 0 22px 0 #0c0a16, 0 24px 0 rgba(168,85,247,0.35), 0 60px 90px rgba(0,0,0,0.6), 0 0 90px rgba(124,58,237,0.35), inset 0 2px 0 rgba(255,255,255,0.18); }
+  .kc small { position: absolute; left: 34px; top: 26px; font-size: 26px; font-weight: 600; color: var(--lav); }
+  .kplus { position: absolute; left: 0; right: 0; top: 440px; text-align: center; font-size: 90px; font-weight: 300; color: var(--dim); }
+
   /* cta */
   .cta h2 { left: 96px; width: 888px; top: 380px; font-weight: 900; font-size: 108px; line-height: 1; letter-spacing: -0.05em; color: #fff; text-wrap: balance; }
   .cta p { left: 96px; width: 820px; top: 740px; font-size: 38px; line-height: 1.4; font-weight: 500; color: var(--muted); }
@@ -344,6 +405,40 @@
       <i class="ln"></i><span class="hd">${svg('<path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/>', '#6d28d9', 44, 2.6)}</span></div>
       <div class="abs big" style="top:880px">${s.title}</div>`;
 
+
+  const PLANE = '<path d="M2 16l20-6-20-6 3 6-3 6z"/><path d="M5 10h8"/>';
+  const SUN = '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>';
+  const RAIN = '<path d="M7 15a4.5 4.5 0 1 1 1.2-8.8A6 6 0 0 1 19.5 9 3.5 3.5 0 0 1 18 15z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/>';
+  const BOLT = '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>';
+  const obj = {
+    pass: (s) => `<div class="abs hdl">${s.title}</div>
+      <div class="abs bp"><div class="top"><span>MBN DEV · BOARDING PASS</span>${svg(PLANE, '#fff', 34, 2)}</div>
+        <div class="main"><div class="route"><div><div class="lbl">FROM</div><div class="big">PAGE 5</div></div>${svg(PLANE, '#7c3aed', 60, 1.8)}<div><div class="lbl">TO</div><div class="big">PAGE 1</div></div></div>
+          <div class="fields"><div><div class="lbl">PASSENGER</div><b>Your business</b></div><div><div class="lbl">FLIGHT</div><b>MBN-2026</b></div><div><div class="lbl">GATE</div><b>SEO</b></div>
+          <div><div class="lbl">SEAT</div><b>#1</b></div><div><div class="lbl">CLASS</div><b>First</b></div><div><div class="lbl">BOARDING</div><b style="color:#7c3aed">NOW</b></div></div></div>
+        <div class="stub"><div class="lbl">PASSENGER</div><b style="display:block;font-size:22px;font-weight:800;margin-top:4px;white-space:nowrap">Your business</b><div class="lbl" style="margin-top:20px">ROUTE</div><b style="display:block;font-size:24px;font-weight:800;margin-top:4px">P5 → P1</b><div class="code"></div></div>
+        <i class="cut" style="top:78px"></i><i class="cut" style="bottom:-18px"></i></div>
+      <div class="abs ctr2" style="top:1090px">${s.body}</div>`,
+    weather: (s) => `<div class="abs hdl">${s.title}</div>
+      <div class="abs wx"><div class="loc">${svg(PIN, '#c4b5fd', 30, 2)}yourbusiness.ma</div>
+        <div class="now"><div class="deg">9s</div><div>${svg(RAIN, '#94a3b8', 150, 1.4)}<div class="cond">Heavy load · visitors leaving</div></div></div>
+        <div class="days">${s.days.map((d) => `<div class="day ${d.on ? 'on' : ''}"><b>${d.d}</b>${svg(d.sun ? SUN : RAIN, d.sun ? '#fbbf24' : '#94a3b8', 58, 1.8)}<span>${d.t}</span><em>${d.note || '&nbsp;'}</em></div>`).join('')}</div></div>
+      <div class="abs ctr2" style="top:1118px">${s.body}</div>`,
+    poster: (s) => `<div class="abs pst-glow"></div><div class="abs pst-pre">MBN DEV PRESENTS</div><div class="abs pst-ring"></div><div class="abs pst-pct">12%</div>
+      <div class="abs pst-t">${s.title}</div><div class="abs pst-tag">${s.tagline}</div><div class="abs pst-cred">${s.credits}</div>`,
+    nutrition: (s) => `<div class="abs hdl">${s.title}</div><div class="abs nf"><h4>Website Facts</h4><div class="sv">Serving size <b>1 visit</b></div><div class="r1"></div>
+        <div class="amt">Amount per visit</div><div class="cal"><span>Load time</span><span>0.8s</span></div><div class="r2"></div>
+        ${s.rows.map((r) => `<div class="row ${r.in ? 'in' : ''}"><span><b>${r.l}</b>${r.v ? ' ' + r.v : ''}</span><b>${r.p}</b></div>`).join('')}
+        <div class="r2"></div><div class="ft">${s.foot}</div></div>`,
+    battery: (s) => `<div class="abs hdl">${s.title}</div>
+      <div class="bat-l" style="top:430px">${svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v.5"/>', '#f87171', 34, 2.4)}Your website now <span style="color:#f87171">12%</span></div>
+      <div class="bat" style="top:490px"><i style="width:12%;background:#ef4444;box-shadow:0 0 30px rgba(239,68,68,0.6)"></i></div>
+      <div class="bat-l" style="top:800px">${svg(BOLT, '#c4b5fd', 34, 2)}After MBN DEV <span style="color:#c4b5fd">100%</span></div>
+      <div class="bat" style="top:860px;border-color:#c4b5fd"><i style="width:100%;background:linear-gradient(90deg,#7c3aed,#a855f7,#3b82f6);box-shadow:0 0 40px rgba(168,85,247,0.6)"></i></div>`,
+    keys: (s) => `<div class="kc" style="left:120px;width:420px"><small>ctrl</small>Ctrl</div><div class="kplus">+</div><div class="kc" style="left:640px;width:300px">Z</div>
+      <div class="abs hdl" style="top:760px">${s.title}</div><div class="abs ctr2" style="top:1010px;text-align:left">${s.body}</div>`,
+  };
+
   document.getElementById('deck').innerHTML = D.slides.map((s, i) => {
     const back = `<div class="abs glow"></div><div class="abs grid"></div>
       <div class="abs head"><span class="series">${s.series || D.series}<i></i></span>${D.single ? '<span class="count">mbndev.ma</span>' : `<span class="count">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>`}</div>`;
@@ -360,6 +455,7 @@
     else if (s.kind === 'loading') body = loading(s);
     else if (s.kind === 'code') body = code(s);
     else if (s.kind === 'split') body = split(s);
+    else if (obj[s.kind]) body = obj[s.kind](s);
     else if (s.kind === 'lock') body = lockSlide(s);
     else if (s.kind === 'report') body = report(s);
     else body = `<h2 class="abs">${s.title}</h2><p class="abs">${s.body}</p><span class="abs btn">${s.button}</span>`;

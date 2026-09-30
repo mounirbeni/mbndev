@@ -1,0 +1,104 @@
+{
+  "series": "MBN DEV",
+  "single": true,
+  "slides": [
+    {
+      "kind": "pass",
+      "series": "NOW BOARDING",
+      "title": "Your ticket from page 5 <span class=\"hl\">to page 1.</span>",
+      "body": "Fast, clear, built for Google from day one. DM us “PAGE1”."
+    },
+    {
+      "kind": "weather",
+      "series": "FORECAST",
+      "title": "Your website's <span class=\"hl\">forecast.</span>",
+      "days": [
+        {
+          "d": "MON",
+          "t": "9s"
+        },
+        {
+          "d": "TUE",
+          "t": "8s"
+        },
+        {
+          "d": "WED",
+          "t": "0.8s",
+          "sun": true,
+          "on": true,
+          "note": "LAUNCH"
+        },
+        {
+          "d": "THU",
+          "t": "0.8s",
+          "sun": true
+        },
+        {
+          "d": "FRI",
+          "t": "0.7s",
+          "sun": true
+        }
+      ],
+      "body": "Clear skies from launch day. Load times, not temperatures."
+    },
+    {
+      "kind": "poster",
+      "series": "NOW SHOWING",
+      "title": "THE SLOW<br/>WEBSITE",
+      "tagline": "Every second, another client disappears.",
+      "credits": "<b>Starring</b> 9-second loading · a broken contact form &nbsp;·&nbsp; <b>Directed by</b> a cheap template &nbsp;·&nbsp; <b>Music by</b> silence<br/><b>Now playing on a website near you</b> · mbndev.ma"
+    },
+    {
+      "kind": "nutrition",
+      "series": "READ THE LABEL",
+      "rows": [
+        {
+          "l": "Mobile-ready",
+          "p": "100%"
+        },
+        {
+          "l": "SEO",
+          "v": "from day one",
+          "p": "100%"
+        },
+        {
+          "l": "Custom design",
+          "p": "100%"
+        },
+        {
+          "l": "WhatsApp & booking",
+          "p": "100%"
+        },
+        {
+          "l": "Pop-ups",
+          "p": "0%"
+        },
+        {
+          "l": "Bloat",
+          "v": "0g",
+          "p": "0%",
+          "in": true
+        },
+        {
+          "l": "Stock photos",
+          "v": "0g",
+          "p": "0%",
+          "in": true
+        }
+      ],
+      "foot": "Contains: clean code, fast hosting, real support.<br/><b>May cause:</b> more bookings, more calls, fewer excuses.",
+      "title": "Read the label before you <span class=\"hl\">buy a website.</span>"
+    },
+    {
+      "kind": "battery",
+      "series": "LOW POWER MODE",
+      "title": "Is your website in <span class=\"hl\">low power mode?</span>"
+    },
+    {
+      "kind": "keys",
+      "series": "FIRST IMPRESSIONS",
+      "title": "There's no Ctrl+Z for <span class=\"hl\">a first impression.</span>",
+      "body": "Visitors decide in seconds. Get it right the first time — we build websites that do."
+    }
+  ]
+}
