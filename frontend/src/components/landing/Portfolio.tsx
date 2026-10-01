@@ -85,10 +85,10 @@ export default function Portfolio() {
               initial={{ opacity: 0, y: 28 }}
               animate={headerInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.04] tracking-tight"
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.04] tracking-[-0.035em]"
             >
               {t('portfolio.title')}{' '}
-              <span className="gradient-text">{t('portfolio.title.bold')}</span>
+              <span className="serif-accent silk-text pr-[0.06em]">{t('portfolio.title.bold')}</span>
             </motion.h2>
 
             <motion.p

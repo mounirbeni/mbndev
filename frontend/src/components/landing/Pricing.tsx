@@ -110,10 +110,10 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 24 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-5 tracking-tight leading-[1.04]"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-5 tracking-[-0.035em] leading-[1.04]"
           >
             {t('pricing.title.simple')}{' '}
-            <span className="gradient-text">{t('pricing.title.bold')}</span>
+            <span className="serif-accent silk-text pr-[0.06em]">{t('pricing.title.bold')}</span>
             <br className="hidden sm:block" />
             <span className="text-slate-500 font-semibold text-4xl sm:text-5xl lg:text-6xl">{t('pricing.title.end')}</span>
           </motion.h2>
@@ -124,7 +124,10 @@ export default function Pricing() {
             transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-slate-500 max-w-lg mx-auto text-lg leading-relaxed"
           >
-            {t('pricing.subtitle')}
+            {t('pricing.subtitle').replace(
+              '{pct}',
+              `${Math.max(0, ...packages.map(p => (p.originalPrice ? discountPct(p.originalPrice, p.price) : 0)))}%`,
+            )}
           </motion.p>
         </div>
 

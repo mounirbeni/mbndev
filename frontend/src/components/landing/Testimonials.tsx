@@ -205,9 +205,9 @@ export default function Testimonials() {
           className="text-center mb-16"
         >
           <span className="section-label mb-6">{t('commit.eyebrow')}</span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 tracking-[-0.035em]">
             {t('commit.title')}{' '}
-            <span className="gradient-text">{t('commit.title.bold')}</span>
+            <span className="serif-accent silk-text pr-[0.06em]">{t('commit.title.bold')}</span>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
             {t('commit.subtitle')}

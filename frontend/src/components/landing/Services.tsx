@@ -176,7 +176,8 @@ export default function Services() {
 
           <WordReveal
             text="Our Services"
-            className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight"
+            accentLast={1}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 tracking-[-0.035em]"
             delay={0.1}
           />
 

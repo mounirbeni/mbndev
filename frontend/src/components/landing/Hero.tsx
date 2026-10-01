@@ -1,402 +1,293 @@
 'use client';
 
-import Image from 'next/image';
-import { motion, useScroll, useTransform, useMotionValue, useSpring, useInView, useReducedMotion, animate, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, animate } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowUpRight, Users, Rocket, TrendingUp, Shield, Play } from 'lucide-react';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { ArrowUpRight, Check, Play, MessageSquare } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
 import Magnetic from '@/components/ui/Magnetic';
+import SilkRibbons from '@/components/ui/SilkRibbons';
 
 const STATS = [
-  { icon: Users,      val: 50,   suffix: '+', label: 'Happy Clients'       },
-  { icon: Rocket,     val: 120,  suffix: '+', label: 'Projects Delivered'  },
-  { icon: TrendingUp, val: 98,   suffix: '%', label: 'Client Satisfaction' },
-  { icon: Shield,     val: 5,    suffix: '+', label: 'Years of Experience' },
+  { val: 50,  suffix: '+', label: 'Happy clients'       },
+  { val: 120, suffix: '+', label: 'Projects delivered'  },
+  { val: 98,  suffix: '%', label: 'Client satisfaction' },
+  { val: 5,   suffix: '+', label: 'Years of experience' },
 ];
 
-const ROTATING_PHRASES = [
-  'drive real impact.',
-  'convert more visitors.',
-  'scale your business.',
-  'stand out online.',
-];
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 function AnimatedCounter({ val, suffix }: { val: number; suffix: string }) {
   const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
 
   useEffect(() => {
     if (!inView) return;
     const controls = animate(0, val, {
       duration: 1.8,
-      ease: [0.16, 1, 0.3, 1],
+      ease: EASE,
       onUpdate: (v) => setCount(Math.round(v)),
     });
     return () => controls.stop();
   }, [inView, val]);
 
-  return <div ref={ref}>{count}{suffix}</div>;
+  return <span ref={ref}>{count}{suffix}</span>;
 }
 
-function RotatingText() {
-  const [index, setIndex] = useState(0);
+/* ── Glass mock of the client portal ─────────────────────────────────── */
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % ROTATING_PHRASES.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+const STAGES = [
+  { label: 'Brief',  note: 'Goals & pages agreed', state: 'done' },
+  { label: 'Design', note: 'Homepage approved',    state: 'done' },
+  { label: 'Build',  note: 'Menu & booking pages', state: 'active' },
+  { label: 'Review', note: 'Your feedback round',  state: 'todo' },
+  { label: 'Launch', note: 'Live on your domain',  state: 'todo' },
+] as const;
 
+function PortalPanel() {
   return (
-    <span className="relative inline-block">
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={index}
-          initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -20, filter: 'blur(4px)' }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          style={{
-            background: 'linear-gradient(135deg, #c084fc 0%, #9333ea 40%, #818cf8 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            display: 'inline-block',
-          }}
-        >
-          {ROTATING_PHRASES[index]}
-        </motion.span>
-      </AnimatePresence>
-    </span>
+    <motion.div
+      initial={{ opacity: 0, y: 40, filter: 'blur(12px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={{ duration: 1.1, delay: 0.5, ease: EASE }}
+      className="relative w-full max-w-[440px]"
+    >
+      <div className="silk-glass rounded-[22px] p-5">
+        {/* window bar */}
+        <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+          <div className="flex gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+          </div>
+          <span className="font-mono text-[10.5px] tracking-wide text-slate-500">mbndev.ma/dashboard</span>
+        </div>
+
+        {/* project row */}
+        <div className="flex items-start justify-between pt-4 pb-5">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Your project</p>
+            <p className="mt-1 text-[17px] font-semibold text-white tracking-tight">Restaurant website</p>
+          </div>
+          <span className="flex items-center gap-1.5 rounded-full border border-violet-400/25 bg-violet-500/10 px-2.5 py-1 text-[11px] font-medium text-violet-200">
+            <span className="relative flex w-1.5 h-1.5">
+              <span className="absolute inset-0 rounded-full bg-violet-300 animate-ping opacity-60" />
+              <span className="relative w-1.5 h-1.5 rounded-full bg-violet-300" />
+            </span>
+            In progress
+          </span>
+        </div>
+
+        {/* stages */}
+        <ol className="relative">
+          <span aria-hidden className="absolute left-[11px] top-3 bottom-3 w-px bg-gradient-to-b from-violet-400/60 via-violet-400/25 to-white/5" />
+          {STAGES.map((s, i) => (
+            <motion.li
+              key={s.label}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.9 + i * 0.09, ease: EASE }}
+              className="relative flex items-center gap-3.5 py-2"
+            >
+              <span
+                className={`relative z-10 flex items-center justify-center w-[23px] h-[23px] rounded-full border text-[10px] ${
+                  s.state === 'done'
+                    ? 'bg-violet-500/90 border-violet-300/60 text-white'
+                    : s.state === 'active'
+                      ? 'bg-[#120c24] border-violet-300/70 text-violet-200 shadow-[0_0_18px_rgba(168,85,247,0.55)]'
+                      : 'bg-[#0d0b16] border-white/10 text-slate-600'
+                }`}
+              >
+                {s.state === 'done' ? <Check className="w-3 h-3" strokeWidth={3} /> : i + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className={`text-[13.5px] font-semibold ${s.state === 'todo' ? 'text-slate-500' : 'text-white'}`}>{s.label}</span>
+                  <span className="font-mono text-[10.5px] text-slate-500 truncate">{s.note}</span>
+                </div>
+                {s.state === 'active' && (
+                  <div className="mt-2 h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
+                    <motion.div
+                      initial={{ width: '0%' }}
+                      animate={{ width: '68%' }}
+                      transition={{ duration: 2.2, delay: 1.5, ease: EASE }}
+                      className="h-full rounded-full bg-gradient-to-r from-[#a855f7] via-[#3b82f6] to-[#06b6d4]"
+                    />
+                  </div>
+                )}
+              </div>
+            </motion.li>
+          ))}
+        </ol>
+      </div>
+
+      {/* floating message */}
+      <motion.div
+        initial={{ opacity: 0, y: 16, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.8, delay: 2.1, ease: EASE }}
+        className="silk-glass absolute -left-14 -bottom-9 flex items-center gap-3 rounded-2xl py-3 pl-3 pr-4"
+      >
+        <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500">
+          <MessageSquare className="w-4 h-4 text-white" />
+        </span>
+        <div>
+          <p className="text-[12.5px] font-semibold text-white leading-tight">New update from your team</p>
+          <p className="font-mono text-[10.5px] text-slate-400 mt-0.5">Menu page ready for review</p>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
-function FloatingOrb({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return <div className={`absolute rounded-full pointer-events-none ${className}`} style={style} />;
-}
+/* ── Hero ────────────────────────────────────────────────────────────── */
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const reducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
+  const contentY  = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
+  const contentOp = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
+  const silkY     = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
 
-  // Multi-layer parallax at different rates for depth
-  const contentY    = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
-  const contentOp   = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const imageY      = useTransform(scrollYProgress, [0, 1], ['0%', '8%']);
-  const orbTopY     = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);  // fast
-  const orbRightY   = useTransform(scrollYProgress, [0, 1], ['0%', '15%']); // medium
-  const orbBottomY  = useTransform(scrollYProgress, [0, 1], ['0%', '-10%']); // reverse
-  const statsOp     = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const statsY      = useTransform(scrollYProgress, [0, 0.2], ['0%', '40%']);
-
-  // Cursor parallax — orbs drift horizontally toward/away from the pointer
-  const mouseX = useMotionValue(0);
-  const smoothMouseX = useSpring(mouseX, { stiffness: 50, damping: 20 });
-  const orbTopX    = useTransform(smoothMouseX, (v) => v * -44);
-  const orbRightX  = useTransform(smoothMouseX, (v) => v * 36);
-  const orbBottomX = useTransform(smoothMouseX, (v) => v * -24);
-  const headlineX  = useTransform(smoothMouseX, (v) => v * 8);
-
-  const onSectionMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    if (reducedMotion) return;
-    mouseX.set(e.clientX / window.innerWidth - 0.5);
-  }, [mouseX, reducedMotion]);
-
-  // Touch devices: drive the same parallax from the gyroscope (device tilt).
-  // On iOS 13+ orientation events need a permission gesture, so they simply
-  // never fire there — the effect degrades silently.
+  // Desktop: the ribbon sweeps behind the portal panel on the right.
+  // Mobile: it sits low, under the CTAs, so it never crosses body text.
+  const [wide, setWide] = useState(true);
   useEffect(() => {
-    if (reducedMotion) return;
-    if (!window.matchMedia('(pointer: coarse)').matches) return;
-    const onTilt = (e: DeviceOrientationEvent) => {
-      if (e.gamma == null) return;
-      mouseX.set(Math.max(-0.5, Math.min(0.5, e.gamma / 60)));
-    };
-    window.addEventListener('deviceorientation', onTilt);
-    return () => window.removeEventListener('deviceorientation', onTilt);
-  }, [mouseX, reducedMotion]);
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setWide(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
 
   return (
     <section
       ref={sectionRef}
       id="home"
-      onMouseMove={onSectionMouseMove}
-      className="relative overflow-hidden"
-      style={{ height: '100dvh', minHeight: '640px', background: '#07060f' }}
+      className="relative overflow-hidden bg-[#07060f]"
+      style={{ minHeight: '100dvh' }}
     >
-
-      {/* ── ANIMATED GRADIENT ORBS — each on its own parallax layer ──────── */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div style={{ y: orbTopY, x: orbTopX, position: 'absolute', top: '-10%', left: '-5%' }} className="animate-float-a">
-          <div style={{
-            width: 600, height: 600, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-          }} />
-        </motion.div>
-
-        <motion.div style={{ y: orbRightY, x: orbRightX, position: 'absolute', top: '20%', right: '-10%' }} className="animate-float-b">
-          <div style={{
-            width: 500, height: 500, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-          }} />
-        </motion.div>
-
-        <motion.div style={{ y: orbBottomY, x: orbBottomX, position: 'absolute', bottom: '5%', left: '30%' }} className="animate-float-a" aria-hidden="true">
-          <div style={{
-            width: 400, height: 400, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-            animationDelay: '-3s',
-          }} />
-        </motion.div>
-      </div>
-
-      {/* ── FULL-BLEED ARTWORK ────────────────────────────────────────────── */}
-      <motion.div style={{ y: imageY }} className="absolute inset-0">
-        <Image
-          src="/hero.png"
-          alt="MBN DEV"
-          fill
-          priority
-          quality={95}
-          sizes="100vw"
-          className="object-cover object-[60%_center]"
-        />
-
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(100deg, rgba(7,6,15,0.97) 0%, rgba(7,6,15,0.88) 22%, rgba(7,6,15,0.6) 42%, rgba(7,6,15,0.2) 62%, transparent 78%)',
-        }} />
-
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(to bottom, rgba(7,6,15,0.55) 0%, transparent 22%)',
-        }} />
-
-        <div className="absolute bottom-0 left-0 right-0" style={{
-          height: '45%',
-          background: 'linear-gradient(to top, rgba(7,6,15,0.98) 0%, rgba(7,6,15,0.6) 35%, transparent 70%)',
-        }} />
+      {/* ribbons */}
+      <motion.div style={{ y: silkY }} className="absolute inset-0">
+        <SilkRibbons className="absolute inset-0" anchor={wide ? [0.66, 0.42] : [0.5, 0.13]} />
       </motion.div>
 
-      {/* ── AMBIENT GRID ──────────────────────────────────────────────────── */}
-      <div className="absolute inset-0 ambient-grid opacity-[0.03] pointer-events-none" />
+      {/* readability scrims */}
+      <div aria-hidden className="absolute inset-0 pointer-events-none"
+        style={{ background: 'linear-gradient(90deg, rgba(7,6,15,0.94) 0%, rgba(7,6,15,0.72) 30%, rgba(7,6,15,0.15) 58%, transparent 75%)' }} />
+      <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
+        style={{ background: 'linear-gradient(to top, #07060f 0%, rgba(7,6,15,0.6) 45%, transparent 100%)' }} />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-32 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(7,6,15,0.7), transparent)' }} />
 
-      {/* ── CONTENT ───────────────────────────────────────────────────────── */}
       <motion.div
-        style={{ opacity: contentOp, y: contentY }}
-        className="absolute inset-0 z-10 flex flex-col"
+        style={{ y: contentY, opacity: contentOp }}
+        className="relative z-10 flex flex-col min-h-[100dvh]"
       >
-        <div className="flex-1 flex items-center px-6 sm:px-10 lg:px-14 xl:px-20 pt-20 lg:pt-24">
-          <motion.div className="max-w-[620px] w-full" style={{ x: headlineX }}>
-
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.9, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                fontSize: 'clamp(2.4rem, 4.2vw, 4.2rem)',
-                fontWeight: 900,
-                lineHeight: 1.06,
-                letterSpacing: '-0.025em',
-                marginBottom: 24,
-                color: '#fff',
-              }}
+        <div className="flex-1 w-full max-w-[1320px] mx-auto px-6 sm:px-10 lg:px-14 pt-32 pb-16 lg:pt-28 grid lg:grid-cols-[1.08fr_0.92fr] items-center gap-16">
+          {/* copy */}
+          <div className="max-w-[640px]">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: EASE }}
+              className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] pl-1.5 pr-3.5 py-1.5 backdrop-blur-md"
             >
-              We build<br />
-              digital experiences<br />
-              that <RotatingText />
+              <span className="rounded-full bg-violet-400/15 border border-violet-300/25 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-violet-200">
+                Studio
+              </span>
+              <span className="font-mono text-[11px] tracking-wide text-slate-400">
+                <span className="hidden sm:inline">Websites · SaaS · Web apps — </span>Morocco → worldwide
+              </span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 28, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 1, delay: 0.12, ease: EASE }}
+              className="mt-8 text-white font-extrabold tracking-[-0.035em] leading-[0.98]"
+              style={{ fontSize: 'clamp(2.7rem, 5.6vw, 5.6rem)' }}
+            >
+              <span className="whitespace-nowrap">Websites that</span>
+              <br />
+              <span className="serif-accent silk-text pr-2">sell for you.</span>
             </motion.h1>
 
-            {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)',
-                lineHeight: 1.75,
-                color: 'rgba(148,163,184,0.78)',
-                maxWidth: 500,
-                marginBottom: 40,
-              }}
+              transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
+              className="mt-7 max-w-[500px] text-[clamp(0.98rem,1.25vw,1.1rem)] leading-[1.7] text-slate-400"
             >
               We design and develop high-performance websites, SaaS platforms
-              and digital products for ambitious brands and modern businesses.
+              and digital products — and you follow every step from your own client portal.
             </motion.p>
 
-            {/* CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-4 flex-wrap"
+              transition={{ duration: 0.7, delay: 0.42, ease: EASE }}
+              className="mt-10 flex flex-wrap items-center gap-3"
             >
               <Magnetic>
-                <Link href="/request">
-                  <motion.button
-                    whileHover={{ scale: 1.03, y: -1 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="relative flex items-center gap-2.5 overflow-hidden group btn-shimmer"
-                    style={{
-                      padding:       '14px 32px',
-                      background:    'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                      borderRadius:  '12px',
-                      color:         '#fff',
-                      fontSize:      '13px',
-                      fontWeight:    700,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      boxShadow:     '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    }}
-                  >
-                    <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <span className="relative z-10 flex items-center gap-2.5">
-                      Start Your Project
-                      <ArrowUpRight className="w-4 h-4" />
-                    </span>
-                  </motion.button>
+                <Link
+                  href="/request"
+                  className="group inline-flex items-center gap-2 rounded-full bg-[#ede6ff] pl-6 pr-2 py-2 text-[14px] font-semibold text-[#14092b] shadow-[0_10px_40px_-8px_rgba(168,85,247,0.65)] transition-colors hover:bg-white"
+                >
+                  Start your project
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#14092b] text-white transition-transform duration-300 group-hover:rotate-45">
+                    <ArrowUpRight className="w-4 h-4" />
+                  </span>
                 </Link>
               </Magnetic>
-
-              <motion.a
+              <a
                 href="#portfolio"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-3 group"
-                style={{
-                  padding:       '14px 28px',
-                  background:    'rgba(255,255,255,0.04)',
-                  border:        '1px solid rgba(255,255,255,0.12)',
-                  borderRadius:  '12px',
-                  color:         'rgba(255,255,255,0.7)',
-                  fontSize:      '13px',
-                  fontWeight:    700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  transition:    'border-color 0.2s, color 0.2s, background 0.2s',
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.borderColor = 'rgba(255,255,255,0.25)';
-                  el.style.color       = '#fff';
-                  el.style.background  = 'rgba(255,255,255,0.07)';
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.borderColor = 'rgba(255,255,255,0.12)';
-                  el.style.color       = 'rgba(255,255,255,0.7)';
-                  el.style.background  = 'rgba(255,255,255,0.04)';
-                }}
+                className="group inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-white/[0.03] px-5 py-3 text-[14px] font-medium text-slate-200 backdrop-blur-md transition-colors hover:border-white/25 hover:bg-white/[0.06]"
               >
-                View Our Work
-                <span
-                  className="flex items-center justify-center rounded-full transition-colors duration-200 group-hover:bg-white/10"
-                  style={{ width: 28, height: 28, border: '1px solid rgba(255,255,255,0.2)' }}
-                >
-                  <Play className="w-3 h-3 fill-current" />
-                </span>
-              </motion.a>
+                <Play className="w-3.5 h-3.5 fill-current text-violet-300" />
+                See our work
+              </a>
             </motion.div>
-          </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+              className="mt-7 font-mono text-[11px] tracking-wide text-slate-500"
+            >
+              Reply within 24h <span className="text-slate-700 mx-2">/</span>
+              No surprise pricing <span className="text-slate-700 mx-2">/</span>
+              You own the code
+            </motion.p>
+          </div>
+
+          {/* portal mock */}
+          <div className="hidden lg:flex justify-end pr-2">
+            <PortalPanel />
+          </div>
         </div>
 
-        {/* ── STATS BAR — desktop ─────────────────────────────────────────── */}
+        {/* stats */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          style={{
-            opacity: statsOp,
-            y: statsY,
-            background:           'rgba(7,6,15,0.82)',
-            backdropFilter:       'blur(24px) saturate(1.6)',
-            WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
-            borderTop:            '1px solid rgba(255,255,255,0.07)',
-          }}
-          className="shrink-0 hidden lg:flex"
+          transition={{ duration: 0.8, delay: 0.8, ease: EASE }}
+          className="w-full border-t border-white/[0.07] bg-[#07060f]/60 backdrop-blur-xl"
         >
-          {STATS.map((s, i) => {
-            const Icon = s.icon;
-            return (
+          <div className="max-w-[1320px] mx-auto px-6 sm:px-10 lg:px-14 grid grid-cols-2 lg:grid-cols-4">
+            {STATS.map((s, i) => (
               <div
                 key={s.label}
-                className="flex-1 flex items-center gap-4 py-6"
-                style={{
-                  padding:     '22px 0 22px',
-                  paddingLeft: i === 0 ? '5rem' : '2.5rem',
-                  borderRight: i < STATS.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
-                }}
+                className={`py-5 lg:py-7 ${i % 2 === 1 ? 'pl-6' : ''} lg:pl-0 ${i > 0 ? 'lg:pl-8 lg:border-l lg:border-white/[0.07]' : ''} ${i > 1 ? 'border-t border-white/[0.07] lg:border-t-0' : ''}`}
               >
-                <div
-                  className="flex items-center justify-center rounded-xl shrink-0"
-                  style={{
-                    width: 40, height: 40,
-                    background: 'rgba(124,58,237,0.12)',
-                    border:     '1px solid rgba(124,58,237,0.2)',
-                  }}
-                >
-                  <Icon className="w-4 h-4 text-violet-400" strokeWidth={1.8} />
+                <div className="text-[clamp(1.6rem,2.4vw,2.2rem)] font-semibold tracking-tight text-white tabular-nums leading-none">
+                  <AnimatedCounter val={s.val} suffix={s.suffix} />
                 </div>
-                <div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                    <AnimatedCounter val={s.val} suffix={s.suffix} />
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'rgba(148,163,184,0.6)', marginTop: 4 }}>
-                    {s.label}
-                  </div>
-                </div>
+                <div className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-slate-500">{s.label}</div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </motion.div>
-
-        {/* Mobile stats — springy staggered entrance */}
-        <div
-          className="lg:hidden shrink-0 flex justify-around px-6 py-5"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(7,6,15,0.9)' }}
-        >
-          {STATS.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 14, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: 0.6 + i * 0.09, type: 'spring', damping: 18, stiffness: 260, mass: 0.7 }}
-              className="text-center"
-            >
-              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
-                <AnimatedCounter val={s.val} suffix={s.suffix} />
-              </div>
-              <div style={{ fontSize: '10px', color: 'rgba(148,163,184,0.6)', marginTop: 3 }}>{s.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Scroll hint */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.8 }}
-        className="absolute bottom-[88px] lg:bottom-[100px] left-1/2 -translate-x-1/2 z-20 hidden lg:flex flex-col items-center gap-2"
-      >
-        <div
-          className="flex justify-center pt-1.5"
-          style={{ width: 22, height: 34, borderRadius: 12, border: '1.5px solid rgba(148,163,184,0.3)' }}
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0], opacity: [1, 0.15, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ width: 3, height: 7, borderRadius: 99, background: 'rgba(168,85,247,0.85)', boxShadow: '0 0 8px rgba(168,85,247,0.6)' }}
-          />
-        </div>
-        <span style={{ fontSize: 8, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(100,116,139,0.5)' }}>
-          Scroll
-        </span>
       </motion.div>
     </section>
   );

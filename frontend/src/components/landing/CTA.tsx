@@ -3,26 +3,33 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
-import Button from '@/components/ui/Button';
 import Magnetic from '@/components/ui/Magnetic';
 import { ArrowRight, MapPin, Zap, Clock, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import SilkRibbons from '@/components/ui/SilkRibbons';
 
 export default function CTA() {
   const { t } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
+  // Last two words of the title in the serif accent: "Have a project *in mind?*"
+  const titleWords = t('cta.title').split(' ');
+  const titleLead = titleWords.slice(0, -2).join(' ');
+  const titleAccent = titleWords.slice(-2).join(' ');
 
   return (
     <section id="contact" className="py-32 relative overflow-hidden">
 
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full animate-float-a"
-          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.12) 0%, transparent 60%)', filter: 'blur(60px)' }} />
-        <div className="absolute top-1/3 left-1/3 w-[400px] h-[300px] rounded-full animate-float-b"
-          style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 60%)', filter: 'blur(60px)' }} />
-        <div className="absolute inset-0 ambient-grid opacity-30" />
+      {/* Silk ribbon bookend — echoes the hero */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          maskImage: 'linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%)',
+        }}
+      >
+        <SilkRibbons className="absolute inset-0" anchor={[0.5, 0.3]} intensity={0.75} speed={0.8} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(55% 45% at 50% 38%, rgba(7,6,15,0.82) 0%, rgba(7,6,15,0.35) 70%, transparent 100%)' }} />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10" ref={ref}>
@@ -48,9 +55,10 @@ export default function CTA() {
           initial={{ opacity: 0, y: 32 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight leading-[1.06]"
+          className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 tracking-[-0.035em] leading-[1.06]"
         >
-          {t('cta.title')}
+          {titleLead}{' '}
+          <span className="serif-accent silk-text pr-[0.06em]">{titleAccent}</span>
         </motion.h2>
 
         <motion.p
@@ -76,23 +84,26 @@ export default function CTA() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.36, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row gap-3 justify-center mb-14"
+          className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-14"
         >
           <Magnetic>
-            <Link href="/request">
-              <Button size="lg" className="group relative overflow-hidden glow-button btn-shimmer">
-                <span className="relative z-10 flex items-center gap-2">
-                  {t('cta.start')}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Button>
+            <Link
+              href="/request"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#ede6ff] pl-6 pr-2 py-2 text-[15px] font-semibold text-[#14092b] shadow-[0_10px_40px_-8px_rgba(168,85,247,0.65)] transition-colors hover:bg-white"
+            >
+              {t('cta.start')}
+              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#14092b] text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                <ArrowRight className="w-4 h-4" />
+              </span>
             </Link>
           </Magnetic>
-          <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
-            <Button size="lg" variant="outline" className="group relative overflow-hidden">
-              <span className="relative z-10">{t('cta.whatsapp')}</span>
-              <span className="absolute inset-0 bg-white/4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-            </Button>
+          <a
+            href="https://wa.me/212705914424"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-6 py-3.5 text-[15px] font-medium text-slate-200 backdrop-blur-md transition-colors hover:border-white/25 hover:bg-white/[0.06]"
+          >
+            {t('cta.whatsapp')}
           </a>
         </motion.div>
 

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, JetBrains_Mono, Instrument_Serif } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -7,6 +8,12 @@ import InstallPrompt from '@/components/mobile/InstallPrompt';
 import SplashScreen from '@/components/mobile/SplashScreen';
 import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 import './globals.css';
+
+// Self-hosted at build time by next/font. (A CSS @import of Google Fonts is
+// dropped by the bundler, so the fonts never loaded that way.)
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], display: 'swap', variable: '--font-mono' });
+const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal', 'italic'], display: 'swap', variable: '--font-serif' });
 
 export const metadata: Metadata = {
   title: {
@@ -85,13 +92,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="ltr" className="dark">
+    <html lang="en" dir="ltr" className={`dark ${inter.variable} ${mono.variable} ${serif.variable}`}>
       <head>
         {/* Browser and home-screen icons share the transparent official brand mark. */}
         <link rel="icon" type="image/webp" href="/brand-icon-transparent.webp" />
         <link rel="apple-touch-icon" sizes="128x128" href="/brand-icon-transparent.webp" />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://mbndev.ma" />
 
         <meta name="apple-mobile-web-app-capable" content="yes" />

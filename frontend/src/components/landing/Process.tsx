@@ -225,7 +225,8 @@ export default function Process() {
 
           <WordReveal
             text={`${t('process.title')} ${t('process.title.bold')}`}
-            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-5 tracking-tight leading-[1.04]"
+            accentLast={1}
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-5 tracking-[-0.035em] leading-[1.04]"
             delay={0.1}
           />
 
