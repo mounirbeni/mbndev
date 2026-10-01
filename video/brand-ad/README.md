@@ -118,6 +118,19 @@ ffmpeg -i out/mbndev-experience-4k-silent.mp4 -i out/experience-mix.wav -c:v cop
 `render.mjs --scale 2` renders any template at 4K; frames are captured through CDP (≈10× faster
 than `page.screenshot` at 4K).
 
+## promo.html — 30s trend promos (9:16, 60 fps, with sound design)
+
+One template, three compositions chosen by `data/promo-<id>.json` (`{"id": "ai" | "tot" | "near"}`):
+`ai` — "Will AI name your business?" (AI search) · `tot` — "This or That: website edition" (game-style format) ·
+`near` — "Someone nearby is searching" (local search). Structure: hook 0–2.8s → 3 story beats → logo end card 26.6–30s.
+Topics were picked from current trend reports (AI search recommendations, game-style Reels formats, local visibility).
+No invented statistics: every number on screen is a demo value, not a claim.
+
+```bash
+./promo-build.sh ai 60      # picture (4 parallel chunks) → cues → synthesised sound → mux → out/promo-ai-60fps.mp4
+./promo-build.sh tot 120    # 120 fps master (platforms re-encode to ≤60 fps; use only for archive/screens)
+```
+
 ## Social templates
 
 | Template | Output | Command |

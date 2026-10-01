@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN DEV — Trend promos (9:16, 30s)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    30-second trend promos, 1080 × 1920, one template, three compositions (data: {"id": "ai" | "tot" | "near"}).
+    Render:  node render-par.mjs --page promo.html --data data/promo-ai.json --fps 60 --duration 30 --jobs 4
+    Grid (same as the other ads): 96px margins · eyebrow y 300 · two-line headline y 340 (78px) ·
+    visual zone y 690 → 1620 · hook + logo on optical centre y 920 · end card 26.6 → 30s.
+  */
+  :root { --bg:#08080b; --p:#7c3aed; --pl:#a855f7; --lav:#c4b5fd; --text:#e2e8f0; --muted:#94a3b8; --dim:#64748b; --ok:#34d399; --bad:#f87171; --hair:rgba(255,255,255,0.08); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { width:1080px; height:1920px; background:var(--bg); overflow:hidden; }
+  body { font-family:'Inter',system-ui,sans-serif; font-feature-settings:'cv02','cv03','cv04','cv11'; -webkit-font-smoothing:antialiased; color:var(--text); }
+  .abs { position:absolute; }
+  #stage { position:relative; width:1080px; height:1920px; overflow:hidden; background:var(--bg); }
+  #ambient { inset:-10%; opacity:0; background:radial-gradient(ellipse 60% 40% at 50% 62%, rgba(124,58,237,0.22) 0%, transparent 60%), radial-gradient(ellipse 45% 30% at 15% 22%, rgba(59,130,246,0.07) 0%, transparent 55%); }
+  .w { display:inline-block; will-change:transform,opacity,filter; }
+  .hl { color:var(--pl); }
+  .eyebrow { font-weight:700; font-size:26px; letter-spacing:0.15em; text-transform:uppercase; color:var(--pl); }
+  #eyebrow { left:96px; width:888px; top:290px; text-align:center; opacity:0; }
+  .head { left:96px; width:888px; top:340px; text-align:center; font-weight:800; font-size:78px; line-height:1.06; letter-spacing:-0.035em; color:#fff; text-wrap:balance; }
+  #hook { left:96px; width:888px; top:920px; transform:translateY(-50%); text-align:center; font-weight:900; font-size:100px; line-height:1.04; letter-spacing:-0.04em; color:#fff; }
+  #hook div { display:block; }
+  .glass { border-radius:36px; background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)); border:1px solid rgba(255,255,255,0.12); box-shadow:inset 0 1px 0 rgba(255,255,255,0.14), 0 40px 100px rgba(0,0,0,0.5), 0 0 80px rgba(124,58,237,0.13); }
+  .mono { font-family:'JetBrains Mono',monospace; }
+  .grp { position:absolute; inset:0; opacity:0; }
+
+  /* chat (ai) */
+  .wh { height:104px; display:flex; align-items:center; gap:18px; padding:0 34px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .av { width:60px; height:60px; border-radius:50%; display:grid; place-items:center; background:linear-gradient(135deg,#8b5cf6,#3b82f6); font-weight:900; font-size:22px; color:#fff; flex-shrink:0; }
+  .wh b { font-size:30px; color:#fff; font-weight:800; } .wh em { margin-left:auto; font-style:normal; font-size:21px; color:#6ee7b7; display:flex; align-items:center; gap:10px; }
+  .wh em::before { content:''; width:11px; height:11px; border-radius:50%; background:#34d399; box-shadow:0 0 10px #34d399; display:block; }
+  .ub { position:absolute; right:34px; top:134px; max-width:640px; min-height:84px; padding:20px 30px; border-radius:30px 30px 10px 30px; background:linear-gradient(135deg,#8b5cf6,#6d28d9); font-size:31px; font-weight:600; color:#fff; box-shadow:0 10px 30px rgba(124,58,237,0.3); }
+  .th { position:absolute; left:34px; top:262px; display:flex; gap:10px; padding:24px 28px; border-radius:30px 30px 30px 10px; background:rgba(255,255,255,0.08); opacity:0; }
+  .th i { width:14px; height:14px; border-radius:50%; background:#94a3b8; display:block; }
+  .ans { position:absolute; left:34px; right:34px; top:258px; opacity:0; }
+  .ans .al { font-size:28px; color:var(--muted); font-weight:500; height:56px; }
+  .rows { position:relative; height:480px; }
+  .rw { position:absolute; left:0; right:0; height:104px; border-radius:26px; display:flex; align-items:center; gap:22px; padding:0 26px; background:rgba(255,255,255,0.05); border:1px solid var(--hair); }
+  .rw .n { width:48px; height:48px; border-radius:14px; display:grid; place-items:center; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.4); font-family:'JetBrains Mono',monospace; font-size:22px; color:var(--lav); flex-shrink:0; }
+  .rw b { display:block; font-size:29px; color:#fff; font-weight:800; } .rw em { display:block; font-style:normal; font-size:21px; color:var(--muted); margin-top:3px; }
+  .rw .st { margin-left:auto; font-size:24px; font-weight:700; color:#fcd34d; white-space:nowrap; }
+  .rw.miss { border:2px dashed rgba(248,113,113,0.6); background:rgba(239,68,68,0.08); }
+  .rw.miss .n { background:rgba(239,68,68,0.18); border-color:rgba(248,113,113,0.5); color:#fca5a5; }
+  .rw.miss b { color:#fecaca; } .rw.me { border:2px solid rgba(168,85,247,0.85); background:rgba(124,58,237,0.16); box-shadow:0 0 50px rgba(124,58,237,0.4); }
+  .rw.me .n { background:#a855f7; border-color:#a855f7; color:#fff; }
+  .rw .tag { margin-left:auto; height:44px; padding:0 18px; border-radius:999px; display:flex; align-items:center; font-size:18px; font-weight:800; letter-spacing:0.08em; color:#fff; background:#a855f7; white-space:nowrap; }
+
+  /* fix cards (ai) */
+  .fc { position:absolute; left:96px; width:888px; height:214px; border-radius:34px; display:flex; align-items:center; gap:30px; padding:0 40px; opacity:0; }
+  .fc .ic { width:96px; height:96px; border-radius:28px; display:grid; place-items:center; background:rgba(124,58,237,0.18); border:1px solid rgba(124,58,237,0.5); flex-shrink:0; }
+  .fc b { display:block; font-size:38px; color:#fff; font-weight:800; letter-spacing:-0.02em; line-height:1.1; } .fc em { display:block; font-style:normal; font-size:25px; color:var(--muted); margin-top:8px; line-height:1.35; }
+  .fc .ck { margin-left:auto; width:68px; height:68px; border-radius:50%; border:3px solid rgba(255,255,255,0.18); display:grid; place-items:center; position:relative; flex-shrink:0; }
+  .fc .ck i { position:absolute; inset:-3px; border-radius:50%; background:linear-gradient(135deg,#a855f7,#6d28d9); box-shadow:0 0 26px rgba(168,85,247,0.6); opacity:0; display:block; }
+  .fc .ck svg { position:relative; opacity:0; }
+
+  /* this or that (tot) */
+  .trk { left:96px; top:700px; width:888px; height:14px; border-radius:7px; background:rgba(255,255,255,0.08); overflow:hidden; opacity:0; }
+  .trk i { display:block; height:100%; border-radius:7px; background:linear-gradient(90deg,#7c3aed,#a855f7,#3b82f6); transform-origin:0 50%; }
+  .opt { position:absolute; left:96px; width:888px; height:300px; border-radius:38px; display:flex; align-items:center; gap:36px; padding:0 52px; opacity:0; }
+  .opt .lt { width:100px; height:100px; border-radius:50%; display:grid; place-items:center; font-size:44px; font-weight:900; color:#fff; background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.14); flex-shrink:0; }
+  .opt .tx { font-size:58px; font-weight:800; letter-spacing:-0.03em; line-height:1.06; color:#fff; }
+  .opt .mk { position:absolute; right:40px; top:40px; width:76px; height:76px; border-radius:50%; display:grid; place-items:center; opacity:0; }
+  .opt .mk.y { background:linear-gradient(135deg,#a855f7,#6d28d9); box-shadow:0 0 34px rgba(168,85,247,0.7); } .opt .mk.n { background:rgba(239,68,68,0.9); box-shadow:0 0 26px rgba(239,68,68,0.5); }
+  #why { left:96px; width:888px; top:1425px; text-align:center; font-size:44px; font-weight:700; letter-spacing:-0.02em; color:#fff; }
+  #dots { left:0; right:0; top:1565px; display:flex; justify-content:center; gap:22px; opacity:0; }
+  #dots i { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.12); display:block; border:2px solid rgba(255,255,255,0.1); }
+  #score { left:96px; width:888px; top:920px; transform:translateY(-50%); text-align:center; font-weight:900; font-size:96px; line-height:1.05; letter-spacing:-0.04em; color:#fff; }
+  #scoreSub { left:96px; width:888px; top:1160px; text-align:center; font-size:38px; font-weight:500; color:var(--muted); }
+
+  /* near me */
+  #sb { left:96px; top:690px; width:888px; height:110px; border-radius:55px; display:flex; align-items:center; gap:22px; padding:0 40px; font-size:40px; font-weight:600; color:#fff; opacity:0; }
+  #sb .caret { width:4px; height:50px; border-radius:2px; background:var(--pl); display:block; }
+  #map { left:96px; top:830px; width:888px; height:340px; border-radius:36px; overflow:hidden; opacity:0; border:1px solid rgba(255,255,255,0.12); background:#0e0d16; box-shadow:0 40px 100px rgba(0,0,0,0.5), 0 0 80px rgba(124,58,237,0.13); }
+  #map svg { position:absolute; inset:0; }
+  .pin { position:absolute; width:64px; height:64px; margin:-64px 0 0 -32px; opacity:0; }
+  .ring { position:absolute; width:90px; height:90px; margin:-45px 0 0 -45px; border-radius:50%; border:3px solid #a855f7; opacity:0; }
+  #res { left:96px; top:1196px; width:888px; height:430px; opacity:0; }
+  #res .rw { height:96px; }
+  #prof { left:96px; top:690px; width:888px; height:850px; border-radius:38px; overflow:hidden; opacity:0; }
+  #pimg { position:absolute; left:0; right:0; top:0; height:300px; opacity:0;
+    background:radial-gradient(ellipse 70% 90% at 18% 110%, rgba(6,182,212,0.5) 0%, transparent 60%), radial-gradient(ellipse 80% 90% at 90% 0%, rgba(168,85,247,0.85) 0%, transparent 60%), linear-gradient(135deg, #3b0f7a 0%, #1e3a8a 60%, #0e7490 100%); }
+  #pimg::before { content:''; position:absolute; right:14%; top:16%; width:130px; height:130px; border-radius:50%; background:radial-gradient(circle, #fde68a 0%, #f472b6 55%, transparent 72%); opacity:.9; }
+  #pimg::after { content:''; position:absolute; left:-10%; right:-10%; bottom:-120px; height:200px; border-radius:50%; background:rgba(8,8,11,0.6); }
+  #pname { position:absolute; left:44px; top:326px; opacity:0; } #pname b { display:block; font-size:56px; font-weight:900; letter-spacing:-0.035em; color:#fff; } #pname em { display:block; font-style:normal; font-size:26px; color:var(--muted); margin-top:4px; }
+  #phours { position:absolute; left:44px; top:462px; font-size:28px; font-weight:700; color:#6ee7b7; display:flex; align-items:center; gap:12px; opacity:0; }
+  #pbtn { position:absolute; left:44px; right:44px; top:526px; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  #pbtn span { height:96px; border-radius:26px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; font-size:21px; font-weight:700; color:#fff; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); opacity:0; }
+  #pbtn span.wa { background:#25d366; color:#052e16; border-color:transparent; }
+  #prev { position:absolute; left:44px; right:44px; top:650px; opacity:0; }
+  #prev .big { display:flex; align-items:baseline; gap:20px; } #prev .big b { font-size:92px; font-weight:900; letter-spacing:-0.05em; color:#fff; line-height:1; }
+  #prev .stars { font-size:44px; letter-spacing:6px; color:#fcd34d; } #prev .cnt { font-size:26px; color:var(--muted); margin-top:6px; }
+  #prev .q { margin-top:20px; padding:18px 26px; border-radius:22px; background:rgba(255,255,255,0.06); border:1px solid var(--hair); font-size:27px; font-style:italic; color:#e2e8f0; opacity:0; }
+
+  /* end card — official logo, no background */
+  #endglow { left:540px; top:920px; width:900px; height:900px; margin:-450px 0 0 -450px; border-radius:50%; background:radial-gradient(circle, rgba(124,58,237,0.2) 0%, transparent 62%); opacity:0; }
+  #logoIcon { left:452px; top:700px; width:176px; height:176px; object-fit:contain; opacity:0; }
+  #logoWord { left:96px; width:888px; top:900px; text-align:center; white-space:nowrap; font-weight:900; font-size:76px; line-height:1; letter-spacing:-0.015em; opacity:0; }
+  #logoWord .a { color:#f4f0ff; text-shadow:0 0 8px rgba(196,181,253,0.18); } #logoWord .b { color:#a855f7; margin-left:0.33em; text-shadow:0 0 9px rgba(168,85,247,0.27); }
+  #sweep { left:452px; top:700px; width:176px; height:176px; overflow:hidden; opacity:0; -webkit-mask:url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; mask:url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; }
+  #sweep i { position:absolute; top:-20%; left:-60%; width:40%; height:140%; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent); transform:skewX(-18deg); display:block; }
+  #cta { left:96px; width:888px; top:1050px; text-align:center; font-weight:800; font-size:56px; letter-spacing:-0.03em; color:#fff; opacity:0; }
+  #url { left:96px; width:888px; top:1140px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:30px; letter-spacing:0.06em; color:var(--lav); opacity:0; }
+  #grain { inset:-50%; width:200%; height:200%; opacity:0.045; mix-blend-mode:overlay; pointer-events:none; z-index:90;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E"); background-size:260px 260px; }
+  #vignette { inset:0; pointer-events:none; z-index:91; background:radial-gradient(ellipse 75% 60% at 50% 50%, transparent 55%, rgba(0,0,0,0.65) 100%); }
+  #fade { inset:0; background:#000; opacity:1; pointer-events:none; z-index:95; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ambient" class="abs"></div>
+  <div id="eyebrow" class="abs eyebrow"></div>
+  <div id="scene"></div>
+  <div id="endglow" class="abs"></div>
+  <img id="logoIcon" class="abs" src="assets/brand-icon-transparent.webp" alt="MBN DEV" />
+  <div id="sweep" class="abs"><i></i></div>
+  <div id="logoWord" class="abs"><span class="a">MBN</span><span class="b">DEV</span></div>
+  <div id="cta" class="abs"></div>
+  <div id="url" class="abs">mbndev.ma</div>
+  <div id="grain" class="abs"></div>
+  <div id="vignette" class="abs"></div>
+  <div id="fade" class="abs"></div>
+</div>
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script src="promo.js"></script>
+</body>
+</html>
