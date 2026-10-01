@@ -15,6 +15,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { getInitials } from '@/lib/utils';
 import CommandPalette from '@/components/ui/CommandPalette';
 import Link from 'next/link';
+import SilkBackdrop from '@/components/ui/SilkBackdrop';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Scroll-hide header hook — hides mobile header on scroll-down, shows on up
@@ -206,13 +207,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* ── Page content ─────────────────────────────────────────── */}
         <main
           ref={scrollRef}
-          className="flex-1 overflow-y-auto inertial-scroll"
+          className="flex-1 overflow-y-auto inertial-scroll relative isolate"
           onScroll={onScroll}
           style={{
             paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 74px)',
           // Note: 74px clears the mobile bottom nav — MobileNav hides itself at lg: breakpoints
           }}
         >
+          {/* Faint silk ribbon across the top of every dashboard page */}
+          <SilkBackdrop className="absolute inset-x-0 top-0 h-[460px]" anchor={[0.78, 0.7]} intensity={0.45} speed={0.6} scrim="none" />
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={pathname}

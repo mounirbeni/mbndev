@@ -12,6 +12,7 @@ import { getInitials } from '@/lib/utils';
 import { APP_VERSION } from '@/lib/version';
 import { User, Lock, ShieldCheck, Activity, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import AccentText from '@/components/ui/AccentText';
 
 export default function AdminSettingsPage() {
   const { user, refresh } = useAuth();
@@ -64,7 +65,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold text-white">{t('dash.nav.settings')}</h1>
+        <h1 className="text-2xl font-bold text-white"><AccentText text={t('dash.nav.settings')} /></h1>
         <p className="text-slate-400 text-sm mt-1">Manage your admin account and security.</p>
       </motion.div>
 

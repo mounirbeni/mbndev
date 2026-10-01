@@ -17,24 +17,21 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:   [
-    'btn-shimmer relative overflow-hidden',
-    'bg-gradient-to-r from-primary-600 via-primary-500 to-primary-600',
-    'text-white font-semibold',
-    'shadow-lg shadow-primary-500/20',
-    'hover:shadow-primary-500/35 hover:from-primary-500 hover:to-primary-500',
+    'bg-[#ede6ff] text-[#14092b] font-semibold',
+    'shadow-[0_10px_36px_-10px_rgba(168,85,247,0.7)]',
+    'hover:bg-white hover:shadow-[0_12px_44px_-8px_rgba(168,85,247,0.8)]',
     'active:shadow-none',
-    'background-size-200 animate-gradient',
   ].join(' '),
   secondary: [
-    'bg-white/8 border border-white/10',
+    'bg-white/[0.04] border border-white/10 backdrop-blur-md',
     'text-slate-200',
     'hover:bg-white/12 hover:border-white/18 hover:text-white',
     'active:bg-white/15',
   ].join(' '),
   outline:   [
-    'border border-primary-500/45 text-primary-400',
-    'hover:bg-primary-500/10 hover:border-primary-400 hover:text-primary-300',
-    'active:bg-primary-500/18',
+    'border border-white/15 bg-white/[0.03] text-slate-100 backdrop-blur-md',
+    'hover:bg-white/[0.07] hover:border-white/30 hover:text-white',
+    'active:bg-white/10',
   ].join(' '),
   ghost:     [
     'text-slate-400',
@@ -54,10 +51,10 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  xs: 'px-2.5 py-1.5 text-xs rounded-lg min-h-[32px] gap-1.5',
-  sm: 'px-3.5 py-2   text-xs rounded-xl min-h-[36px] gap-1.5',
-  md: 'px-4.5 py-2.5 text-sm rounded-xl min-h-[44px] gap-2',
-  lg: 'px-6   py-3.5 text-sm sm:text-base rounded-xl min-h-[48px] gap-2',
+  xs: 'px-3   py-1.5 text-xs rounded-full min-h-[32px] gap-1.5',
+  sm: 'px-4   py-2   text-xs rounded-full min-h-[36px] gap-1.5',
+  md: 'px-5   py-2.5 text-sm rounded-full min-h-[44px] gap-2',
+  lg: 'px-7   py-3.5 text-sm sm:text-base rounded-full min-h-[48px] gap-2',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -70,7 +67,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'transition-all duration-150',
           'cursor-pointer select-none',
           'active:scale-[0.97] active:opacity-90',
-          'focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent',
+          'focus-visible:ring-2 focus-visible:ring-violet-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent',
           variants[variant],
           sizes[size],
           fullWidth && 'w-full',

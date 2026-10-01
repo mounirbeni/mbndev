@@ -270,11 +270,11 @@ export default function Pricing() {
                     {/* CTA */}
                     <button
                       onClick={() => choosePlan(pkg)}
-                      className="group relative w-full rounded-2xl py-4 text-sm font-semibold transition-all duration-300 overflow-hidden"
+                      className="group relative w-full rounded-full py-4 text-sm font-semibold transition-all duration-300 overflow-hidden"
                       style={isFeatured ? {
-                        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
-                        color: '#fff',
-                        boxShadow: '0 8px 32px rgba(124,58,237,0.35), 0 0 0 1px rgba(168,85,247,0.3) inset',
+                        background: '#ede6ff',
+                        color: '#14092b',
+                        boxShadow: '0 10px 36px -10px rgba(168,85,247,0.7)',
                       } : {
                         background: 'rgba(255,255,255,0.04)',
                         color: '#94a3b8',

@@ -11,6 +11,7 @@ import { orderAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Button from '@/components/ui/Button';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import AccentText from '@/components/ui/AccentText';
 
 const SERVICE_LABELS: Record<string, string> = {
   website: 'Website', ecommerce: 'E-Commerce', dashboard: 'SaaS Dashboard',
@@ -81,7 +82,7 @@ export default function ClientOrdersPage() {
         </div>
       )}
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-white">{t('dash.nav.myOrders')}</h1>
+        <h1 className="text-2xl font-bold text-white"><AccentText text={t('dash.nav.myOrders')} /></h1>
         <Link href="/request">
           <Button size="sm">
             <Plus className="w-4 h-4" /> {t('orders.newOrder')}
@@ -177,8 +178,7 @@ export default function ClientOrdersPage() {
                         {order.status === 'pending' && !hasPaymentUnderReview && (
                           <Link href={`/checkout/${order.id}`} className="ml-auto">
                             <button
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-all active:scale-95"
-                              style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}
+                              className="btn-silk flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold active:scale-95"
                             >
                               <CreditCard className="w-3.5 h-3.5" />
                               {t('orders.payNow')}

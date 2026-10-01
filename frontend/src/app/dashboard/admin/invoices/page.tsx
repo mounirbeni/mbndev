@@ -11,6 +11,7 @@ import {
 import { paymentAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import AccentText from '@/components/ui/AccentText';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -301,7 +302,7 @@ export default function AdminInvoicesPage() {
         className="flex items-start justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Invoices</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight"><AccentText text="Invoices" /></h1>
           <p className="text-slate-400 text-sm mt-1">
             {payments.length} invoice{payments.length !== 1 ? 's' : ''} &nbsp;&middot;&nbsp; {formatCurrency(stats.totalRevenue)} collected
           </p>

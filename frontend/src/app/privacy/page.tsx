@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { LegalPageNav } from '@/components/legal/LegalPageNav';
 import { LegalPageFooter } from '@/components/legal/LegalPageFooter';
+import SilkBackdrop from '@/components/ui/SilkBackdrop';
+import AccentText from '@/components/ui/AccentText';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — MBN DEV',
@@ -11,13 +13,14 @@ const LAST_UPDATED = 'May 7, 2026';
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0d]">
+    <div className="min-h-screen bg-[#0a0a0d] relative isolate">
+      <SilkBackdrop className="absolute inset-x-0 top-0 h-[70vh]" anchor={[0.75, 0.6]} intensity={0.6} scrim="left" />
       <LegalPageNav />
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-white mb-2">Privacy Policy</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2"><AccentText text="Privacy Policy" /></h1>
           <p className="text-slate-500 text-sm">Last updated: {LAST_UPDATED}</p>
         </div>
 

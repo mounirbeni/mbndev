@@ -339,21 +339,7 @@ export default function InsightsPage() {
 
               <Link
                 href="/request"
-                className="inline-flex items-center gap-2.5 group"
-                style={{
-                  padding: '14px 32px',
-                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                  borderRadius: '12px',
-                  color: '#fff',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  boxShadow: '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(124,58,237,0.5), inset 0 1px 0 rgba(255,255,255,0.15)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.1)'; }}
+                className="btn-silk inline-flex items-center gap-2.5 group px-8 py-3.5 text-[14px] font-semibold hover:-translate-y-px"
               >
                 Start Your Project
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

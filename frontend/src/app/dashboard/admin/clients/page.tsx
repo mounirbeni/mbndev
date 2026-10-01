@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/Badge';
 import PlanBadge from '@/components/ui/PlanBadge';
 import toast from 'react-hot-toast';
 import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX, Trash2, X, StickyNote, ChevronLeft, ChevronRight } from 'lucide-react';
+import AccentText from '@/components/ui/AccentText';
 
 const PAGE_SIZE = 25;
 
@@ -144,7 +145,7 @@ export default function AdminClientsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-          {t('admin.clients')}
+          <AccentText text={t('admin.clients')} />
         </h1>
         <p className="text-slate-400 text-sm mt-1">
           {loading ? 'Loading...' : `${stats.total} ${t('admin.clients.count')}`}

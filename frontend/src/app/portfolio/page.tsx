@@ -8,6 +8,7 @@ import { ExternalLink, ArrowRight, Zap, BadgeCheck } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import AccentText from '@/components/ui/AccentText';
 
 // Project category IDs (language-agnostic, used for filtering)
 type Category = 'All' | 'E-Commerce' | 'Web App' | 'SaaS' | 'Hospitality';
@@ -380,7 +381,7 @@ export default function PortfolioPage() {
               <Zap className="w-3 h-3 text-primary-400" /> {t('portfolio.badge')}
             </span>
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight">
-              {t('portfolio.pageTitle')}
+              <AccentText text={t('portfolio.pageTitle')} />
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
               {t('portfolio.pageSub')}

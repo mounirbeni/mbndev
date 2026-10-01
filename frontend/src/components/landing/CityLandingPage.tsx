@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
+import AccentText from '@/components/ui/AccentText';
 
 export interface CityProof {
   title: string;
@@ -59,7 +60,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
               {heroKicker}
             </span>
             <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-              {h1}
+              <AccentText text={h1} />
             </h1>
             {intro.map((p, i) => (
               <p key={i} className="text-slate-400 leading-relaxed mb-4 max-w-2xl">{p}</p>

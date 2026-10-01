@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, Edit2, Check, AlertTriangle, RefreshCcw } from 'lucide-react';
+import AccentText from '@/components/ui/AccentText';
 
 const emptyForm = {
   name: '', slug: '', price: '', description: '', features: '',
@@ -117,7 +118,7 @@ export default function AdminPackagesPage() {
       )}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t('dash.nav.packages')}</h1>
+          <h1 className="text-2xl font-bold text-white"><AccentText text={t('dash.nav.packages')} /></h1>
           <p className="text-slate-400 text-sm mt-1">{packages.length} {t('admin.pkg.count')}</p>
         </div>
         <Button size="md" onClick={openCreate}>

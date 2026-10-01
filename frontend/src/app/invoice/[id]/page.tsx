@@ -89,7 +89,7 @@ export default function InvoicePage() {
             <span className="text-xs text-gray-400 font-mono hidden sm:block">{invoiceNum}</span>
             <button
               onClick={() => window.print()}
-              className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-700"
+              className="flex items-center gap-2 btn-silk px-5 py-2 text-sm font-semibold"
             >
               <Printer className="w-4 h-4" />
               <span className="hidden sm:inline">Print / Save PDF</span>

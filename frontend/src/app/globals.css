@@ -220,10 +220,11 @@ input, textarea, p, h1, h2, h3, h4, h5, h6, span, li {
 
 /* ── Glass system ─────────────────────────────────────────────────────────── */
 .glass {
-  background: var(--glass-bg-card);
+  background: linear-gradient(160deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.01) 100%), var(--glass-bg-card);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
   border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .glass-strong {
@@ -297,7 +298,7 @@ body.nav-sheet-open .layout-frame {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #06b6d4 100%);
+  background: linear-gradient(100deg, #e9d5ff 0%, #c084fc 28%, #818cf8 58%, #67e8f9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1238,12 +1239,12 @@ input, textarea, select {
   gap: 8px;
   width: 100%;
   padding: 15px 24px;
-  border-radius: 14px;
+  border-radius: 9999px;
   font-size: 15px;
   font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
-  box-shadow: 0 8px 32px rgba(124,58,237,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  color: #14092b;
+  background: #ede6ff;
+  box-shadow: 0 10px 36px -10px rgba(168,85,247,0.7);
   transition: transform 0.2s var(--ease-spring), box-shadow 0.2s ease, opacity 0.2s ease;
   overflow: hidden;
   cursor: pointer;
@@ -1254,13 +1255,13 @@ input, textarea, select {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #4f46e5 100%);
+  background: #fff;
   opacity: 0;
   transition: opacity 0.25s ease;
 }
-.cin-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 40px rgba(124,58,237,0.5), 0 4px 12px rgba(0,0,0,0.35); }
+.cin-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 44px -8px rgba(168,85,247,0.8); }
 .cin-btn-primary:hover::before { opacity: 1; }
-.cin-btn-primary:active { transform: scale(0.98); box-shadow: 0 4px 16px rgba(124,58,237,0.3); }
+.cin-btn-primary:active { transform: scale(0.98); box-shadow: none; }
 .cin-btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 .cin-btn-primary span { position: relative; z-index: 1; }
 
@@ -1630,4 +1631,36 @@ input, textarea, select {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(124,58,237,0.06);
   backdrop-filter: blur(22px) saturate(1.5);
   -webkit-backdrop-filter: blur(22px) saturate(1.5);
+}
+
+/* Platform-wide: an accent phrase inside a heading is always the italic serif,
+   so every page title reads the same way as the home page. */
+:is(h1, h2, h3) :is(.gradient-text, .gradient-text-animated) {
+  font-family: var(--font-serif), 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.1em;
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  padding-right: 0.06em;
+}
+h1, h2 { letter-spacing: -0.03em; }
+
+/* Primary call-to-action pill (same as the shared <Button variant="primary">). */
+.btn-silk {
+  background: #ede6ff;
+  color: #14092b;
+  border-radius: 9999px;
+  box-shadow: 0 10px 36px -10px rgba(168,85,247,0.7);
+  transition: background-color .2s, box-shadow .2s, transform .2s;
+}
+.btn-silk:hover { background: #fff; box-shadow: 0 12px 44px -8px rgba(168,85,247,0.8); }
+
+/* Darkening behind page text for <SilkBackdrop>; wider on phones, where the
+   ribbon would otherwise run behind body copy. */
+.silk-scrim-center { background: radial-gradient(48% 42% at 50% 40%, rgba(7,6,15,0.85) 0%, rgba(7,6,15,0.4) 65%, transparent 100%); }
+.silk-scrim-left   { background: linear-gradient(90deg, rgba(7,6,15,0.92) 0%, rgba(7,6,15,0.6) 38%, transparent 70%); }
+@media (max-width: 640px) {
+  .silk-scrim-center { background: radial-gradient(95% 40% at 50% 38%, rgba(7,6,15,0.9) 0%, rgba(7,6,15,0.55) 70%, transparent 100%); }
+  .silk-scrim-left   { background: linear-gradient(180deg, rgba(7,6,15,0.4) 0%, rgba(7,6,15,0.85) 30%, rgba(7,6,15,0.85) 70%, rgba(7,6,15,0.4) 100%); }
 }

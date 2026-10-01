@@ -550,11 +550,7 @@ export default function AboutPage() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link href="/request">
                     <button
-                      className="flex items-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-semibold text-white transition-all duration-300 group"
-                      style={{
-                        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                        boxShadow: '0 8px 28px rgba(124,58,237,0.4)',
-                      }}
+                      className="btn-silk flex items-center gap-2 px-7 py-3.5 text-sm font-semibold group"
                     >
                       {t('about.cta.start')}
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

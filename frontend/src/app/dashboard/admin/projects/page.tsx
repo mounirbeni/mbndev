@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { Search, AlertTriangle, RefreshCcw, ChevronDown, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import PlanBadge from '@/components/ui/PlanBadge';
+import AccentText from '@/components/ui/AccentText';
 
 const statusOptions: ProjectStatus[] = ['pending', 'in-progress', 'review', 'revision', 'completed', 'cancelled'];
 
@@ -184,7 +185,7 @@ export default function AdminProjectsPage() {
       )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{t('admin.allProjects')}</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight"><AccentText text={t('admin.allProjects')} /></h1>
           <p className="text-slate-400 text-sm mt-1">
             {loading ? 'Loading...' : `${projects.length} ${t('admin.projectsTotal')}`}
           </p>

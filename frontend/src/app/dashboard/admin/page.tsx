@@ -17,6 +17,7 @@ import { formatCurrency, timeAgo, getInitials } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
+import AccentText from '@/components/ui/AccentText';
 
 interface Analytics {
   totalProjects:  number;
@@ -198,7 +199,7 @@ export default function AdminDashboard() {
           <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              {t('admin.dashboard')}
+              <AccentText text={t('admin.dashboard')} />
             </h1>
             <p className="text-slate-400 text-sm mt-1">{t('admin.dashboard.sub')}</p>
           </div>

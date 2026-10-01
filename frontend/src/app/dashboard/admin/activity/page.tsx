@@ -10,6 +10,7 @@ import {
 import { searchAPI } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import AccentText from '@/components/ui/AccentText';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -91,7 +92,7 @@ export default function ActivityLogPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Activity Log</h1>
+          <h1 className="text-xl font-bold text-white"><AccentText text="Activity Log" /></h1>
           <p className="text-slate-500 text-sm mt-0.5">{total.toLocaleString()} events recorded</p>
         </div>
         <button

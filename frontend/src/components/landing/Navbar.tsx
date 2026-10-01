@@ -143,30 +143,15 @@ export default function Navbar() {
                     Dashboard <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                   {/* Mobile */}
-                  <div className="lg:hidden flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold text-white"
-                    style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', boxShadow:'0 4px 14px rgba(124,58,237,0.35)' }}>
+                  <div className="lg:hidden btn-silk flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold">
                     Dashboard
                   </div>
                 </Link>
               ) : (
                 <>
                   {/* Desktop: BOOK A CALL */}
-                  <Link href="/request" className="hidden lg:flex items-center gap-2 transition-all duration-200"
-                    style={{
-                      padding:       '10px 22px',
-                      fontSize:      '11px',
-                      fontWeight:    700,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color:         '#fff',
-                      border:        '1px solid rgba(255,255,255,0.25)',
-                      borderRadius:  '8px',
-                      background:    'rgba(255,255,255,0.04)',
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(124,58,237,0.15)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(124,58,237,0.5)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.25)'; }}
-                  >
-                    Start New Project <ArrowUpRight className="w-3.5 h-3.5" />
+                  <Link href="/request" className="hidden lg:flex btn-silk items-center gap-2 pl-5 pr-4 py-2.5 text-[13px] font-semibold">
+                    Start a project <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
 
                   {/* Mobile */}
@@ -174,8 +159,7 @@ export default function Navbar() {
                     style={{ background: 'rgba(255,255,255,0.05)' }}>
                     Sign In
                   </Link>
-                  <Link href="/request" className="lg:hidden flex items-center px-3.5 py-2 rounded-full text-sm font-semibold text-white active:scale-95 transition-transform"
-                    style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', boxShadow:'0 4px 14px rgba(124,58,237,0.3)' }}>
+                  <Link href="/request" className="lg:hidden btn-silk flex items-center px-3.5 py-2 text-sm font-semibold active:scale-95">
                     Start →
                   </Link>
                 </>

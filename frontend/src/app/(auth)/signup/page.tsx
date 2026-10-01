@@ -15,6 +15,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
 import api from '@/lib/api';
+import AccentText from '@/components/ui/AccentText';
+import SilkBackdrop from '@/components/ui/SilkBackdrop';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -309,13 +311,14 @@ export default function SignupPage() {
 
   return (
     <div
-      className="min-h-dvh flex flex-col relative overflow-hidden"
+      className="min-h-dvh flex flex-col relative isolate overflow-hidden"
       style={{
         background: '#08080b',
         paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
       }}
     >
       {/* Cinematic background */}
+      <SilkBackdrop className="absolute inset-0" anchor={[0.5, 0.42]} />
       <div className="absolute inset-0 pointer-events-none">
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 70% 50% at 30% 30%, rgba(124,58,237,0.12) 0%, transparent 60%)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 40% at 80% 70%, rgba(59,130,246,0.07) 0%, transparent 55%)' }} />
@@ -352,7 +355,7 @@ export default function SignupPage() {
             <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-5">
               <Logo3D size="xl" />
             </Link>
-            <h1 className="text-3xl font-black text-white tracking-tight">{t('auth.signup.title')}</h1>
+            <h1 className="text-3xl font-black text-white tracking-tight"><AccentText text={t('auth.signup.title')} /></h1>
             <p className="text-slate-400 mt-2 text-sm leading-relaxed">{t('auth.signup.subtitle')}</p>
           </div>
 
@@ -503,7 +506,7 @@ export default function SignupPage() {
                 disabled={loading || emailState.status === 'checking' || emailState.status === 'error' || phoneState.status === 'error'}
                 className="cin-btn-primary mt-1"
                 onClick={() => !loading && haptic('medium')}
-                style={loading ? { background: 'rgba(124,58,237,0.5)', boxShadow: 'none', cursor: 'not-allowed' } : undefined}
+                style={loading ? { background: 'rgba(237,230,255,0.55)', boxShadow: 'none', cursor: 'not-allowed' } : undefined}
               >
                 <span className="flex items-center gap-2">
                   {loading ? (

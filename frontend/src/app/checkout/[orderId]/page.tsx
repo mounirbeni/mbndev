@@ -360,8 +360,7 @@ export default function CheckoutPage() {
                       <button
                         onClick={handleSaveEdit}
                         disabled={savingEdit}
-                        className="flex items-center gap-1.5 text-xs text-white px-3 py-2 rounded-lg transition-all disabled:opacity-60"
-                        style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}
+                        className="btn-silk flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 disabled:opacity-60"
                       >
                         {savingEdit ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                         Save Changes

@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { CreditCard, FileText, AlertTriangle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
+import AccentText from '@/components/ui/AccentText';
 
 export default function ClientPaymentsPage() {
   const { t } = useLanguage();
@@ -61,7 +62,7 @@ export default function ClientPaymentsPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {t('dash.nav.payments')}
+            <AccentText text={t('dash.nav.payments')} />
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             {loading ? 'Loading...' : `${payments.length} transaction${payments.length !== 1 ? 's' : ''}`}

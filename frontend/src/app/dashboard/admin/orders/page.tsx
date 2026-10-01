@@ -12,6 +12,7 @@ import { orderAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import AccentText from '@/components/ui/AccentText';
 
 const SERVICE_LABELS: Record<string, string> = {
   website: 'Website', ecommerce: 'E-Commerce', dashboard: 'SaaS Dashboard',
@@ -113,7 +114,7 @@ export default function AdminOrdersPage() {
         </div>
       )}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-2xl font-bold text-white">{t('admin.orders')}</h1>
+        <h1 className="text-2xl font-bold text-white"><AccentText text={t('admin.orders')} /></h1>
         <div className="text-slate-400 text-sm">
           {orders.length} total · {formatCurrency(revenue)} {t('admin.totalRevenue').toLowerCase()}
         </div>

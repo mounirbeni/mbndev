@@ -13,6 +13,7 @@ import {
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import AccentText from '@/components/ui/AccentText';
 
 // ─── Service Data ──────────────────────────────────────────────────────────────
 // Market research: Upwork / Fiverr Pro / GoodFirms / Clutch — 2026
@@ -324,7 +325,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                 <Icon className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">
-                {service.title}
+                <AccentText text={service.title} />
               </h1>
               <p className={`text-lg font-medium mb-4 ${service.accent}`}>{service.tagline}</p>
               <p className="text-slate-400 leading-relaxed mb-8">{service.longDesc}</p>

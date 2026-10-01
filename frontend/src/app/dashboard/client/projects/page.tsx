@@ -9,6 +9,7 @@ import { Project } from '@/types';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import Button from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
+import AccentText from '@/components/ui/AccentText';
 
 const statusTabs = ['all', 'pending', 'in-progress', 'review', 'completed'] as const;
 
@@ -64,7 +65,7 @@ export default function ClientProjectsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {t('dash.nav.myProjects')}
+            <AccentText text={t('dash.nav.myProjects')} />
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             {loading ? 'Loading...' : `${projects.length} project${projects.length !== 1 ? 's' : ''} total`}

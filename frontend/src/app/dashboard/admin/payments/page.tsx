@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
+import AccentText from '@/components/ui/AccentText';
 
 const METHOD_LABELS: Record<string, string> = {
   cih_bank:   'CIH Bank',
@@ -444,7 +445,7 @@ export default function AdminPaymentsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {t('admin.payments')}
+            <AccentText text={t('admin.payments')} />
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             {loading ? 'Loading...' : `${payments.length} transaction${payments.length !== 1 ? 's' : ''}`}

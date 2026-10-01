@@ -14,6 +14,8 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
+import AccentText from '@/components/ui/AccentText';
+import SilkBackdrop from '@/components/ui/SilkBackdrop';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -130,10 +132,11 @@ const stats = [
 
 function LeftPanel() {
   return (
-    <div className="hidden lg:flex flex-col relative overflow-hidden h-full"
+    <div className="hidden lg:flex flex-col relative isolate overflow-hidden h-full"
       style={{ background: '#07070d' }}>
 
       {/* ── Backgrounds ── */}
+      <SilkBackdrop className="absolute inset-0" anchor={[0.55, 0.3]} scrim="left" />
       {/* Primary large purple orb — centred left */}
       <div className="absolute inset-0 pointer-events-none" style={{
         background: 'radial-gradient(ellipse 80% 70% at 35% 55%, rgba(124,58,237,0.28) 0%, transparent 65%)',
@@ -401,7 +404,7 @@ export default function LoginPage() {
             {/* Heading */}
             <div className="mb-7">
               <h1 className="text-[1.85rem] sm:text-3xl font-black text-white tracking-tight mb-1.5">
-                {t('auth.login.title')}
+                <AccentText text={t('auth.login.title')} />
               </h1>
               <p className="text-slate-500 text-sm leading-relaxed">
                 {t('auth.login.subtitleShort')}
@@ -507,26 +510,23 @@ export default function LoginPage() {
                   type="submit"
                   disabled={loading || isLocked}
                   onClick={() => !loading && !isLocked && haptic('medium')}
-                  className="w-full rounded-[14px] py-3.5 text-sm font-bold text-white transition-all duration-200 flex items-center justify-center gap-2"
+                  className="w-full rounded-full py-3.5 text-sm font-bold text-white transition-all duration-200 flex items-center justify-center gap-2"
                   style={
                     isLocked
                       ? { background: 'rgba(239,68,68,0.4)', cursor: 'not-allowed' }
                       : loading
                       ? { background: 'rgba(124,58,237,0.5)', cursor: 'not-allowed' }
-                      : {
-                          background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                          boxShadow:  '0 6px 24px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset',
-                        }
+                      : { background: '#ede6ff', color: '#14092b', boxShadow: '0 10px 36px -10px rgba(168,85,247,0.7)' }
                   }
                   onMouseEnter={e => {
                     if (!loading && !isLocked) {
-                      (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 32px rgba(124,58,237,0.55), 0 1px 0 rgba(255,255,255,0.12) inset';
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 44px -8px rgba(168,85,247,0.8)';
                       (e.currentTarget as HTMLElement).style.transform  = 'translateY(-1px)';
                     }
                   }}
                   onMouseLeave={e => {
                     if (!loading && !isLocked) {
-                      (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(124,58,237,0.4), 0 1px 0 rgba(255,255,255,0.1) inset';
+                      (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 36px -10px rgba(168,85,247,0.7)';
                       (e.currentTarget as HTMLElement).style.transform  = 'none';
                     }
                   }}

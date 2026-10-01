@@ -11,6 +11,7 @@ import {
   ChevronDown, MessageCircle, Check, Building2, Utensils, ShoppingBag,
   Map, Zap, type LucideIcon,
 } from 'lucide-react';
+import AccentText from '@/components/ui/AccentText';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Lead {
@@ -282,7 +283,7 @@ export default function AdminLeadsPage() {
             <Target className="w-5 h-5 text-primary-400" strokeWidth={1.8} />
           </div>
           <div>
-            <h1 className="text-white font-semibold text-lg leading-tight">Lead Outreach</h1>
+            <h1 className="text-white font-semibold text-lg leading-tight"><AccentText text="Lead Outreach" /></h1>
             <p className="text-slate-500 text-xs">{leads.length} prospects · {hotCount} hot · {convCount} converted</p>
           </div>
         </div>

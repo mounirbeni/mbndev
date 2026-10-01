@@ -20,6 +20,7 @@ import PlanBadge from '@/components/ui/PlanBadge';
 import { orderAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import SilkBackdrop from '@/components/ui/SilkBackdrop';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -270,8 +271,9 @@ function RequestPageContent() {
   const svcLabel = serviceTypes.find((s) => s.value === form.serviceType)?.label ?? form.serviceType;
 
   return (
-    <div className="min-h-dvh bg-hero-gradient flex flex-col">
+    <div className="min-h-dvh bg-hero-gradient flex flex-col relative isolate">
       {/* Header */}
+      <SilkBackdrop className="absolute inset-x-0 top-0 h-[80vh]" anchor={[0.5, 0.5]} intensity={0.6} />
       <header className="glass border-b border-white/5 px-4 sm:px-6 py-4 flex items-center gap-4 shrink-0">
         <Link href="/" className="text-slate-400 hover:text-white transition-colors">
           <ArrowLeft className="w-5 h-5" />

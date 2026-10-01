@@ -11,6 +11,7 @@ import {
 import { adminAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import AccentText from '@/components/ui/AccentText';
 
 // TYPE_LABELS moved inside component (uses t() for locale-aware labels)
 
@@ -274,7 +275,7 @@ export default function AdminAnalyticsPage() {
     <div className="space-y-6 max-w-7xl">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{t('admin.analytics')}</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight"><AccentText text={t('admin.analytics')} /></h1>
           <p className="text-slate-400 text-sm mt-1">
             {t('admin.analytics.sub')} — {year}
           </p>

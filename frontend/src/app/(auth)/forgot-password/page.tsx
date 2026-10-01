@@ -10,6 +10,8 @@ import Input from '@/components/ui/Input';
 import { authAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
+import AccentText from '@/components/ui/AccentText';
+import SilkBackdrop from '@/components/ui/SilkBackdrop';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -32,8 +34,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-hero-gradient flex items-center justify-center px-4">
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-dvh bg-hero-gradient flex items-center justify-center px-4 relative isolate overflow-hidden">
+      <SilkBackdrop className="absolute inset-0" anchor={[0.5, 0.45]} />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -53,7 +55,7 @@ export default function ForgotPasswordPage() {
                 <Lock className="w-7 h-7 text-primary-400" />
               </div>
 
-              <h1 className="text-2xl font-bold text-white mb-2 text-center">{t('auth.forgot.title')}</h1>
+              <h1 className="text-2xl font-bold text-white mb-2 text-center"><AccentText text={t('auth.forgot.title')} /></h1>
               <p className="text-slate-400 text-sm mb-6 leading-relaxed text-center">
                 {t('auth.forgot.subtitle')}
               </p>
@@ -86,7 +88,7 @@ export default function ForgotPasswordPage() {
               >
                 <CheckCircle2 className="w-7 h-7 text-green-400" />
               </motion.div>
-              <h1 className="text-2xl font-bold text-white mb-2">{t('auth.forgot.sent.title')}</h1>
+              <h1 className="text-2xl font-bold text-white mb-2"><AccentText text={t('auth.forgot.sent.title')} /></h1>
               <p className="text-slate-400 text-sm leading-relaxed mb-6">
                 {t('auth.forgot.sent.body').replace('{email}', email)}
               </p>

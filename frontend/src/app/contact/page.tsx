@@ -8,6 +8,7 @@ import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useLanguage } from '@/contexts/LanguageContext';
+import AccentText from '@/components/ui/AccentText';
 
 const cardStyle = {
   background:    'rgba(10,10,16,0.88)',
@@ -76,7 +77,7 @@ export default function ContactPage() {
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
             <span className="section-label mb-6">{t('contact.badge')}</span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight leading-[1.06] mt-6">
-              {t('contact.title')}
+              <AccentText text={t('contact.title')} />
             </h1>
             <p className="text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
               {t('contact.sub')}
@@ -253,13 +254,7 @@ export default function ContactPage() {
 
                 <button
                   type="submit"
-                  className="group w-full rounded-xl py-3.5 text-sm font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2"
-                  style={{
-                    background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                    boxShadow:  '0 6px 24px rgba(124,58,237,0.35)',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 10px 32px rgba(124,58,237,0.5)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(124,58,237,0.35)'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
+                  className="group btn-silk w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-2 hover:-translate-y-px"
                 >
                   {t('contact.sendWhatsApp')}
                   <Send className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />

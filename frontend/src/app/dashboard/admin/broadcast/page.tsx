@@ -9,6 +9,7 @@ import {
 import { adminAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import AccentText from '@/components/ui/AccentText';
 
 /* ── Template definitions ─────────────────────────────────────────────────── */
 
@@ -171,7 +172,7 @@ export default function BroadcastPage() {
               <div className="w-8 h-8 rounded-xl bg-violet-500/15 flex items-center justify-center">
                 <Mail className="w-4 h-4 text-violet-400" />
               </div>
-              <h1 className="text-2xl font-black text-white tracking-tight">Send Email to All Users</h1>
+              <h1 className="text-2xl font-black text-white tracking-tight"><AccentText text="Send Email to All Users" /></h1>
             </div>
             <p className="text-slate-400 text-sm mt-1.5">
               Choose a template and broadcast it to all registered clients.
