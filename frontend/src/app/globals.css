@@ -1615,10 +1615,11 @@ input, textarea, select {
   font-family: var(--font-serif), 'Instrument Serif', Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: 1.1em;
-  line-height: 0.9;
   letter-spacing: -0.01em;
 }
+/* An accent phrase inside a heading runs slightly larger than the sans words
+   around it (serif x-height is smaller). Standalone serif titles keep their own size. */
+:is(h1, h2, h3, h4) .serif-accent { font-size: 1.1em; line-height: 0.9; }
 .silk-text {
   background: linear-gradient(100deg, #e9d5ff 0%, #c084fc 28%, #818cf8 58%, #67e8f9 100%);
   -webkit-background-clip: text;
@@ -1664,3 +1665,67 @@ h1, h2 { letter-spacing: -0.03em; }
   .silk-scrim-center { background: radial-gradient(95% 40% at 50% 38%, rgba(7,6,15,0.9) 0%, rgba(7,6,15,0.55) 70%, transparent 100%); }
   .silk-scrim-left   { background: linear-gradient(180deg, rgba(7,6,15,0.4) 0%, rgba(7,6,15,0.85) 30%, rgba(7,6,15,0.85) 70%, rgba(7,6,15,0.4) 100%); }
 }
+
+/* ── Cinema layer ─────────────────────────────────────────────────────────── */
+@keyframes cinemaKenBurns { from { transform: scale(1.0) translateY(0); } to { transform: scale(1.08) translateY(-2%); } }
+.cinema-kenburns { animation: cinemaKenBurns 14s ease-out both; }
+@keyframes cinemaFade { from { opacity: 0; transform: translateY(10px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+.cinema-fade { animation: cinemaFade .8s cubic-bezier(0.16,1,0.3,1) both; }
+/* A display surface: a faint glass glare, so a screenshot reads as a lit screen. */
+.cinema-screen {
+  background: linear-gradient(115deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.02) 26%, transparent 40%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinema-kenburns, .cinema-fade { animation: none; }
+}
+
+/* Fixed film grain over the whole public site. */
+.cinema-grain {
+  position: fixed; inset: -50%; width: 200%; height: 200%;
+  z-index: 60; pointer-events: none; opacity: 0.045; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: grainShift 0.5s steps(1) infinite;
+}
+/* Trailing cursor ring; opens into a labelled disc over [data-cursor]. */
+.cinema-cursor {
+  position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none;
+  width: 0; height: 0; opacity: 0; transition: opacity .3s;
+}
+.cinema-cursor[data-live="true"] { opacity: 1; }
+@media (pointer: coarse), (prefers-reduced-motion: reduce) { .cinema-cursor { display: none; } }
+.cinema-cursor::before {
+  content: ''; position: absolute; left: -14px; top: -14px; width: 28px; height: 28px;
+  border-radius: 9999px; border: 1px solid rgba(196,181,253,0.55);
+  transition: transform .45s cubic-bezier(0.16,1,0.3,1), background-color .3s, border-color .3s;
+}
+.cinema-cursor span {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -50%) scale(0.6); opacity: 0;
+  font: 600 11px/1 var(--font-mono), monospace; letter-spacing: .14em; text-transform: uppercase; color: #14092b;
+  transition: opacity .25s, transform .45s cubic-bezier(0.16,1,0.3,1); white-space: nowrap;
+}
+.cinema-cursor[data-open="true"]::before { transform: scale(2.9); background: #ede6ff; border-color: transparent; }
+.cinema-cursor[data-open="true"] span { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+@media (prefers-reduced-motion: reduce) { .cinema-grain { animation: none; } }
+
+/* Opening shot on the home page: two bars part like a cinema curtain. */
+.cinema-open { position: fixed; left: 0; right: 0; height: 50vh; background: #000; z-index: 80; pointer-events: none;
+  animation: cinemaOpen 1.25s cubic-bezier(0.76,0,0.24,1) 0.55s both; }
+.cinema-open-top { top: 0; transform-origin: top; }
+.cinema-open-bottom { bottom: 0; transform-origin: bottom; }
+@keyframes cinemaOpen { from { transform: scaleY(1); } to { transform: scaleY(0); } }
+.cinema-open-title { position: fixed; inset: 0; z-index: 81; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: .6em;
+  font: 500 12px/1 var(--font-mono), monospace; letter-spacing: .4em; text-transform: uppercase; color: #ede6ff;
+  animation: cinemaTitle 1s ease both; }
+.cinema-open-title span { color: #a78bfa; }
+@keyframes cinemaTitle { 0% { opacity: 0; } 25% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .cinema-open, .cinema-open-title { display: none; } }
+
+/* Home sections read as numbered chapters: "01 — What we build". */
+.chapters { counter-reset: chapter; }
+.chapters .section-label::before {
+  counter-increment: chapter; content: counter(chapter, decimal-leading-zero) "  —";
+  width: auto; height: auto; background: none; white-space: pre;
+  font-family: var(--font-mono), monospace; color: #c4b5fd; letter-spacing: .1em;
+}
+.section-label { font-family: var(--font-mono), monospace; font-weight: 500; letter-spacing: 0.22em; color: rgba(196,181,253,0.85); }

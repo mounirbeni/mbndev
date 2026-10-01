@@ -142,7 +142,14 @@ function PortalPanel() {
 
 /* ── Hero ────────────────────────────────────────────────────────────── */
 
+// The opening shot plays on a full page load only, not when the visitor
+// navigates back to the home page inside the app (module state survives
+// client-side navigation and resets on reload).
+let openingPlayed = false;
+
 export default function Hero() {
+  const [opening] = useState(() => !openingPlayed);
+  useEffect(() => { openingPlayed = true; }, []);
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
   const contentY  = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
@@ -167,6 +174,15 @@ export default function Hero() {
       className="relative overflow-hidden bg-[#07060f]"
       style={{ minHeight: '100dvh' }}
     >
+      {/* Opening shot — cinema bars part as the page loads */}
+      {opening && (
+        <>
+          <div aria-hidden className="cinema-open cinema-open-top" />
+          <div aria-hidden className="cinema-open cinema-open-bottom" />
+          <div aria-hidden className="cinema-open-title">MBN DEV <span>presents</span></div>
+        </>
+      )}
+
       {/* ribbons */}
       <motion.div style={{ y: silkY }} className="absolute inset-0">
         <SilkRibbons className="absolute inset-0" anchor={wide ? [0.66, 0.42] : [0.5, 0.13]} />

@@ -14,6 +14,7 @@ import PoweredByPopup from '@/components/landing/PoweredByPopup';
 import ScrollingBanner from '@/components/ui/ScrollingBanner';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 import JsonLd from '@/components/JsonLd';
+import CinemaLayer from '@/components/ui/CinemaLayer';
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -105,7 +106,7 @@ export default function LandingPage() {
       <JsonLd data={websiteSchema} />
       <JsonLd data={serviceSchema} />
       <JsonLd data={localBusinessSchema} />
-      <main className="pb-[74px] lg:pb-0">
+      <main className="chapters pb-[74px] lg:pb-0">
         <Navbar />
         <Hero />
         <TechMarquee />
@@ -119,6 +120,7 @@ export default function LandingPage() {
         <Footer />
       </main>
       <LandingBottomNav />
+      <CinemaLayer />
       <PoweredByPopup />
     </SmoothScroll>
   );

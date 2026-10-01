@@ -4,6 +4,7 @@ import LandingBottomNav from './LandingBottomNav';
 import FloatingSupport from '@/components/ui/FloatingSupport';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 import SilkBackdrop from '@/components/ui/SilkBackdrop';
+import CinemaLayer from '@/components/ui/CinemaLayer';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -28,6 +29,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       {/* Bottom tab bar — mobile only */}
       <LandingBottomNav />
       <FloatingSupport />
+      <CinemaLayer />
     </div>
     </SmoothScroll>
   );

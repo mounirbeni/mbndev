@@ -364,6 +364,17 @@ const CATEGORY_KEYS: Record<string, string> = {
 
 const CATEGORY_IDS: Category[] = ['All', 'E-Commerce', 'Web App', 'SaaS', 'Hospitality'];
 
+// Full-size captures, used where we have them (see public/images/portfolio/hd).
+const HD_COVERS: Record<string, string> = {
+  '/images/portfolio/tarique.png':     '/images/portfolio/hd/tarique.webp',
+  '/images/portfolio/riadconnect.png': '/images/portfolio/hd/riadconnect.webp',
+  '/images/portfolio/transo.png':      '/images/portfolio/hd/transo.webp',
+  '/images/portfolio/lueur-skin.png':  '/images/portfolio/hd/lueur-skin.webp',
+  '/images/portfolio/vitacore.png':    '/images/portfolio/hd/vitacore.webp',
+  '/images/portfolio/emll.png':        '/images/portfolio/hd/emll.webp',
+  '/images/portfolio/chronocraft.png': '/images/portfolio/hd/chronocraft.webp',
+};
+
 export default function PortfolioPage() {
   const { t } = useLanguage();
   const [active, setActive] = useState<Category>('All');
@@ -398,10 +409,10 @@ export default function PortfolioPage() {
               <button
                 key={catId}
                 onClick={() => setActive(catId)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-full font-mono text-[11px] uppercase tracking-[0.18em] transition-all ${
                   active === catId
-                    ? 'bg-primary-500/20 border border-primary-500/40 text-primary-400'
-                    : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                    ? 'bg-[#ede6ff] text-[#14092b] border border-transparent'
+                    : 'bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white hover:border-white/25'
                 }`}
               >
                 {t(CATEGORY_KEYS[catId])}
@@ -428,18 +439,33 @@ export default function PortfolioPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.07 }}
-                  className={`glass rounded-2xl border ${p.border} overflow-hidden group hover:scale-[1.015] transition-transform duration-300 flex flex-col`}
+                  className="relative isolate group flex flex-col"
                 >
+                  {/* Screen light: the cover, blurred, glows behind the card on hover */}
+                  <div aria-hidden className="absolute -inset-6 -z-10 opacity-0 group-hover:opacity-70 transition-opacity duration-700 pointer-events-none">
+                    <Image src={p.image} alt="" fill sizes="30vw" className="object-cover blur-[60px] saturate-150" />
+                  </div>
+                  <div className={`glass rounded-[22px] border ${p.border} overflow-hidden flex flex-col flex-1 transition-transform duration-500 group-hover:-translate-y-1`}>
                   {/* Preview area */}
-                  <div className={`h-44 bg-gradient-to-br ${p.gradient} relative flex items-center justify-center overflow-hidden`}>
+                  <a
+                    href={p.url || undefined}
+                    target={p.url ? '_blank' : undefined}
+                    rel={p.url ? 'noopener noreferrer' : undefined}
+                    data-cursor={p.url ? 'Visit' : undefined}
+                    tabIndex={p.url ? -1 : undefined}
+                    aria-hidden={p.url ? true : undefined}
+                    className={`block aspect-[16/10] bg-gradient-to-br ${p.gradient} relative overflow-hidden`}
+                  >
                     <Image
-                      src={p.image}
+                      src={HD_COVERS[p.image] ?? p.image}
                       alt={`${p.title} project preview`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="object-cover object-top transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#090713]/85 via-[#090713]/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#090713]/85 via-[#090713]/10 to-transparent" />
+                    <div className="absolute inset-0 cinema-screen" />
+                    <span className="absolute bottom-3 left-4 font-mono text-[10.5px] tracking-[0.2em] text-slate-300/80">{String(i + 1).padStart(2, '0')}</span>
                     {/* Type badge */}
                     <span className="absolute top-3 right-3 text-[10px] bg-black/30 backdrop-blur-sm border border-white/15 rounded-full px-2.5 py-1 text-slate-300">
                       {p.type}
@@ -455,11 +481,11 @@ export default function PortfolioPage() {
                         Selected Work
                       </span>
                     )}
-                  </div>
+                  </a>
 
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="text-white font-bold text-lg">{p.title}</h3>
+                      <h3 className="serif-accent silk-text text-[1.9rem] leading-tight pr-1">{p.title}</h3>
                       {p.url && (
                         <a
                           href={p.url}
@@ -510,6 +536,7 @@ export default function PortfolioPage() {
                         ))}
                       </div>
                     )}
+                  </div>
                   </div>
                 </motion.div>
               ))}
