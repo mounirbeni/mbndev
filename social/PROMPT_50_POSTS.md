@@ -41,7 +41,7 @@ with one clear action: "DM us “KEYWORD”" + mbndev.ma.
   2) BEFORE / AFTER — carousel: split cover → before (red numbered markers) → after (purple markers)
      → "what changed" → CTA. One business type per episode.
   3) IF YOUR WEBSITE WERE A… — carousel: web development explained with a Moroccan place
-     (riad, hammam, taxi, souk, wedding…), one concept per slide (frontend, backend, API, database…).
+     (restaurant, hammam, taxi, wedding, café…), one concept per slide (frontend, backend, API, database…).
 - Everything else uses clean typographic layouts in the same identity.
 
 ═════════ 3. CONTENT CALENDAR (post #, format, topic, DM keyword) ═════════
@@ -49,7 +49,7 @@ with one clear action: "DM us “KEYWORD”" + mbndev.ma.
  2 C  5 website myths that cost you clients — FACT
  3 S  One detail #1: the WhatsApp button — CHAT
  4 C  6 signs your website is losing you clients — CHECK
- 5 C  If your website were a riad — RIAD
+ 5 C  If your website were a restaurant — MENU
  6 S  404: “Clients not found.” (not on Google) — FOUND
  7 C  Before/After #1: restaurant — AFTER
  8 S  One detail #2: the first sentence — HERO
@@ -60,15 +60,15 @@ with one clear action: "DM us “KEYWORD”" + mbndev.ma.
 13 C  What really decides the price of a website — PRICE
 14 C  If your website were a hammam — HAMMAM
 15 S  Search “page 5” — where do you show up? — SEARCH
-16 C  Before/After #2: riad / guesthouse — AFTER
+16 C  Before/After #2: clinic / dentist — AFTER
 17 S  One detail #4: your Google Business profile — MAPS
 18 C  6 questions before you hire a web developer — QUOTE
 19 S  Loading 12% — “Visitor left.” — FAST
 20 C  If your website were a taxi — TAXI
 21 S  One detail #5: mobile first — MOBILE
-22 C  Riads: why direct booking beats commissions — BOOK
+22 C  Restaurants: why your own booking page beats delivery apps — BOOK
 23 S  Report card: F vs A+ — GRADE
-24 C  Before/After #3: clinic / dentist — AFTER
+24 C  Before/After #3: gym / sports club — AFTER
 25 S  One detail #6: reviews on the page — TRUST
 26 C  What's included in every MBN DEV website — INCLUDED
 27 S  Glow up 2014 → 2026 — GLOWUP
@@ -84,7 +84,7 @@ with one clear action: "DM us “KEYWORD”" + mbndev.ma.
 37 S  One detail #9: real photos, not stock — PHOTOS
 38 C  5 more myths: SEO, hosting, “I'll do it myself” — MYTHS
 39 S  “Website Facts” nutrition label (0% bloat, 100% mobile) — LABEL
-40 C  Before/After #5: hotel / guesthouse — AFTER
+40 C  Before/After #5: real-estate agency — AFTER
 41 S  One detail #10: the padlock (SSL) — SECURE
 42 C  Client portal: track your project in real time — PORTAL
 43 C  Why websites need monthly care (updates, backups) — CARE
