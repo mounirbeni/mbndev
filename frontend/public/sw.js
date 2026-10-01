@@ -7,9 +7,18 @@
 //
 // Safari-safe: every respondWith() code path returns a non-null Response.
 
-const STATIC_CACHE  = 'mbndev-static-v2';
-const PAGE_CACHE    = 'mbndev-pages-v2';
-const CACHE_VERSION = 'v2';
+const STATIC_CACHE  = 'mbndev-static-v3';
+const PAGE_CACHE    = 'mbndev-pages-v3';
+const CACHE_VERSION = 'v3';
+
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  event.waitUntil(self.registration.showNotification(data.title || 'MBN DEV', { body: data.body || '', icon: '/brand-icon-transparent.webp', badge: '/brand-icon-transparent.webp', data: { url: data.url || '/dashboard/client' } }));
+});
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(event.notification.data?.url || '/dashboard/client'));
+});
 
 // Pages to warm on install
 const PRECACHE_URLS = ['/', '/login', '/services', '/pricing', '/offline'];

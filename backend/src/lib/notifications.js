@@ -3,6 +3,7 @@
 const prisma   = require('./prisma');
 const realtime = require('./realtime');
 const cache    = require('./cache');
+const { sendPush } = require('./push');
 
 // ─── notify ──────────────────────────────────────────────────────────────────
 /**
@@ -24,6 +25,7 @@ async function notify(userId, { type, title, message, link = null, metadata = nu
       read:      false,
       createdAt: notif.createdAt,
     });
+    sendPush(userId, { title: notif.title, body: notif.message, url: notif.link || '/dashboard/client' }).catch(() => {});
     return notif;
   } catch (err) {
     console.error('[notify] Failed to create notification:', err.message);

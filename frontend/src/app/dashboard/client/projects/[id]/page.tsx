@@ -8,6 +8,7 @@ import { projectAPI, messageAPI, paymentAPI } from '@/lib/api';
 import { Project, Message, Payment } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import ProjectStageTracker from '@/components/dashboard/ProjectStageTracker';
+import ProjectAnalytics from '@/components/dashboard/ProjectAnalytics';
 import MessageThread from '@/components/dashboard/MessageThread';
 import Button from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -30,6 +31,7 @@ const TAB_DEFS = [
   { id: 'files',     labelKey: 'dash.tab.files',     icon: Paperclip       },
   { id: 'payments',  labelKey: 'dash.nav.payments',  icon: CreditCard      },
   { id: 'activity',  labelKey: 'dash.tab.activity',  icon: Activity        },
+  { id: 'analytics', labelKey: 'client.progress',     icon: TrendingUp     },
 ];
 
 const STATUS_STEP_DEFS = [
@@ -537,6 +539,9 @@ export default function ClientProjectWorkspace() {
               )}
             </div>
           )}
+
+          {/* ── ANALYTICS ── */}
+          {tab === 'analytics' && <ProjectAnalytics project={project as any} />}
 
         </motion.div>
       </AnimatePresence>
