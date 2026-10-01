@@ -107,7 +107,7 @@ Instagram caption structure (max ~900 characters):
   CTA line: “DM us “KEYWORD” for a free quote 👉 mbndev.ma”.
   Blank line, then 10–12 hashtags: 3 brand/niche (#mbndev #webdesign #webdevelopment),
   3 audience (#smallbusiness #entrepreneur #startup), 3 local (#maroc #morocco #marrakech or the
-  city relevant to the post), 2–3 topic-specific (e.g. #riad #restaurant #ecommerce #seo).
+  city relevant to the post), 2–3 topic-specific (e.g. #restaurant #cafe #ecommerce #seo).
 Facebook caption: same text, but only 3–5 hashtags, and add the link mbndev.ma as plain text.
 Never use banned/spammy tags, never repeat the exact same hashtag set two posts in a row,
 never mention competitors, never promise rankings or guaranteed results.
