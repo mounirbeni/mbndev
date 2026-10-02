@@ -144,7 +144,6 @@ export default function Portfolio() {
                 onClick={() => goTo(i)}
                 aria-label={`Show ${proj.title}`}
                 aria-current={i === active}
-                data-cursor="Play"
                 className={`relative h-[6.2vh] aspect-video rounded-[6px] overflow-hidden border transition-all duration-500 ${
                   i === active ? 'opacity-100 scale-105' : 'border-white/10 opacity-40 hover:opacity-80'
                 }`}
@@ -192,7 +191,7 @@ export default function Portfolio() {
               ))}
             </div>
             <div className="mt-9 flex items-center gap-3">
-              <a href={p.url} target="_blank" rel="noopener noreferrer" data-cursor="Visit" className="btn-silk group inline-flex items-center gap-2 pl-6 pr-2 py-2 text-[14px] font-semibold">
+              <a href={p.url} target="_blank" rel="noopener noreferrer" className="btn-silk group inline-flex items-center gap-2 pl-6 pr-2 py-2 text-[14px] font-semibold">
                 Visit live site
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#14092b] text-white transition-transform duration-300 group-hover:rotate-45">
                   <ArrowUpRight className="w-4 h-4" />
@@ -209,7 +208,6 @@ export default function Portfolio() {
             href={p.url}
             target="_blank"
             rel="noopener noreferrer"
-            data-cursor="Visit"
             aria-label={`Visit ${p.title}`}
             className="relative block"
           >

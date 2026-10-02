@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { CountUpText } from '@/components/ui/CountUp';
 import { useRouter } from 'next/navigation';
 import {
   Mail, Lock, ArrowRight, Eye, EyeOff, ChevronLeft,
@@ -245,7 +246,7 @@ function LeftPanel() {
         >
           {stats.map((s) => (
             <div key={s.label}>
-              <div className="text-xl font-black text-white tabular-nums">{s.val}</div>
+              <div className="text-xl font-black text-white tabular-nums"><CountUpText text={s.val} /></div>
               <div className="text-[11px] text-slate-500 mt-0.5">{s.label}</div>
             </div>
           ))}

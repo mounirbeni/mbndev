@@ -18,6 +18,7 @@ import Button from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
 import AccentText from '@/components/ui/AccentText';
+import CountUp from '@/components/ui/CountUp';
 
 interface Analytics {
   totalProjects:  number;
@@ -135,7 +136,7 @@ export default function AdminDashboard() {
   const stackCards = useMemo(() => [
     {
       title:    t('admin.allProjects'),
-      value:    loading ? '—' : String(a?.totalProjects ?? 0),
+      value:    loading ? '—' : <CountUp value={a?.totalProjects ?? 0} />,
       sub:      loading ? '' : `${a?.byStatus.inProgress ?? 0} active · ${a?.byStatus.completed ?? 0} done`,
       icon:     FolderOpen,
       gradient: 'from-violet-600 via-purple-600 to-blue-600',
@@ -144,7 +145,7 @@ export default function AdminDashboard() {
     },
     {
       title:    'Clients',
-      value:    loading ? '—' : String(a?.activeClients ?? 0),
+      value:    loading ? '—' : <CountUp value={a?.activeClients ?? 0} />,
       sub:      loading ? '' : `${a?.totalClients ?? 0} registered total`,
       icon:     Users,
       gradient: 'from-blue-600 via-cyan-600 to-teal-600',
@@ -153,7 +154,7 @@ export default function AdminDashboard() {
     },
     {
       title:    t('admin.totalRevenue'),
-      value:    loading ? '—' : formatCurrency(a?.totalRevenue ?? 0),
+      value:    loading ? '—' : <CountUp value={a?.totalRevenue ?? 0} format="currency" decimals={2} />,
       sub:      loading ? '' : `${formatCurrency(a?.pendingRevenue ?? 0)} pending`,
       icon:     DollarSign,
       gradient: 'from-emerald-600 via-green-600 to-lime-600',
@@ -162,7 +163,7 @@ export default function AdminDashboard() {
     },
     {
       title:    t('status.inProgress'),
-      value:    loading ? '—' : String(a?.byStatus.inProgress ?? 0),
+      value:    loading ? '—' : <CountUp value={a?.byStatus.inProgress ?? 0} />,
       sub:      loading ? '' : `${a?.byStatus.review ?? 0} in review · ${a?.byStatus.revision ?? 0} revision`,
       icon:     Activity,
       gradient: 'from-orange-600 via-amber-600 to-yellow-600',
@@ -645,7 +646,7 @@ export default function AdminDashboard() {
                         />
                       </div>
                       <span className="text-slate-500 text-xs tabular-nums w-5 text-right shrink-0">
-                        {s.value}
+                        <CountUp value={s.value} duration={0.8} />
                       </span>
                     </div>
                   ))

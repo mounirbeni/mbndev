@@ -1687,25 +1687,6 @@ h1, h2 { letter-spacing: -0.03em; }
   background-size: 180px 180px;
   animation: grainShift 0.5s steps(1) infinite;
 }
-/* Trailing cursor ring; opens into a labelled disc over [data-cursor]. */
-.cinema-cursor {
-  position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none;
-  width: 0; height: 0; opacity: 0; transition: opacity .3s;
-}
-.cinema-cursor[data-live="true"] { opacity: 1; }
-@media (pointer: coarse), (prefers-reduced-motion: reduce) { .cinema-cursor { display: none; } }
-.cinema-cursor::before {
-  content: ''; position: absolute; left: -14px; top: -14px; width: 28px; height: 28px;
-  border-radius: 9999px; border: 1px solid rgba(196,181,253,0.55);
-  transition: transform .45s cubic-bezier(0.16,1,0.3,1), background-color .3s, border-color .3s;
-}
-.cinema-cursor span {
-  position: absolute; left: 0; top: 0; transform: translate(-50%, -50%) scale(0.6); opacity: 0;
-  font: 600 11px/1 var(--font-mono), monospace; letter-spacing: .14em; text-transform: uppercase; color: #14092b;
-  transition: opacity .25s, transform .45s cubic-bezier(0.16,1,0.3,1); white-space: nowrap;
-}
-.cinema-cursor[data-open="true"]::before { transform: scale(2.9); background: #ede6ff; border-color: transparent; }
-.cinema-cursor[data-open="true"] span { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 @media (prefers-reduced-motion: reduce) { .cinema-grain { animation: none; } }
 
 /* Opening shot on the home page: two bars part like a cinema curtain. */

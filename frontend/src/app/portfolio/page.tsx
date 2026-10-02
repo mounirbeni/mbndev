@@ -449,7 +449,6 @@ export default function PortfolioPage() {
                     href={p.url || undefined}
                     target={p.url ? '_blank' : undefined}
                     rel={p.url ? 'noopener noreferrer' : undefined}
-                    data-cursor={p.url ? 'Visit' : undefined}
                     tabIndex={p.url ? -1 : undefined}
                     aria-hidden={p.url ? true : undefined}
                     className={`block aspect-[1672/941] bg-gradient-to-br ${p.gradient} relative overflow-hidden`}

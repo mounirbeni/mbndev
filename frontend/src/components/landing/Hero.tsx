@@ -1,11 +1,12 @@
 'use client';
 
-import { motion, useScroll, useTransform, useInView, animate } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowUpRight, Check, Play, MessageSquare } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import Magnetic from '@/components/ui/Magnetic';
 import SilkRibbons from '@/components/ui/SilkRibbons';
+import CountUp from '@/components/ui/CountUp';
 
 const STATS = [
   { val: 50,  suffix: '+', label: 'Happy clients'       },
@@ -15,24 +16,6 @@ const STATS = [
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-
-function AnimatedCounter({ val, suffix }: { val: number; suffix: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.3 });
-
-  useEffect(() => {
-    if (!inView) return;
-    const controls = animate(0, val, {
-      duration: 1.8,
-      ease: EASE,
-      onUpdate: (v) => setCount(Math.round(v)),
-    });
-    return () => controls.stop();
-  }, [inView, val]);
-
-  return <span ref={ref}>{count}{suffix}</span>;
-}
 
 /* ── Glass mock of the client portal ─────────────────────────────────── */
 
@@ -297,7 +280,7 @@ export default function Hero() {
                 className={`py-5 lg:py-7 ${i % 2 === 1 ? 'pl-6' : ''} lg:pl-0 ${i > 0 ? 'lg:pl-8 lg:border-l lg:border-white/[0.07]' : ''} ${i > 1 ? 'border-t border-white/[0.07] lg:border-t-0' : ''}`}
               >
                 <div className="text-[clamp(1.6rem,2.4vw,2.2rem)] font-semibold tracking-tight text-white tabular-nums leading-none">
-                  <AnimatedCounter val={s.val} suffix={s.suffix} />
+                  <CountUp value={s.val} suffix={s.suffix} duration={1.8} />
                 </div>
                 <div className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-slate-500">{s.label}</div>
               </div>

@@ -11,6 +11,7 @@ import {
   Check,
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
+import { CountUpText } from '@/components/ui/CountUp';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -121,7 +122,7 @@ export default function AboutPage() {
                     style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)' }}>
                     <Icon className="w-5 h-5 text-violet-400" />
                   </div>
-                  <div className="text-4xl font-black text-white mb-1 tracking-tight">{s.value}</div>
+                  <div className="text-4xl font-black text-white mb-1 tracking-tight"><CountUpText text={s.value} /></div>
                   <div className="text-slate-500 text-sm">{s.label}</div>
                 </motion.div>
               );
@@ -205,7 +206,7 @@ export default function AboutPage() {
                       { val: '3', lab: 'Languages' },
                     ].map(({ val, lab }) => (
                       <div key={lab} className="text-center">
-                        <div className="text-2xl font-black text-white">{val}</div>
+                        <div className="text-2xl font-black text-white"><CountUpText text={val} /></div>
                         <div className="text-slate-500 text-xs mt-0.5">{lab}</div>
                       </div>
                     ))}

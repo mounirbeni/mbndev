@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Check, ArrowRight, Zap, Star, HelpCircle, Flame, Tag, Trophy } from 'lucide-react';
 import { packageAPI } from '@/lib/api';
 import { Package } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+import CountUp from '@/components/ui/CountUp';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import AuthModal from '@/components/ui/AuthModal';
@@ -150,7 +150,7 @@ export default function PricingPage() {
                   {pct > 0 && (
                     <div className="absolute top-4 right-4">
                       <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-2 py-0.5 rounded-full">
-                        -{pct}%
+                        -<CountUp value={pct} suffix="%" duration={1.2} />
                       </span>
                     </div>
                   )}
@@ -172,17 +172,17 @@ export default function PricingPage() {
                   <div className="mb-6">
                     {pkg.originalPrice && (
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-slate-500 text-sm line-through">{formatCurrency(pkg.originalPrice)}</span>
+                        <span className="text-slate-500 text-sm line-through"><CountUp value={pkg.originalPrice} format="currency" duration={1.2} /></span>
                         <span className="text-slate-500 text-xs">{t('pricing.marketAvgLabel')}</span>
                       </div>
                     )}
                     <div className="flex items-end gap-1.5">
-                      <span className="text-4xl font-black text-white">{formatCurrency(pkg.price)}</span>
+                      <span className="text-4xl font-black text-white"><CountUp value={pkg.price} format="currency" /></span>
                       <span className="text-slate-500 text-sm mb-1">{t('pricing.perProjectLabel')}</span>
                     </div>
                     {pkg.originalPrice && (
                       <p className="text-green-400 text-xs font-semibold mt-1.5">
-                        {t('pricing.youSaveLabel').replace('{amount}', formatCurrency(pkg.originalPrice - pkg.price))}
+                        {t('pricing.youSaveLabel').split('{amount}')[0]}<CountUp value={pkg.originalPrice - pkg.price} format="currency" />{t('pricing.youSaveLabel').split('{amount}')[1]}
                       </p>
                     )}
                   </div>

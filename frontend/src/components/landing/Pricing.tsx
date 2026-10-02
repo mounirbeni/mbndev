@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useInView, animate } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import CountUp from '@/components/ui/CountUp';
 import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AuthModal from '@/components/ui/AuthModal';
@@ -33,24 +34,6 @@ const defaultPackages: Package[] = [
 
 function discountPct(original: number, current: number) {
   return Math.round((1 - current / original) * 100);
-}
-
-function AnimatedPrice({ value }: { value: number }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-40px' });
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    const controls = animate(0, value, {
-      duration: 1.4,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => setDisplay(Math.round(v)),
-    });
-    return () => controls.stop();
-  }, [inView, value]);
-
-  return <span ref={ref}>${display.toLocaleString()}</span>;
 }
 
 export default function Pricing() {
@@ -199,7 +182,7 @@ export default function Pricing() {
                             color: isFeatured ? '#c4b5fd' : '#64748b',
                           }}
                         >
-                          -{pct}%
+                          -<CountUp value={pct} suffix="%" duration={1.2} />
                         </span>
                       )}
                     </div>
@@ -208,14 +191,14 @@ export default function Pricing() {
                     <div className="mb-7">
                       {pkg.originalPrice && (
                         <p className="text-slate-700 text-sm line-through mb-1.5 tabular-nums">
-                          ${pkg.originalPrice.toLocaleString()}
+                          <CountUp value={pkg.originalPrice} format="currency" duration={1.2} />
                         </p>
                       )}
                       <div className="flex items-baseline gap-1">
                         <span className={`text-6xl lg:text-7xl font-black leading-none tracking-tight tabular-nums ${
                           isFeatured ? 'text-white' : 'text-white'
                         }`}>
-                          <AnimatedPrice value={pkg.price} />
+                          <CountUp value={pkg.price} format="currency" />
                         </span>
                       </div>
                       <p className="text-slate-600 text-[11px] tracking-widest uppercase mt-2">per project</p>
@@ -223,7 +206,7 @@ export default function Pricing() {
                         <p className={`text-xs font-semibold mt-2 ${
                           isFeatured ? 'text-violet-400' : 'text-slate-500'
                         }`}>
-                          Save ${savings.toLocaleString()}
+                          Save <CountUp value={savings} format="currency" />
                         </p>
                       )}
                     </div>
