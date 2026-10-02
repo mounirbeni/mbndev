@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Bell, BellRing, Check, CheckCheck, X, Loader2, BellOff } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';
+import { enablePushNotifications, PUSH_RESULT_MESSAGES } from '@/lib/pushNotifications';
 import { useLanguage } from '@/contexts/LanguageContext';
 import toast from 'react-hot-toast';
 import { cn, makeTimeAgo } from '@/lib/utils';
@@ -123,35 +124,15 @@ export default function NotificationBell() {
   };
 
   const enablePush = async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      toast.error('This browser can’t receive notifications. On iPhone, add MBN DEV to your Home Screen first, then enable them from there.');
-      return;
-    }
     setPushBusy(true);
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        toast.error('Notifications are blocked for this site. Allow them in your browser settings, then try again.');
-        return;
-      }
-      const { data } = await notificationAPI.pushConfig();
-      if (!data.configured || !data.publicKey) {
-        toast.error('Phone notifications are not configured on the server yet.');
-        return;
-      }
-      const registration = await navigator.serviceWorker.ready;
-      const base64 = data.publicKey.replace(/-/g, '+').replace(/_/g, '/');
-      const key = Uint8Array.from(
-        atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')),
-        (char) => char.charCodeAt(0)
-      );
-      const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
-      await notificationAPI.subscribePush(subscription.toJSON());
+    const result = await enablePushNotifications();
+    setPushBusy(false);
+    if (result === 'enabled') {
       setPushEnabled(true);
       toast.success('Phone notifications are on.');
-    } catch {
-      toast.error('Could not enable notifications. Please try again.');
-    } finally { setPushBusy(false); }
+    } else {
+      toast.error(PUSH_RESULT_MESSAGES[result]);
+    }
   };
 
   return (

@@ -25,7 +25,7 @@ const PHRASES = [
   'grow with you.',
 ];
 
-const HOLD_MS = 3200;
+const HOLD_MS = 3400;
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function RotatingPhrase({ className = '' }: { className?: string }) {
@@ -51,8 +51,8 @@ export default function RotatingPhrase({ className = '' }: { className?: string 
               aria-hidden
               className="inline-block silk-text"
               initial={reduced ? { opacity: 0 } : { opacity: 0, y: '0.35em' }}
-              animate={{ opacity: 1, y: 0, transition: { duration: 0.7, delay: k * 0.08, ease: EASE } }}
-              exit={reduced ? { opacity: 0 } : { opacity: 0, y: '-0.3em', transition: { duration: 0.35, delay: k * 0.04, ease: EASE } }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.55, delay: k * 0.06, ease: EASE } }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, y: '-0.3em', transition: { duration: 0.22, delay: k * 0.02, ease: EASE } }}
             >
               {w}
               {k < words.length - 1 && ' '}

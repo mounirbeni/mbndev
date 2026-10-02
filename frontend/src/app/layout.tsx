@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
+import PushPrompt from '@/components/mobile/PushPrompt';
 import SplashScreen from '@/components/mobile/SplashScreen';
 import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 import './globals.css';
@@ -135,6 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 error: { iconTheme: { primary: '#ef4444', secondary: '#e2e8f0' } },
               }}
             />
+            <PushPrompt />
           </AuthProvider>
         </LanguageProvider>
         <SplashScreen />

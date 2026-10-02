@@ -20,12 +20,16 @@ export default function SplashScreen() {
 
     if (!isStandalone) return;
 
-    // Only show once per session
+    // Only show once per session. The flag is written when the splash ends:
+    // written up front, an effect re-run (React StrictMode) would skip the
+    // timer and leave the splash covering the app.
     if (sessionStorage.getItem('splash-shown')) return;
-    sessionStorage.setItem('splash-shown', '1');
 
     setVisible(true);
-    const t = setTimeout(() => setVisible(false), 1800);
+    const t = setTimeout(() => {
+      sessionStorage.setItem('splash-shown', '1');
+      setVisible(false);
+    }, 1800);
     return () => clearTimeout(t);
   }, []);
 
