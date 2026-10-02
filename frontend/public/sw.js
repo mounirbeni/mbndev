@@ -7,18 +7,9 @@
 //
 // Safari-safe: every respondWith() code path returns a non-null Response.
 
-const STATIC_CACHE  = 'mbndev-static-v3';
-const PAGE_CACHE    = 'mbndev-pages-v3';
-const CACHE_VERSION = 'v3';
-
-self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
-  event.waitUntil(self.registration.showNotification(data.title || 'MBN DEV', { body: data.body || '', icon: '/brand-icon-transparent.webp', badge: '/brand-icon-transparent.webp', data: { url: data.url || '/dashboard/client' } }));
-});
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(clients.openWindow(event.notification.data?.url || '/dashboard/client'));
-});
+const STATIC_CACHE  = 'mbndev-static-v4';
+const PAGE_CACHE    = 'mbndev-pages-v4';
+const CACHE_VERSION = 'v4';
 
 // Pages to warm on install
 const PRECACHE_URLS = ['/', '/login', '/services', '/pricing', '/offline'];
@@ -181,10 +172,10 @@ self.addEventListener('push', (event) => {
     event.waitUntil(
       self.registration.showNotification(data.title || 'MBN DEV', {
         body:    data.body  || 'You have a new update.',
-        icon:    '/icons/icon-192x192.png',
-        badge:   '/icons/icon-72x72.png',
-        tag:     data.tag   || 'mbndev',
-        data:    { url: data.url || '/' },
+        icon:    '/brand-icon-transparent.webp',
+        badge:   '/brand-icon-transparent.webp',
+        tag:     data.tag   || undefined,      // distinct notifications don't replace each other
+        data:    { url: data.url || '/dashboard/client' },
         actions: [
           { action: 'open',    title: 'View' },
           { action: 'dismiss', title: 'Dismiss' },
@@ -199,7 +190,7 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   if (event.action === 'dismiss') return;
-  const url = event.notification.data?.url || '/';
+  const url = new URL(event.notification.data?.url || '/dashboard/client', self.location.origin).href;
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
       for (const client of list) {

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Bell, BellRing, Check, CheckCheck, X, Loader2, BellOff } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
+import toast from 'react-hot-toast';
 import { cn, makeTimeAgo } from '@/lib/utils';
 import { useRealtime } from '@/hooks/useRealtime';
 
@@ -48,7 +49,12 @@ export default function NotificationBell() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
     navigator.serviceWorker.ready
       .then((registration) => registration.pushManager.getSubscription())
-      .then((subscription) => setPushEnabled(Boolean(subscription)))
+      .then((subscription) => {
+        setPushEnabled(Boolean(subscription));
+        // Re-register every load: the server copy can be missing (it was lost
+        // while the PushSubscription table didn't exist) and the upsert is cheap.
+        if (subscription) notificationAPI.subscribePush(subscription.toJSON()).catch(() => undefined);
+      })
       .catch(() => undefined);
   }, []);
 
@@ -117,13 +123,22 @@ export default function NotificationBell() {
   };
 
   const enablePush = async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      toast.error('This browser can’t receive notifications. On iPhone, add MBN DEV to your Home Screen first, then enable them from there.');
+      return;
+    }
     setPushBusy(true);
     try {
       const permission = await Notification.requestPermission();
-      if (permission !== 'granted') return;
+      if (permission !== 'granted') {
+        toast.error('Notifications are blocked for this site. Allow them in your browser settings, then try again.');
+        return;
+      }
       const { data } = await notificationAPI.pushConfig();
-      if (!data.configured || !data.publicKey) return;
+      if (!data.configured || !data.publicKey) {
+        toast.error('Phone notifications are not configured on the server yet.');
+        return;
+      }
       const registration = await navigator.serviceWorker.ready;
       const base64 = data.publicKey.replace(/-/g, '+').replace(/_/g, '/');
       const key = Uint8Array.from(
@@ -133,7 +148,10 @@ export default function NotificationBell() {
       const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
       await notificationAPI.subscribePush(subscription.toJSON());
       setPushEnabled(true);
-    } catch {} finally { setPushBusy(false); }
+      toast.success('Phone notifications are on.');
+    } catch {
+      toast.error('Could not enable notifications. Please try again.');
+    } finally { setPushBusy(false); }
   };
 
   return (
@@ -188,7 +206,7 @@ export default function NotificationBell() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
               <div className="flex items-center gap-2">
-                {!pushEnabled && typeof window !== 'undefined' && 'PushManager' in window && (
+                {!pushEnabled && typeof window !== 'undefined' && 'serviceWorker' in navigator && (
                   <button onClick={enablePush} disabled={pushBusy} className="text-[11px] text-slate-400 hover:text-primary-300 flex items-center gap-1.5 transition-colors disabled:opacity-50">
                     <BellRing className="w-3.5 h-3.5" /> {pushBusy ? 'Enabling…' : 'Enable push'}
                   </button>
