@@ -9,6 +9,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SilkRibbons from '@/components/ui/SilkRibbons';
 import { PROJECT_MEDIA } from '@/lib/portfolioMedia';
+import BrandWordmark from './BrandWordmark';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,6 +35,23 @@ const projectsMeta: ProjectMeta[] = [
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+/** Long, soft ease shared by every reel transition. */
+const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+/**
+ * Slides before the active one wait on one side, slides after it on the
+ * other, so a change always travels in the direction of the scroll.
+ */
+function slide(i: number, active: number, axis: 'x' | 'y', dist: number) {
+  const d = i === active ? 0 : i < active ? -dist : dist;
+  return {
+    opacity: i === active ? 1 : 0,
+    transform: `translate${axis.toUpperCase()}(${d}px) scale(${i === active ? 1 : 0.97})`,
+    filter: i === active ? 'blur(0px)' : 'blur(8px)',
+    transition: `opacity 1s ${EASE}, transform 1.25s ${EASE}, filter 1s ${EASE}`,
+  } as const;
+}
+
 /** Film timecode for a 0..1 progress through a ~2-minute "reel". */
 function timecode(p: number) {
   const total = p * 128;
@@ -45,7 +63,15 @@ export default function Portfolio() {
   const { t } = useLanguage();
   const projects = projectsMeta.map((p) => {
     const media = PROJECT_MEDIA[p.media];
-    return { ...p, mockup: media.mockup!, palette: media.palette, type: t(`portfolio.type.${p.key}`), desc: t(`portfolio.desc.${p.key}`) };
+    return {
+      ...p,
+      mockup: media.mockup!,
+      // Same shot with the backdrop removed, so the devices float in the reel.
+      cutout: `/images/portfolio/cutouts/${p.media}.webp`,
+      palette: media.palette,
+      type: t(`portfolio.type.${p.key}`),
+      desc: t(`portfolio.desc.${p.key}`),
+    };
   });
   const n = projects.length;
 
@@ -63,7 +89,7 @@ export default function Portfolio() {
       const st = ScrollTrigger.create({
         trigger: root,
         start: 'top top',
-        end: () => `+=${window.innerHeight * (n - 1) * 0.85}`,
+        end: () => `+=${window.innerHeight * (n - 1)}`,
         pin: true,
         anticipatePin: 1,
         onUpdate: (self) => {
@@ -131,7 +157,7 @@ export default function Portfolio() {
           <div className="w-[220px] shrink-0">
             <div className="h-px bg-white/10 overflow-hidden">
               <div
-                className="h-full transition-[background] duration-700"
+                className="h-full"
                 style={{ width: `${progress * 100}%`, background: `linear-gradient(90deg, ${p.palette.join(', ')})` }}
               />
             </div>
@@ -144,32 +170,27 @@ export default function Portfolio() {
           {/* Credits */}
           <div className="relative min-h-[380px]">
             <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-slate-500 mb-6">
-              <span style={{ color: p.palette[2] }} className="transition-colors duration-700">{pad(active + 1)}</span> — {p.type}
+              <span style={{ color: p.palette[2], transition: `color 1s ${EASE}` }}>{pad(active + 1)}</span> — {p.type}
             </p>
-            <div className="relative h-[clamp(4.5rem,8vw,7.5rem)]">
+            <div className="relative h-[clamp(5rem,8.5vw,8rem)]" style={{ fontSize: 'clamp(3.2rem, 5.6vw, 5.6rem)' }}>
               {projects.map((proj, i) => (
                 <h3
                   key={proj.key}
                   aria-hidden={i !== active}
-                  className="absolute inset-0 serif-accent whitespace-nowrap transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                  style={{
-                    fontSize: 'clamp(3.4rem, 6vw, 6rem)',
-                    background: `linear-gradient(100deg, #ffffff 0%, ${proj.palette[2]} 45%, ${proj.palette[1]} 100%)`,
-                    WebkitBackgroundClip: 'text',
-                    backgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    opacity: i === active ? 1 : 0,
-                    transform: `translateY(${i === active ? 0 : i < active ? -40 : 40}px)`,
-                    filter: i === active ? 'blur(0px)' : 'blur(10px)',
-                  }}
+                  className="absolute inset-x-0 bottom-0 leading-none whitespace-nowrap"
+                  style={slide(i, active, 'y', 36)}
                 >
-                  {proj.title}
+                  <BrandWordmark brand={proj.media} title={proj.title} />
                 </h3>
               ))}
             </div>
-            <p key={p.key} className="mt-6 max-w-[400px] text-[16px] leading-[1.7] text-slate-400 cinema-fade">
-              {p.desc}
-            </p>
+            <div className="relative mt-6 max-w-[400px] h-[5.4em] text-[16px] leading-[1.7]">
+              {projects.map((proj, i) => (
+                <p key={proj.key} aria-hidden={i !== active} className="absolute inset-0 text-slate-400" style={slide(i, active, 'y', 14)}>
+                  {proj.desc}
+                </p>
+              ))}
+            </div>
             <div className="mt-9 flex items-center gap-3">
               <a href={p.url} target="_blank" rel="noopener noreferrer" data-cursor="Visit" className="btn-silk group inline-flex items-center gap-2 pl-6 pr-2 py-2 text-[14px] font-semibold">
                 Visit live site
@@ -192,32 +213,25 @@ export default function Portfolio() {
             aria-label={`Visit ${p.title}`}
             className="relative block"
           >
-            <div
-              className="relative aspect-[1672/941] rounded-[22px] overflow-hidden border border-white/10 transition-shadow duration-[1200ms]"
-              style={{ boxShadow: `0 0 140px -30px ${p.palette[1]}aa, 0 60px 140px -40px rgba(0,0,0,0.95)` }}
-            >
+            <div className="relative aspect-[1672/941]">
+              {/* soft floor light under the devices, in the project's colour */}
+              <div
+                aria-hidden
+                className="absolute inset-x-[8%] bottom-[2%] h-[16%] rounded-[50%] blur-3xl"
+                style={{ background: p.palette[1], opacity: 0.32, transition: `background 1.2s ${EASE}` }}
+              />
               {projects.map((proj, i) => (
-                <div
-                  key={proj.key}
-                  aria-hidden={i !== active}
-                  className="absolute inset-0 transition-[opacity,transform,filter] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
-                  style={{
-                    opacity: i === active ? 1 : 0,
-                    transform: i === active ? 'scale(1)' : 'scale(1.04)',
-                    filter: i === active ? 'blur(0px)' : 'blur(8px)',
-                  }}
-                >
+                <div key={proj.key} aria-hidden={i !== active} className="absolute inset-0" style={slide(i, active, 'x', 70)}>
                   <Image
-                    src={proj.mockup}
+                    src={proj.cutout}
                     alt={`${proj.title} on laptop and phone`}
                     fill
                     sizes="(min-width: 1024px) 62vw, 90vw"
                     priority={i === 0}
-                    className={`object-cover ${i === active ? 'cinema-kenburns' : ''}`}
+                    className="object-contain drop-shadow-[0_40px_60px_rgba(0,0,0,0.65)]"
                   />
                 </div>
               ))}
-              <div aria-hidden className="absolute inset-0 pointer-events-none cinema-screen" />
             </div>
           </a>
         </div>
@@ -241,17 +255,14 @@ export default function Portfolio() {
                 style={{ background: `radial-gradient(70% 45% at 50% 30%, ${proj.palette[1]}40 0%, ${proj.palette[0]}14 45%, transparent 75%)` }}
               />
               <div className="relative">
-                <div className="relative aspect-[1672/941] rounded-2xl overflow-hidden border border-white/10" style={{ boxShadow: `0 0 70px -20px ${proj.palette[1]}aa` }}>
-                  <Image src={proj.mockup} alt={`${proj.title} on laptop and phone`} fill sizes="92vw" className="object-cover" />
+                <div className="relative aspect-[1672/941]">
+                  <Image src={proj.cutout} alt={`${proj.title} on laptop and phone`} fill sizes="92vw" className="object-contain drop-shadow-[0_24px_36px_rgba(0,0,0,0.6)]" />
                 </div>
                 <p className="mt-5 font-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-500">
                   <span style={{ color: proj.palette[2] }}>{pad(i + 1)}</span> — {proj.type}
                 </p>
-                <h3
-                  className="mt-1 serif-accent text-[2.6rem]"
-                  style={{ background: `linear-gradient(100deg, #fff 0%, ${proj.palette[2]} 50%, ${proj.palette[1]} 100%)`, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
-                >
-                  {proj.title}
+                <h3 className="mt-2 text-[2.5rem] leading-none">
+                  <BrandWordmark brand={proj.media} title={proj.title} />
                 </h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-slate-400">{proj.desc}</p>
                 <a href={proj.url} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-violet-200">
