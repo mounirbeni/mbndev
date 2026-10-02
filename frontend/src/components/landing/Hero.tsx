@@ -7,6 +7,7 @@ import { useRef, useState, useEffect } from 'react';
 import Magnetic from '@/components/ui/Magnetic';
 import SilkRibbons from '@/components/ui/SilkRibbons';
 import CountUp from '@/components/ui/CountUp';
+import RotatingPhrase from './RotatingPhrase';
 
 const STATS = [
   { val: 50,  suffix: '+', label: 'Happy clients'       },
@@ -209,7 +210,7 @@ export default function Hero() {
             >
               <span className="whitespace-nowrap">Websites that</span>
               <br />
-              <span className="serif-accent silk-text pr-2">sell for you.</span>
+              <RotatingPhrase className="serif-accent pr-2" />
             </motion.h1>
 
             <motion.p
