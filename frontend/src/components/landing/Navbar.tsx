@@ -149,7 +149,13 @@ export default function Navbar() {
                 </Link>
               ) : (
                 <>
-                  {/* Desktop: BOOK A CALL */}
+                  {/* Desktop */}
+                  <Link
+                    href="/login"
+                    className="hidden lg:flex items-center px-5 py-2.5 rounded-full text-[13px] font-semibold text-slate-200 border border-white/15 bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.09] hover:border-white/30 hover:text-white transition-colors duration-200"
+                  >
+                    Log in
+                  </Link>
                   <Link href="/request" className="hidden lg:flex btn-silk items-center gap-2 pl-5 pr-4 py-2.5 text-[13px] font-semibold">
                     Start a project <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
