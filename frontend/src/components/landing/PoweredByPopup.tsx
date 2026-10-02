@@ -5,9 +5,9 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Code2, Globe2, Layers3, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const SESSION_KEY = 'mbndev-powered-by-dismissed';
+const SEEN_KEY = 'mbndev-powered-by-seen';
 
-/** A one-time-per-tab brand introduction on the public landing page only. */
+/** A one-time-per-device brand introduction on the public landing page only. */
 export default function PoweredByPopup() {
   const [open, setOpen] = useState(false);
   const reducedMotion = useReducedMotion();
@@ -16,21 +16,21 @@ export default function PoweredByPopup() {
 
   const dismiss = useCallback(() => {
     setOpen(false);
-    try {
-      window.sessionStorage.setItem(SESSION_KEY, 'true');
-    } catch {
-      // Storage may be unavailable in private/restricted browsing.
-    }
   }, []);
 
   useEffect(() => {
+    // Once per device: recorded when it is shown, so leaving without
+    // closing it doesn't bring it back on the next visit.
     try {
-      if (window.sessionStorage.getItem(SESSION_KEY) === 'true') return;
+      if (window.localStorage.getItem(SEEN_KEY)) return;
     } catch {
-      // Still allow visitors to dismiss the popup if storage is unavailable.
+      return; // no storage (private/restricted browsing): skip rather than repeat
     }
 
-    const timer = window.setTimeout(() => setOpen(true), 1400);
+    const timer = window.setTimeout(() => {
+      try { window.localStorage.setItem(SEEN_KEY, '1'); } catch { /* ignore */ }
+      setOpen(true);
+    }, 1400);
     return () => window.clearTimeout(timer);
   }, []);
 

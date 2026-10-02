@@ -12,6 +12,8 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+const SEEN_KEY = 'mbndev-pwa-prompt-seen';
+
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [show,      setShow]      = useState(false);
@@ -20,12 +22,20 @@ export default function InstallPrompt() {
   const haptic  = useHaptic();
 
   useEffect(() => {
-    if (sessionStorage.getItem('pwa-prompt-dismissed')) return;
+    // Once per device: recorded when it is shown.
+    try {
+      if (localStorage.getItem(SEEN_KEY)) return;
+    } catch {
+      return;
+    }
 
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setTimeout(() => setShow(true), 3500);
+      setTimeout(() => {
+        try { localStorage.setItem(SEEN_KEY, '1'); } catch { /* ignore */ }
+        setShow(true);
+      }, 3500);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
@@ -44,7 +54,6 @@ export default function InstallPrompt() {
 
   const handleDismiss = () => {
     haptic('light');
-    sessionStorage.setItem('pwa-prompt-dismissed', '1');
     setShow(false);
     setDismissed(true);
   };

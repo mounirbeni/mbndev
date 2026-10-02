@@ -30,14 +30,18 @@ export default function WhatsNewModal() {
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    const seen = localStorage.getItem(STORAGE_KEY);
-    if (seen !== APP_VERSION) setOpen(true);
+    // Once per device per version: recorded as soon as it is shown, so
+    // navigating away without closing it doesn't bring it back.
+    try {
+      if (localStorage.getItem(STORAGE_KEY) === APP_VERSION) return;
+      localStorage.setItem(STORAGE_KEY, APP_VERSION);
+    } catch {
+      return; // no storage (private mode): don't nag on every page load
+    }
+    setOpen(true);
   }, []);
 
-  const dismiss = () => {
-    localStorage.setItem(STORAGE_KEY, APP_VERSION);
-    setOpen(false);
-  };
+  const dismiss = () => setOpen(false);
 
   const goTo = (href: string) => {
     dismiss();
@@ -65,6 +69,9 @@ export default function WhatsNewModal() {
             style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
           />
 
+          {/* Centred by a flex wrapper: framer-motion owns the modal's
+              `transform`, so translate-based centring would be overwritten. */}
+          <div key="whats-new-center" className="fixed inset-0 z-[9991] flex items-center justify-center p-4 pointer-events-none">
           {/* Modal — narrow on mobile, wide 2-col on laptop */}
           <motion.div
             key="whats-new-modal"
@@ -77,9 +84,7 @@ export default function WhatsNewModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 16 }}
             transition={{ type: 'spring', damping: 26, stiffness: 320, mass: 0.75 }}
-            className="fixed z-[9991] inset-x-4 bottom-[88px] outline-none
-                       sm:inset-auto sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2
-                       sm:w-full sm:max-w-lg lg:max-w-2xl"
+            className="relative w-full max-w-lg lg:max-w-2xl outline-none pointer-events-auto"
           >
             {/* Outer glow ring */}
             <div
@@ -206,6 +211,7 @@ export default function WhatsNewModal() {
               </div>
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>,
