@@ -19,6 +19,11 @@ const LOCAL_DIR = process.env.VERCEL
 
 const hasBlobToken = () => !!process.env.BLOB_READ_WRITE_TOKEN;
 
+// Must match the store's configured access (mbndev-blob is a private store);
+// a mismatch makes every put() fail with "Cannot use public access on a
+// private store".
+const BLOB_ACCESS = 'private';
+
 if (process.env.VERCEL && !hasBlobToken()) {
   console.warn(
     '[storage] BLOB_READ_WRITE_TOKEN is not set — uploads will be written to ' +
@@ -38,8 +43,10 @@ async function saveUpload(file) {
 
   if (hasBlobToken()) {
     const { put } = require('@vercel/blob');
+    // The Blob store is private: files are only ever served through the
+    // authorised download route (projectController.downloadProjectFile).
     const blob = await put(`project-files/${filename}`, file.buffer, {
-      access:      'public',
+      access:      BLOB_ACCESS,
       contentType: file.mimetype,
     });
     return blob.url;
@@ -75,4 +82,4 @@ async function deleteStoredFiles(urls) {
   }
 }
 
-module.exports = { saveUpload, deleteStoredFiles, LOCAL_DIR };
+module.exports = { saveUpload, deleteStoredFiles, LOCAL_DIR, BLOB_ACCESS };

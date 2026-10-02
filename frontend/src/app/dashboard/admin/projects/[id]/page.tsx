@@ -21,6 +21,7 @@ import {
   RefreshCw, TrendingUp, Target, Package, Star, Edit3,
   Share2, Copy, CheckCheck, Trash2, ShieldOff,
 } from 'lucide-react';
+import { uploadProjectFile, UPLOAD_ACCEPT } from '@/lib/projectUpload';
 
 const TAB_DEFS = [
   { id: 'overview',  labelKey: 'dash.tab.overview',  icon: LayoutDashboard },
@@ -65,6 +66,7 @@ export default function AdminProjectWorkspace() {
   const [msgText, setMsgText] = useState('');
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadPct, setUploadPct] = useState(0);
   const [sharing, setSharing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -186,20 +188,18 @@ export default function AdminProjectWorkspace() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Kept in sync with the actual server-side limit (middleware/upload.js) —
-    // that limit itself sits under Vercel's ~4.5MB platform request-body
-    // ceiling, so this check must not advertise a size the backend can't
-    // actually accept.
-    if (file.size > 4 * 1024 * 1024) { toast.error('File too large. Maximum size is 4MB.'); return; }
-    const fd = new FormData();
-    fd.append('file', file);
     setUploading(true);
+    setUploadPct(0);
     try {
-      await projectAPI.uploadFile(id, fd);
-      toast.success(t('toast.saved'));
+      await uploadProjectFile(id, file, setUploadPct);
+      toast.success(`${file.name} uploaded`);
       fetchAll();
-    } catch { toast.error(t('toast.error')); }
-    finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
+    } catch (err) {
+      toast.error((err as Error).message || t('toast.error'));
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   if (loading) {
@@ -522,9 +522,14 @@ export default function AdminProjectWorkspace() {
                 className="glass rounded-2xl border-2 border-dashed border-white/10 hover:border-primary-500/40 p-10 text-center cursor-pointer transition-colors group">
                 <Upload className="w-8 h-8 text-slate-600 group-hover:text-primary-400 mx-auto mb-3 transition-colors" />
                 <p className="text-slate-400 text-sm">{t('admin.uploadFile')}</p>
-                <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.doc,.docx,.zip,.rar,.png,.jpg,.jpeg,.gif,.svg,.webp,.mp4,.txt,.csv,.xlsx,.xls" onChange={handleUpload} />
+                <input ref={fileInputRef} type="file" className="hidden" accept={UPLOAD_ACCEPT} onChange={handleUpload} />
               </div>
-              {uploading && <div className="glass rounded-xl p-3 border border-primary-500/20 text-primary-400 text-sm text-center animate-pulse">Uploading...</div>}
+              {uploading && (
+                <div className="glass rounded-xl p-3 border border-primary-500/20 text-sm" role="status" aria-live="polite">
+                  <div className="flex justify-between text-primary-300 mb-2"><span>Uploading…</span><span className="tabular-nums">{uploadPct}%</span></div>
+                  <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-primary-400 transition-[width] duration-300" style={{ width: `${uploadPct}%` }} /></div>
+                </div>
+              )}
               {!project.files || project.files.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border border-white/5">
                   <FileText className="w-10 h-10 text-slate-700 mx-auto mb-3" />

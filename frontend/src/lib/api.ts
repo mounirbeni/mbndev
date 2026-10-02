@@ -333,11 +333,14 @@ export const projectAPI = {
   getAll:          (params?: ProjectListParams)      => api.get('/projects', { params }),
   getOne:          (id: string)                      => api.get(`/projects/${id}`),
   update:          (id: string, data: UpdateProjectPayload) => api.put(`/projects/${id}`, data),
-  uploadFile:      (id: string, formData: FormData)  =>
+  uploadFile:      (id: string, formData: FormData, onProgress?: (percent: number) => void) =>
     api.post(`/projects/${id}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 60_000,
+      onUploadProgress: (e) => { if (onProgress && e.total) onProgress(Math.min(99, Math.round((e.loaded / e.total) * 100))); },
     }),
+  uploadMode:      ()                                => api.get('/projects/upload-mode'),
+  registerFile:    (id: string, data: { url: string; name: string }) => api.post(`/projects/${id}/files`, data),
   getStats:        ()                                => api.get('/projects/stats'),
   generateShare:   (id: string)                      => api.post(`/projects/${id}/share`, {}),
   revokeShare:     (id: string)                      => api.post(`/projects/${id}/share/revoke`, {}),

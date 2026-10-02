@@ -40,7 +40,26 @@ const CHECKS = {
   // actually a Windows/Linux executable" cases rather than trying to prove
   // a positive.
   '.txt':  (buf) => !startsWith(buf, [0x4d, 0x5a]) && !startsWith(buf, [0x7f, 0x45, 0x4c, 0x46]),
+  '.csv':  (buf) => !startsWith(buf, [0x4d, 0x5a]) && !startsWith(buf, [0x7f, 0x45, 0x4c, 0x46]),
+  // Office Open XML formats are zip containers
+  '.xlsx': (buf) => startsWith(buf, [0x50, 0x4b, 0x03, 0x04]),
+  '.pptx': (buf) => startsWith(buf, [0x50, 0x4b, 0x03, 0x04]),
+  '.xls':  (buf) => startsWith(buf, [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]),
+  // archives
+  '.rar':  (buf) => startsWith(buf, [0x52, 0x61, 0x72, 0x21, 0x1a, 0x07]),            // Rar!\x1a\x07
+  '.7z':   (buf) => startsWith(buf, [0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c]),
+  '.gz':   (buf) => startsWith(buf, [0x1f, 0x8b]),
+  '.tgz':  (buf) => startsWith(buf, [0x1f, 0x8b]),
+  '.tar':  (buf) => startsWith(buf, [0x75, 0x73, 0x74, 0x61, 0x72], 257),             // "ustar" at 257
+  // ISO base media (mp4 / mov): a box size, then "ftyp" — or a QuickTime atom
+  '.mp4':  (buf) => startsWith(buf, [0x66, 0x74, 0x79, 0x70], 4),
+  '.mov':  (buf) => startsWith(buf, [0x66, 0x74, 0x79, 0x70], 4)
+                  || startsWith(buf, [0x6d, 0x6f, 0x6f, 0x76], 4)
+                  || startsWith(buf, [0x77, 0x69, 0x64, 0x65], 4),
 };
+
+/** Bytes needed to evaluate every signature above (tar's magic sits at 257). */
+const SIGNATURE_BYTES = 264;
 
 /**
  * @param {Buffer} buffer
@@ -56,4 +75,4 @@ function matchesSignature(buffer, ext) {
   return check(buffer);
 }
 
-module.exports = { matchesSignature };
+module.exports = { matchesSignature, SIGNATURE_BYTES };

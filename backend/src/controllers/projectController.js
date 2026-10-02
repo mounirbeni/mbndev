@@ -2,14 +2,15 @@
 
 const prisma   = require('../lib/prisma');
 const jwt      = require('jsonwebtoken');
-const { saveUpload, deleteStoredFiles } = require('../lib/storage');
+const { saveUpload, deleteStoredFiles, BLOB_ACCESS } = require('../lib/storage');
 const { fmt }  = require('../lib/format');
 const { notify, logActivity } = require('../lib/notifications');
 const { SM }   = require('../lib/systemMessages');
 const realtime = require('../lib/realtime');
 const { sendEmail, templates } = require('../lib/email');
 const { telegram }   = require('../lib/telegram');
-const { matchesSignature } = require('../lib/fileSignature');
+const { matchesSignature, SIGNATURE_BYTES } = require('../lib/fileSignature');
+const { MAX_DIRECT_BYTES, extOf, isAllowedName } = require('../lib/uploadPolicy');
 const path = require('path');
 const fs = require('fs');
 const { PROJECT_STATUS } = require('../lib/constants');
@@ -334,6 +335,110 @@ exports.uploadFile = async (req, res, next) => {
   }
 };
 
+// ─── Direct uploads (browser → Vercel Blob) ───────────────────────────────────
+// Deliverables such as zipped source code are far larger than the ~4.5MB a
+// Vercel function accepts per request, so in production the browser uploads
+// straight to Blob storage with a short-lived token from this route, then
+// registers the finished file with registerUploadedFile below.
+
+const projectPrefix = (projectId) => `project-files/${projectId}/`;
+
+// Tells the dashboard which path to use: direct (Blob configured) or the
+// legacy multipart route (local dev).
+exports.getUploadMode = (req, res) => {
+  res.json({
+    success: true,
+    direct: !!process.env.BLOB_READ_WRITE_TOKEN,
+    maxBytes: process.env.BLOB_READ_WRITE_TOKEN ? MAX_DIRECT_BYTES : require('../lib/uploadPolicy').MAX_LEGACY_BYTES,
+  });
+};
+
+exports.createUploadToken = async (req, res, next) => {
+  try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return res.status(501).json({ success: false, message: 'Direct uploads are not configured on this server.' });
+    }
+    const { handleUpload } = require('@vercel/blob/client');
+    const projectId = req.params.id;
+    const result = await handleUpload({
+      body: req.body,
+      request: req,
+      onBeforeGenerateToken: async (pathname) => {
+        if (!pathname.startsWith(projectPrefix(projectId)) || pathname.includes('..')) {
+          throw new Error('Invalid upload path');
+        }
+        if (!isAllowedName(pathname)) {
+          throw new Error(`File type '${extOf(pathname) || 'unknown'}' is not allowed`);
+        }
+        return {
+          maximumSizeInBytes: MAX_DIRECT_BYTES,
+          addRandomSuffix: true,
+          allowOverwrite: false,
+          validUntil: Date.now() + 60 * 60 * 1000,
+        };
+      },
+    });
+    res.json(result);
+  } catch (err) {
+    // handleUpload reports policy failures as plain Errors — surface them.
+    res.status(400).json({ success: false, message: err.message || 'Could not start the upload' });
+  }
+};
+
+exports.registerUploadedFile = async (req, res, next) => {
+  try {
+    const projectId = req.params.id;
+    const { url, name } = req.body || {};
+    if (typeof url !== 'string' || typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ success: false, message: 'url and name are required' });
+    }
+    let parsed;
+    try { parsed = new URL(url); } catch { parsed = null; }
+    if (!parsed || parsed.protocol !== 'https:' || !parsed.hostname.endsWith('.blob.vercel-storage.com')) {
+      return res.status(400).json({ success: false, message: 'Not a storage URL' });
+    }
+    if (!isAllowedName(name)) {
+      return res.status(400).json({ success: false, message: `File type '${extOf(name) || 'unknown'}' is not allowed` });
+    }
+
+    const { head, del } = require('@vercel/blob');
+    let meta;
+    try { meta = await head(url); } catch { meta = null; }
+    if (!meta || !meta.pathname.startsWith(projectPrefix(projectId))) {
+      return res.status(400).json({ success: false, message: 'Uploaded file not found for this project' });
+    }
+
+    // Same rule as the legacy path: the bytes must match the extension.
+    // (Private store: reads need the store token.)
+    const probe = await fetch(url, {
+      headers: { Range: `bytes=0-${SIGNATURE_BYTES - 1}`, Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` },
+    });
+    const firstBytes = probe.ok ? Buffer.from(await probe.arrayBuffer()) : Buffer.alloc(0);
+    if (!matchesSignature(firstBytes, extOf(name))) {
+      await del(url).catch(() => {});
+      return res.status(400).json({ success: false, message: `File content does not match its extension '${extOf(name)}'.` });
+    }
+
+    const existing = await prisma.projectFile.findFirst({ where: { projectId, url }, select: { id: true } });
+    if (existing) {
+      return res.json({ success: true, file: fmt({ id: existing.id, name, projectId }) });
+    }
+
+    const file = await prisma.projectFile.create({
+      data: { name: name.slice(0, 200), url, projectId, uploadedById: req.user.id },
+    });
+    SM.fileUploaded(projectId, {
+      fileName:     name.slice(0, 100),
+      uploaderName: req.user.name,
+    }).catch(() => {});
+
+    const { url: _url, ...safeFile } = file;
+    res.json({ success: true, file: fmt(safeFile) });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // A small, fixed lookup — the same extensions middleware/upload.js allows —
 // rather than adding a mime-type-detection dependency for this alone.
 const EXT_CONTENT_TYPES = {
@@ -341,8 +446,22 @@ const EXT_CONTENT_TYPES = {
   '.gif': 'image/gif', '.webp': 'image/webp', '.pdf': 'application/pdf',
   '.zip': 'application/zip', '.doc': 'application/msword',
   '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  '.txt': 'text/plain',
+  '.txt': 'text/plain', '.csv': 'text/csv',
+  '.xls': 'application/vnd.ms-excel',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.rar': 'application/vnd.rar', '.7z': 'application/x-7z-compressed',
+  '.tar': 'application/x-tar', '.gz': 'application/gzip', '.tgz': 'application/gzip',
+  '.mp4': 'video/mp4', '.mov': 'video/quicktime',
 };
+
+// Shown in the browser; everything else (archives, office files) downloads.
+const INLINE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.txt', '.mp4', '.mov']);
+
+// Above this, files are not streamed through the function (response size
+// limit); the authorised request is redirected to a short-lived signed URL.
+const PROXY_MAX_BYTES = 4 * 1024 * 1024;
+const SIGNED_URL_TTL_MS = 10 * 60 * 1000;
 
 // ─── Download a project file (authenticated) ──────────────────────────────────
 // Project deliverables were previously served straight off a public,
@@ -377,7 +496,8 @@ exports.downloadProjectFile = async (req, res, next) => {
     const ext         = path.extname(file.name).toLowerCase();
     const contentType = EXT_CONTENT_TYPES[ext] || 'application/octet-stream';
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Disposition', `inline; filename="${file.name.replace(/"/g, '')}"`);
+    const safeName = file.name.replace(/["\r\n]/g, '');
+    res.setHeader('Content-Disposition', `${INLINE_EXTS.has(ext) ? 'inline' : 'attachment'}; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`);
     res.setHeader('Cache-Control', 'private, no-store');
 
     if (file.url.startsWith('/uploads/')) {
@@ -389,15 +509,38 @@ exports.downloadProjectFile = async (req, res, next) => {
       return fs.createReadStream(localPath).pipe(res);
     }
 
-    // Remote (Vercel Blob) storage — fetch server-side and stream the bytes
-    // through, so the underlying (permanent, unauthenticated) blob URL is
-    // never sent to the browser.
-    const upstream = await fetch(file.url);
-    if (!upstream.ok || !upstream.body) {
+    // Remote (Vercel Blob, private store). Nothing is reachable without the
+    // store token, so after the ownership check above:
+    //  - small files stream through this function;
+    //  - large ones (source archives, videos) don't fit in a function
+    //    response, so redirect to a signed URL that expires in 10 minutes.
+    const blobApi = require('@vercel/blob');
+    const meta = await blobApi.head(file.url).catch(() => null);
+    if (!meta) {
+      return res.status(404).json({ success: false, message: 'File no longer exists in storage' });
+    }
+    if (meta.size > PROXY_MAX_BYTES) {
+      try {
+        const validUntil = Date.now() + SIGNED_URL_TTL_MS;
+        const signed = await blobApi.issueSignedToken({ pathname: meta.pathname, operations: ['get'], validUntil });
+        const { presignedUrl } = await blobApi.presignUrl(signed, {
+          operation: 'get', pathname: meta.pathname, access: BLOB_ACCESS, validUntil,
+        });
+        res.removeHeader('Content-Type');
+        res.removeHeader('Content-Disposition');
+        return res.redirect(302, presignedUrl);
+      } catch {
+        // signing unavailable — fall back to streaming below
+      }
+    }
+    const result = await blobApi.get(file.url, { access: BLOB_ACCESS });
+    if (!result || result.statusCode !== 200 || !result.stream) {
       return res.status(502).json({ success: false, message: 'Could not retrieve the file from storage' });
     }
+    if (meta.size) res.setHeader('Content-Length', String(meta.size));
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     const { Readable } = require('stream');
-    Readable.fromWeb(upstream.body).pipe(res);
+    Readable.fromWeb(result.stream).pipe(res);
   } catch (err) {
     next(err);
   }

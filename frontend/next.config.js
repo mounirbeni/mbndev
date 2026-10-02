@@ -16,6 +16,9 @@ const connectSrc = [
   'wss://mbndev.ma',
   'https://api.mbndev.ma',
   'https://fonts.googleapis.com',
+  // Project files upload straight from the browser to Vercel Blob.
+  'https://vercel.com',
+  'https://*.blob.vercel-storage.com',
   API_ORIGIN,
   !isProd && 'http://localhost:5000',
   !isProd && 'ws://localhost:*',        // HMR websocket

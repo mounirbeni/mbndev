@@ -59,3 +59,27 @@ test('plain text (.txt) accepts ordinary content but rejects an ELF binary', () 
 test('an extension with no defined signature check fails open', () => {
   assert.equal(matchesSignature(Buffer.from('anything'), '.unknownext'), true);
 });
+
+test('archives used for code deliverables are recognised by their bytes', () => {
+  const rar = Buffer.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x01, 0x00]);
+  const sevenZ = Buffer.from([0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0x00, 0x04]);
+  const gz = Buffer.from([0x1f, 0x8b, 0x08, 0x00]);
+  assert.equal(matchesSignature(rar, '.rar'), true);
+  assert.equal(matchesSignature(sevenZ, '.7z'), true);
+  assert.equal(matchesSignature(gz, '.gz'), true);
+  assert.equal(matchesSignature(gz, '.tgz'), true);
+  const tar = Buffer.alloc(300); tar.write('ustar', 257, 'ascii');
+  assert.equal(matchesSignature(tar, '.tar'), true);
+});
+
+test('a Windows executable renamed to .rar or .mp4 is rejected', () => {
+  const exe = Buffer.from([0x4d, 0x5a, 0x90, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00]);
+  assert.equal(matchesSignature(exe, '.rar'), false);
+  assert.equal(matchesSignature(exe, '.mp4'), false);
+});
+
+test('an MP4 (ftyp box) matches .mp4 and .mov', () => {
+  const mp4 = Buffer.from([0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d]);
+  assert.equal(matchesSignature(mp4, '.mp4'), true);
+  assert.equal(matchesSignature(mp4, '.mov'), true);
+});
