@@ -40,7 +40,7 @@ export default function PushPrompt() {
     try {
       if (Number(localStorage.getItem(SNOOZE_KEY) || 0) > Date.now()) return;
     } catch { /* storage blocked: still ask */ }
-    const t = setTimeout(() => setEligible(true), 2600); // after the splash screen
+    const t = setTimeout(() => setEligible(true), 5000); // after the opening sequence
     return () => clearTimeout(t);
   }, []);
 

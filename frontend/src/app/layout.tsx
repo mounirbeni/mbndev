@@ -6,7 +6,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
 import PushPrompt from '@/components/mobile/PushPrompt';
-import SplashScreen from '@/components/mobile/SplashScreen';
+import Intro, { INTRO_HEAD_SCRIPT } from '@/components/ui/Intro';
 import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 import './globals.css';
 
@@ -93,8 +93,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="ltr" className={`dark ${inter.variable} ${mono.variable} ${serif.variable}`}>
+    <html lang="en" dir="ltr" suppressHydrationWarning className={`dark ${inter.variable} ${mono.variable} ${serif.variable}`}>
       <head>
+        {/* Decides before first paint whether the opening sequence plays (once per session). */}
+        <script dangerouslySetInnerHTML={{ __html: INTRO_HEAD_SCRIPT }} />
         {/* Browser and home-screen icons share the transparent official brand mark. */}
         <link rel="icon" type="image/webp" href="/brand-icon-transparent.webp" />
         <link rel="apple-touch-icon" sizes="128x128" href="/brand-icon-transparent.webp" />
@@ -109,6 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#08080b" />
       </head>
       <body suppressHydrationWarning>
+        <Intro />
         <LanguageProvider>
           <AuthProvider>
             <ScrollProgressBar />
@@ -139,7 +142,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <PushPrompt />
           </AuthProvider>
         </LanguageProvider>
-        <SplashScreen />
         <InstallPrompt />
         <ServiceWorkerRegistration />
       </body>
