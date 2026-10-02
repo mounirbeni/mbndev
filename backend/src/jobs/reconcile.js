@@ -237,19 +237,34 @@ async function detectOrphanedPaid(report) {
 // ─── 4. Order/payment sync drift ─────────────────────────────────────────────
 // An order is "paid" but all its payments are in non-paid states,
 // or vice-versa. Detects split-brain between Order and Payment tables.
+// A "partial" payment (deposit recorded by the admin) counts as confirmed.
+//
+// This runs on every serverless cold start, so the admin alert is sent once
+// per order — otherwise the same drift re-alerts (and re-pushes) every time.
+
+const CONFIRMED_PAYMENT_STATUSES = ['paid', 'partial'];
+const SYNC_DRIFT_TITLE = '⚠️ Order/Payment Sync Drift';
 
 async function fixOrderPaymentSync(report) {
   try {
-    // Orders marked "paid" with no paid Payment
     const paidOrdersNoPaidPayment = await prisma.order.findMany({
-      where:   { status: 'paid' },
-      include: { payments: { where: { status: 'paid' }, select: { id: true } } },
-      take:    50,
+      where: {
+        status:   'paid',
+        payments: { none: { status: { in: CONFIRMED_PAYMENT_STATUSES } } },
+      },
+      select: { id: true, title: true },
+      take:   50,
     });
 
     for (const order of paidOrdersNoPaidPayment) {
-      if (order.payments.length === 0) {
+      try {
         report.orderSyncFixed++;
+        const alreadyAlerted = await prisma.notification.findFirst({
+          where:  { title: SYNC_DRIFT_TITLE, metadata: { path: ['orderId'], equals: order.id } },
+          select: { id: true },
+        });
+        if (alreadyAlerted) continue;
+
         await logAdminAction({
           adminId:    'system',
           action:     'reconcile',
@@ -259,15 +274,17 @@ async function fixOrderPaymentSync(report) {
           after:      null,
         }).catch(() => {});
 
-        notifyAdmins({
+        await notifyAdmins({
           type:    'payment_received',
-          title:   '⚠️ Order/Payment Sync Drift',
+          title:   SYNC_DRIFT_TITLE,
           message: `Order "${order.title}" is marked "paid" but has no confirmed payment record.`,
           link:    '/dashboard/admin/payments',
           metadata: { orderId: order.id },
         }).catch(() => {});
 
         console.error(`[reconcile] SYNC DRIFT: Order ${order.id} is paid but has no paid payment`);
+      } catch (err) {
+        report.errors.push({ step: 'fixOrderPaymentSync', orderId: order.id, error: err.message });
       }
     }
   } catch (err) {
