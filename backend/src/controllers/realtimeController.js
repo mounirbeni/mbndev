@@ -78,11 +78,23 @@ exports.stream = async (req, res) => {
     }
   }, 25_000);
 
+  // ── Planned recycle on serverless ──
+  // A Vercel function is killed at maxDuration (60 s in vercel.json), which
+  // logs a runtime timeout error for every open stream. End it cleanly a
+  // little before that; EventSource reconnects on its own within ~1 s.
+  const recycle = process.env.VERCEL
+    ? setTimeout(() => {
+        try { res.write(`retry: 1000\n\n`); } catch { /* already gone */ }
+        cleanup();
+      }, 55_000)
+    : null;
+
   let cleaned = false;
   const cleanup = () => {
     if (cleaned) return;
     cleaned = true;
     clearInterval(heartbeat);
+    if (recycle) clearTimeout(recycle);
     unsubscribe();
     if (!res.writableEnded) {
       try { res.end(); } catch { /* connection already gone — nothing to clean up */ }

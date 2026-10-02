@@ -12,6 +12,8 @@ export interface ChangeEntry {
   desc: string;
   tag: 'new' | 'fix' | 'improved';
   href?: string;
+  /** Who sees it in What's New. Omitted = everyone. */
+  audience?: 'admin' | 'client';
 }
 
 export const CHANGELOG: ChangeEntry[] = [
@@ -20,6 +22,7 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'SEO: New Location Pages',
     desc: 'Dedicated pages for Marrakech, Casablanca, and Rabat help local businesses in these cities find us on Google — plus every blog article now has its own optimized title and description for better search visibility.',
     tag: 'new',
+    audience: 'admin',
   },
   {
     icon: Shield,
@@ -32,6 +35,7 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'Admin Settings',
     desc: 'Admins finally get their own Settings page — update your name, company and phone, and change your password without leaving the dashboard.',
     tag: 'new',
+    audience: 'admin',
     href: '/dashboard/admin/settings',
   },
   {
@@ -39,6 +43,7 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'Leads Manager',
     desc: 'Track prospects end-to-end — import leads from CSV, update statuses, and never lose a follow-up.',
     tag: 'new',
+    audience: 'admin',
     href: '/dashboard/admin/leads',
   },
   {
@@ -46,6 +51,7 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'Bulk Outreach Email',
     desc: 'Send your outreach email to every new lead at once — delivered in parallel, no timeouts.',
     tag: 'new',
+    audience: 'admin',
     href: '/dashboard/admin/leads',
   },
   {
@@ -53,6 +59,7 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'Landing Motion Upgrade',
     desc: 'Magnetic buttons, cursor-reactive parallax, 3D-tilt cards, animated pricing, and a swipeable testimonial carousel across the site.',
     tag: 'improved',
+    audience: 'admin',
   },
   {
     icon: Smartphone,
@@ -65,6 +72,7 @@ export const CHANGELOG: ChangeEntry[] = [
     title: 'Command Palette: Leads',
     desc: 'Press ⌘K and jump straight to the Leads manager — now included in admin navigation results.',
     tag: 'improved',
+    audience: 'admin',
     href: '/dashboard/admin/leads',
   },
   {

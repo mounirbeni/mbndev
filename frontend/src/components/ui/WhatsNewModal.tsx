@@ -7,6 +7,7 @@ import { X, Sparkles, ArrowRight } from 'lucide-react';
 import { APP_VERSION, CHANGELOG } from '@/lib/version';
 import { useRouter } from 'next/navigation';
 import { useDialogA11y } from '@/hooks/useDialogA11y';
+import { useAuth } from '@/contexts/AuthContext';
 
 const STORAGE_KEY = 'mbndev_seen_version';
 
@@ -18,6 +19,9 @@ const tagStyles = {
 
 export default function WhatsNewModal() {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
+  const role = user?.role === 'admin' ? 'admin' : 'client';
+  const entries = CHANGELOG.filter((e) => !e.audience || e.audience === role);
   const router = useRouter();
 
   // dashboard/layout.tsx wraps content in a motion.div driven by `transform`
@@ -56,7 +60,7 @@ export default function WhatsNewModal() {
 
   return createPortal(
     <AnimatePresence>
-      {open && (
+      {open && entries.length > 0 && (
         <>
           {/* Backdrop */}
           <motion.div
@@ -151,7 +155,7 @@ export default function WhatsNewModal() {
                   className="grid grid-cols-1 lg:grid-cols-2 gap-3 overflow-y-auto pr-1"
                   style={{ maxHeight: 'min(60vh, 420px)' }}
                 >
-                  {CHANGELOG.map((entry, i) => {
+                  {entries.map((entry, i) => {
                     const style = tagStyles[entry.tag];
                     return (
                       <motion.div
