@@ -3,6 +3,9 @@
   "build": {
     "env": { "NEXT_TELEMETRY_DISABLED": "1" }
   },
+  "git": {
+    "deploymentEnabled": { "claude/**": false }
+  },
   "builds": [
     {
       "src": "frontend/package.json",
