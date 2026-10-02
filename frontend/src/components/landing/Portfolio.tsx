@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight } from 'lucide-react';
@@ -12,6 +12,16 @@ import { PROJECT_MEDIA } from '@/lib/portfolioMedia';
 import BrandWordmark from './BrandWordmark';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Below the desktop breakpoint the reel is a stacked list with its own silk
+// layer; each layout mounts only its own, so a device runs one WebGL context.
+const SMALL = '(max-width: 1023.98px)';
+const subscribeSmall = (cb: () => void) => {
+  const mq = window.matchMedia(SMALL);
+  mq.addEventListener('change', cb);
+  return () => mq.removeEventListener('change', cb);
+};
+const isSmall = () => window.matchMedia(SMALL).matches;
 
 interface ProjectMeta {
   /** Translation key suffix for type/description. */
@@ -79,6 +89,22 @@ export default function Portfolio() {
   const stRef = useRef<ScrollTrigger | null>(null);
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
+  const small = useSyncExternalStore(subscribeSmall, isSmall, () => false);
+  const [mActive, setMActive] = useState(0);
+  const sceneRefs = useRef<(HTMLElement | null)[]>([]);
+
+  // Phones: the scene crossing the middle of the screen sets the silk colours.
+  useEffect(() => {
+    if (!small) return;
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) setMActive(Number((e.target as HTMLElement).dataset.i));
+      }),
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    sceneRefs.current.forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, [small, n]);
 
   // Desktop: pin the reel and let scroll advance the scenes.
   useEffect(() => {
@@ -120,7 +146,7 @@ export default function Portfolio() {
         className="relative hidden lg:block h-screen overflow-hidden bg-[#040308]"
       >
         {/* The project's own colours, woven into the MBN DEV silk */}
-        <SilkRibbons className="absolute inset-0" anchor={[0.66, 0.46]} intensity={0.9} speed={0.7} palette={p.palette} />
+        {!small && <SilkRibbons className="absolute inset-0" anchor={[0.66, 0.46]} intensity={0.9} speed={0.7} palette={p.palette} />}
         <div
           aria-hidden
           className="absolute inset-0 transition-[background] duration-[1200ms]"
@@ -236,7 +262,21 @@ export default function Portfolio() {
       </section>
 
       {/* ── Phones & tablets: stacked scenes ────────────────────────────── */}
-      <section aria-label="Selected work" className="lg:hidden relative bg-[#040308] py-20">
+      <section aria-label="Selected work" className="lg:hidden relative isolate bg-[#040308] py-20">
+        {/* Silk in the current project's colours, held behind the scenes as they scroll */}
+        {small && (
+          <div aria-hidden className="pointer-events-none sticky top-0 -z-10 h-[100svh] -mb-[100svh]">
+            <SilkRibbons className="absolute inset-0" anchor={[0.5, 0.6]} intensity={0.85} speed={0.7} palette={projects[mActive].palette} />
+            <div
+              className="absolute inset-0 transition-[background] duration-[1200ms]"
+              style={{ background: `radial-gradient(80% 45% at 50% 40%, ${projects[mActive].palette[1]}26 0%, transparent 70%)` }}
+            />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(4,3,8,0.35) 0%, rgba(4,3,8,0.15) 35%, rgba(4,3,8,0.55) 100%)' }} />
+          </div>
+        )}
+        {/* soften the section's top and bottom edges into the page */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-32 -z-[5] bg-gradient-to-b from-[#040308] to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-40 -z-[5] bg-gradient-to-t from-[#040308] to-transparent" />
         <div className="px-6 mb-10">
           <span className="section-label">{t('portfolio.eyebrow')}</span>
           <h2 className="text-[2.6rem] leading-[1.02] font-bold text-white">
@@ -245,7 +285,12 @@ export default function Portfolio() {
         </div>
         <div className="space-y-16">
           {projects.map((proj, i) => (
-            <article key={proj.key} className="relative px-5">
+            <article
+              key={proj.key}
+              ref={(el) => { sceneRefs.current[i] = el; }}
+              data-i={i}
+              className="relative px-5"
+            >
               {/* Each project lit in its own colours */}
               <div
                 aria-hidden
