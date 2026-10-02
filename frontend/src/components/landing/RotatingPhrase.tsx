@@ -5,7 +5,9 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 /**
  * The italic second line of the hero headline ("Websites that …").
- * Cycles through short phrases; each word rises out of a soft blur, staggered.
+ * Cycles through short phrases; each word rises and fades in, staggered.
+ * No CSS `filter` on the words: Safari/iOS renders gradient (background-clip)
+ * text invisible while a filter is applied.
  * The first phrase is what renders on the server (and for crawlers).
  */
 const PHRASES = [
@@ -48,9 +50,9 @@ export default function RotatingPhrase({ className = '' }: { className?: string 
               key={k}
               aria-hidden
               className="inline-block silk-text"
-              initial={reduced ? { opacity: 0 } : { opacity: 0, y: '0.35em', filter: 'blur(8px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.7, delay: k * 0.08, ease: EASE } }}
-              exit={reduced ? { opacity: 0 } : { opacity: 0, y: '-0.3em', filter: 'blur(8px)', transition: { duration: 0.35, delay: k * 0.04, ease: EASE } }}
+              initial={reduced ? { opacity: 0 } : { opacity: 0, y: '0.35em' }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.7, delay: k * 0.08, ease: EASE } }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, y: '-0.3em', transition: { duration: 0.35, delay: k * 0.04, ease: EASE } }}
             >
               {w}
               {k < words.length - 1 && ' '}
