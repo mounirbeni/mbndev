@@ -6,8 +6,8 @@ import { useEffect, useRef } from 'react';
  * Flowing "silk" light ribbon — a single full-screen fragment shader.
  * 56 hairline strands follow one curve; the band's signed width swings
  * through zero, so it fans out and twists into a bright knot like folded
- * silk. Tinted with the brand gradient
- * (#a855f7 → #3b82f6 → #06b6d4).
+ * silk. Tinted with the brand gradient (#a855f7 → #3b82f6 → #06b6d4) by
+ * default, or any three-colour `palette` (cross-fades when it changes).
  *
  * - Renders only while on screen and while the tab is visible.
  * - prefers-reduced-motion: draws one still frame.
@@ -25,12 +25,12 @@ uniform vec2  uRes;
 uniform float uTime;
 uniform float uIntensity;
 uniform vec2  uAnchor;   // where the ribbon sits (0..1, origin bottom-left)
+uniform vec3  uA;        // palette, edge to edge across the band
+uniform vec3  uB;
+uniform vec3  uC;
 
 vec3 brand(float f){
-  vec3 a = vec3(0.659, 0.333, 0.969);
-  vec3 b = vec3(0.231, 0.510, 0.965);
-  vec3 c = vec3(0.024, 0.714, 0.831);
-  return f < 0.5 ? mix(a, b, f * 2.0) : mix(b, c, f * 2.0 - 1.0);
+  return f < 0.5 ? mix(uA, uB, f * 2.0) : mix(uB, uC, f * 2.0 - 1.0);
 }
 
 void main(){
@@ -60,11 +60,11 @@ void main(){
   }
   // silk body: faint fill between the edges + glow
   float inside = 1.0 - smoothstep(abs(W) * 0.85, abs(W) + 0.02, abs(p.y - cy));
-  col += mix(vec3(0.45,0.28,0.95), vec3(0.15,0.55,0.95), smoothstep(-1.0,1.0,p.x)) * inside * 0.16;
-  col += vec3(0.40, 0.30, 0.95) * exp(-abs(p.y - cy) * 5.0) * 0.16;
+  col += mix(uA, uB, smoothstep(-1.0,1.0,p.x)) * inside * 0.16;
+  col += mix(uA, uB, 0.4) * exp(-abs(p.y - cy) * 5.0) * 0.16;
   // the twist knot catches the light
   float knot = 1.0 - smoothstep(0.0, 0.07, abs(W));
-  col += vec3(0.75, 0.70, 1.0) * knot * exp(-abs(p.y - cy) * 26.0) * 1.1;
+  col += mix(vec3(1.0), uB, 0.3) * knot * exp(-abs(p.y - cy) * 26.0) * 1.1;
   col *= sheen;
 
   float ends = smoothstep(-1.7, -0.5, p.x) * (1.0 - smoothstep(1.0, 2.2, p.x));
@@ -84,16 +84,34 @@ interface SilkRibbonsProps {
   intensity?: number;
   /** Time multiplier. */
   speed?: number;
+  /** Three hex colours across the band; changes cross-fade. Defaults to the MBN DEV gradient. */
+  palette?: [string, string, string];
 }
+
+const BRAND: [string, string, string] = ['#a855f7', '#3b82f6', '#06b6d4'];
+const rgb = (hex: string) => {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+};
 
 export default function SilkRibbons({
   className = '',
   anchor = [0.7, 0.45],
   intensity = 1,
   speed = 1,
+  palette = BRAND,
 }: SilkRibbonsProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ax, ay] = anchor;
+  // Palette is read by the render loop through a ref so a change cross-fades
+  // instead of rebuilding the GL program.
+  const target = useRef<number[]>([]);
+  const redraw = useRef<(() => void) | null>(null);
+  const paletteKey = palette.join(',');
+  useEffect(() => {
+    target.current = paletteKey.split(',').flatMap(rgb);
+    redraw.current?.();
+  }, [paletteKey]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -128,6 +146,9 @@ export default function SilkRibbons({
     const uTime = gl.getUniformLocation(prog, 'uTime');
     const uIntensity = gl.getUniformLocation(prog, 'uIntensity');
     const uAnchor = gl.getUniformLocation(prog, 'uAnchor');
+    const uCols = ['uA', 'uB', 'uC'].map((n) => gl.getUniformLocation(prog, n));
+    const cur = target.current.length ? [...target.current] : BRAND.flatMap(rgb);
+    const setCols = () => uCols.forEach((u, i) => gl.uniform3f(u, cur[i * 3], cur[i * 3 + 1], cur[i * 3 + 2]));
     gl.uniform1f(uIntensity, intensity);
     gl.uniform2f(uAnchor, ax, ay);
 
@@ -149,12 +170,17 @@ export default function SilkRibbons({
     let last = performance.now();
 
     const draw = () => {
+      setCols();
       gl.uniform1f(uTime, elapsed);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
     const loop = (now: number) => {
-      elapsed += Math.min(0.05, (now - last) / 1000) * speed;
+      const dt = Math.min(0.05, (now - last) / 1000);
+      elapsed += dt * speed;
       last = now;
+      const k = 1 - Math.exp(-dt * 2.6);       // ~1s cross-fade between palettes
+      const tgt = target.current;
+      if (tgt.length) for (let i = 0; i < 9; i++) cur[i] += (tgt[i] - cur[i]) * k;
       draw();
       raf = requestAnimationFrame(loop);
     };
@@ -165,6 +191,12 @@ export default function SilkRibbons({
     };
     const stop = () => { cancelAnimationFrame(raf); raf = 0; };
 
+    // Under reduced motion (or when paused) a palette change jumps and redraws once.
+    redraw.current = () => {
+      if (raf) return;
+      if (target.current.length) cur.splice(0, 9, ...target.current);
+      draw();
+    };
     draw();
     start();
 
@@ -180,6 +212,7 @@ export default function SilkRibbons({
 
     return () => {
       stop();
+      redraw.current = null;
       ro.disconnect();
       io.disconnect();
       document.removeEventListener('visibilitychange', onVis);

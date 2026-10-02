@@ -9,6 +9,7 @@ import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AccentText from '@/components/ui/AccentText';
+import { mediaFor } from '@/lib/portfolioMedia';
 
 // Project category IDs (language-agnostic, used for filtering)
 type Category = 'All' | 'E-Commerce' | 'Web App' | 'SaaS' | 'Hospitality';
@@ -364,17 +365,6 @@ const CATEGORY_KEYS: Record<string, string> = {
 
 const CATEGORY_IDS: Category[] = ['All', 'E-Commerce', 'Web App', 'SaaS', 'Hospitality'];
 
-// Full-size captures, used where we have them (see public/images/portfolio/hd).
-const HD_COVERS: Record<string, string> = {
-  '/images/portfolio/tarique.png':     '/images/portfolio/hd/tarique.webp',
-  '/images/portfolio/riadconnect.png': '/images/portfolio/hd/riadconnect.webp',
-  '/images/portfolio/transo.png':      '/images/portfolio/hd/transo.webp',
-  '/images/portfolio/lueur-skin.png':  '/images/portfolio/hd/lueur-skin.webp',
-  '/images/portfolio/vitacore.png':    '/images/portfolio/hd/vitacore.webp',
-  '/images/portfolio/emll.png':        '/images/portfolio/hd/emll.webp',
-  '/images/portfolio/chronocraft.png': '/images/portfolio/hd/chronocraft.webp',
-};
-
 export default function PortfolioPage() {
   const { t } = useLanguage();
   const [active, setActive] = useState<Category>('All');
@@ -433,7 +423,10 @@ export default function PortfolioPage() {
               exit={{ opacity: 0 }}
               className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {filtered.map((p, i) => (
+              {filtered.map((p, i) => {
+                const media = mediaFor(p.image);
+                const pal = media?.palette ?? ['#7c3aed', '#a855f7', '#06b6d4'];
+                return (
                 <motion.div
                   key={p.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -441,11 +434,16 @@ export default function PortfolioPage() {
                   transition={{ delay: i * 0.07 }}
                   className="relative isolate group flex flex-col"
                 >
-                  {/* Screen light: the cover, blurred, glows behind the card on hover */}
-                  <div aria-hidden className="absolute -inset-6 -z-10 opacity-0 group-hover:opacity-70 transition-opacity duration-700 pointer-events-none">
-                    <Image src={p.image} alt="" fill sizes="30vw" className="object-cover blur-[60px] saturate-150" />
-                  </div>
-                  <div className={`glass rounded-[22px] border ${p.border} overflow-hidden flex flex-col flex-1 transition-transform duration-500 group-hover:-translate-y-1`}>
+                  {/* The project's own colours light the card: a soft glow at rest, brighter on hover */}
+                  <div
+                    aria-hidden
+                    className="absolute -inset-8 -z-10 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity duration-700 blur-2xl"
+                    style={{ background: `radial-gradient(60% 50% at 30% 20%, ${pal[1]}55 0%, transparent 70%), radial-gradient(55% 45% at 80% 75%, ${pal[2]}33 0%, transparent 70%)` }}
+                  />
+                  <div
+                    className="glass rounded-[22px] overflow-hidden flex flex-col flex-1 transition-transform duration-500 group-hover:-translate-y-1"
+                    style={{ borderColor: `${pal[1]}40`, backgroundImage: `linear-gradient(180deg, ${pal[0]}1f 0%, transparent 45%)` }}
+                  >
                   {/* Preview area */}
                   <a
                     href={p.url || undefined}
@@ -454,16 +452,16 @@ export default function PortfolioPage() {
                     data-cursor={p.url ? 'Visit' : undefined}
                     tabIndex={p.url ? -1 : undefined}
                     aria-hidden={p.url ? true : undefined}
-                    className={`block aspect-[16/10] bg-gradient-to-br ${p.gradient} relative overflow-hidden`}
+                    className={`block aspect-[1672/941] bg-gradient-to-br ${p.gradient} relative overflow-hidden`}
                   >
                     <Image
-                      src={HD_COVERS[p.image] ?? p.image}
+                      src={media?.mockup ?? p.image}
                       alt={`${p.title} project preview`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                      className="object-cover object-top transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
+                      className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#090713]/85 via-[#090713]/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#090713]/70 via-transparent to-transparent" />
                     <div className="absolute inset-0 cinema-screen" />
                     <span className="absolute bottom-3 left-4 font-mono text-[10.5px] tracking-[0.2em] text-slate-300/80">{String(i + 1).padStart(2, '0')}</span>
                     {/* Type badge */}
@@ -485,7 +483,12 @@ export default function PortfolioPage() {
 
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="serif-accent silk-text text-[1.9rem] leading-tight pr-1">{p.title}</h3>
+                      <h3
+                        className="serif-accent text-[1.9rem] leading-tight pr-1"
+                        style={{ background: `linear-gradient(100deg, #fff 0%, ${pal[2]} 55%, ${pal[1]} 100%)`, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+                      >
+                        {p.title}
+                      </h3>
                       {p.url && (
                         <a
                           href={p.url}
@@ -539,7 +542,8 @@ export default function PortfolioPage() {
                   </div>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </motion.div>
           </AnimatePresence>
         </div>
