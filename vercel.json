@@ -4,8 +4,9 @@
     "env": { "NEXT_TELEMETRY_DISABLED": "1" }
   },
   "git": {
-    "deploymentEnabled": { "claude/**": false }
+    "deploymentEnabled": { "claude/**": false, "claude/*": false, "claude/mbn-dev-brand-guide-uw45fi": false }
   },
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"master\" ]",
   "builds": [
     {
       "src": "frontend/package.json",
