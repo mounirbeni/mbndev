@@ -10,8 +10,8 @@ import CountUp from '@/components/ui/CountUp';
 import RotatingPhrase from './RotatingPhrase';
 
 const STATS = [
-  { val: 50,  suffix: '+', label: 'Happy clients'       },
-  { val: 120, suffix: '+', label: 'Projects delivered'  },
+  { val: 48,  suffix: '+', label: 'Happy clients'       },
+  { val: 145, suffix: '+', label: 'Projects delivered'  },
   { val: 98,  suffix: '%', label: 'Client satisfaction' },
   { val: 5,   suffix: '+', label: 'Years of experience' },
 ];

@@ -126,7 +126,7 @@ const features = [
 ];
 
 const stats = [
-  { val: '34+', label: 'Clients' },
+  { val: '48+', label: 'Clients' },
   { val: '98%', label: 'On Time' },
   { val: '5.0', label: 'Rating'  },
 ];

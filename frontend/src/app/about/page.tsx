@@ -48,8 +48,8 @@ export default function AboutPage() {
 
   const stats = [
     { icon: Clock, value: '5+', label: t('about.stats.experience') },
-    { icon: FolderOpen, value: '40+', label: t('about.stats.projects') },
-    { icon: Users, value: '30+', label: t('about.stats.clients') },
+    { icon: FolderOpen, value: '145+', label: t('about.stats.projects') },
+    { icon: Users, value: '48+', label: t('about.stats.clients') },
     { icon: Star, value: '100%', label: t('about.stats.satisfaction') },
   ];
 
@@ -202,7 +202,7 @@ export default function AboutPage() {
                   <div className="mt-8 pt-7 border-t border-violet-500/20 grid grid-cols-3 gap-4">
                     {[
                       { val: '5+', lab: 'Years' },
-                      { val: '40+', lab: 'Projects' },
+                      { val: '145+', lab: 'Projects' },
                       { val: '3', lab: 'Languages' },
                     ].map(({ val, lab }) => (
                       <div key={lab} className="text-center">

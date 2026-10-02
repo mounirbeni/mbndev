@@ -109,8 +109,8 @@ export default function OGImage() {
         {/* Stats row */}
         <div style={{ display: 'flex', gap: '48px' }}>
           {[
-            { val: '50+', label: 'Happy Clients' },
-            { val: '120+', label: 'Projects Delivered' },
+            { val: '48+', label: 'Happy Clients' },
+            { val: '145+', label: 'Projects Delivered' },
             { val: '98%', label: 'Satisfaction Rate' },
             { val: '5+', label: 'Years Experience' },
           ].map(({ val, label }) => (
