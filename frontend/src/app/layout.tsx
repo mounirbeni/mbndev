@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Instrument_Serif } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
@@ -160,6 +161,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <InstallPrompt />
           <ServiceWorkerRegistration />
           <Analytics />
+          <VercelAnalytics />
         </MotionProvider>
       </body>
     </html>
