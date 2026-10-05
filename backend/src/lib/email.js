@@ -491,6 +491,31 @@ const templates = {
     };
   },
 
+  // ── Client: manual payment submitted, NOT yet verified ───────────────────
+  paymentSubmitted: ({ client, order, method }) => {
+    const first = client.name.split(' ')[0];
+    return {
+      subject: `We received your payment details — verification in progress`,
+      html: layout({
+        preheader: `Thanks ${first}. We'll verify your ${method} payment for "${order.title}" and confirm shortly.`,
+        badgeHtml: badge('Verification pending', { bg: T.amberBg, color: T.amber, border: T.amberBorder }),
+        heading:   `Thanks, ${first} — we're checking it.`,
+        intro:     `We've received your payment details. Payments are verified manually, so your payment is not confirmed yet: we'll check it shortly and email you as soon as it's confirmed and your project starts.`,
+        body: [
+          infoBox([
+            ['Project', order.title],
+            ['Amount',  `$${Number(order.totalPrice).toLocaleString('en-US')}`, { bold: true }],
+            ['Method',  method],
+            ['Status',  'Awaiting verification'],
+          ]),
+          notice('Usually verified within a few hours. If anything is missing (wrong amount or reference), we\'ll message you in your dashboard.', { type: 'warning' }),
+          ctaButton('View my order →', `${APP_URL}/dashboard/client/orders`),
+        ].join(''),
+        footer: 'You will receive a separate confirmation email once the payment is verified.',
+      }),
+    };
+  },
+
   // ── Admin: new payment to verify ─────────────────────────────────────────
   adminPaymentSubmitted: ({ order, client, method }) => ({
     subject: `Action required: payment to verify — ${order.title}`,

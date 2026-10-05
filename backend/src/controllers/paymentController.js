@@ -321,6 +321,11 @@ exports.submitManualPayment = async (req, res, next) => {
       }).catch(() => {});
     }
     await telegram.paymentSubmitted({ client: order.client, order, method: label }).catch(() => {});
+    // Tell the client we got their payment details — not that it is confirmed.
+    await sendEmail({
+      to: order.client.email,
+      ...templates.paymentSubmitted({ client: order.client, order, method: label }),
+    }).catch(() => {});
 
     res.json({ success: true, payment: fmt(payment) });
   } catch (err) { next(err); }
