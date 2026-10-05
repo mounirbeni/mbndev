@@ -20,13 +20,17 @@ const connectSrc = [
   'https://vercel.com',
   'https://*.blob.vercel-storage.com',
   API_ORIGIN,
+  // Google Analytics 4 (loaded only after consent)
+  'https://www.googletagmanager.com',
+  'https://*.google-analytics.com',
+  'https://*.analytics.google.com',
   !isProd && 'http://localhost:5000',
   !isProd && 'ws://localhost:*',        // HMR websocket
 ].filter(Boolean).join(' ');
 
 const scriptSrc = isProd
-  ? "'self' 'unsafe-inline'"            // Next.js inline scripts are hashed/nonce'd at runtime
-  : "'self' 'unsafe-inline' 'unsafe-eval'"; // dev: eval needed for fast-refresh
+  ? "'self' 'unsafe-inline' https://www.googletagmanager.com"            // Next.js inline scripts are hashed/nonce'd at runtime; GA4 after consent
+  : "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com"; // dev: eval needed for fast-refresh
 
 const csp = [
   "default-src 'self'",

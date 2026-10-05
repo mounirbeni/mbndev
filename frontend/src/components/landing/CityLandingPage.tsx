@@ -66,7 +66,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
               <p key={i} className="text-slate-400 leading-relaxed mb-4 max-w-2xl">{p}</p>
             ))}
             <div className="flex flex-wrap gap-3 mt-6">
-              <Link href="/request">
+              <Link href="/request" className="inline-flex">
                 <Button size="lg" className="group">
                   Start a Project <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -228,7 +228,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
               <Link href="/pricing">
                 <Button size="lg" variant="outline">See Full Pricing</Button>
               </Link>
-              <Link href="/request">
+              <Link href="/request" className="inline-flex">
                 <Button size="lg" className="group">
                   Get a Free Quote <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -285,7 +285,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
                 Tell us about your project and get a free, no-obligation quote within 24 hours.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link href="/request">
+                <Link href="/request" className="inline-flex">
                   <Button size="lg" className="group">
                     Start Your Project <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>

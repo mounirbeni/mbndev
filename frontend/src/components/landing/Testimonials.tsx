@@ -3,13 +3,26 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ShieldCheck, Repeat, Clock, MessageSquare, Code2, Sparkles,
   ArrowRight, Quote, Star,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const TESTIMONIALS = [
+type Testimonial = {
+  quote: string;
+  name: string;
+  role: string;
+  initials: string;
+  color: string;
+  /** Optional client photo in /public (e.g. '/images/testimonials/youssef.webp'); replaces the initials. */
+  photo?: string;
+  /** Optional link to the client's live site or the project, shown under the name. */
+  url?: string;
+};
+
+const TESTIMONIALS: Testimonial[] = [
   {
     quote: "MBN DEV transformed our online presence completely. The website they built loads incredibly fast and our conversion rate doubled within the first month.",
     name: 'Youssef A.',
@@ -119,15 +132,29 @@ function TestimonialCarousel() {
             </p>
 
             <div className="flex items-center gap-4">
-              <div
-                className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-                style={{ background: `${t.color}30`, border: `1px solid ${t.color}40` }}
-              >
-                {t.initials}
-              </div>
+              {t.photo ? (
+                <Image src={t.photo} alt={t.name} width={44} height={44} className="w-11 h-11 rounded-full object-cover shrink-0" />
+              ) : (
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
+                  style={{ background: `${t.color}30`, border: `1px solid ${t.color}40` }}
+                >
+                  {t.initials}
+                </div>
+              )}
               <div>
                 <p className="text-white font-semibold text-sm">{t.name}</p>
                 <p className="text-slate-500 text-xs">{t.role}</p>
+                {t.url && (
+                  <a
+                    href={t.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-violet-300 text-xs underline underline-offset-2 hover:text-white"
+                  >
+                    {t.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                  </a>
+                )}
               </div>
             </div>
           </motion.div>

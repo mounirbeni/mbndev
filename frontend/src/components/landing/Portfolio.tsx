@@ -3,15 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import type { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SilkRibbons from '@/components/ui/SilkRibbons';
 import { PROJECT_MEDIA } from '@/lib/portfolioMedia';
 import BrandWordmark from './BrandWordmark';
 
-gsap.registerPlugin(ScrollTrigger);
 
 // Below the desktop breakpoint the reel is a stacked list with its own silk
 // layer; each layout mounts only its own, so a device runs one WebGL context.
@@ -92,6 +90,21 @@ export default function Portfolio() {
   const small = useSyncExternalStore(subscribeSmall, isSmall, () => false);
   const [mActive, setMActive] = useState(0);
   const sceneRefs = useRef<(HTMLElement | null)[]>([]);
+  // Brand typefaces for the wordmarks load only once the reel is near the
+  // viewport — otherwise ~160 KB of fonts compete with the page's first paint.
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [nearView, setNearView] = useState(false);
+
+  useEffect(() => {
+    const root = wrapRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setNearView(true); io.disconnect(); } },
+      { rootMargin: '800px 0px' },
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
 
   // Phones: the scene crossing the middle of the screen sets the silk colours.
   useEffect(() => {
@@ -106,27 +119,35 @@ export default function Portfolio() {
     return () => io.disconnect();
   }, [small, n]);
 
-  // Desktop: pin the reel and let scroll advance the scenes.
+  // Desktop: pin the reel and let scroll advance the scenes. GSAP is loaded
+  // after mount so it stays off the page's critical path.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    const mm = gsap.matchMedia();
-    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
-      const st = ScrollTrigger.create({
-        trigger: root,
-        start: 'top top',
-        end: () => `+=${window.innerHeight * (n - 1)}`,
-        pin: true,
-        anticipatePin: 1,
-        onUpdate: (self) => {
-          setProgress(self.progress);
-          setActive(Math.min(n - 1, Math.round(self.progress * (n - 1))));
-        },
+    let cancelled = false;
+    let revert: (() => void) | undefined;
+    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([{ gsap }, { ScrollTrigger }]) => {
+      if (cancelled) return;
+      gsap.registerPlugin(ScrollTrigger);
+      const mm = gsap.matchMedia();
+      revert = () => mm.revert();
+      mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+        const st = ScrollTrigger.create({
+          trigger: root,
+          start: 'top top',
+          end: () => `+=${window.innerHeight * (n - 1)}`,
+          pin: true,
+          anticipatePin: 1,
+          onUpdate: (self) => {
+            setProgress(self.progress);
+            setActive(Math.min(n - 1, Math.round(self.progress * (n - 1))));
+          },
+        });
+        stRef.current = st;
+        return () => { st.kill(); stRef.current = null; };
       });
-      stRef.current = st;
-      return () => { st.kill(); stRef.current = null; };
     });
-    return () => mm.revert();
+    return () => { cancelled = true; revert?.(); };
   }, [n]);
 
   const goTo = (i: number) => {
@@ -138,7 +159,7 @@ export default function Portfolio() {
   const p = projects[active];
 
   return (
-    <div id="portfolio">
+    <div id="portfolio" ref={wrapRef}>
       {/* ── Desktop: the pinned cinema reel ─────────────────────────────── */}
       <section
         ref={rootRef}
@@ -205,7 +226,7 @@ export default function Portfolio() {
                   className="absolute inset-x-0 bottom-0 leading-none whitespace-nowrap"
                   style={slide(i, active, 'y', 36)}
                 >
-                  <BrandWordmark brand={proj.media} title={proj.title} />
+                  <BrandWordmark brand={proj.media} title={proj.title} loadFonts={nearView} />
                 </h3>
               ))}
             </div>
@@ -305,7 +326,7 @@ export default function Portfolio() {
                   <span style={{ color: proj.palette[2] }}>{pad(i + 1)}</span> — {proj.type}
                 </p>
                 <h3 className="mt-2 text-[2.5rem] leading-none">
-                  <BrandWordmark brand={proj.media} title={proj.title} />
+                  <BrandWordmark brand={proj.media} title={proj.title} loadFonts={nearView} />
                 </h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-slate-400">{proj.desc}</p>
                 <a href={proj.url} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-violet-200">

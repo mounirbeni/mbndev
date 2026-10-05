@@ -11,7 +11,10 @@ import { useEffect, useRef } from 'react';
  *
  * - Renders only while on screen and while the tab is visible.
  * - prefers-reduced-motion: draws one still frame.
- * - No WebGL: the CSS fallback glow in the wrapper stays visible.
+ * - No WebGL, or only a software (CPU) renderer: the CSS fallback glow in
+ *   the wrapper stays visible — software WebGL stalls the main thread.
+ * - Starts animating once the page has loaded and stops (keeping the still
+ *   frame) if the device can't keep a smooth frame rate.
  */
 
 const VERT = `
@@ -116,8 +119,19 @@ export default function SilkRibbons({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
+    const gl = canvas.getContext('webgl', {
+      antialias: false,
+      alpha: false,
+      powerPreference: 'low-power',
+      failIfMajorPerformanceCaveat: true,
+    });
     if (!gl) { canvas.style.display = 'none'; return; }
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    const renderer = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : '';
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer)) {
+      canvas.style.display = 'none';
+      return;
+    }
 
     const compile = (type: number, src: string) => {
       const s = gl.createShader(type)!;
@@ -166,15 +180,26 @@ export default function SilkRibbons({
 
     let raf = 0;
     let visible = true;
+    let ready = document.readyState === 'complete';
+    let tooSlow = false;
+    let slowFrames = 0;
+    let frames = 0;
     let elapsed = 14;         // start on a twist so the first frame is already composed
     let last = performance.now();
 
     const draw = () => {
+      if (!ready) return;
       setCols();
       gl.uniform1f(uTime, elapsed);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+      canvas.style.opacity = '1';
     };
     const loop = (now: number) => {
+      // A device that can't hold ~20fps here would jank the whole page:
+      // give up on the animation and keep the current frame.
+      frames += 1;
+      if (frames > 2) slowFrames = now - last > 50 ? slowFrames + 1 : 0;
+      if (slowFrames >= 3) { tooSlow = true; raf = 0; return; }
       const dt = Math.min(0.05, (now - last) / 1000);
       elapsed += dt * speed;
       last = now;
@@ -185,7 +210,7 @@ export default function SilkRibbons({
       raf = requestAnimationFrame(loop);
     };
     const start = () => {
-      if (reduced || raf || !visible || document.hidden) return;
+      if (reduced || tooSlow || !ready || raf || !visible || document.hidden) return;
       last = performance.now();
       raf = requestAnimationFrame(loop);
     };
@@ -197,8 +222,10 @@ export default function SilkRibbons({
       if (target.current.length) cur.splice(0, 9, ...target.current);
       draw();
     };
-    draw();
-    start();
+    // First frame (and the animation) wait for the page load, so the shader
+    // never competes with hydration; until then the CSS glow shows.
+    const onLoad = () => { ready = true; draw(); start(); };
+    if (ready) onLoad(); else window.addEventListener('load', onLoad, { once: true });
 
     const ro = new ResizeObserver(() => { resize(); draw(); });
     ro.observe(canvas);
@@ -216,6 +243,7 @@ export default function SilkRibbons({
       ro.disconnect();
       io.disconnect();
       document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('load', onLoad);
       // Free GPU objects but keep the context: StrictMode re-runs this effect
       // on the same canvas, and a lost context cannot be recovered.
       gl.deleteBuffer(buf);
@@ -234,7 +262,7 @@ export default function SilkRibbons({
           'radial-gradient(60% 45% at 70% 55%, rgba(124,58,237,0.22) 0%, rgba(59,130,246,0.08) 45%, transparent 75%), #07060f',
       }}
     >
-      <canvas ref={canvasRef} className="block w-full h-full" />
+      <canvas ref={canvasRef} className="block w-full h-full transition-opacity duration-700" style={{ opacity: 0 }} />
     </div>
   );
 }

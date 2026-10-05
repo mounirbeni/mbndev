@@ -21,6 +21,7 @@ import { orderAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SilkBackdrop from '@/components/ui/SilkBackdrop';
+import { trackEvent } from '@/lib/analytics';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -247,6 +248,7 @@ function RequestPageContent() {
         plan,
       });
 
+      trackEvent('project_request_submitted', { plan: plan || 'custom' });
       toast.success(t('request.orderCreated'));
       localStorage.removeItem('mbndev_request_draft');
       localStorage.removeItem('mbndev_request_step');
@@ -275,7 +277,7 @@ function RequestPageContent() {
       {/* Header */}
       <SilkBackdrop className="absolute inset-x-0 top-0 h-[80vh]" anchor={[0.5, 0.5]} intensity={0.6} />
       <header className="glass border-b border-white/5 px-4 sm:px-6 py-4 flex items-center gap-4 shrink-0">
-        <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+        <Link href="/" aria-label="Back to home" className="text-slate-400 hover:text-white transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex items-center gap-2">

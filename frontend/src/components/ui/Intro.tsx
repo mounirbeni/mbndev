@@ -40,7 +40,7 @@ export default function Intro() {
     const end = () => { if (!done) { done = true; finish(); } };
     const anims = el.getAnimations?.({ subtree: true }) ?? [];
     if (anims.length) Promise.all(anims.map((a) => a.finished)).then(end, end);
-    const t = setTimeout(end, 7000);
+    const t = setTimeout(end, 2500);
     return () => clearTimeout(t);
   }, []);
 
@@ -73,7 +73,7 @@ export default function Intro() {
             <path
               key={o}
               pathLength={1}
-              style={{ animationDelay: `${0.25 + i * 0.07}s` }}
+              style={{ animationDelay: `${0.09 + i * 0.025}s` }}
               d={`M -40 ${250 + o} C 260 ${120 - o * 2}, 520 ${330 + o}, 760 ${200 - o} S 1100 ${90 + o}, 1260 ${150 - o}`}
               stroke="url(#mbnIntroSilk)"
               strokeWidth={i === 2 ? 2.2 : 1}
@@ -89,7 +89,7 @@ export default function Intro() {
 
         <div className="mbn-intro-word">
           {WORD.map((ch, i) => (
-            <span key={i} className={i >= 4 ? 'is-accent' : undefined} style={{ animationDelay: `${1.35 + i * 0.06}s` }}>
+            <span key={i} className={i >= 4 ? 'is-accent' : undefined} style={{ animationDelay: `${0.47 + i * 0.02}s` }}>
               {ch === ' ' ? ' ' : ch}
             </span>
           ))}

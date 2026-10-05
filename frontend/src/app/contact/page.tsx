@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AccentText from '@/components/ui/AccentText';
+import { trackEvent } from '@/lib/analytics';
 
 const cardStyle = {
   background:    'rgba(10,10,16,0.88)',
@@ -54,6 +55,7 @@ export default function ContactPage() {
     }
     const subject = form.subject ? `[${form.subject}] ` : '';
     const text = encodeURIComponent(`Hi Mounir, I'm ${form.name} (${form.email}).\n\n${subject}${form.message}`);
+    trackEvent('contact_form_submitted', { subject: form.subject || 'none' });
     window.open(`https://wa.me/212705914424?text=${text}`, '_blank');
   };
 
@@ -74,7 +76,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 ambient-grid opacity-20 pointer-events-none" />
 
         <div className="max-w-3xl mx-auto text-center relative z-10">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
+          <div className="hero-enter">
             <span className="section-label mb-6">{t('contact.badge')}</span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight leading-[1.06] mt-6">
               <AccentText text={t('contact.title')} />
@@ -82,7 +84,7 @@ export default function ContactPage() {
             <p className="text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
               {t('contact.sub')}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -181,7 +183,7 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                       {t('contact.form.name')} *
                     </label>
                     <input
@@ -197,7 +199,7 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                       {t('contact.form.email')} *
                     </label>
                     <input
@@ -215,10 +217,11 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                     {t('contact.form.subject')}
                   </label>
                   <select
+                    aria-label={t('contact.form.subject')}
                     value={form.subject}
                     onChange={set('subject')}
                     onFocus={() => setFocusField('subject')}
@@ -236,7 +239,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                     {t('contact.form.message')} *
                   </label>
                   <textarea

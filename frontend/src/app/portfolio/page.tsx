@@ -377,7 +377,7 @@ export default function PortfolioPage() {
       <section className="pt-32 pb-16 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute top-0 right-1/4 w-[600px] h-[400px] bg-primary-500/8 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="hero-enter">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-6">
               <Zap className="w-3 h-3 text-primary-400" /> {t('portfolio.badge')}
             </span>
@@ -387,7 +387,7 @@ export default function PortfolioPage() {
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
               {t('portfolio.pageSub')}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -482,12 +482,12 @@ export default function PortfolioPage() {
 
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3
+                      <h2
                         className="serif-accent text-[1.9rem] leading-tight pr-1"
                         style={{ background: `linear-gradient(100deg, #fff 0%, ${pal[2]} 55%, ${pal[1]} 100%)`, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
                       >
                         {p.title}
-                      </h3>
+                      </h2>
                       {p.url && (
                         <a
                           href={p.url}

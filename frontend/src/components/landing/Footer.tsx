@@ -173,7 +173,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.nav')}</h4>
+            <h2 className="text-white font-semibold text-sm mb-4">{t('footer.nav')}</h2>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
@@ -190,7 +190,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.services')}</h4>
+            <h2 className="text-white font-semibold text-sm mb-4">{t('footer.services')}</h2>
             <ul className="space-y-2">
               {serviceLinks.map((link) => (
                 <li key={link.label}>
@@ -207,7 +207,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.contact')}</h4>
+            <h2 className="text-white font-semibold text-sm mb-4">{t('footer.contact')}</h2>
             <ul className="space-y-3 text-sm text-slate-500 mb-5">
               <li className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 shrink-0" />

@@ -105,7 +105,7 @@ export default function PricingPage() {
       <section className="pt-32 pb-16 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary-500/8 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-3xl mx-auto text-center relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="hero-enter">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-slate-400 mb-6">
               <Zap className="w-3 h-3 text-primary-400" /> {t('pricing.page.badge')}
             </span>
@@ -115,7 +115,7 @@ export default function PricingPage() {
             <p className="text-xl text-slate-400 max-w-xl mx-auto">
               {t('pricing.page.subtitle')} <span className="text-green-400 font-semibold">{t('pricing.page.subtitlePct')}</span> {t('pricing.page.subtitleEnd')}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -164,7 +164,7 @@ export default function PricingPage() {
                   )}
 
                   <div className="mb-5">
-                    <h3 className="text-white font-bold text-xl mb-1">{pkg.name}</h3>
+                    <h2 className="text-white font-bold text-xl mb-1">{pkg.name}</h2>
                     <p className="text-slate-400 text-sm">{pkg.description}</p>
                   </div>
 

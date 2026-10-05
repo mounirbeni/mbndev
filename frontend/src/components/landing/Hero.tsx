@@ -171,11 +171,9 @@ export default function Hero() {
         <div className="flex-1 w-full max-w-[1320px] mx-auto px-6 sm:px-10 lg:px-14 pt-32 pb-16 lg:pt-28 grid lg:grid-cols-[1.08fr_0.92fr] items-center gap-16">
           {/* copy */}
           <div className="max-w-[640px]">
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: EASE }}
-              className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] pl-1.5 pr-3.5 py-1.5 backdrop-blur-md"
+            <div
+              style={{ '--hero-y': '12px' } as React.CSSProperties}
+              className="hero-enter inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] pl-1.5 pr-3.5 py-1.5 backdrop-blur-md"
             >
               <span className="rounded-full bg-violet-400/15 border border-violet-300/25 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-violet-200">
                 Studio
@@ -183,35 +181,28 @@ export default function Hero() {
               <span className="font-mono text-[11px] tracking-wide text-slate-400">
                 <span className="hidden sm:inline">Websites · SaaS · Web apps — </span>Morocco → worldwide
               </span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 28, filter: 'blur(10px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 1, delay: 0.12, ease: EASE }}
-              className="mt-8 text-white font-extrabold tracking-[-0.035em] leading-[0.98]"
-              style={{ fontSize: 'clamp(2.7rem, 5.6vw, 5.6rem)' }}
+            <h1
+              className="hero-enter-blur mt-8 text-white font-extrabold tracking-[-0.035em] leading-[0.98]"
+              style={{ fontSize: 'clamp(2.7rem, 5.6vw, 5.6rem)', '--hero-delay': '0.12s' } as React.CSSProperties}
             >
               <span className="whitespace-nowrap">Websites that</span>
               <br />
               <RotatingPhrase className="serif-accent pr-2" />
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
-              className="mt-7 max-w-[500px] text-[clamp(0.98rem,1.25vw,1.1rem)] leading-[1.7] text-slate-400"
+            <p
+              style={{ '--hero-y': '16px', '--hero-delay': '0.3s' } as React.CSSProperties}
+              className="hero-enter mt-7 max-w-[500px] text-[clamp(0.98rem,1.25vw,1.1rem)] leading-[1.7] text-slate-400"
             >
               We design and develop high-performance websites, SaaS platforms
               and digital products — and you follow every step from your own client portal.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.42, ease: EASE }}
-              className="mt-10 flex flex-wrap items-center gap-3"
+            <div
+              style={{ '--hero-y': '14px', '--hero-delay': '0.42s' } as React.CSSProperties}
+              className="hero-enter mt-10 flex flex-wrap items-center gap-3"
             >
               <Magnetic>
                 <Link
@@ -231,18 +222,16 @@ export default function Hero() {
                 <Play className="w-3.5 h-3.5 fill-current text-violet-300" />
                 See our work
               </a>
-            </motion.div>
+            </div>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-              className="mt-7 font-mono text-[11px] tracking-wide text-slate-500"
+            <p
+              style={{ '--hero-y': '0px', '--hero-delay': '0.7s' } as React.CSSProperties}
+              className="hero-enter mt-7 font-mono text-[11px] tracking-wide text-slate-500"
             >
               Reply within 24h <span className="text-slate-700 mx-2">/</span>
               No surprise pricing <span className="text-slate-700 mx-2">/</span>
               You own the code
-            </motion.p>
+            </p>
           </div>
 
           {/* portal mock */}

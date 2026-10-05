@@ -16,7 +16,7 @@ export interface Article {
 }
 
 export const TAG_COLORS: Record<string, string> = {
-  Strategy: '#7c3aed',
+  Strategy: '#a78bfa', // violet-400: readable as small text on dark (brand #7c3aed is 3.6:1)
   Development: '#3b82f6',
   Design: '#ec4899',
   Growth: '#10b981',

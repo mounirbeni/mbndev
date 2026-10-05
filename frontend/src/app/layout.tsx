@@ -8,13 +8,17 @@ import InstallPrompt from '@/components/mobile/InstallPrompt';
 import PushPrompt from '@/components/mobile/PushPrompt';
 import Intro, { INTRO_HEAD_SCRIPT } from '@/components/ui/Intro';
 import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
+import Analytics from '@/components/Analytics';
+import { VERCEL_ANALYTICS_BOOTSTRAP } from '@/lib/analytics';
 import './globals.css';
 
 // Self-hosted at build time by next/font. (A CSS @import of Google Fonts is
 // dropped by the bundler, so the fonts never loaded that way.)
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
-const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], display: 'swap', variable: '--font-mono' });
-const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal', 'italic'], display: 'swap', variable: '--font-serif' });
+// Accent fonts aren't preloaded: they only style small labels and the serif
+// accent, and preloading them competes with the main content on slow networks.
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], display: 'swap', variable: '--font-mono', preload: false });
+const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal', 'italic'], display: 'swap', variable: '--font-serif', preload: false });
 
 export const metadata: Metadata = {
   title: {
@@ -109,6 +113,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="format-detection" content="telephone=no" />
         <meta name="google" content="notranslate" />
         <meta name="theme-color" content="#08080b" />
+        {/* Vercel Web Analytics + Speed Insights (cookieless). The scripts only
+            exist on Vercel deployments, so they are skipped elsewhere. */}
+        {process.env.VERCEL && (
+          <>
+            <script dangerouslySetInnerHTML={{ __html: VERCEL_ANALYTICS_BOOTSTRAP }} />
+            <script defer src="/_vercel/insights/script.js" />
+            <script defer src="/_vercel/speed-insights/script.js" />
+          </>
+        )}
       </head>
       <body suppressHydrationWarning>
         <Intro />
@@ -144,6 +157,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </LanguageProvider>
         <InstallPrompt />
         <ServiceWorkerRegistration />
+        <Analytics />
       </body>
     </html>
   );

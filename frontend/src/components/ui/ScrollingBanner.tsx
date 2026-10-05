@@ -27,7 +27,7 @@ export default function ScrollingBanner() {
       {/* Row 1 — scrolls left */}
       <motion.div style={{ x: x1 }} className="flex gap-8 mb-3 whitespace-nowrap">
         {row.map((item, i) => (
-          <span key={i} className="flex items-center gap-8 text-[11px] font-bold tracking-[0.25em] text-slate-600">
+          <span key={i} className="flex items-center gap-8 text-[11px] font-bold tracking-[0.25em] text-slate-400">
             {item}
             <span className="w-1 h-1 rounded-full bg-violet-700/60 shrink-0" />
           </span>
@@ -37,7 +37,7 @@ export default function ScrollingBanner() {
       {/* Row 2 — scrolls right */}
       <motion.div style={{ x: x2 }} className="flex gap-8 whitespace-nowrap">
         {[...row].reverse().map((item, i) => (
-          <span key={i} className="flex items-center gap-8 text-[11px] font-bold tracking-[0.25em] text-violet-900/50">
+          <span key={i} className="flex items-center gap-8 text-[11px] font-bold tracking-[0.25em] text-violet-400/80">
             {item}
             <span className="w-1 h-1 rounded-full bg-slate-700/60 shrink-0" />
           </span>

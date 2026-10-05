@@ -92,7 +92,7 @@ export default function AboutPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 70%)' }} />
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+          <div className="hero-enter">
             <span className="section-label mb-8 inline-flex">{t('about.badge')}</span>
             <h1 className="text-5xl lg:text-7xl font-black text-white mb-6 leading-tight tracking-tight">
               {t('about.hero.title')}{' '}
@@ -101,7 +101,7 @@ export default function AboutPage() {
             <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
               {t('about.hero.subtitle')}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 

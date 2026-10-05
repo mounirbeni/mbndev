@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'How MBN DEV collects, uses, and protects your personal information.',
 };
 
-const LAST_UPDATED = 'May 7, 2026';
+const LAST_UPDATED = 'October 5, 2026';
 
 export default function PrivacyPage() {
   return (
@@ -87,9 +87,13 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-semibold text-white mb-3">5. Cookies</h2>
             <p>
-              We use minimal, essential cookies required for authentication (JWT tokens stored in localStorage).
-              We do not use advertising cookies or third-party tracking cookies.
-              You can clear your browser&apos;s localStorage at any time to remove stored session data.
+              We use minimal, essential storage required for authentication (JWT tokens stored in localStorage).
+              We measure visits with Vercel Web Analytics, which is cookieless and only reports aggregated,
+              anonymous statistics (pages viewed, referrer, country, device type). If you accept the analytics
+              banner, Google Analytics also sets cookies to help us understand how the site is used; if you
+              decline, it is never loaded. We do not use advertising cookies and never sell your data.
+              You can clear your browser&apos;s localStorage at any time to remove stored session data and
+              your analytics choice.
             </p>
           </section>
 

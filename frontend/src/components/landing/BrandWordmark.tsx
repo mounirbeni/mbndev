@@ -7,10 +7,11 @@ import { Building2, Compass } from 'lucide-react';
  * Colours are lifted a little where the original sits on a light page.
  */
 
-const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700'], display: 'swap' });
-const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['500', '600'], display: 'swap' });
-const plexArabic = IBM_Plex_Sans_Arabic({ subsets: ['arabic'], weight: ['700'], display: 'swap' });
-const ruqaa = Aref_Ruqaa({ subsets: ['arabic'], weight: ['700'], display: 'swap' });
+// Not preloaded: these only render in the portfolio reel, far below the fold.
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700'], display: 'swap', preload: false });
+const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['500', '600'], display: 'swap', preload: false });
+const plexArabic = IBM_Plex_Sans_Arabic({ subsets: ['arabic'], weight: ['700'], display: 'swap', preload: false });
+const ruqaa = Aref_Ruqaa({ subsets: ['arabic'], weight: ['700'], display: 'swap', preload: false });
 
 const small = 'block font-mono text-[max(0.17em,10px)] tracking-[0.42em] uppercase mt-[0.35em] leading-none';
 
@@ -23,12 +24,22 @@ function TransoMark() {
   );
 }
 
-export default function BrandWordmark({ brand, title }: { brand: string; title: string }) {
+export default function BrandWordmark({
+  brand,
+  title,
+  loadFonts = true,
+}: {
+  brand: string;
+  title: string;
+  /** False keeps the fallback font, so the brand typefaces aren't downloaded until needed. */
+  loadFonts?: boolean;
+}) {
+  const f = (font: { className: string }) => (loadFonts ? font.className : '');
   switch (brand) {
     case 'tarique':
       return (
         <span className="inline-block text-left" dir="rtl">
-          <span className={`${plexArabic.className} block leading-none`} style={{ color: '#e6eeff' }}>
+          <span className={`${f(plexArabic)} block leading-none`} style={{ color: '#e6eeff' }}>
             طريق
           </span>
           <span className={small} style={{ color: '#60a5fa', direction: 'ltr' }}>Tarique</span>
@@ -37,7 +48,7 @@ export default function BrandWordmark({ brand, title }: { brand: string; title: 
     case 'chronocraft':
       return (
         <span
-          className={`${playfair.className} font-semibold`}
+          className={`${f(playfair)} font-semibold`}
           style={{ background: 'linear-gradient(180deg, #f6e3b0 0%, #d6a650 55%, #a87b32 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
         >
           ChronoCraft
@@ -47,7 +58,7 @@ export default function BrandWordmark({ brand, title }: { brand: string; title: 
       return (
         <span className="inline-block text-left" dir="rtl">
           <span
-            className={`${ruqaa.className} block leading-[1.05] text-[1.45em]`}
+            className={`${f(ruqaa)} block leading-[1.05] text-[1.45em]`}
             style={{ background: 'linear-gradient(180deg, #f8e7b5 0%, #d4a24c 60%, #9c7430 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
           >
             عبق
@@ -57,7 +68,7 @@ export default function BrandWordmark({ brand, title }: { brand: string; title: 
       );
     case 'riadconnect':
       return (
-        <span className={`${playfair.className} font-bold inline-flex items-center gap-[0.18em] text-[0.8em]`} style={{ color: '#f97316' }}>
+        <span className={`${f(playfair)} font-bold inline-flex items-center gap-[0.18em] text-[0.8em]`} style={{ color: '#f97316' }}>
           <Building2 className="h-[0.8em] w-[0.8em]" strokeWidth={2.2} />
           RiadConnect
         </span>
@@ -71,7 +82,7 @@ export default function BrandWordmark({ brand, title }: { brand: string; title: 
       );
     case 'caramelio':
       return (
-        <span className={`${cormorant.className} font-semibold`} style={{ color: '#e0a46a' }}>
+        <span className={`${f(cormorant)} font-semibold`} style={{ color: '#e0a46a' }}>
           Caramelio<span style={{ color: '#f5deb3' }}>.</span>
         </span>
       );

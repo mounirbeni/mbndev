@@ -17,6 +17,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import api from '@/lib/api';
 import AccentText from '@/components/ui/AccentText';
 import SilkBackdrop from '@/components/ui/SilkBackdrop';
+import { trackEvent } from '@/lib/analytics';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -284,6 +285,7 @@ export default function SignupPage() {
         phone:    form.phone || undefined,
       });
       haptic('success');
+      trackEvent('sign_up');
       toast.success('Welcome to MBN DEV!');
       router.push('/dashboard/client');
     } catch (err: any) {

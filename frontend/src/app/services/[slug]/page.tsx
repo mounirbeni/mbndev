@@ -320,7 +320,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
 
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="hero-enter">
               <div className={`w-16 h-16 bg-gradient-to-br ${service.color} border ${service.border} rounded-2xl flex items-center justify-center mb-6`}>
                 <Icon className="w-8 h-8 text-white" />
               </div>
@@ -349,7 +349,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                   </Button>
                 </Link>
               </div>
-            </motion.div>
+            </div>
 
             {/* Right — price card */}
             <motion.div

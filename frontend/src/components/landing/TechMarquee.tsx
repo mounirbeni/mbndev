@@ -31,7 +31,7 @@ function MarqueeRow({ items, reverse = false, speed = 30 }: { items: string[]; r
             style={{
               background: 'rgba(124,58,237,0.06)',
               border: '1px solid rgba(124,58,237,0.12)',
-              color: 'rgba(168,85,247,0.7)',
+              color: '#c084fc',
               transition: 'all 0.3s ease',
             }}
             onMouseEnter={e => {
@@ -44,7 +44,7 @@ function MarqueeRow({ items, reverse = false, speed = 30 }: { items: string[]; r
               const el = e.currentTarget;
               el.style.background = 'rgba(124,58,237,0.06)';
               el.style.borderColor = 'rgba(124,58,237,0.12)';
-              el.style.color = 'rgba(168,85,247,0.7)';
+              el.style.color = '#c084fc';
             }}
           >
             {tech}

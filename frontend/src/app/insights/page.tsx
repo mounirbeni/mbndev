@@ -59,7 +59,7 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
             >
               <Icon className="w-4 h-4" style={{ color }} strokeWidth={1.8} />
             </div>
-            <span className="text-[10px] font-bold tracking-[0.15em] uppercase" style={{ color: `${color}90` }}>
+            <span className="text-[10px] font-bold tracking-[0.15em] uppercase" style={{ color }}>
               {article.tag}
             </span>
           </div>
@@ -141,16 +141,16 @@ function FeaturedCard({ article, index }: { article: Article; index: number }) {
             <Icon className="w-6 h-6" style={{ color }} strokeWidth={1.7} />
           </div>
 
-          <h3 className="text-2xl lg:text-3xl font-bold text-white leading-snug tracking-tight">
+          <h2 className="text-2xl lg:text-3xl font-bold text-white leading-snug tracking-tight">
             {article.title}
-          </h3>
+          </h2>
 
           <p className="text-slate-400 text-base leading-relaxed max-w-lg">
             {article.excerpt}
           </p>
 
           <div className="flex items-center gap-4 mt-2">
-            <span className="flex items-center gap-1.5 text-sm text-slate-500">
+            <span className="flex items-center gap-1.5 text-sm text-slate-400">
               <Clock className="w-3.5 h-3.5" />
               {article.readTime}
             </span>
@@ -248,7 +248,7 @@ export default function InsightsPage() {
                   style={{
                     background: activeCategory === cat ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.04)',
                     border: `1px solid ${activeCategory === cat ? 'rgba(124,58,237,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                    color: activeCategory === cat ? '#c4b5fd' : 'rgba(148,163,184,0.7)',
+                    color: activeCategory === cat ? '#c4b5fd' : '#94a3b8',
                   }}
                 >
                   {cat}

@@ -43,8 +43,10 @@ export default function RotatingPhrase({ className = '' }: { className?: string 
 
   return (
     <span className={`relative inline-block whitespace-nowrap ${className}`}>
+      {/* aria-label isn't allowed on a plain span; screen readers get this text instead */}
+      <span className="sr-only">{PHRASES[i]}</span>
       <AnimatePresence mode="wait" initial={false}>
-        <motion.span key={i} className="inline-block" aria-label={PHRASES[i]}>
+        <motion.span key={i} className="inline-block" aria-hidden>
           {words.map((w, k) => (
             <motion.span
               key={k}

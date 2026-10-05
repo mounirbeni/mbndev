@@ -9,6 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Secondary-text greys lifted from Tailwind's defaults (#64748b / #475569)
+        // so they meet WCAG AA (4.5:1) on the site's near-black backgrounds.
+        slate: {
+          500: '#8190a6',
+          600: '#74819a',
+        },
         primary: {
           50:  '#f0e7ff',
           100: '#dcc5ff',
