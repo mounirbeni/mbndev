@@ -2,18 +2,23 @@ import type { Metadata } from 'next';
 import Navbar from '@/components/landing/Navbar';
 import LandingBottomNav from '@/components/landing/LandingBottomNav';
 import Hero from '@/components/landing/Hero';
-import Services from '@/components/landing/Services';
-import Portfolio from '@/components/landing/Portfolio';
-import Pricing from '@/components/landing/Pricing';
-import Process from '@/components/landing/Process';
-import Testimonials from '@/components/landing/Testimonials';
-import CTA from '@/components/landing/CTA';
-import Footer from '@/components/landing/Footer';
-import TechMarquee from '@/components/landing/TechMarquee';
-import ScrollingBanner from '@/components/ui/ScrollingBanner';
+import dynamic from 'next/dynamic';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 import JsonLd from '@/components/JsonLd';
 import CinemaLayer from '@/components/ui/CinemaLayer';
+
+// Below-the-fold sections: still server-rendered (same HTML, same SEO), but
+// each ships as its own chunk inside its own Suspense boundary, so React
+// hydrates them one at a time instead of in one long main-thread task.
+const TechMarquee = dynamic(() => import('@/components/landing/TechMarquee'));
+const ScrollingBanner = dynamic(() => import('@/components/ui/ScrollingBanner'));
+const Services = dynamic(() => import('@/components/landing/Services'));
+const Portfolio = dynamic(() => import('@/components/landing/Portfolio'));
+const Pricing = dynamic(() => import('@/components/landing/Pricing'));
+const Process = dynamic(() => import('@/components/landing/Process'));
+const Testimonials = dynamic(() => import('@/components/landing/Testimonials'));
+const CTA = dynamic(() => import('@/components/landing/CTA'));
+const Footer = dynamic(() => import('@/components/landing/Footer'));
 
 const organizationSchema = {
   '@context': 'https://schema.org',

@@ -154,7 +154,6 @@ const en: Dict = {
   'pricing.custom':       'Need something custom?',
   'pricing.letstalk':     "Let's talk",
   'pricing.aboutProject': 'about your project.',
-  'pricing.authPrompt':   'Sign up to start your project request and track everything in your dashboard.',
   'pricing.starter.desc': 'Perfect for small businesses and personal projects',
   'pricing.pro.desc':     'Best for growing businesses who need more',
   'pricing.premium.desc': 'For complex projects with custom requirements',

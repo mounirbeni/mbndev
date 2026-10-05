@@ -390,6 +390,8 @@ export const notificationAPI = {
 
 export const packageAPI = {
   getAll: ()                                       => api.get('/packages'),
+  /** Bypasses the CDN cache on /packages — for the admin editor. */
+  getAllFresh: ()                                  => api.get('/packages', { params: { fresh: Date.now() } }),
   create: (data: PackagePayload)                   => api.post('/packages', data),
   update: (id: string, data: Partial<PackagePayload>) => api.put(`/packages/${id}`, data),
   delete: (id: string)                             => api.delete(`/packages/${id}`),

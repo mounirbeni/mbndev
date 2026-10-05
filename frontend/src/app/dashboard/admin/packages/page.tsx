@@ -31,7 +31,7 @@ export default function AdminPackagesPage() {
 
   const fetchPackages = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
-    packageAPI.getAll()
+    packageAPI.getAllFresh()
       .then(({ data }) => setPackages(data.packages))
       .catch((err) => {
         console.error(err);

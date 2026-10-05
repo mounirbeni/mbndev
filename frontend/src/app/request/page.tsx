@@ -15,13 +15,15 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import AuthModal from '@/components/ui/AuthModal';
+import dynamic from 'next/dynamic';
 import PlanBadge from '@/components/ui/PlanBadge';
-import { orderAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SilkBackdrop from '@/components/ui/SilkBackdrop';
 import { trackEvent } from '@/lib/analytics';
+
+// Only used when a signed-out visitor submits: kept out of the initial bundle.
+const AuthModal = dynamic(() => import('@/components/ui/AuthModal'), { ssr: false });
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -227,13 +229,18 @@ function RequestPageContent() {
     return true;
   };
 
-  const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  const next = () => {
+    // Funnel: which steps visitors complete before dropping off.
+    trackEvent('request_step_completed', { step: step + 1, of: STEPS.length });
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const submitOrder = async () => {
     setLoading(true);
     try {
       const plan = params.get('package') || localStorage.getItem('mbndev_selected_plan') || undefined;
+      const { orderAPI } = await import('@/lib/api');
       const { data } = await orderAPI.create({
         serviceType:  form.serviceType,
         title:        form.title,

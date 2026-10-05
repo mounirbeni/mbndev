@@ -4,7 +4,7 @@ import {
   createContext, useContext, useEffect, useState,
   ReactNode, useCallback, useRef,
 } from 'react';
-import { authAPI, resetUnauthorizedFlag, setTokenRefreshedListener, RegisterPayload } from '@/lib/api';
+import type { RegisterPayload } from '@/lib/api';
 import { User } from '@/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -46,6 +46,8 @@ function clearAuthCookie() {
   document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; samesite=lax`;
 }
 
+type ApiModule = typeof import('@/lib/api');
+
 // ─── Context ──────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -58,17 +60,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Track whether a background /auth/me check is already in-flight
   const checkingRef = useRef(false);
 
-  // ── Stay in sync with a token silently rotated by the axios interceptor ──
-  // Without this, a 401-triggered refresh updates localStorage but not this
-  // component's state — so useAuth().token (and anything built on it, like
-  // useRealtime's SSE connection) keeps using the stale token until a full
-  // reload or an explicit refresh()/getMe() call.
-  useEffect(() => {
-    setTokenRefreshedListener((newToken, newUser) => {
-      setToken(newToken);
-      if (newUser) setUser(newUser as User);
-    });
-    return () => setTokenRefreshedListener(null);
+  // ── API client, loaded on demand ──────────────────────────────────────────
+  // The axios-based client is only needed for a signed-in session or a
+  // login/register, so anonymous visitors never download it.
+  const apiRef = useRef<Promise<ApiModule> | null>(null);
+  const loadApi = useCallback(() => {
+    if (!apiRef.current) {
+      apiRef.current = import('@/lib/api').then((mod) => {
+        // Stay in sync with a token silently rotated by the axios interceptor.
+        // Without this, a 401-triggered refresh updates localStorage but not
+        // this component's state — so useAuth().token (and anything built on
+        // it, like useRealtime's SSE connection) keeps using the stale token.
+        mod.setTokenRefreshedListener((newToken, newUser) => {
+          setToken(newToken);
+          if (newUser) setUser(newUser as User);
+        });
+        return mod;
+      });
+    }
+    return apiRef.current;
+  }, []);
+
+  useEffect(() => () => {
+    apiRef.current?.then((mod) => mod.setTokenRefreshedListener(null));
   }, []);
 
   // ── Session restore on mount ───────────────────────────────────────────────
@@ -108,7 +122,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }, AUTH_CHECK_TIMEOUT_MS);
 
-    authAPI.getMe()
+    loadApi()
+      .then(({ authAPI }) => authAPI.getMe())
       .then(({ data }) => {
         setUser(data.user);
         localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -125,11 +140,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         checkingRef.current = false;
       });
-  }, []); // runs once on mount
+  }, [loadApi]); // runs once on mount (loadApi is stable)
 
   // ── persistSession ────────────────────────────────────────────────────────
-  const persistSession = useCallback((newToken: string, newUser: User) => {
-    resetUnauthorizedFlag();
+  const persistSession = useCallback((api: ApiModule, newToken: string, newUser: User) => {
+    api.resetUnauthorizedFlag();
     localStorage.setItem(TOKEN_KEY, newToken);
     localStorage.setItem(USER_KEY, JSON.stringify(newUser));
     setAuthCookie(newUser.role);
@@ -139,32 +154,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── login ─────────────────────────────────────────────────────────────────
   const login = async (email: string, password: string) => {
-    const { data } = await authAPI.login({ email, password });
-    persistSession(data.token, data.user);
+    const api = await loadApi();
+    const { data } = await api.authAPI.login({ email, password });
+    persistSession(api, data.token, data.user);
   };
 
   // ── register ──────────────────────────────────────────────────────────────
   const register = async (registerData: RegisterPayload) => {
-    const { data } = await authAPI.register(registerData);
-    persistSession(data.token, data.user);
+    const api = await loadApi();
+    const { data } = await api.authAPI.register(registerData);
+    persistSession(api, data.token, data.user);
   };
 
   // ── logout ────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
     // Tell the server to clear the httpOnly refresh cookie
-    authAPI.logout().catch(() => {});
+    loadApi().then(({ authAPI }) => authAPI.logout()).catch(() => {});
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     clearAuthCookie();
     setToken(null);
     setUser(null);
-  }, []);
+  }, [loadApi]);
 
   // ── refresh ───────────────────────────────────────────────────────────────
   // Syncs the cached user object with the latest data from the server.
   // Call after profile updates or plan changes.
   const refresh = useCallback(async () => {
     try {
+      const { authAPI } = await loadApi();
       const { data } = await authAPI.getMe();
       setUser(data.user);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -172,7 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // 401 interceptor handles redirect — no further action needed here
     }
-  }, []);
+  }, [loadApi]);
 
   return (
     <AuthContext.Provider

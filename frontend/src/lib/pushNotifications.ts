@@ -1,4 +1,3 @@
-import { notificationAPI } from '@/lib/api';
 
 /** Phone/desktop push support, as the browser reports it right now. */
 export function pushSupported() {
@@ -26,6 +25,9 @@ export async function enablePushNotifications(): Promise<EnablePushResult> {
   try {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') return 'denied';
+    // Loaded here, not at module level: this file ships with the root layout
+    // (PushPrompt), and only this rarely-used path needs the API client.
+    const { notificationAPI } = await import('@/lib/api');
     const { data } = await notificationAPI.pushConfig();
     if (!data.configured || !data.publicKey) return 'not-configured';
     const registration = await navigator.serviceWorker.ready;

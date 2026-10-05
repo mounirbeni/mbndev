@@ -5,10 +5,8 @@ import { m as motion, useInView } from 'framer-motion';
 import CountUp from '@/components/ui/CountUp';
 import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import AuthModal from '@/components/ui/AuthModal';
-import { packageAPI } from '@/lib/api';
+import { fetchPackages } from '@/lib/packages';
 import { Package } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const defaultPackages: Package[] = [
@@ -37,33 +35,23 @@ function discountPct(original: number, current: number) {
 }
 
 export default function Pricing() {
-  const { user } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
   const [packages, setPackages] = useState<Package[]>(defaultPackages);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [pendingPlan, setPendingPlan] = useState<string | null>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' });
 
   useEffect(() => {
-    packageAPI.getAll()
-      .then(({ data }) => { if (data.packages?.length) setPackages(data.packages); })
+    fetchPackages()
+      .then((list) => { if (list.length) setPackages(list); })
       .catch(() => {});
   }, []);
 
+  // Plans go straight to the request form: an account is only needed at its
+  // final step (the request page asks then), not before seeing the form.
   const choosePlan = (pkg: Package) => {
     localStorage.setItem('mbndev_selected_plan', pkg.slug);
-    if (user) {
-      router.push(`/request?package=${pkg.slug}`);
-    } else {
-      setPendingPlan(pkg.slug);
-      setAuthOpen(true);
-    }
-  };
-
-  const handleAuthSuccess = () => {
-    router.push(`/request?package=${pendingPlan || localStorage.getItem('mbndev_selected_plan') || ''}`);
+    router.push(`/request?package=${pkg.slug}`);
   };
 
   return (
@@ -312,13 +300,6 @@ export default function Pricing() {
         </motion.p>
       </div>
 
-      <AuthModal
-        open={authOpen}
-        onClose={() => setAuthOpen(false)}
-        onSuccess={handleAuthSuccess}
-        plan={pendingPlan ?? undefined}
-        contextMessage={t('pricing.authPrompt')}
-      />
     </section>
   );
 }

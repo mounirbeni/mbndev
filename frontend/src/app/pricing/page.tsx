@@ -5,13 +5,11 @@ import { m as motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Check, ArrowRight, Zap, Star, HelpCircle, Flame, Tag, Trophy } from 'lucide-react';
-import { packageAPI } from '@/lib/api';
+import { fetchPackages } from '@/lib/packages';
 import { Package } from '@/types';
 import CountUp from '@/components/ui/CountUp';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
-import AuthModal from '@/components/ui/AuthModal';
-import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const BADGE_STYLES: Record<string, { icon: any; className: string }> = {
@@ -46,14 +44,11 @@ const fallbackPackages = [
 ];
 
 export default function PricingPage() {
-  const { user } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAnnual, setShowAnnual] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [pendingPlan, setPendingPlan] = useState<string | null>(null);
 
   const comparison = [
     { feature: t('pricing.compare.pages'),      starter: 'Up to 5',  pro: 'Up to 10', premium: t('pricing.compare.unlimited') },
@@ -76,25 +71,17 @@ export default function PricingPage() {
   ];
 
   useEffect(() => {
-    packageAPI.getAll()
-      .then(({ data }) => setPackages(data.packages?.length ? data.packages : fallbackPackages))
+    fetchPackages()
+      .then((list) => setPackages(list.length ? list : fallbackPackages))
       .catch(() => setPackages(fallbackPackages as any))
       .finally(() => setLoading(false));
   }, []);
 
+  // Plans go straight to the request form: an account is only needed at its
+  // final step (the request page asks then), not before seeing the form.
   const choosePlan = (pkg: { slug: string; name: string }) => {
     localStorage.setItem('mbndev_selected_plan', pkg.slug);
-    if (user) {
-      router.push(`/request?package=${pkg.slug}`);
-    } else {
-      setPendingPlan(pkg.slug);
-      setAuthOpen(true);
-    }
-  };
-
-  const handleAuthSuccess = () => {
-    const plan = pendingPlan || localStorage.getItem('mbndev_selected_plan') || '';
-    router.push(`/request?package=${plan}`);
+    router.push(`/request?package=${pkg.slug}`);
   };
 
   const displayed = loading ? fallbackPackages : packages;
@@ -306,13 +293,6 @@ export default function PricingPage() {
           </motion.div>
         </div>
       </section>
-      <AuthModal
-        open={authOpen}
-        onClose={() => setAuthOpen(false)}
-        onSuccess={handleAuthSuccess}
-        plan={pendingPlan ?? undefined}
-        contextMessage="Create your account to start your project and access your client dashboard."
-      />
     </PublicLayout>
   );
 }

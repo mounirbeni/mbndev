@@ -18,6 +18,13 @@ exports.getPackages = async (req, res, next) => {
       where: { isActive: true },
       orderBy: { price: 'asc' },
     });
+    // Public, identical for every visitor and read on every home/pricing
+    // view: let Vercel's CDN serve it (vercel.json's no-store only governs
+    // browsers); visitors see admin edits within 5 minutes. Authenticated or
+    // parameterised requests (the admin packages page) always hit the DB.
+    if (!req.headers.authorization && Object.keys(req.query).length === 0) {
+      res.set('Vercel-CDN-Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+    }
     res.json({ success: true, packages: fmt(packages) });
   } catch (err) {
     next(err);
