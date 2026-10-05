@@ -45,7 +45,7 @@ export default function AdminOrdersPage() {
         if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
-  }, [filter]);
+  }, [filter, t]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 

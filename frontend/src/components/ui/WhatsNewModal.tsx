@@ -8,6 +8,7 @@ import { APP_VERSION, CHANGELOG } from '@/lib/version';
 import { useRouter } from 'next/navigation';
 import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsClient } from '@/hooks/useIsClient';
 
 const STORAGE_KEY = 'mbndev_seen_version';
 
@@ -30,8 +31,7 @@ export default function WhatsNewModal() {
   // sized/positioned relative to that transformed box instead of the real
   // viewport. `mounted` defers the portal to a client-only effect so this
   // never touches `document` during SSR.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useIsClient();
 
   useEffect(() => {
     // Once per device per version: recorded as soon as it is shown, so

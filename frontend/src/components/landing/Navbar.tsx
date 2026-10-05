@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { m as motion, AnimatePresence, useScroll, useMotionValueEvent, useSpring } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -8,6 +8,7 @@ import Logo3D from '@/components/ui/Logo3D';
 import { ArrowUpRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsClient } from '@/hooks/useIsClient';
 
 const navLinks = [
   { label: 'Services',  href: '/services'  },
@@ -21,7 +22,7 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden,   setHidden]   = useState(false);
-  const [mounted,  setMounted]  = useState(false);
+  const mounted = useIsClient();
   const prevScrollY = useRef(0);
 
   const { user } = useAuth();
@@ -29,7 +30,6 @@ export default function Navbar() {
   const { scrollY, scrollYProgress } = useScroll();
   const readProgress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, restDelta: 0.001 });
 
-  useEffect(() => { setMounted(true); }, []);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setScrolled(latest > 30);

@@ -17,6 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
 import AccentText from '@/components/ui/AccentText';
 import SilkBackdrop from '@/components/ui/SilkBackdrop';
+import { useIsClient } from '@/hooks/useIsClient';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -272,7 +273,7 @@ export default function LoginPage() {
   const [password,     setPassword]     = useState('');
   const [showPw,       setShowPw]       = useState(false);
   const [loading,      setLoading]      = useState(false);
-  const [mounted,      setMounted]      = useState(false);
+  const mounted = useIsClient();
   const [emailFocused, setEmailFocused] = useState(false);
   const [passFocused,  setPassFocused]  = useState(false);
 
@@ -288,7 +289,6 @@ export default function LoginPage() {
   const router          = useRouter();
   const haptic          = useHaptic();
 
-  useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     if (mounted && user) {
       router.push(user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client');

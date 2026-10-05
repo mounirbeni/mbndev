@@ -38,7 +38,7 @@ export default function AdminPackagesPage() {
         if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
-  }, []);
+  }, [t]);
 
   useEffect(() => { fetchPackages(); }, [fetchPackages]);
 

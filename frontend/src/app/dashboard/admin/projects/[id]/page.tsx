@@ -74,7 +74,7 @@ export default function AdminProjectWorkspace() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
       const [pRes, mRes, payRes] = await Promise.all([
         projectAPI.getOne(id),
@@ -96,10 +96,10 @@ export default function AdminProjectWorkspace() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router, t]);
 
   // Initial load
-  useEffect(() => { fetchAll(); }, [id]);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   // Real-time polling: messages + project updates every 10 s (tab visible only)
   const silentRefresh = useCallback(async () => {

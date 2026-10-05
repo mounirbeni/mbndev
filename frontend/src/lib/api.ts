@@ -89,6 +89,9 @@ function clearSessionAndRedirect(url: string) {
     const next = encodeURIComponent(window.location.pathname + window.location.search);
     const isPublic = /^\/(login|signup|forgot-password|reset-password|$)/.test(window.location.pathname);
     if (!isPublic) {
+      // A full reload on purpose: this runs outside React (an axios
+      // interceptor) and must also drop all in-memory session state.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.href = `/login?next=${next}`;
     }
   }

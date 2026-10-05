@@ -16,6 +16,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { getInitials } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { useIsClient } from '@/hooks/useIsClient';
 
 /* ─── Types ────────────────────────────────────────────────────────────────── */
 type NavItem = { labelKey: string; href: string; icon: React.ElementType; dot?: boolean };
@@ -664,9 +665,8 @@ function BottomBar({
 export default function MobileNav() {
   const pathname              = usePathname();
   const [open,    setOpen]    = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
 
-  useEffect(() => { setMounted(true); }, []);
 
   /* Close sheet on route change */
   useEffect(() => { setOpen(false); }, [pathname]);

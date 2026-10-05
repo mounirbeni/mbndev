@@ -73,7 +73,7 @@ export default function ClientProjectWorkspace() {
   const [uploadPct, setUploadPct] = useState(0);
   const fileInputRef   = useRef<HTMLInputElement>(null);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
       const [pRes, mRes, payRes] = await Promise.all([
         projectAPI.getOne(id),
@@ -93,10 +93,10 @@ export default function ClientProjectWorkspace() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router, t]);
 
   // Initial load
-  useEffect(() => { fetchAll(); }, [id]);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   // Real-time polling: project status + messages every 10 s (when tab visible)
   const silentRefresh = useCallback(async () => {

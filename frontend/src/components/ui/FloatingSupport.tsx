@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import { X, MessageCircle, Phone, Mail } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useIsClient } from '@/hooks/useIsClient';
 
 const WA_URL = 'https://wa.me/212705914424';
 const TEL    = 'tel:+212705914424';
@@ -22,8 +23,7 @@ export default function FloatingSupport() {
   // shrinks/shifts while the mobile nav sheet is open instead of staying
   // pinned to the real viewport. `mounted` defers the portal to a client-
   // only effect so this never touches `document` during SSR.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useIsClient();
 
   const toggle = () => {
     haptic('light');

@@ -2,9 +2,10 @@
 
 import { m as motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { ReactNode, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useDialogA11y } from '@/hooks/useDialogA11y';
+import { useIsClient } from '@/hooks/useIsClient';
 
 interface ModalProps {
   isOpen: boolean;
@@ -30,8 +31,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
   // (matching CommandPalette/MobileNav). Portalling is deferred behind a
   // `mounted` flag, set only in an effect (client-only), so this never
   // tries to access `document` during server-side rendering.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useIsClient();
 
   const dialogRef = useRef<HTMLDivElement>(null);
   useDialogA11y(isOpen, onClose, dialogRef);

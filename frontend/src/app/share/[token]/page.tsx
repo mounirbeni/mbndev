@@ -50,7 +50,7 @@ export default function SharePage() {
       .then(({ data }) => setProject(data.project))
       .catch((err) => setError(err?.response?.data?.message || t('share.linkInvalidSub')))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, t]);
 
   return (
     <div className="min-h-screen bg-[#0a0a12] text-white">

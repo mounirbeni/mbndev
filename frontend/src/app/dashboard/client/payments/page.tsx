@@ -26,7 +26,7 @@ export default function ClientPaymentsPage() {
         if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
-  }, []);
+  }, [t]);
 
   // Initial load
   useEffect(() => { fetchPayments(); }, [fetchPayments]);

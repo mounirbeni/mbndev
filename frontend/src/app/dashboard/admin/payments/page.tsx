@@ -358,7 +358,7 @@ export default function AdminPaymentsPage() {
       .then(({ data }) => setPayments(data.payments))
       .catch((err) => { console.error(err); if (!silent) setFetchError(t('toast.error')); })
       .finally(() => { if (!silent) setLoading(false); });
-  }, [showFlagged]);
+  }, [showFlagged, t]);
 
   useEffect(() => { fetchPayments(); }, [fetchPayments]);
 

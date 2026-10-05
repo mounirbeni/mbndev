@@ -43,7 +43,7 @@ export default function AdminClientsPage() {
         if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
-  }, []);
+  }, [t]);
 
   useEffect(() => { fetchClients(1); }, [fetchClients]);
 

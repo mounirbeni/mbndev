@@ -41,7 +41,7 @@ export default function ClientOrdersPage() {
         if (!silent) setFetchError(t('toast.error'));
       })
       .finally(() => { if (!silent) setLoading(false); });
-  }, []);
+  }, [t]);
 
   // Initial load
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
