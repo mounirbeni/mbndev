@@ -13,8 +13,9 @@ import { useEffect, useRef } from 'react';
  * - prefers-reduced-motion: draws one still frame.
  * - No WebGL, or only a software (CPU) renderer: the CSS fallback glow in
  *   the wrapper stays visible — software WebGL stalls the main thread.
- * - Starts animating once the page has loaded and stops (keeping the still
- *   frame) if the device can't keep a smooth frame rate.
+ * - Starts animating once the page has loaded. Only a device that stays
+ *   below ~10fps for two seconds, after the page has settled, gets the
+ *   still frame instead.
  */
 
 const VERT = `
@@ -123,7 +124,6 @@ export default function SilkRibbons({
       antialias: false,
       alpha: false,
       powerPreference: 'low-power',
-      failIfMajorPerformanceCaveat: true,
     });
     if (!gl) { canvas.style.display = 'none'; return; }
     const dbg = gl.getExtension('WEBGL_debug_renderer_info');
@@ -182,8 +182,9 @@ export default function SilkRibbons({
     let visible = true;
     let ready = document.readyState === 'complete';
     let tooSlow = false;
-    let slowFrames = 0;
-    let frames = 0;
+    let runStart = 0;   // when animating first started
+    let winStart = 0;   // current 2s measuring window
+    let winFrames = 0;
     let elapsed = 14;         // start on a twist so the first frame is already composed
     let last = performance.now();
 
@@ -195,11 +196,18 @@ export default function SilkRibbons({
       canvas.style.opacity = '1';
     };
     const loop = (now: number) => {
-      // A device that can't hold ~20fps here would jank the whole page:
-      // give up on the animation and keep the current frame.
-      frames += 1;
-      if (frames > 2) slowFrames = now - last > 50 ? slowFrames + 1 : 0;
-      if (slowFrames >= 3) { tooSlow = true; raf = 0; return; }
+      // Safety net for genuinely weak devices: the first 3s are ignored
+      // (hydration and the intro make any device drop frames then), after
+      // that a 2s window under 20 frames (<10fps) keeps the current frame.
+      if (now - runStart > 3000) {
+        winFrames += 1;
+        if (!winStart) winStart = now;
+        else if (now - winStart >= 2000) {
+          if (winFrames < 20) { tooSlow = true; raf = 0; return; }
+          winStart = now;
+          winFrames = 0;
+        }
+      }
       const dt = Math.min(0.05, (now - last) / 1000);
       elapsed += dt * speed;
       last = now;
@@ -212,6 +220,9 @@ export default function SilkRibbons({
     const start = () => {
       if (reduced || tooSlow || !ready || raf || !visible || document.hidden) return;
       last = performance.now();
+      if (!runStart) runStart = last;
+      winStart = 0;           // a pause (off-screen, hidden tab) restarts the window
+      winFrames = 0;
       raf = requestAnimationFrame(loop);
     };
     const stop = () => { cancelAnimationFrame(raf); raf = 0; };
