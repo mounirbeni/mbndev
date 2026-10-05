@@ -192,6 +192,7 @@ app.use('/api/orders',        require('./routes/orders'));
 app.use('/api/messages',      require('./routes/messages'));
 app.use('/api/payments',      require('./routes/payments'));
 app.use('/api/packages',      require('./routes/packages'));
+app.use('/api/offers',        require('./routes/offers'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));

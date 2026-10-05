@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { Check, ArrowRight, Zap, Star, HelpCircle, Flame, Tag, Trophy } from 'lucide-react';
 import { fetchPackages } from '@/lib/packages';
 import { Package } from '@/types';
+import { useOffer, discounted } from '@/lib/offer';
+import OfferBanner from '@/components/ui/OfferBanner';
 import CountUp from '@/components/ui/CountUp';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
@@ -70,6 +72,8 @@ export default function PricingPage() {
     { q: t('pricing.faq.q4'), a: t('pricing.faq.a4') },
   ];
 
+  const offer = useOffer();
+
   useEffect(() => {
     fetchPackages()
       .then((list) => setPackages(list.length ? list : fallbackPackages))
@@ -102,6 +106,7 @@ export default function PricingPage() {
             <p className="text-xl text-slate-400 max-w-xl mx-auto">
               {t('pricing.page.subtitle')}
             </p>
+            <OfferBanner offer={offer} className="mt-6 max-w-md mx-auto" />
           </div>
         </div>
       </section>
@@ -167,6 +172,11 @@ export default function PricingPage() {
                       <span className="text-4xl font-black text-white"><CountUp value={pkg.price} format="currency" /></span>
                       <span className="text-slate-500 text-sm mb-1">{t('pricing.perProjectLabel')}</span>
                     </div>
+                    {offer && (
+                      <p className="text-violet-300 text-xs font-semibold mt-1.5">
+                        {t('offer.yourPrice').replace('{price}', `$${discounted(pkg.price, offer.pct).toLocaleString()}`).replace('{pct}', String(offer.pct))}
+                      </p>
+                    )}
                     {pkg.originalPrice && (
                       <p className="text-green-400 text-xs font-semibold mt-1.5">
                         {t('pricing.youSaveLabel').split('{amount}')[0]}<CountUp value={pkg.originalPrice - pkg.price} format="currency" />{t('pricing.youSaveLabel').split('{amount}')[1]}

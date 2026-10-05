@@ -226,6 +226,7 @@ export interface CreateOrderPayload {
   designColors?:  string[];
   designRefs?:    string[];
   plan?:          string;
+  offerToken?:    string;
 }
 
 export interface OrderListParams {

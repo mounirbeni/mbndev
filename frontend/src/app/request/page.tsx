@@ -21,6 +21,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SilkBackdrop from '@/components/ui/SilkBackdrop';
 import { trackEvent } from '@/lib/analytics';
+import { useOffer, discounted, activeOfferToken } from '@/lib/offer';
 
 // Only used when a signed-out visitor submits: kept out of the initial bundle.
 const AuthModal = dynamic(() => import('@/components/ui/AuthModal'), { ssr: false });
@@ -222,6 +223,9 @@ function RequestPageContent() {
     });
 
   const pricing = calcPrice(form.serviceType, form.pages, form.features, form.addons, selectedPlan);
+  // Display only — the backend verifies the offer token and applies it.
+  const offer = useOffer();
+  const finalTotal = offer ? discounted(pricing.total, offer.pct) : pricing.total;
 
   const canNext = () => {
     if (step === 0) return !!form.serviceType;
@@ -253,6 +257,7 @@ function RequestPageContent() {
         designColors: form.colors ? form.colors.split(',').map((c) => c.trim()) : [],
         designRefs:   form.references ? form.references.split('\n').filter(Boolean) : [],
         plan,
+        offerToken:   activeOfferToken(),
       });
 
       trackEvent('project_request_submitted', { plan: plan || 'custom' });
@@ -297,7 +302,7 @@ function RequestPageContent() {
         <div className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold text-primary-300"
              style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)' }}>
           <span className="text-slate-500 font-normal text-xs">{t('request.totalLabel')}</span>
-          ${pricing.total.toLocaleString()}
+          ${finalTotal.toLocaleString()}
         </div>
       </header>
 
@@ -758,10 +763,18 @@ function RequestPageContent() {
                       </div>
                     )}
 
+                    {/* Personal offer */}
+                    {offer && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-violet-300">{t('offer.discountLine').replace('{pct}', String(offer.pct))}</span>
+                        <span className="text-violet-300">-${(pricing.total - finalTotal).toLocaleString()}</span>
+                      </div>
+                    )}
+
                     {/* Total */}
                     <div className="border-t border-white/10 pt-2 flex justify-between font-bold">
                       <span className="text-white">{t('invoice.total')}</span>
-                      <span className="text-primary-400 text-lg">${pricing.total.toLocaleString()}</span>
+                      <span className="text-primary-400 text-lg">${finalTotal.toLocaleString()}</span>
                     </div>
 
                     {/* Delivery estimate */}

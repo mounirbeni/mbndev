@@ -171,6 +171,7 @@ export interface Order {
   features: string[];
   addons: string[];
   totalPrice: number;
+  discountPct?: number | null;
   deliveryDays: number;
   notes?: string;
   status: 'pending' | 'paid' | 'cancelled';

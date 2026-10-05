@@ -2,6 +2,7 @@ const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
 const { notifyAdmins } = require('../lib/notifications');
 const { calculatePrice, VALID_PLANS } = require('../lib/pricing');
+const { verifyOffer, applyDiscount } = require('../lib/offers');
 const { sendEmail, templates } = require('../lib/email');
 const { telegram } = require('../lib/telegram');
 const { assertOrderTransition, ACTIVE_PAYMENT_STATUSES } = require('../lib/orderGuard');
@@ -32,7 +33,7 @@ exports.createOrder = async (req, res, next) => {
   try {
     const {
       serviceType, title, description, pages, features, addons, notes,
-      designStyle, designColors, designRefs, plan,
+      designStyle, designColors, designRefs, plan, offerToken,
     } = req.body;
 
     if (!serviceType || !title) {
@@ -41,13 +42,15 @@ exports.createOrder = async (req, res, next) => {
 
     // Backend is authoritative — never trust client-supplied price
     const safePlan = plan && VALID_PLANS.includes(plan) ? plan : null;
-    const { totalPrice, deliveryDays } = calculatePrice({
+    const { totalPrice: listPrice, deliveryDays } = calculatePrice({
       serviceType,
       pages:    Number(pages) || 5,
       features: features || [],
       addons:   addons   || [],
       plan:     safePlan,
     });
+    const discountPct = verifyOffer(offerToken);
+    const totalPrice  = applyDiscount(listPrice, discountPct);
 
     // Atomic: create order + update user.plan in one transaction
     const order = await prisma.$transaction(async (tx) => {
@@ -64,6 +67,7 @@ exports.createOrder = async (req, res, next) => {
           deliveryDays,
           notes:        notes || null,
           plan:         safePlan,
+          discountPct:  discountPct || null,
           designStyle:  designStyle || null,
           designColors: designColors || [],
           designRefs:   designRefs || [],
@@ -84,7 +88,7 @@ exports.createOrder = async (req, res, next) => {
     notifyAdmins({
       type:    'order_placed',
       title:   'New Order Received',
-      message: `${req.user.name} placed a new order: "${title}" ($${totalPrice})`,
+      message: `${req.user.name} placed a new order: "${title}" ($${totalPrice}${discountPct ? `, -${discountPct}% offer` : ''})`,
       link:    `/dashboard/admin/orders/${order.id}`,
       metadata: { orderId: order.id, clientId: req.user.id },
     }).catch((err) => console.error('[notifyAdmins] failed:', err));
@@ -191,13 +195,15 @@ exports.updateOrder = async (req, res, next) => {
     // — not null, and never the client's current (possibly since-changed)
     // plan — so an edit can't silently move the price away from what the
     // client actually agreed to.
-    const { totalPrice, deliveryDays } = calculatePrice({
+    const { totalPrice: listPrice, deliveryDays } = calculatePrice({
       serviceType: order.serviceType,
       pages:       newPages,
       features:    newFeatures,
       addons:      newAddons,
       plan:        order.plan,
     });
+    // Keep the offer the order was placed with.
+    const totalPrice = applyDiscount(listPrice, order.discountPct);
 
     const updated = await prisma.order.update({
       where: { id: req.params.id },

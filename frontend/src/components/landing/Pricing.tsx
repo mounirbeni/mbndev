@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { fetchPackages } from '@/lib/packages';
 import { Package } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useOffer, discounted } from '@/lib/offer';
+import OfferBanner from '@/components/ui/OfferBanner';
 
 const defaultPackages: Package[] = [
   {
@@ -36,6 +38,7 @@ function discountPct(original: number, current: number) {
 
 export default function Pricing() {
   const { t } = useLanguage();
+  const offer = useOffer();
   const router = useRouter();
   const [packages, setPackages] = useState<Package[]>(defaultPackages);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -97,6 +100,7 @@ export default function Pricing() {
           >
             {t('pricing.subtitle')}
           </motion.p>
+          <OfferBanner offer={offer} className="mt-6 max-w-md mx-auto" />
         </div>
 
         {/* ── Cards ── */}
@@ -187,6 +191,11 @@ export default function Pricing() {
                         </span>
                       </div>
                       <p className="text-slate-600 text-[11px] tracking-widest uppercase mt-2">per project</p>
+                      {offer && (
+                        <p className="text-xs font-semibold mt-2 text-violet-300">
+                          {t('offer.yourPrice').replace('{price}', `$${discounted(pkg.price, offer.pct).toLocaleString()}`).replace('{pct}', String(offer.pct))}
+                        </p>
+                      )}
                       {savings > 0 && (
                         <p className={`text-xs font-semibold mt-2 ${
                           isFeatured ? 'text-violet-400' : 'text-slate-500'

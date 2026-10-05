@@ -82,6 +82,9 @@ model Order {
   // column; null means "no plan discount applied" (the pre-existing
   // behavior), never "recalculate under the client's current plan".
   plan         String?
+  // Personal offer (lib/offers.js) applied at creation, as a percentage.
+  // Null = no offer. Re-applied when a pending order is edited.
+  discountPct  Int?
   designStyle  String?
   designColors String[]
   designRefs   String[]
