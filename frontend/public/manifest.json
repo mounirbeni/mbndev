@@ -1,12 +1,31 @@
 {
+  "id": "/",
   "name": "MBN DEV — Custom Websites",
   "short_name": "MBN DEV",
   "description": "Premium web development platform by Mounir Banni.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#08080b",
   "theme_color": "#7c3aed",
   "icons": [
-    { "src": "/brand-icon-transparent.webp", "sizes": "128x128", "type": "image/webp", "purpose": "any" }
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

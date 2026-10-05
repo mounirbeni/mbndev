@@ -41,7 +41,8 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   icons: {
     icon: [{ url: '/brand-icon-transparent.webp', sizes: '128x128', type: 'image/webp' }],
-    apple: [{ url: '/brand-icon-transparent.webp', sizes: '128x128', type: 'image/webp' }],
+    // iOS needs a PNG apple-touch-icon (it ignores WebP); 180px is its home-screen size.
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     shortcut: '/brand-icon-transparent.webp',
   },
   robots: {
@@ -104,7 +105,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: INTRO_HEAD_SCRIPT }} />
         {/* Browser and home-screen icons share the transparent official brand mark. */}
         <link rel="icon" type="image/webp" href="/brand-icon-transparent.webp" />
-        <link rel="apple-touch-icon" sizes="128x128" href="/brand-icon-transparent.webp" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
 
         <link rel="dns-prefetch" href="https://mbndev.ma" />
 

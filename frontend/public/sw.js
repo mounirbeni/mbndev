@@ -7,12 +7,17 @@
 //
 // Safari-safe: every respondWith() code path returns a non-null Response.
 
-const STATIC_CACHE  = 'mbndev-static-v4';
-const PAGE_CACHE    = 'mbndev-pages-v4';
-const CACHE_VERSION = 'v4';
+const STATIC_CACHE  = 'mbndev-static-v5';
+const PAGE_CACHE    = 'mbndev-pages-v5';
+const CACHE_VERSION = 'v5';
+
+// Upper bounds so the caches don't grow forever (old hashed chunks after
+// every deploy, every optimised image variant). Oldest entries go first.
+const MAX_STATIC_ENTRIES = 150;
+const MAX_PAGE_ENTRIES   = 80;
 
 // Pages to warm on install
-const PRECACHE_URLS = ['/', '/login', '/services', '/pricing', '/offline'];
+const PRECACHE_URLS = ['/', '/login', '/services', '/pricing', '/offline.html'];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -31,6 +36,14 @@ function offlineResponse(request) {
     status:  503,
     headers: { 'Content-Type': 'text/plain' },
   });
+}
+
+/** Store a response, then drop the oldest entries beyond `max`. */
+async function putAndTrim(cacheName, request, response, max) {
+  const cache = await caches.open(cacheName);
+  await cache.put(request, response);
+  const keys = await cache.keys(); // insertion order: oldest first
+  for (let i = 0; i < keys.length - max; i++) await cache.delete(keys[i]);
 }
 
 /** True for responses that are safe to store in the Cache API. */
@@ -115,8 +128,7 @@ async function cacheFirst(request, cacheName) {
 
     const response = await fetch(request);
     if (isCacheable(response)) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone()); // fire-and-forget
+      putAndTrim(cacheName, request, response.clone(), MAX_STATIC_ENTRIES).catch(() => {}); // fire-and-forget
     }
     return response;
   } catch {
@@ -129,15 +141,15 @@ async function networkFirstNavigate(request) {
   try {
     const response = await fetch(request);
     if (isCacheable(response)) {
-      const cache = await caches.open(PAGE_CACHE);
-      cache.put(request, response.clone()); // fire-and-forget
+      putAndTrim(PAGE_CACHE, request, response.clone(), MAX_PAGE_ENTRIES).catch(() => {}); // fire-and-forget
     }
     return response;
   } catch {
-    // Network failed — try the exact URL, then root '/'
+    // Network failed — the page itself if it was visited before, otherwise
+    // the offline page (not the home page under a different URL).
     const cached =
       (await caches.match(request)) ||
-      (await caches.match('/'));
+      (await caches.match('/offline.html'));
     return cached || offlineResponse(request);
   }
 }
@@ -150,7 +162,9 @@ async function staleWhileRevalidate(request, cacheName) {
     // Kick off revalidation in the background regardless of cache state
     const revalidate = fetch(request)
       .then((response) => {
-        if (isCacheable(response)) cache.put(request, response.clone());
+        if (isCacheable(response)) {
+          putAndTrim(cacheName, request, response.clone(), MAX_PAGE_ENTRIES).catch(() => {});
+        }
         return response;
       })
       .catch(() => null); // background — errors are silent
@@ -172,8 +186,9 @@ self.addEventListener('push', (event) => {
     event.waitUntil(
       self.registration.showNotification(data.title || 'MBN DEV', {
         body:    data.body  || 'You have a new update.',
-        icon:    '/brand-icon-transparent.webp',
-        badge:   '/brand-icon-transparent.webp',
+        icon:    '/icons/icon-192.png',
+        // Android draws the badge as a white silhouette in the status bar.
+        badge:   '/icons/badge-96.png',
         tag:     data.tag   || undefined,      // distinct notifications don't replace each other
         data:    { url: data.url || '/dashboard/client' },
         actions: [
