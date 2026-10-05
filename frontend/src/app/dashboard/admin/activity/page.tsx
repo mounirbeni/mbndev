@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import {
   Activity, FolderOpen, User, ChevronLeft, ChevronRight,
   RefreshCw, Filter, Upload, MessageSquare, CreditCard,

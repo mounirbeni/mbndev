@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useMotionValueEvent, useSpring } from 'framer-motion';
+import { m as motion, AnimatePresence, useScroll, useMotionValueEvent, useSpring } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo3D from '@/components/ui/Logo3D';

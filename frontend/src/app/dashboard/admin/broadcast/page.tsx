@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import {
   Mail, Users, Send, CheckCircle2, Clock, Zap, Gift,
   Calendar, AlertTriangle, ChevronRight, Sparkles, RefreshCcw, Newspaper,

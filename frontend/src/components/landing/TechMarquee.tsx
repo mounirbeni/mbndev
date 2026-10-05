@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 
 const TECH_ROW_1 = [
   'Next.js', 'React', 'TypeScript', 'Node.js', 'Tailwind CSS',

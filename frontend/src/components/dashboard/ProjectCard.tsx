@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import Link from 'next/link';
 import { Calendar, ArrowUpRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Project } from '@/types';

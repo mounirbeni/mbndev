@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { m as motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowUpRight, Check, Play, MessageSquare } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';

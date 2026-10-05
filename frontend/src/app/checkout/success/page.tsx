@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { CheckCircle2, ArrowRight, FolderOpen, LayoutDashboard } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';

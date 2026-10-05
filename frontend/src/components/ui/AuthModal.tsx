@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff, Check, Zap, Star, Crown, ArrowRight, Lock } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';

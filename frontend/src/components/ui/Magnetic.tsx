@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
-import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
+import { m as motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
 
 /**
  * Magnetic hover wrapper — the child gently follows the cursor while hovered

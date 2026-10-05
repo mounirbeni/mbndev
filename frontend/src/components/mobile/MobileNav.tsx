@@ -4,10 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  motion, AnimatePresence, useMotionValue, useTransform,
-  useDragControls,
-} from 'framer-motion';
+import { m as motion, AnimatePresence, useMotionValue, useTransform, useDragControls } from 'framer-motion';
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
   Settings, LogOut, Users, Package, BarChart2, ShoppingBag,

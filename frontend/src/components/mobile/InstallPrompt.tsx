@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Star } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import { useLanguage } from '@/contexts/LanguageContext';

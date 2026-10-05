@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { projectAPI } from '@/lib/api';
 import { Project, ProjectStatus } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';

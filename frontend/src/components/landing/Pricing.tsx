@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m as motion, useInView } from 'framer-motion';
 import CountUp from '@/components/ui/CountUp';
 import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';

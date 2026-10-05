@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Bell, BellRing, Check, CheckCheck, X, Loader2, BellOff } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';

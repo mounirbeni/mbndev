@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { Home, Briefcase, FolderOpen, DollarSign, BookOpen } from 'lucide-react';
 import { useHaptic } from '@/hooks/useHaptic';
 

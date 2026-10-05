@@ -10,7 +10,6 @@ import Testimonials from '@/components/landing/Testimonials';
 import CTA from '@/components/landing/CTA';
 import Footer from '@/components/landing/Footer';
 import TechMarquee from '@/components/landing/TechMarquee';
-import PoweredByPopup from '@/components/landing/PoweredByPopup';
 import ScrollingBanner from '@/components/ui/ScrollingBanner';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 import JsonLd from '@/components/JsonLd';
@@ -116,7 +115,6 @@ export default function LandingPage() {
       </main>
       <LandingBottomNav />
       <CinemaLayer />
-      <PoweredByPopup />
     </SmoothScroll>
   );
 }

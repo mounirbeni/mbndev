@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { paymentAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Payment } from '@/types';

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import {
   FileText, Zap, Code2, RotateCcw, Package, Trophy, CheckCircle2,
 } from 'lucide-react';

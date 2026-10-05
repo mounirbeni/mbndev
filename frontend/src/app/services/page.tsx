@@ -1,6 +1,6 @@
 'use client';
 // v3 — market-researched pricing with smart discount strategy
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   Globe, ShoppingCart, BarChart3, Rocket, Settings, Wrench,

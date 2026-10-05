@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import Link from 'next/link';
 import { Home } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';

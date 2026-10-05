@@ -9,6 +9,7 @@ import PushPrompt from '@/components/mobile/PushPrompt';
 import Intro, { INTRO_HEAD_SCRIPT } from '@/components/ui/Intro';
 import ScrollProgressBar from '@/components/ui/ScrollProgressBar';
 import Analytics from '@/components/Analytics';
+import MotionProvider from '@/components/MotionProvider';
 import { VERCEL_ANALYTICS_BOOTSTRAP } from '@/lib/analytics';
 import './globals.css';
 
@@ -124,40 +125,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body suppressHydrationWarning>
-        <Intro />
-        <LanguageProvider>
-          <AuthProvider>
-            <ScrollProgressBar />
-            {children}
-            <Toaster
-              position="top-center"
-              gutter={8}
-              containerStyle={{ top: 'max(env(safe-area-inset-top, 0px) + 16px, 16px)' }}
-              toastOptions={{
-                duration: 3500,
-                style: {
-                  background: 'rgba(18, 18, 22, 0.96)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  color: '#e2e8f0',
-                  border: '1px solid rgba(124,58,237,0.25)',
-                  borderRadius: '14px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  padding: '12px 16px',
-                  maxWidth: '340px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                },
-                success: { iconTheme: { primary: '#7c3aed', secondary: '#e2e8f0' } },
-                error: { iconTheme: { primary: '#ef4444', secondary: '#e2e8f0' } },
-              }}
-            />
-            <PushPrompt />
-          </AuthProvider>
-        </LanguageProvider>
-        <InstallPrompt />
-        <ServiceWorkerRegistration />
-        <Analytics />
+        <MotionProvider>
+          <Intro />
+          <LanguageProvider>
+            <AuthProvider>
+              <ScrollProgressBar />
+              {children}
+              <Toaster
+                position="top-center"
+                gutter={8}
+                containerStyle={{ top: 'max(env(safe-area-inset-top, 0px) + 16px, 16px)' }}
+                toastOptions={{
+                  duration: 3500,
+                  style: {
+                    background: 'rgba(18, 18, 22, 0.96)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    color: '#e2e8f0',
+                    border: '1px solid rgba(124,58,237,0.25)',
+                    borderRadius: '14px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    padding: '12px 16px',
+                    maxWidth: '340px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  },
+                  success: { iconTheme: { primary: '#7c3aed', secondary: '#e2e8f0' } },
+                  error: { iconTheme: { primary: '#ef4444', secondary: '#e2e8f0' } },
+                }}
+              />
+              <PushPrompt />
+            </AuthProvider>
+          </LanguageProvider>
+          <InstallPrompt />
+          <ServiceWorkerRegistration />
+          <Analytics />
+        </MotionProvider>
       </body>
     </html>
   );

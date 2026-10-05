@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Zap, CreditCard, Shield, Clock, Check,
   Loader2, AlertCircle, Copy, ExternalLink, CheckCircle2, BookmarkCheck,

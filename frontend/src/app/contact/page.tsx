@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { Mail, MapPin, Send, MessageCircle, ArrowRight, Zap, Clock, CheckCircle2, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PublicLayout from '@/components/landing/PublicLayout';

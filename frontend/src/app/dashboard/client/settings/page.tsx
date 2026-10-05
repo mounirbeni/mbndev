@@ -9,7 +9,7 @@ import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import { getInitials } from '@/lib/utils';
 import { User, Lock, Shield, MessageCircle, ExternalLink, Trash2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import AccentText from '@/components/ui/AccentText';
 

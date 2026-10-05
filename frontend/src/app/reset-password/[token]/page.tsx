@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import Button from '@/components/ui/Button';

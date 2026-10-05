@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { MessageSquare, Search, ArrowLeft, Loader2, Zap, AlertTriangle, RefreshCcw } from 'lucide-react';
 import { messageAPI } from '@/lib/api';
 import { MessageThread as ThreadType } from '@/types';

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { ArrowLeft, Mail, Lock, CheckCircle2 } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import Button from '@/components/ui/Button';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m as motion, useInView } from 'framer-motion';
 import Link from 'next/link';
 import Magnetic from '@/components/ui/Magnetic';
 import { ArrowRight, MapPin, Zap, Clock, Sparkles, CheckCircle2 } from 'lucide-react';

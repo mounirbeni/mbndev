@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
-import { motion, useInView, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
+import { m as motion, useInView, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
 import {
   Globe, ShoppingCart, BarChart3, Layout, Smartphone, Settings,
   ArrowRight,

@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 import { getInitials } from '@/lib/utils';
 import { APP_VERSION } from '@/lib/version';
 import { User, Lock, ShieldCheck, Activity, ArrowUpRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import AccentText from '@/components/ui/AccentText';
 
 export default function AdminSettingsPage() {

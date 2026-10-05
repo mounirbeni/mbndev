@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m as motion, useInView } from 'framer-motion';
 import {
   MessageSquare, Palette, Code2, Eye, Wrench, Rocket,
 } from 'lucide-react';

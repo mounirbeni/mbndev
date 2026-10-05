@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { paymentAPI } from '@/lib/api';
 import { Payment } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { ArrowLeft, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import PublicLayout from '@/components/landing/PublicLayout';

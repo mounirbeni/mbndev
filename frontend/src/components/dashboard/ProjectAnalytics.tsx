@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { Activity, CalendarClock, CheckCircle2, Clock3, TrendingUp } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
