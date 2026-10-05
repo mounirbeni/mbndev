@@ -596,13 +596,13 @@ exports.approveManualPayment = async (req, res, next) => {
       { orderId: payment.orderId, amount: payment.amount, method: payment.method }
     ).catch(() => {});
 
-    notify(payment.clientId, {
+    await notify(payment.clientId, {
       type:    'project_created',
       title:   'Payment Verified — Project Active!',
       message: `Your payment for "${payment.order.title}" was verified. Your project is now live!`,
       link:    `/dashboard/client/projects/${project.id}`,
       metadata: { projectId: project.id },
-    }).catch(() => {});
+    });
 
     notifyAdmins({
       type:    'project_created',
@@ -724,13 +724,13 @@ exports.rejectManualPayment = async (req, res, next) => {
       ? `Reason: ${safeReason}`
       : 'Please check your payment details and try again.';
 
-    notify(payment.clientId, {
+    await notify(payment.clientId, {
       type:    'payment_failed',
       title:   'Payment Not Confirmed',
       message: `Your payment for "${orderTitle}" could not be verified. ${rejectionMsg}`,
       link:    payment.orderId ? `/checkout/${payment.orderId}` : '/dashboard/client/orders',
       metadata: { orderId: payment.orderId, reason: safeReason },
-    }).catch(() => {});
+    });
 
     if (payment.orderId) {
       logActivity(

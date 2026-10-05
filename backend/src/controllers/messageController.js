@@ -3,7 +3,7 @@
 const prisma   = require('../lib/prisma');
 const { fmt }  = require('../lib/format');
 const realtime = require('../lib/realtime');
-const { notifyAdmins } = require('../lib/notifications');
+const { notifyAdmins, notifyClient } = require('../lib/notifications');
 
 const MESSAGE_PAGE_SIZE = 50; // messages per page
 
@@ -207,6 +207,24 @@ exports.sendMessage = async (req, res, next) => {
 
     if (req.user.role === 'admin') {
       realtime.publishToUser(project.clientId, 'message:new', payload);
+      // Push every message; email only the first of a burst (no other team
+      // message on this project in the last 15 minutes).
+      const recent = await prisma.message.count({
+        where: {
+          projectId,
+          id:        { not: message.id },
+          sender:    { role: 'admin' },
+          createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) },
+        },
+      });
+      const text = message.content;
+      await notifyClient(project.clientId, {
+        type:    'new_message',
+        title:   `New message about "${project.title}"`,
+        message: text.length > 160 ? `${text.slice(0, 160)}…` : text,
+        link:    `/dashboard/client/projects/${project.id}`,
+        metadata: { projectId: project.id, messageId: message.id },
+      }, { email: recent === 0 });
     } else {
       realtime.publishToAdmins('message:new', payload);
       const text = message.content;

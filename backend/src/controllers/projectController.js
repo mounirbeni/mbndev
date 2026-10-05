@@ -4,7 +4,7 @@ const prisma   = require('../lib/prisma');
 const jwt      = require('jsonwebtoken');
 const { saveUpload, deleteStoredFiles, BLOB_ACCESS } = require('../lib/storage');
 const { fmt }  = require('../lib/format');
-const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
+const { notify, notifyClient, notifyAdmins, logActivity } = require('../lib/notifications');
 const { SM }   = require('../lib/systemMessages');
 const realtime = require('../lib/realtime');
 const { sendEmail, templates } = require('../lib/email');
@@ -241,7 +241,7 @@ exports.updateProject = async (req, res, next) => {
       ]);
 
       if (fullClient?.email) {
-        sendEmail({
+        await sendEmail({
           to: fullClient.email,
           ...templates.projectStatusUpdate({
             client:     fullClient,
@@ -263,6 +263,27 @@ exports.updateProject = async (req, res, next) => {
         `Progress updated to ${progress}%`,
         { from: current.progress, to: Number(progress) }
       ).catch(() => {});
+      await notifyClient(project.clientId, {
+        type:    'status_update',
+        title:   `Progress: ${Number(progress)}% — ${project.title}`,
+        message: `Your project "${project.title}" moved from ${current.progress}% to ${Number(progress)}%.`,
+        link:    `/dashboard/client/projects/${project.id}`,
+        metadata: { projectId: project.id, progress: Number(progress) },
+      });
+    }
+
+    const oldDeadline = current.deadline ? new Date(current.deadline).getTime() : null;
+    const newDeadline = project.deadline ? new Date(project.deadline).getTime() : null;
+    if (deadline !== undefined && oldDeadline !== newDeadline) {
+      await notifyClient(project.clientId, {
+        type:    'status_update',
+        title:   `Delivery date updated — ${project.title}`,
+        message: newDeadline
+          ? `The delivery date for "${project.title}" is now ${new Date(newDeadline).toDateString()}.`
+          : `The delivery date for "${project.title}" was cleared; we'll confirm a new one soon.`,
+        link:    `/dashboard/client/projects/${project.id}`,
+        metadata: { projectId: project.id },
+      }, { email: true });
     }
 
     // Realtime push
@@ -302,9 +323,19 @@ exports.checkProjectUploadAuth = async (req, res, next) => {
   }
 };
 
-// Admins hear about every file a client adds to a project.
+// Every new file is announced to the other side: admins hear about client
+// uploads, the client hears (with an email) about files we deliver.
 function notifyClientUpload(req, fileName) {
-  if (req.user.role === 'admin') return Promise.resolve();
+  if (req.user.role === 'admin') {
+    if (!req.project?.clientId) return Promise.resolve();
+    return notifyClient(req.project.clientId, {
+      type:    'file_uploaded',
+      title:   `New file on "${req.project.title}"`,
+      message: `We added "${fileName.slice(0, 100)}" to your project.`,
+      link:    `/dashboard/client/projects/${req.params.id}`,
+      metadata: { projectId: req.params.id },
+    }, { email: true });
+  }
   return notifyAdmins({
     type:    'file_uploaded',
     title:   `📎 ${req.user.name} uploaded a file`,
@@ -611,12 +642,12 @@ exports.deleteProject = async (req, res, next) => {
     await prisma.project.delete({ where: { id: req.params.id } });
 
     // Notify client that the project was removed
-    notify(project.clientId, {
+    await notifyClient(project.clientId, {
       type:    'status_update',
       title:   'Project Removed',
-      message: `Your project "${project.title}" has been removed by the admin.`,
+      message: `Your project "${project.title}" has been removed by our team.`,
       link:    '/dashboard/client/projects',
-    }).catch(() => {});
+    }, { email: true });
 
     // Realtime push to client and admins
     realtime.publishToUser(project.clientId, 'project:deleted', { id: project.id });

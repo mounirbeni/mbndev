@@ -2,9 +2,9 @@ const router = require('express').Router();
 const { protect, authorize } = require('../middleware/auth');
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
-const { invalidateAdminCache } = require('../lib/notifications');
+const { invalidateAdminCache, notifyClient } = require('../lib/notifications');
 const cache = require('../lib/cache');
-const { sendBroadcast, templates } = require('../lib/email');
+const { sendEmail, sendBroadcast, templates } = require('../lib/email');
 const { deleteStoredFiles } = require('../lib/storage');
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
@@ -48,6 +48,18 @@ router.put('/clients/:id/toggle', protect, authorize('admin'), async (req, res, 
     });
     // If toggling an admin, invalidate the cached admin ID list
     if (existing.role === 'admin') invalidateAdminCache();
+    else {
+      await notifyClient(user.id, user.isActive ? {
+        type:    'status_update',
+        title:   'Your account is active again',
+        message: 'Your MBN DEV account has been reactivated. You can sign in again.',
+        link:    '/dashboard/client',
+      } : {
+        type:    'status_update',
+        title:   'Your account has been suspended',
+        message: 'Your MBN DEV account has been suspended. Contact us if you think this is a mistake.',
+      }, { email: true });
+    }
     res.json({ success: true, user: fmt(user) });
   } catch (err) { next(err); }
 });
@@ -123,6 +135,15 @@ router.post('/clients/:id/approve-deletion', protect, authorize('admin'), async 
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     if (!existing.deletionRequestedAt) return res.status(400).json({ success: false, message: 'No pending deletion request for this user.' });
     await deleteUserCascade(req.params.id, existing.email);
+    // The account is gone, so this can only be an email.
+    await sendEmail({
+      to: existing.email,
+      ...templates.clientUpdate({
+        client:  existing,
+        title:   'Your account has been deleted',
+        message: 'As requested, your MBN DEV account and its data have been deleted. Thank you for working with us.',
+      }),
+    }).catch(() => {});
     res.json({ success: true, message: 'Account deleted.' });
   } catch (err) { next(err); }
 });
@@ -133,6 +154,12 @@ router.post('/clients/:id/reject-deletion', protect, authorize('admin'), async (
     const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!existing) return res.status(404).json({ success: false, message: 'User not found.' });
     await prisma.user.update({ where: { id: req.params.id }, data: { deletionRequestedAt: null } });
+    await notifyClient(existing.id, {
+      type:    'status_update',
+      title:   'Account deletion request declined',
+      message: 'Your account deletion request was not processed — usually because a project or payment is still open. Message us in your dashboard for details.',
+      link:    '/dashboard/client',
+    }, { email: true });
     res.json({ success: true, message: 'Deletion request rejected.' });
   } catch (err) { next(err); }
 });

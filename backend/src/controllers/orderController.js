@@ -1,6 +1,6 @@
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
-const { notifyAdmins } = require('../lib/notifications');
+const { notifyAdmins, notifyClient } = require('../lib/notifications');
 const { calculatePrice, VALID_PLANS } = require('../lib/pricing');
 const { verifyOffer, applyDiscount } = require('../lib/offers');
 const { sendEmail, templates } = require('../lib/email');
@@ -254,7 +254,15 @@ exports.cancelOrder = async (req, res, next) => {
       data:  { status: 'cancelled' },
     });
 
-    if (req.user.role !== 'admin') {
+    if (req.user.role === 'admin') {
+      await notifyClient(order.clientId, {
+        type:    'order_cancelled',
+        title:   'Order Cancelled',
+        message: `Your order "${order.title}" was cancelled by our team. Reply in your dashboard if you have any question.`,
+        link:    '/dashboard/client/orders',
+        metadata: { orderId: order.id },
+      }, { email: true });
+    } else {
       await notifyAdmins({
         type:    'order_cancelled',
         title:   'Order Cancelled by Client',
@@ -294,6 +302,12 @@ exports.deleteOrder = async (req, res, next) => {
     }
 
     await prisma.order.delete({ where: { id: req.params.id } });
+    await notifyClient(order.clientId, {
+      type:    'order_cancelled',
+      title:   'Order Removed',
+      message: `Your order "${order.title}" was removed by our team.`,
+      link:    '/dashboard/client/orders',
+    }, { email: true });
     res.json({ success: true, message: 'Order deleted' });
   } catch (err) {
     next(err);

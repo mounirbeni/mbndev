@@ -367,7 +367,25 @@ const STATUS_DESCRIPTIONS = {
   cancelled: 'This project has been cancelled. Contact us if you\'d like to discuss next steps.',
 };
 
+const escHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
 const templates = {
+
+  // ── Client: generic project/account update (mirrors an in-app notification)
+  clientUpdate: ({ client, title, message, link }) => {
+    const first = String(client.name || '').split(' ')[0] || 'there';
+    return {
+      subject: title,
+      html: layout({
+        preheader: message,
+        badgeHtml: badge('Update from MBN DEV'),
+        heading:   escHtml(title),
+        intro:     `Hi ${escHtml(first)}, ${escHtml(message)}`,
+        body:      link ? ctaButton('Open in my dashboard →', `${APP_URL}${link}`) : '',
+        footer:    'You are receiving this because you have a project or account with MBN DEV.',
+      }),
+    };
+  },
 
   // ── Welcome ──────────────────────────────────────────────────────────────
   welcome: ({ user }) => {

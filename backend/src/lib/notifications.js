@@ -33,6 +33,26 @@ async function notify(userId, { type, title, message, link = null, metadata = nu
   }
 }
 
+// ─── notifyClient ────────────────────────────────────────────────────────────
+/**
+ * Tell a client about something we did: in-app notification + web push and,
+ * with `email: true`, the same update by email (for anything they must not
+ * miss when they aren't signed in). Never throws; callers should `await` it
+ * so Vercel doesn't freeze the function before the push/email goes out.
+ */
+async function notifyClient(userId, payload, { email = false } = {}) {
+  const tasks = [notify(userId, payload)];
+  if (email) {
+    tasks.push((async () => {
+      const client = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
+      if (!client?.email) return;
+      const { sendEmail, templates } = require('./email');
+      await sendEmail({ to: client.email, ...templates.clientUpdate({ client, ...payload }) });
+    })().catch((err) => console.error('[notifyClient] email failed:', err.message)));
+  }
+  await Promise.allSettled(tasks);
+}
+
 // ─── getAdminIds ─────────────────────────────────────────────────────────────
 /**
  * Return active admin user IDs, cached for 2 minutes.
@@ -116,4 +136,4 @@ async function logActivity(projectId, userId, action, description, metadata = nu
   }
 }
 
-module.exports = { notify, notifyAdmins, logActivity, invalidateAdminCache };
+module.exports = { notify, notifyClient, notifyAdmins, logActivity, invalidateAdminCache };
