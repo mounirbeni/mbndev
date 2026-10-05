@@ -165,7 +165,7 @@ const en: Dict = {
   'commit.eyebrow':       'Why MBN DEV',
   'commit.title':         'What we',
   'commit.title.bold':    'commit to',
-  'commit.subtitle':      'Concrete promises, not testimonials. Everything below is honoured for every project — no exceptions.',
+  'commit.subtitle':      'Hear it from our clients — then read the promises we honour on every project, no exceptions.',
   'commit.cta':           'Start a project on these terms',
   'commit.c1.title':      'No surprise pricing',
   'commit.c1.desc':       'Quote in writing before any work starts. The number you see on /pricing is the number you pay.',

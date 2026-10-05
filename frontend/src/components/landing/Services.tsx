@@ -148,7 +148,7 @@ export default function Services() {
   const FeaturedIcon = featured.icon;
 
   return (
-    <section ref={sectionRef} id="services" className="py-28 relative overflow-hidden">
+    <section ref={sectionRef} id="services" className="py-14 sm:py-20 lg:py-28 relative overflow-hidden">
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">

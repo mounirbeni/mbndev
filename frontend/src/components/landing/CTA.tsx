@@ -18,7 +18,7 @@ export default function CTA() {
   const titleAccent = titleWords.slice(-2).join(' ');
 
   return (
-    <section id="contact" className="py-32 relative overflow-hidden">
+    <section id="contact" className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
 
       {/* Silk ribbon bookend — echoes the hero */}
       <div

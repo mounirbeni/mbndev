@@ -201,7 +201,7 @@ export default function Process() {
   ];
 
   return (
-    <section id="process" className="py-32 relative overflow-hidden">
+    <section id="process" className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">

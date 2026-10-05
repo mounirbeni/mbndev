@@ -55,7 +55,7 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="py-32 relative overflow-hidden">
+    <section id="pricing" className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
 
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
