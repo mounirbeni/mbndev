@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 const SERVICE_META: Record<string, { title: string; description: string }> = {
   'custom-websites': {
@@ -23,12 +24,18 @@ const SERVICE_META: Record<string, { title: string; description: string }> = {
   },
 };
 
+// Only the known slugs exist: anything else is a real 404 at routing level
+// (the root loading.tsx streams a 200 before a notFound() could change it).
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return Object.keys(SERVICE_META).map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const meta = SERVICE_META[slug];
-  if (!meta) {
-    return { title: 'Service', description: 'MBN DEV service detail.' };
-  }
+  if (!meta) notFound();
   const url = `https://mbndev.ma/services/${slug}`;
   return {
     title:       meta.title,
@@ -48,6 +55,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default function ServiceSlugLayout({ children }: { children: React.ReactNode }) {
+export default async function ServiceSlugLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  if (!SERVICE_META[slug]) notFound();
   return children;
 }

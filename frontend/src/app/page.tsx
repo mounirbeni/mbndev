@@ -21,7 +21,7 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'MBN DEV',
   url: 'https://mbndev.ma',
-  logo: 'https://mbndev.ma/logo.png',
+  logo: 'https://mbndev.ma/brand-icon-transparent.webp',
   description: 'Custom websites, SaaS platforms, and web apps built by Mounir Banni.',
   founder: { '@type': 'Person', name: 'Mounir Banni' },
   address: { '@type': 'PostalAddress', addressCountry: 'MA' },
@@ -33,11 +33,6 @@ const websiteSchema = {
   '@type': 'WebSite',
   name: 'MBN DEV',
   url: 'https://mbndev.ma',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: 'https://mbndev.ma/?q={search_term_string}',
-    'query-input': 'required name=search_term_string',
-  },
 };
 
 const localBusinessSchema = {
@@ -47,8 +42,8 @@ const localBusinessSchema = {
   name: 'MBN DEV',
   description: 'Custom websites, SaaS platforms, e-commerce stores, and web applications built fast, modern, and tailored to your business.',
   url: 'https://mbndev.ma',
-  logo: 'https://mbndev.ma/og-image.png',
-  image: 'https://mbndev.ma/og-image.png',
+  logo: 'https://mbndev.ma/brand-icon-transparent.webp',
+  image: 'https://mbndev.ma/opengraph-image',
   telephone: '+212705914424',
   email: 'contact@mbndev.ma',
   address: {
@@ -95,7 +90,7 @@ export const metadata: Metadata = {
     title:       'MBN DEV — Custom Websites Built to Elevate Your Business',
     description: 'Custom websites, SaaS platforms, and web apps built by Mounir Banni. Fast, modern, and production-ready.',
     url:         'https://mbndev.ma',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'MBN DEV Homepage' }],
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'MBN DEV Homepage' }],
   },
 };
 

@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     images: [
       {
-        url: '/og-image.png',
+        url: '/opengraph-image',
         width: 1200,
         height: 630,
         alt: 'MBN DEV — Custom Websites Built to Elevate Your Business',
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     title: 'MBN DEV — Custom Websites & Web Apps',
     description: 'Custom websites, SaaS platforms, and web apps built fast and professionally.',
     creator: '@mbndev',
-    images: ['/og-image.png'],
+    images: ['/opengraph-image'],
   },
   verification: {
     google: '6iPR0xchv0BJth7bark-LIj4vvX1djZU9hS_oWjZPYA',

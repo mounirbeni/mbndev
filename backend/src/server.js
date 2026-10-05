@@ -28,6 +28,7 @@ const crypto       = require('crypto');
 const prisma             = require('./lib/prisma');
 const pinoHttp           = require('pino-http');
 const { sanitizeBody }   = require('./middleware/sanitize');
+const { createRateLimitStore } = require('./lib/rateLimitStore');
 
 const app = express();
 
@@ -139,6 +140,7 @@ app.use(sanitizeBody);
 
 // ─── Rate limiting ───────────────────────────────────────────────────────────
 const authLimiter = rateLimit({
+  store:           createRateLimitStore('auth'), // shared across instances when REDIS_URL is set
   windowMs:        15 * 60 * 1000,
   max:             20, // 20 attempts per 15 min per IP
   standardHeaders: true,
@@ -147,6 +149,7 @@ const authLimiter = rateLimit({
 });
 
 const apiLimiter = rateLimit({
+  store:           createRateLimitStore('api'), // shared across instances when REDIS_URL is set
   windowMs:        60 * 1000,
   max:             120, // 120 req/min per IP for general API
   standardHeaders: true,
@@ -159,6 +162,7 @@ const apiLimiter = rateLimit({
 // apiLimiter (120/min) is far too loose for an existence-revealing endpoint,
 // letting mass account enumeration at a rate no legitimate typing UX needs.
 const enumerationLimiter = rateLimit({
+  store:           createRateLimitStore('enumeration'), // shared across instances when REDIS_URL is set
   windowMs:        5 * 60 * 1000,
   max:             15, // 15 checks per 5 min per IP — plenty for real typing, not for scraping
   standardHeaders: true,
