@@ -131,7 +131,6 @@ export default function Hero() {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
   const contentY  = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
   const contentOp = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
-  const silkY     = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
 
   // Desktop: the ribbon sweeps behind the portal panel on the right.
   // Mobile: it sits low, under the CTAs, so it never crosses body text.
@@ -152,14 +151,13 @@ export default function Hero() {
       style={{ minHeight: '100dvh' }}
     >
       {/* ribbons */}
-      <motion.div style={{ y: silkY }} className="absolute inset-0">
-        <SilkRibbons className="absolute inset-0" anchor={wide ? [0.66, 0.42] : [0.5, 0.13]} />
-      </motion.div>
+      {/* Held in place (no scroll parallax) so it never slides past the section edge. */}
+      <SilkRibbons className="absolute inset-0" anchor={wide ? [0.66, 0.5] : [0.56, 0.22]} />
 
       {/* readability scrims */}
-      <div aria-hidden className="absolute inset-0 pointer-events-none"
+      <div aria-hidden className="absolute inset-0 pointer-events-none hidden lg:block"
         style={{ background: 'linear-gradient(90deg, rgba(7,6,15,0.94) 0%, rgba(7,6,15,0.72) 30%, rgba(7,6,15,0.15) 58%, transparent 75%)' }} />
-      <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
+      <div aria-hidden className="absolute inset-x-0 bottom-0 h-[12%] lg:h-1/4 pointer-events-none"
         style={{ background: 'linear-gradient(to top, #07060f 0%, rgba(7,6,15,0.6) 45%, transparent 100%)' }} />
       <div aria-hidden className="absolute inset-x-0 top-0 h-32 pointer-events-none"
         style={{ background: 'linear-gradient(to bottom, rgba(7,6,15,0.7), transparent)' }} />
@@ -226,7 +224,8 @@ export default function Hero() {
 
             <p
               style={{ '--hero-y': '0px', '--hero-delay': '0.7s' } as React.CSSProperties}
-              className="hero-enter mt-7 font-mono text-[11px] tracking-wide text-slate-500"
+              // Phones: the ribbon passes behind this line, so it gets a dim backing.
+              className="hero-enter mt-7 font-mono text-[11px] tracking-wide text-slate-500 max-lg:w-fit max-lg:-mx-2.5 max-lg:px-2.5 max-lg:py-1.5 max-lg:rounded-lg max-lg:bg-[#07060f]/75 max-lg:backdrop-blur-sm"
             >
               Reply within 24h <span className="text-slate-700 mx-2">/</span>
               No surprise pricing <span className="text-slate-700 mx-2">/</span>

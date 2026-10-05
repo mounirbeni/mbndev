@@ -29,6 +29,7 @@ uniform vec2  uRes;
 uniform float uTime;
 uniform float uIntensity;
 uniform vec2  uAnchor;   // where the ribbon sits (0..1, origin bottom-left)
+uniform float uFit;      // scales the swing so the band stays inside the canvas
 uniform vec3  uA;        // palette, edge to edge across the band
 uniform vec3  uB;
 uniform vec3  uC;
@@ -46,8 +47,8 @@ void main(){
 
   float t = uTime;
   float px = 1.0 / uRes.y;
-  float cy = 0.16 * sin(p.x * 1.35 + t * 0.19) + 0.06 * sin(p.x * 2.9 - t * 0.23);
-  float W  = 0.20 * cos(p.x * 1.15 + t * 0.27 + 0.9);   // signed half-width: twists through 0
+  float cy = uFit * (0.16 * sin(p.x * 1.35 + t * 0.19) + 0.06 * sin(p.x * 2.9 - t * 0.23));
+  float W  = uFit * 0.20 * cos(p.x * 1.15 + t * 0.27 + 0.9);   // signed half-width: twists through 0
   float sheen = 0.45 + 0.85 * pow(0.5 + 0.5 * sin(p.x * 1.6 - t * 0.5), 2.0);
 
   vec3 col = vec3(0.0);
@@ -55,7 +56,7 @@ void main(){
   for (int i = 0; i < N; i++) {
     float f = float(i) / float(N - 1);
     float s = f * 2.0 - 1.0;
-    float y = cy + s * W + 0.006 * sin(p.x * 6.0 + f * 23.0 + t * 0.7);
+    float y = cy + s * W + uFit * 0.006 * sin(p.x * 6.0 + f * 23.0 + t * 0.7);
     float d = abs(p.y - y);
     float w = 1.1 * px;
     float line = exp(-d * d / (w * w));
@@ -72,7 +73,10 @@ void main(){
   col *= sheen;
 
   float ends = smoothstep(-1.7, -0.5, p.x) * (1.0 - smoothstep(1.0, 2.2, p.x));
-  col *= ends * uIntensity;
+  // Fade out softly at the top and bottom of the canvas, so a section edge
+  // never slices the ribbon off mid-stroke.
+  float rim = smoothstep(0.0, 0.12, uv.y) * smoothstep(0.0, 0.12, 1.0 - uv.y);
+  col *= ends * rim * uIntensity;
   col = 1.0 - exp(-col * 1.2);
   float g = fract(sin(dot(gl_FragCoord.xy + t, vec2(12.9898, 78.233))) * 43758.5453);
   col += (g - 0.5) * 0.018;
@@ -160,11 +164,15 @@ export default function SilkRibbons({
     const uTime = gl.getUniformLocation(prog, 'uTime');
     const uIntensity = gl.getUniformLocation(prog, 'uIntensity');
     const uAnchor = gl.getUniformLocation(prog, 'uAnchor');
+    const uFit = gl.getUniformLocation(prog, 'uFit');
     const uCols = ['uA', 'uB', 'uC'].map((n) => gl.getUniformLocation(prog, n));
     const cur = target.current.length ? [...target.current] : BRAND.flatMap(rgb);
     const setCols = () => uCols.forEach((u, i) => gl.uniform3f(u, cur[i * 3], cur[i * 3 + 1], cur[i * 3 + 2]));
     gl.uniform1f(uIntensity, intensity);
     gl.uniform2f(uAnchor, ax, ay);
+    // The band swings up to ~0.42 of the canvas height around the anchor;
+    // shrink that swing when the anchor sits near the top or bottom edge.
+    gl.uniform1f(uFit, Math.min(1, Math.max(0.45, (Math.min(ay, 1 - ay) - 0.08) / 0.42)));
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
