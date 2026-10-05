@@ -10,9 +10,9 @@
 // read from them (with caching) instead of PACKAGE_INCLUSIONS below.
 
 const BASE_PRICES = {
-  website:   799,
-  ecommerce: 1499,
-  dashboard: 2499,
+  website:   1290,
+  ecommerce: 2900,
+  dashboard: 5900,
   mobile:    3999,
   custom:    1199,
 };
@@ -41,20 +41,20 @@ const VALID_PLANS = ['starter', 'pro', 'premium', 'custom'];
 const PACKAGE_INCLUSIONS = {
   starter: {
     label:            'Starter',
-    price:            799,
+    price:            1290,
     includedPages:    5,
     includedFeatures: ['seo', 'hosting'],
   },
   pro: {
     label:            'Pro',
-    price:            1799,
+    price:            2690,
     includedPages:    10,
     includedFeatures: ['seo', 'hosting', 'auth', 'api'],
   },
   premium: {
     label:            'Premium',
-    price:            3499,
-    includedPages:    99, // effectively unlimited
+    price:            5490,
+    includedPages:    20,
     includedFeatures: ['seo', 'hosting', 'auth', 'api', 'payment', 'dashboard', 'multilang'],
   },
 };

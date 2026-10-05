@@ -1,21 +1,13 @@
 'use client';
-// v3 — market-researched pricing with smart discount strategy
 import { m as motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   Globe, ShoppingCart, BarChart3, Rocket, Settings, Wrench,
-  Check, ArrowRight, Zap, Shield, Clock, Flame, Tag, Trophy, Star, TrendingDown,
+  Check, ArrowRight, Zap, Shield, Clock, Star,
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-// Market research sources: Upwork, Fiverr Pro, GoodFirms, Clutch — 2026
-// Freelancer avg rates used as "original price" for credible comparisons
-
-function discountPct(original: number, current: number) {
-  return Math.round((1 - current / original) * 100);
-}
 
 export default function ServicesPage() {
   const { t } = useLanguage();
@@ -30,11 +22,7 @@ export default function ServicesPage() {
         t('services.web.f1'), t('services.web.f2'), t('services.web.f3'),
         t('services.web.f4'), t('services.web.f5'), t('services.web.f6'),
       ],
-      price: 799,
-      originalPrice: 1499,
-      badge: 'Limited Offer',
-      badgeIcon: Flame,
-      badgeClass: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+      price: 1290,
       slug: 'custom-websites',
       detailPage: true,
       color: 'from-primary-500/20 to-blue-500/10',
@@ -49,11 +37,7 @@ export default function ServicesPage() {
         t('services.ecom.page.f1'), t('services.ecom.page.f2'), t('services.ecom.page.f3'),
         t('services.ecom.page.f4'), t('services.ecom.page.f5'), t('services.ecom.page.f6'),
       ],
-      price: 1499,
-      originalPrice: 2999,
-      badge: 'Best Deal',
-      badgeIcon: Tag,
-      badgeClass: 'bg-primary-500/20 text-primary-300 border-primary-500/30',
+      price: 2900,
       slug: 'ecommerce',
       detailPage: true,
       color: 'from-blue-500/20 to-cyan-500/10',
@@ -68,8 +52,7 @@ export default function ServicesPage() {
         t('services.saas.page.f1'), t('services.saas.page.f2'), t('services.saas.page.f3'),
         t('services.saas.page.f4'), t('services.saas.page.f5'), t('services.saas.page.f6'),
       ],
-      price: 2499,
-      originalPrice: 4999,
+      price: 7900,
       badge: 'Most Popular',
       badgeIcon: Star,
       badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
@@ -87,8 +70,7 @@ export default function ServicesPage() {
         t('services.landing.page.f1'), t('services.landing.page.f2'), t('services.landing.page.f3'),
         t('services.landing.page.f4'), t('services.landing.page.f5'), t('services.landing.page.f6'),
       ],
-      price: 499,
-      originalPrice: 899,
+      price: 699,
       badge: 'Quick Launch',
       badgeIcon: Zap,
       badgeClass: 'bg-green-500/20 text-green-300 border-green-500/30',
@@ -106,11 +88,7 @@ export default function ServicesPage() {
         t('services.webapp.page.f1'), t('services.webapp.page.f2'), t('services.webapp.page.f3'),
         t('services.webapp.page.f4'), t('services.webapp.page.f5'), t('services.webapp.page.f6'),
       ],
-      price: 1999,
-      originalPrice: 3999,
-      badge: 'Best Value',
-      badgeIcon: Trophy,
-      badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+      price: 5900,
       slug: 'web-applications',
       detailPage: true,
       color: 'from-orange-500/20 to-yellow-500/10',
@@ -126,7 +104,6 @@ export default function ServicesPage() {
         t('services.maint.page.f4'), t('services.maint.page.f5'), t('services.maint.page.f6'),
       ],
       price: 149,
-      originalPrice: 299,
       isMonthly: true,
       badge: 'Flexible Plans',
       badgeIcon: Shield,
@@ -158,16 +135,9 @@ export default function ServicesPage() {
               {t('services.page.title1')}<br />
               <span className="gradient-text">{t('services.page.title2')}</span>
             </h1>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-4">
-              {t('services.page.subtitle')}{' '}
-              <span className="text-green-400 font-semibold">{t('services.page.subtitlePct')}</span>{' '}
-              {t('services.page.subtitleEnd')}
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+              {t('services.page.subtitle')}
             </p>
-            {/* Market comparison trust bar */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-10">
-              <TrendingDown className="w-3.5 h-3.5 text-green-400" />
-              <span className="text-green-400 text-xs font-medium">{t('services.page.trust')}</span>
-            </div>
             <div className="flex flex-wrap justify-center gap-8">
               {highlights.map((h) => (
                 <div key={h.label} className="flex items-center gap-2 text-slate-400">
@@ -187,18 +157,10 @@ export default function ServicesPage() {
             {services.map((svc, i) => {
               const Icon = svc.icon;
               const BadgeIcon = svc.badgeIcon;
-              const pct = discountPct(svc.originalPrice, svc.price);
               const href = svc.detailPage ? `/services/${svc.slug}` : `/request?service=${svc.slug}`;
               const priceLabel = svc.isMonthly
                 ? `$${svc.price}${t('services.page.perMo')}`
                 : `${t('services.page.from')} $${svc.price.toLocaleString()}`;
-              const origLabel = svc.isMonthly
-                ? `$${svc.originalPrice}${t('services.page.perMo')}`
-                : `$${svc.originalPrice.toLocaleString()}`;
-              const saveAmt = (svc.originalPrice - svc.price).toLocaleString();
-              const saveLabel = svc.isMonthly
-                ? t('services.page.savePerMo').replace('{amount}', `$${saveAmt}`)
-                : t('services.page.saveVsMarket').replace('{amount}', `$${saveAmt}`);
 
               return (
                 <motion.div
@@ -211,22 +173,17 @@ export default function ServicesPage() {
                   <Link href={href} className="block h-full">
                     <div className={`glass rounded-2xl p-8 border ${svc.border} bg-gradient-to-br ${svc.color} flex flex-col group hover:scale-[1.02] transition-transform duration-300 h-full cursor-pointer relative overflow-hidden`}>
 
-                      {/* Discount % pill — top right */}
-                      <div className="absolute top-4 right-4">
-                        <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-2 py-0.5 rounded-full">
-                          -{pct}%
-                        </span>
-                      </div>
-
                       <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4">
                         <Icon className="w-6 h-6 text-white" />
                       </div>
 
-                      {/* Promo badge */}
-                      <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-3 w-fit ${svc.badgeClass}`}>
-                        <BadgeIcon className="w-3 h-3" />
-                        {svc.badge}
-                      </div>
+                      {/* Badge */}
+                      {svc.badge && BadgeIcon && (
+                        <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-3 w-fit ${svc.badgeClass}`}>
+                          <BadgeIcon className="w-3 h-3" />
+                          {svc.badge}
+                        </div>
+                      )}
 
                       <h2 className="text-xl font-bold text-white mb-1">{svc.title}</h2>
                       <p className="text-primary-400 text-sm mb-3 font-medium">{svc.tagline}</p>
@@ -243,16 +200,7 @@ export default function ServicesPage() {
                       {/* Price block */}
                       <div className="pt-4 border-t border-white/10 mt-auto">
                         <div className="flex items-end justify-between">
-                          <div>
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <span className="text-slate-500 text-xs line-through">{origLabel}</span>
-                              <span className="text-slate-500 text-[10px]">{t('services.page.marketAvg')}</span>
-                            </div>
-                            <span className="text-white font-bold text-lg">{priceLabel}</span>
-                            <p className="text-green-400 text-[10px] font-semibold mt-0.5">
-                              {saveLabel}
-                            </p>
-                          </div>
+                          <span className="text-white font-bold text-lg">{priceLabel}</span>
                           <span className="flex items-center gap-1.5 text-primary-400 text-sm font-medium group-hover:gap-2.5 transition-all">
                             {svc.detailPage ? t('services.page.learnMore') : t('services.page.getStarted')}
                             <ArrowRight className="w-3.5 h-3.5" />

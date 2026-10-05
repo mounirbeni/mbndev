@@ -22,24 +22,24 @@ function discountPct(original: number, current: number) {
   return Math.round((1 - current / original) * 100);
 }
 
-const fallbackPackages = [
+const fallbackPackages: Package[] = [
   {
-    _id: '1', name: 'Starter', slug: 'starter', price: 799, originalPrice: 1499, badge: 'Limited Offer', popular: false,
+    _id: '1', name: 'Starter', slug: 'starter', price: 1290, popular: false,
     description: 'Perfect for small businesses and personal projects.',
     features: ['Up to 5 Pages', 'Responsive Design', 'Contact Form', 'Basic SEO', '2 Revisions', 'Delivery in 14 days'],
     pages: 5, revisions: 2, deliveryDays: 14,
   },
   {
-    _id: '2', name: 'Pro', slug: 'pro', price: 1799, originalPrice: 2999, badge: 'Best Deal', popular: true,
+    _id: '2', name: 'Pro', slug: 'pro', price: 2690, popular: true,
     description: 'Best for growing businesses who need more.',
     features: ['Up to 10 Pages', 'Responsive Design', 'CMS Integration', 'Advanced SEO', '3 Revisions', 'Priority Support', 'Analytics Setup', 'Delivery in 21 days'],
     pages: 10, revisions: 3, deliveryDays: 21,
   },
   {
-    _id: '3', name: 'Premium', slug: 'premium', price: 3499, originalPrice: 5499, badge: 'Best Value', popular: false,
+    _id: '3', name: 'Premium', slug: 'premium', price: 5490, popular: false,
     description: 'For complex projects with custom requirements.',
-    features: ['Unlimited Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance', 'Delivery in 30 days'],
-    pages: 0, revisions: 6, deliveryDays: 30,
+    features: ['Up to 20 Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance', 'Delivery in 30 days'],
+    pages: 20, revisions: 6, deliveryDays: 30,
   },
 ];
 
@@ -51,7 +51,7 @@ export default function PricingPage() {
   const [showAnnual, setShowAnnual] = useState(false);
 
   const comparison = [
-    { feature: t('pricing.compare.pages'),      starter: 'Up to 5',  pro: 'Up to 10', premium: t('pricing.compare.unlimited') },
+    { feature: t('pricing.compare.pages'),      starter: 'Up to 5',  pro: 'Up to 10', premium: 'Up to 20' },
     { feature: t('pricing.compare.responsive'), starter: true,       pro: true,        premium: true },
     { feature: t('pricing.compare.seo'),        starter: t('pricing.compare.basic'), pro: t('pricing.compare.advanced'), premium: t('pricing.compare.advanced') },
     { feature: t('pricing.compare.cms'),        starter: false,      pro: true,        premium: true },
@@ -100,7 +100,7 @@ export default function PricingPage() {
               {t('pricing.page.title1')}<br />{t('pricing.page.title2')} <span className="gradient-text">{t('pricing.page.titleBold')}</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-xl mx-auto">
-              {t('pricing.page.subtitle')} <span className="text-green-400 font-semibold">{t('pricing.page.subtitlePct')}</span> {t('pricing.page.subtitleEnd')}
+              {t('pricing.page.subtitle')}
             </p>
           </div>
         </div>

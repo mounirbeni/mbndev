@@ -28,7 +28,7 @@ const AuthModal = dynamic(() => import('@/components/ui/AuthModal'), { ssr: fals
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const BASE_PRICES: Record<string, number> = {
-  website: 799, ecommerce: 1499, dashboard: 2499, mobile: 3999, custom: 1199,
+  website: 1290, ecommerce: 2900, dashboard: 5900, mobile: 3999, custom: 1199,
 };
 const BASE_DELIVERY: Record<string, number> = {
   website: 14, ecommerce: 21, dashboard: 30, mobile: 45, custom: 21,
@@ -43,30 +43,30 @@ const FEATURE_PRICES: Record<string, number> = {
 const PACKAGE_INCLUSIONS: Record<string, {
   label: string;
   price: number;
-  includedPages: number; // 99 = unlimited
+  includedPages: number;
   includedFeatures: string[];
   summary: string;
 }> = {
   starter: {
     label:            'Starter',
-    price:            799,
+    price:            1290,
     includedPages:    5,
     includedFeatures: ['seo', 'hosting'],
     summary:          '5 pages · SEO optimization · Hosting setup',
   },
   pro: {
     label:            'Pro',
-    price:            1799,
+    price:            2690,
     includedPages:    10,
     includedFeatures: ['seo', 'hosting', 'auth', 'api'],
     summary:          '10 pages · SEO · Hosting · Authentication · API integration',
   },
   premium: {
     label:            'Premium',
-    price:            3499,
-    includedPages:    99, // effectively unlimited
+    price:            5490,
+    includedPages:    20,
     includedFeatures: ['seo', 'hosting', 'auth', 'api', 'payment', 'dashboard', 'multilang'],
-    summary:          'Unlimited pages · All features included',
+    summary:          'Up to 20 pages · All features included',
   },
 };
 
@@ -107,21 +107,21 @@ function RequestPageContent() {
   ];
 
   const serviceTypes = [
-    { value: 'website',   label: t('request.svc.website'),   desc: t('request.svc.websiteDesc'),   icon: Target,       base: 799,  marketValue: '$1,500+' },
-    { value: 'ecommerce', label: t('request.svc.ecommerce'),  desc: t('request.svc.ecommerceDesc'),  icon: ShoppingCart, base: 1499, marketValue: '$3,000+' },
-    { value: 'dashboard', label: t('request.svc.dashboard'),  desc: t('request.svc.dashboardDesc'),  icon: BarChart3,    base: 2499, marketValue: '$8,000+' },
+    { value: 'website',   label: t('request.svc.website'),   desc: t('request.svc.websiteDesc'),   icon: Target,       base: 1290, marketValue: '$1,500+' },
+    { value: 'ecommerce', label: t('request.svc.ecommerce'),  desc: t('request.svc.ecommerceDesc'),  icon: ShoppingCart, base: 2900, marketValue: '$3,000+' },
+    { value: 'dashboard', label: t('request.svc.dashboard'),  desc: t('request.svc.dashboardDesc'),  icon: BarChart3,    base: 5900, marketValue: '$8,000+' },
     { value: 'mobile',    label: t('request.svc.mobile'),     desc: t('request.svc.mobileDesc'),     icon: Smartphone,   base: 3999, marketValue: '$12,000+' },
     { value: 'custom',    label: t('request.svc.custom'),     desc: t('request.svc.customDesc'),     icon: Lightbulb,    base: 1199, marketValue: '$2,500+' },
   ];
 
   const FEATURES = [
-    { key: 'auth',       label: t('request.feat.auth'),       price: 400, marketValue: 800,  desc: t('request.feat.authDesc') },
-    { key: 'payment',    label: t('request.feat.payment'),     price: 500, marketValue: 950,  desc: t('request.feat.paymentDesc') },
-    { key: 'dashboard',  label: t('request.feat.dashboard'),   price: 800, marketValue: 1500, desc: t('request.feat.dashboardDesc') },
-    { key: 'multilang',  label: t('request.feat.multilang'),   price: 300, marketValue: 550,  desc: t('request.feat.multilangDesc') },
-    { key: 'seo',        label: t('request.feat.seo'),         price: 250, marketValue: 450,  desc: t('request.feat.seoDesc') },
-    { key: 'api',        label: t('request.feat.api'),         price: 400, marketValue: 750,  desc: t('request.feat.apiDesc') },
-    { key: 'hosting',    label: t('request.feat.hosting'),     price: 150, marketValue: 280,  desc: t('request.feat.hostingDesc') },
+    { key: 'auth',       label: t('request.feat.auth'),       price: 400, desc: t('request.feat.authDesc') },
+    { key: 'payment',    label: t('request.feat.payment'),     price: 500, desc: t('request.feat.paymentDesc') },
+    { key: 'dashboard',  label: t('request.feat.dashboard'),   price: 800, desc: t('request.feat.dashboardDesc') },
+    { key: 'multilang',  label: t('request.feat.multilang'),   price: 300, desc: t('request.feat.multilangDesc') },
+    { key: 'seo',        label: t('request.feat.seo'),         price: 250, desc: t('request.feat.seoDesc') },
+    { key: 'api',        label: t('request.feat.api'),         price: 400, desc: t('request.feat.apiDesc') },
+    { key: 'hosting',    label: t('request.feat.hosting'),     price: 150, desc: t('request.feat.hostingDesc') },
   ];
 
   const designStyles = [
@@ -546,14 +546,9 @@ function RequestPageContent() {
                                   <span className="text-[9px] text-green-500/50 font-medium">{t('request.inYourPlan')}</span>
                                 </>
                               ) : (
-                                <>
-                                  <span className={`text-xs font-semibold ${isSelected ? 'text-primary-400' : 'text-slate-500'}`}>
-                                    +${f.price}
-                                  </span>
-                                  <span className="text-[9px] text-slate-700 line-through">
-                                    ${f.marketValue}
-                                  </span>
-                                </>
+                                <span className={`text-xs font-semibold ${isSelected ? 'text-primary-400' : 'text-slate-500'}`}>
+                                  +${f.price}
+                                </span>
                               )}
                             </div>
                           </button>

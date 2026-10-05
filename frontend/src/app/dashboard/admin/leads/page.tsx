@@ -63,7 +63,7 @@ Beaucoup de vos clients potentiels cherchent votre business sur Google — sans 
 Quelques exemples de sites que j'ai réalisés :
 ${portfolioRef}
 
-Je vous propose un site professionnel à partir de 799$ — devis gratuit en 24h. Intéressé(e) ?
+Je vous propose un site professionnel à partir de 1 290$ — devis gratuit en 24h. Intéressé(e) ?
 
 mbndev.ma`;
 };

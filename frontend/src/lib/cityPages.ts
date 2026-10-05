@@ -38,7 +38,7 @@ export const CITY_PAGES: Record<string, CityPageData & CitySeoMeta> = {
       { q: 'Do you work with riads and tour operators specifically?', a: 'Yes — we\'ve built booking platforms for the Marrakech hospitality sector, including RiadConnect and Emll. We understand the booking-flow and mobile-first requirements this market needs.' },
       { q: 'Can the website take direct bookings without commission?', a: 'Yes. We build direct booking and payment flows so you keep 100% of your revenue, instead of paying 15-20% to a listing platform.' },
       { q: 'Do you need to meet in person in Marrakech?', a: 'No — the entire process runs remotely over video calls and WhatsApp. Most of our Morocco-based clients never need an in-person meeting.' },
-      { q: 'How much does a website cost for a riad or small business in Marrakech?', a: 'A custom business website starts at $799. A booking or e-commerce platform starts at $1,499, depending on features like payments, availability calendars, and admin tools.' },
+      { q: 'How much does a website cost for a riad or small business in Marrakech?', a: 'A custom business website starts at $1,290. A booking or e-commerce platform starts at $2,900, depending on features like payments, availability calendars, and admin tools.' },
     ],
   },
 

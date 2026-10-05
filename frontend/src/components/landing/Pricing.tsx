@@ -11,21 +11,21 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const defaultPackages: Package[] = [
   {
-    _id: '1', name: 'Starter', slug: 'starter', price: 799, originalPrice: 1499, badge: 'Limited Offer',
+    _id: '1', name: 'Starter', slug: 'starter', price: 1290,
     description: 'A refined online presence for startups and personal brands.',
     features: ['Up to 5 Pages', 'Responsive Design', 'Contact Form', 'Basic SEO', '2 Revisions', 'Delivery in 14 days'],
     popular: false,
   },
   {
-    _id: '2', name: 'Pro', slug: 'pro', price: 1799, originalPrice: 2999, badge: 'Best Deal',
+    _id: '2', name: 'Pro', slug: 'pro', price: 2690,
     description: 'Full-featured and built to scale — the choice of ambitious businesses.',
     features: ['Up to 10 Pages', 'Responsive Design', 'CMS Integration', 'Advanced SEO', '3 Revisions', 'Priority Support', 'Analytics Setup', 'Delivery in 21 days'],
     popular: true,
   },
   {
-    _id: '3', name: 'Premium', slug: 'premium', price: 3499, originalPrice: 5499, badge: 'Best Value',
+    _id: '3', name: 'Premium', slug: 'premium', price: 5490,
     description: 'A bespoke digital experience crafted without compromise.',
-    features: ['Unlimited Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance'],
+    features: ['Up to 20 Pages', 'Custom Features', 'Full-Stack Development', 'Advanced SEO', '6 Revisions', 'Priority Support', 'Source Code', '1 Month Maintenance'],
     popular: false,
   },
 ];
@@ -95,10 +95,7 @@ export default function Pricing() {
             transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-slate-500 max-w-lg mx-auto text-lg leading-relaxed"
           >
-            {t('pricing.subtitle').replace(
-              '{pct}',
-              `${Math.max(0, ...packages.map(p => (p.originalPrice ? discountPct(p.originalPrice, p.price) : 0)))}%`,
-            )}
+            {t('pricing.subtitle')}
           </motion.p>
         </div>
 

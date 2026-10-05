@@ -829,7 +829,7 @@ ${divider('20px 0')}
 <p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${T.green};font-family:${T.font};">The offer</p>
 ${infoBox([
   ['Delivery',          '14 days from project start'],
-  ['Starting price',    '$799 — all-inclusive'],
+  ['Starting price',    '$1,290 — all-inclusive'],
   ['You own the code',  'Full source code delivered to you'],
   ['Revisions',         'Included until you are satisfied'],
 ])}

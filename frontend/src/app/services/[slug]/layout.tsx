@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 const SERVICE_META: Record<string, { title: string; description: string }> = {
   'custom-websites': {
     title:       'Custom Websites',
-    description: 'Bespoke, responsive websites built from scratch for your brand — SEO-optimized, fast, and conversion-focused. Starting at $799.',
+    description: 'Bespoke, responsive websites built from scratch for your brand — SEO-optimized, fast, and conversion-focused. Starting at $1,290.',
   },
   'ecommerce': {
     title:       'E-Commerce Stores',

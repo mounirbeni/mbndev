@@ -8,7 +8,7 @@ import {
   Globe, ShoppingCart, Settings, Rocket, Wrench,
   Check, ArrowRight, Star, Clock, Shield, Zap,
   Code2, Palette, BarChart3, HeadphonesIcon, Package,
-  ChevronRight, MessageSquare, Flame, Tag, Trophy, TrendingDown,
+  ChevronRight, MessageSquare,
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
@@ -16,8 +16,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import AccentText from '@/components/ui/AccentText';
 
 // ─── Service Data ──────────────────────────────────────────────────────────────
-// Market research: Upwork / Fiverr Pro / GoodFirms / Clutch — 2026
-// originalPrice = realistic freelancer market average for each service type
 
 const serviceData: Record<string, {
   icon: React.ElementType;
@@ -29,11 +27,10 @@ const serviceData: Record<string, {
   process: { step: string; title: string; desc: string }[];
   includes: { icon: React.ElementType; label: string; desc: string }[];
   price: number;
-  originalPrice: number;
   isMonthly?: boolean;
-  badge: string;
-  badgeIcon: React.ElementType;
-  badgeClass: string;
+  badge?: string;
+  badgeIcon?: React.ElementType;
+  badgeClass?: string;
   priceNote: string;
   requestType: string;
   color: string;
@@ -71,11 +68,7 @@ const serviceData: Record<string, {
       { icon: BarChart3, label: 'SEO Foundation',    desc: 'Optimized for Google from day one' },
       { icon: Shield,    label: 'Secure & Reliable', desc: 'HTTPS, secure forms, best practices' },
     ],
-    price: 799,
-    originalPrice: 1499,
-    badge: 'Limited Offer',
-    badgeIcon: Flame,
-    badgeClass: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    price: 1290,
     priceNote: 'Final price depends on number of pages, features, and complexity.',
     requestType: 'website',
     color: 'from-primary-500/15 to-blue-500/5',
@@ -119,11 +112,7 @@ const serviceData: Record<string, {
       { icon: BarChart3,      label: 'Sales Analytics',    desc: 'Track revenue, orders, and conversion' },
       { icon: HeadphonesIcon, label: 'Post-Launch Support', desc: '30 days of included support' },
     ],
-    price: 1499,
-    originalPrice: 2999,
-    badge: 'Best Deal',
-    badgeIcon: Tag,
-    badgeClass: 'bg-primary-500/20 text-primary-300 border-primary-500/30',
+    price: 2900,
     priceNote: 'Price varies by catalog size, payment providers, and custom features needed.',
     requestType: 'ecommerce',
     color: 'from-blue-500/15 to-cyan-500/5',
@@ -167,11 +156,7 @@ const serviceData: Record<string, {
       { icon: Zap,       label: 'Performance',            desc: 'Optimized queries & caching' },
       { icon: BarChart3, label: 'Analytics & Reporting',  desc: 'Built-in data insights' },
     ],
-    price: 1999,
-    originalPrice: 3999,
-    badge: 'Best Value',
-    badgeIcon: Trophy,
-    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    price: 5900,
     priceNote: 'Complex applications are scoped individually. Contact us for a custom estimate.',
     requestType: 'custom',
     color: 'from-orange-500/15 to-yellow-500/5',
@@ -215,8 +200,7 @@ const serviceData: Record<string, {
       { icon: Zap,       label: 'Speed',            desc: 'Sub-2s load time guaranteed' },
       { icon: Palette,   label: 'On-Brand Design',  desc: 'Matches your visual identity' },
     ],
-    price: 499,
-    originalPrice: 899,
+    price: 699,
     badge: 'Quick Launch',
     badgeIcon: Zap,
     badgeClass: 'bg-green-500/20 text-green-300 border-green-500/30',
@@ -264,7 +248,6 @@ const serviceData: Record<string, {
       { icon: HeadphonesIcon, label: 'Dedicated Channel', desc: 'Direct WhatsApp or email line' },
     ],
     price: 149,
-    originalPrice: 299,
     isMonthly: true,
     badge: 'Flexible Plans',
     badgeIcon: Shield,
@@ -283,10 +266,6 @@ const serviceData: Record<string, {
   },
 };
 
-function discountPct(original: number, current: number) {
-  return Math.round((1 - current / original) * 100);
-}
-
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -297,11 +276,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
   const { t } = useLanguage();
   const Icon = service.icon;
   const BadgeIcon = service.badgeIcon;
-  const pct = discountPct(service.originalPrice, service.price);
-  const savings = service.originalPrice - service.price;
   const priceLabel    = service.isMonthly ? `From $${service.price}/mo`         : `From $${service.price.toLocaleString()}`;
-  const origLabel     = service.isMonthly ? `$${service.originalPrice}/mo`      : `$${service.originalPrice.toLocaleString()}`;
-  const savingsLabel  = service.isMonthly ? `$${savings}/mo`                    : `$${savings.toLocaleString()}`;
 
   return (
     <PublicLayout>
@@ -330,12 +305,6 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
               <p className={`text-lg font-medium mb-4 ${service.accent}`}>{service.tagline}</p>
               <p className="text-slate-400 leading-relaxed mb-8">{service.longDesc}</p>
 
-              {/* Market comparison trust chip */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full mb-6">
-                <TrendingDown className="w-3 h-3 text-green-400" />
-                <span className="text-green-400 text-xs">{t('services.slug.saveVsMarket').replace('{n}', savingsLabel)}</span>
-              </div>
-
               <div className="flex flex-wrap gap-3">
                 <Link href={`/request?service=${service.requestType}`}>
                   <Button size="lg" className="group">
@@ -358,30 +327,18 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
               transition={{ delay: 0.15 }}
             >
               <div className={`glass rounded-2xl p-8 border ${service.border} bg-gradient-to-br ${service.color} relative overflow-hidden`}>
-                {/* Discount % pill */}
-                <div className="absolute top-4 right-4">
-                  <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-2.5 py-1 rounded-full">
-                    -{pct}% OFF
-                  </span>
-                </div>
-
-                {/* Promo badge */}
-                <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-5 ${service.badgeClass}`}>
-                  <BadgeIcon className="w-3 h-3" />
-                  {service.badge}
-                </div>
+                {/* Badge */}
+                {service.badge && BadgeIcon && (
+                  <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border mb-5 ${service.badgeClass}`}>
+                    <BadgeIcon className="w-3 h-3" />
+                    {service.badge}
+                  </div>
+                )}
 
                 {/* Price */}
                 <div className="mb-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-slate-500 text-sm line-through">{origLabel}</span>
-                    <span className="text-slate-500 text-xs">{t('services.slug.marketAvg')}</span>
-                  </div>
                   <span className="text-4xl font-black text-white">{priceLabel}</span>
                 </div>
-                <p className="text-green-400 text-sm font-semibold mb-1">
-                  {t('services.slug.youSave').replace('{n}', savingsLabel)}
-                </p>
                 <p className="text-slate-500 text-xs mb-6">{service.priceNote}</p>
 
                 <ul className="space-y-3 mb-8">
@@ -544,11 +501,6 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
             <div className="relative z-10">
               <div className="w-14 h-14 bg-primary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
                 <Icon className="w-7 h-7 text-primary-400" />
-              </div>
-              {/* Savings highlight in CTA */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full mb-4">
-                <TrendingDown className="w-3 h-3 text-green-400" />
-                <span className="text-green-400 text-xs font-medium">{t('services.slug.saveVsPct').replace('{n}', savingsLabel).replace('{pct}', String(pct))}</span>
               </div>
               <h2 className="text-3xl font-bold text-white mb-3">{t('services.slug.cta')}</h2>
               <p className="text-slate-400 mb-8 max-w-md mx-auto">

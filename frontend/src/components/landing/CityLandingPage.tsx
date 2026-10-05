@@ -33,10 +33,10 @@ export interface CityPageData {
 }
 
 const SERVICE_META: Record<string, { icon: typeof Globe; title: string; price: string }> = {
-  'custom-websites':  { icon: Globe,       title: 'Custom Websites',    price: 'From $799'  },
-  'ecommerce':        { icon: ShoppingCart, title: 'E-Commerce Stores',  price: 'From $1,499' },
-  'web-applications': { icon: Settings,    title: 'Web Applications',   price: 'From $1,999' },
-  'landing-pages':    { icon: Rocket,      title: 'Landing Pages',      price: 'From $499'  },
+  'custom-websites':  { icon: Globe,       title: 'Custom Websites',    price: 'From $1,290' },
+  'ecommerce':        { icon: ShoppingCart, title: 'E-Commerce Stores',  price: 'From $2,900' },
+  'web-applications': { icon: Settings,    title: 'Web Applications',   price: 'From $5,900' },
+  'landing-pages':    { icon: Rocket,      title: 'Landing Pages',      price: 'From $699'  },
   'maintenance':      { icon: Wrench,      title: 'Maintenance & Support', price: 'From $149/mo' },
 };
 
@@ -219,8 +219,8 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
             <h2 className="text-2xl font-bold text-white mb-3">How Much Does a Website Cost in {city}?</h2>
             <p className="text-slate-400 leading-relaxed mb-6">
               Pricing depends on the type of site and the features you need — a simple business
-              website starts at $799, an online store at $1,499, and a custom web application
-              at $1,999. Every quote is fixed before we start, based on a short discovery call.
+              website starts at $1,290, an online store at $2,900, and a custom web application
+              at $5,900. Every quote is fixed before we start, based on a short discovery call.
               We work in four stages: discovery, design, development, and launch — with your
               review at every step.
             </p>
