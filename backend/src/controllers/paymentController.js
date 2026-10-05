@@ -294,13 +294,13 @@ exports.submitManualPayment = async (req, res, next) => {
       ? `⚠️ HIGH-RISK: ${order.client.name} submitted ${label} $${order.totalPrice} for "${order.title}". Risk score: ${score}/100. Verify carefully.`
       : `${order.client.name} submitted ${label} $${order.totalPrice} for "${order.title}". Verify now.`;
 
-    notifyAdmins({
+    await notifyAdmins({
       type:    'payment_received',
       title:   isHighRisk(score) ? '⚠️ High-Risk Payment Submitted' : 'Manual Payment Submitted',
       message: adminMsg,
       link:    '/dashboard/admin/payments',
       metadata: { orderId: order.id, paymentId: payment.id, method, riskScore: score },
-    }).catch(() => {});
+    }, { telegram: isHighRisk(score) });
 
     notify(req.user.id, {
       type:    'payment_received',
@@ -604,7 +604,7 @@ exports.approveManualPayment = async (req, res, next) => {
       title:   'Payment Approved',
       message: `Payment for "${payment.order.title}" approved. Project created.`,
       link:    `/dashboard/admin/projects/${project.id}`,
-    }).catch(() => {});
+    }, { telegram: false }).catch(() => {});
 
     SM.paymentVerified(project.id).catch(() => {});
 

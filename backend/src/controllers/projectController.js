@@ -4,7 +4,7 @@ const prisma   = require('../lib/prisma');
 const jwt      = require('jsonwebtoken');
 const { saveUpload, deleteStoredFiles, BLOB_ACCESS } = require('../lib/storage');
 const { fmt }  = require('../lib/format');
-const { notify, logActivity } = require('../lib/notifications');
+const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
 const { SM }   = require('../lib/systemMessages');
 const realtime = require('../lib/realtime');
 const { sendEmail, templates } = require('../lib/email');
@@ -75,6 +75,16 @@ exports.createProject = async (req, res, next) => {
       },
       include: withClientFull,
     });
+
+    if (req.user.role !== 'admin') {
+      await notifyAdmins({
+        type:    'project_created',
+        title:   'New Project Request',
+        message: `${req.user.name} created the project "${project.title}".`,
+        link:    `/dashboard/admin/projects/${project.id}`,
+        metadata: { projectId: project.id, clientId: req.user.id },
+      });
+    }
 
     res.status(201).json({ success: true, project: fmt(project) });
   } catch (err) {
@@ -277,7 +287,7 @@ exports.checkProjectUploadAuth = async (req, res, next) => {
   try {
     const project = await prisma.project.findUnique({
       where:  { id: req.params.id },
-      select: { id: true, clientId: true },
+      select: { id: true, clientId: true, title: true },
     });
     if (!project) {
       return res.status(404).json({ success: false, message: 'Project not found' });
@@ -285,11 +295,24 @@ exports.checkProjectUploadAuth = async (req, res, next) => {
     if (req.user.role !== 'admin' && project.clientId !== req.user.id) {
       return res.status(403).json({ success: false, message: 'Not authorized to upload to this project' });
     }
+    req.project = project;
     next();
   } catch (err) {
     next(err);
   }
 };
+
+// Admins hear about every file a client adds to a project.
+function notifyClientUpload(req, fileName) {
+  if (req.user.role === 'admin') return Promise.resolve();
+  return notifyAdmins({
+    type:    'file_uploaded',
+    title:   `📎 ${req.user.name} uploaded a file`,
+    message: `"${fileName.slice(0, 100)}" in ${req.project?.title || 'a project'}.`,
+    link:    `/dashboard/admin/projects/${req.params.id}`,
+    metadata: { projectId: req.params.id },
+  });
+}
 
 // ─── Upload file to project ───────────────────────────────────────────────────
 exports.uploadFile = async (req, res, next) => {
@@ -326,6 +349,7 @@ exports.uploadFile = async (req, res, next) => {
       fileName:     req.file.originalname.slice(0, 100),
       uploaderName: req.user.name,
     }).catch(() => {});
+    await notifyClientUpload(req, req.file.originalname);
 
     // Never return the raw storage URL — same reasoning as withClientLight.
     const { url: _url, ...safeFile } = file;
@@ -431,6 +455,7 @@ exports.registerUploadedFile = async (req, res, next) => {
       fileName:     name.slice(0, 100),
       uploaderName: req.user.name,
     }).catch(() => {});
+    await notifyClientUpload(req, name);
 
     const { url: _url, ...safeFile } = file;
     res.json({ success: true, file: fmt(safeFile) });

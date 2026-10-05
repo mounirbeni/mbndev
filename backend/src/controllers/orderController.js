@@ -84,14 +84,14 @@ exports.createOrder = async (req, res, next) => {
       return created;
     });
 
-    // Notify admins (fire-and-forget — outside transaction)
-    notifyAdmins({
+    // Notify admins (outside the transaction; Telegram has its own template below)
+    await notifyAdmins({
       type:    'order_placed',
       title:   'New Order Received',
       message: `${req.user.name} placed a new order: "${title}" ($${totalPrice}${discountPct ? `, -${discountPct}% offer` : ''})`,
       link:    `/dashboard/admin/orders/${order.id}`,
       metadata: { orderId: order.id, clientId: req.user.id },
-    }).catch((err) => console.error('[notifyAdmins] failed:', err));
+    }, { telegram: false });
 
     // Email + WhatsApp — await so Vercel serverless doesn't kill before sending
     await sendEmail({
@@ -218,6 +218,14 @@ exports.updateOrder = async (req, res, next) => {
       },
     });
 
+    await notifyAdmins({
+      type:    'order_updated',
+      title:   'Order Updated by Client',
+      message: `${req.user.name} edited "${order.title}" — new total $${totalPrice}.`,
+      link:    `/dashboard/admin/orders/${order.id}`,
+      metadata: { orderId: order.id, clientId: req.user.id },
+    });
+
     res.json({ success: true, order: fmt(updated) });
   } catch (err) { next(err); }
 };
@@ -245,6 +253,16 @@ exports.cancelOrder = async (req, res, next) => {
       where: { id: req.params.id },
       data:  { status: 'cancelled' },
     });
+
+    if (req.user.role !== 'admin') {
+      await notifyAdmins({
+        type:    'order_cancelled',
+        title:   'Order Cancelled by Client',
+        message: `${req.user.name} cancelled "${order.title}" ($${order.totalPrice}).`,
+        link:    `/dashboard/admin/orders/${order.id}`,
+        metadata: { orderId: order.id, clientId: req.user.id },
+      });
+    }
 
     res.json({ success: true, order: fmt(updated) });
   } catch (err) {

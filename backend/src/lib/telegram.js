@@ -17,11 +17,17 @@ function sendTelegram(message) {
     console.log(`[telegram:dev]\n${message}\n`);
     return Promise.resolve({ sent: false, reason: 'not_configured' });
   }
+  // User-supplied text (names, emails with "_", titles) can break Markdown
+  // parsing, which makes Telegram reject the whole message with a 400 —
+  // resend it as plain text rather than lose the alert.
+  return post(message, true).then((r) => (r.reason === 'HTTP 400' ? post(message, false) : r));
+}
 
+function post(message, markdown) {
   const body = JSON.stringify({
-    chat_id:    CHAT_ID,
-    text:       message,
-    parse_mode: 'Markdown',
+    chat_id: CHAT_ID,
+    text:    message,
+    ...(markdown ? { parse_mode: 'Markdown' } : {}),
   });
 
   return new Promise((resolve) => {
@@ -131,6 +137,15 @@ const telegram = {
       `${APP_URL}/dashboard/admin/projects/${project.id}`,
     ].join('\n'));
   },
+
+  // Generic admin alert, mirrors an in-app admin notification.
+  adminAlert: ({ title, message, link }) =>
+    sendTelegram([
+      `*${title}*`,
+      ``,
+      message,
+      link ? `${APP_URL}${link}` : '',
+    ].filter(Boolean).join('\n')),
 
   newClientMessage: ({ client, project, preview }) =>
     sendTelegram([

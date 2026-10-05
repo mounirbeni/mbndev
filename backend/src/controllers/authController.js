@@ -173,6 +173,13 @@ exports.register = async (req, res, next) => {
     // Welcome email + WhatsApp
     await sendEmail({ to: user.email, ...templates.welcome({ user }) }).catch(() => {});
     telegram.welcome({ user }).catch(() => {});
+    await notifyAdmins({
+      type:    'client_registered',
+      title:   'New Client Registered',
+      message: `${user.name} (${user.email}) created an account${user.company ? ` — ${user.company}` : ''}.`,
+      link:    '/dashboard/admin/clients',
+      metadata: { clientId: user.id },
+    }, { telegram: false });
 
     sendToken(user, 201, res);
   } catch (err) {
@@ -515,6 +522,16 @@ exports.updateProfile = async (req, res, next) => {
       throw err;
     }
 
+    if (user.role !== 'admin') {
+      await notifyAdmins({
+        type:    'profile_updated',
+        title:   'Client Profile Updated',
+        message: `${user.name} (${user.email}) updated their profile.`,
+        link:    '/dashboard/admin/clients',
+        metadata: { clientId: user.id },
+      });
+    }
+
     res.json({ success: true, user: fmt(user) });
   } catch (err) {
     next(err);
@@ -545,12 +562,12 @@ exports.deleteAccount = async (req, res, next) => {
     });
 
     // Notify all admins
-    notifyAdmins({
+    await notifyAdmins({
       type:    'account_deletion_request',
       title:   'Account Deletion Request',
       message: `${full.name} (${full.email}) has requested to delete their account.`,
       link:    '/dashboard/admin/clients',
-    }).catch(() => {});
+    });
 
     res.json({
       success: true,
@@ -567,6 +584,12 @@ exports.cancelDeletionRequest = async (req, res, next) => {
     await prisma.user.update({
       where: { id: req.user.id },
       data:  { deletionRequestedAt: null },
+    });
+    await notifyAdmins({
+      type:    'account_deletion_request',
+      title:   'Deletion Request Cancelled',
+      message: `${req.user.name} (${req.user.email}) cancelled their account deletion request.`,
+      link:    '/dashboard/admin/clients',
     });
     res.json({ success: true, message: 'Deletion request cancelled.' });
   } catch (err) {

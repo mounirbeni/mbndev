@@ -62,17 +62,27 @@ function invalidateAdminCache() {
 // ─── notifyAdmins ─────────────────────────────────────────────────────────────
 /**
  * Notify all active admin users using cached IDs.
- * Each admin gets an individual Notification record for their own read state.
+ * Each admin gets an individual Notification record (in-app + web push) for
+ * their own read state, and the same alert goes to the admin Telegram chat
+ * unless the caller already sends a dedicated Telegram message.
+ *
+ * Never throws. Callers should `await` it: on Vercel the function can be
+ * frozen once the response is sent, dropping an un-awaited push.
  */
-async function notifyAdmins(payload) {
+async function notifyAdmins(payload, { telegram: toTelegram = true } = {}) {
+  const tasks = [];
+  if (toTelegram) {
+    const { telegram } = require('./telegram');
+    tasks.push(telegram.adminAlert(payload));
+  }
   try {
     const adminIds = await getAdminIds();
-    if (adminIds.length === 0) return;
-    // Run in parallel but don't let one failure abort the others
-    await Promise.allSettled(adminIds.map((id) => notify(id, payload)));
+    tasks.push(...adminIds.map((id) => notify(id, payload)));
   } catch (err) {
     console.error('[notifyAdmins] Failed to fetch admin IDs:', err.message);
   }
+  // Run in parallel but don't let one failure abort the others
+  await Promise.allSettled(tasks);
 }
 
 // ─── logActivity ─────────────────────────────────────────────────────────────

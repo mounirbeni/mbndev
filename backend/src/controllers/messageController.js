@@ -3,6 +3,7 @@
 const prisma   = require('../lib/prisma');
 const { fmt }  = require('../lib/format');
 const realtime = require('../lib/realtime');
+const { notifyAdmins } = require('../lib/notifications');
 
 const MESSAGE_PAGE_SIZE = 50; // messages per page
 
@@ -187,7 +188,7 @@ exports.sendMessage = async (req, res, next) => {
 
     const project = await prisma.project.findUnique({
       where:  { id: projectId },
-      select: { id: true, clientId: true },
+      select: { id: true, clientId: true, title: true },
     });
 
     if (!project) {
@@ -208,6 +209,14 @@ exports.sendMessage = async (req, res, next) => {
       realtime.publishToUser(project.clientId, 'message:new', payload);
     } else {
       realtime.publishToAdmins('message:new', payload);
+      const text = message.content;
+      await notifyAdmins({
+        type:    'new_message',
+        title:   `💬 ${req.user.name} — ${project.title}`,
+        message: text.length > 140 ? `${text.slice(0, 140)}…` : text,
+        link:    `/dashboard/admin/projects/${project.id}`,
+        metadata: { projectId: project.id, messageId: message.id },
+      });
     }
 
     res.status(201).json({ success: true, message: payload });

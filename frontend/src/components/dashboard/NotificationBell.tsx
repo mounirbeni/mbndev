@@ -29,6 +29,11 @@ const TYPE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   new_message:       { bg: 'bg-cyan-500/15',    text: 'text-cyan-400',     dot: 'bg-cyan-400' },
   revision_request:  { bg: 'bg-orange-500/15',  text: 'text-orange-400',   dot: 'bg-orange-400' },
   project_delivered: { bg: 'bg-emerald-500/15', text: 'text-emerald-400',  dot: 'bg-emerald-400' },
+  file_uploaded:     { bg: 'bg-sky-500/15',     text: 'text-sky-400',      dot: 'bg-sky-400' },
+  client_registered: { bg: 'bg-violet-500/15',  text: 'text-violet-400',   dot: 'bg-violet-400' },
+  order_updated:     { bg: 'bg-primary-500/15', text: 'text-primary-400',  dot: 'bg-primary-400' },
+  order_cancelled:   { bg: 'bg-red-500/15',     text: 'text-red-400',      dot: 'bg-red-400' },
+  account_deletion_request: { bg: 'bg-red-500/15', text: 'text-red-400',   dot: 'bg-red-400' },
 };
 
 const DEFAULT_TYPE = { bg: 'bg-slate-500/15', text: 'text-slate-400', dot: 'bg-slate-500' };
