@@ -5,6 +5,16 @@ const PRODUCTS = {
   'leads-ai': {
     name:  'MBN Leads AI',
     plans: { starter: 37, pro: 67, agency: 97 },
+    model: 'leadsAiAccount',
+    path:  '/leads-ai',
+    firstStep: 'add your Google key in Settings and run your first search',
+  },
+  'local-growth': {
+    name:  'MBN Local Growth',
+    plans: { starter: 37, pro: 67, agency: 97 },
+    model: 'localGrowthAccount',
+    path:  '/local-growth',
+    firstStep: 'add your Google key in Settings and create your first report',
   },
 };
 
@@ -16,7 +26,10 @@ function parseProduct(value) {
   const product = PRODUCTS[productId];
   if (!product || !Object.prototype.hasOwnProperty.call(product.plans, plan)) return null;
   const label = plan[0].toUpperCase() + plan.slice(1);
-  return { key: `${productId}:${plan}`, productId, plan, price: product.plans[plan], title: `${product.name} — ${label}`, name: product.name };
+  return {
+    key: `${productId}:${plan}`, productId, plan, price: product.plans[plan], title: `${product.name} — ${label}`,
+    name: product.name, model: product.model, path: product.path, firstStep: product.firstStep,
+  };
 }
 
 /** Higher of two plans (an upgrade never downgrades an existing licence). */

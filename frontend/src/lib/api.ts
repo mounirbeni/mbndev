@@ -499,6 +499,44 @@ export const leadsAiAPI = {
   adminSetAccess: (userId: string, plan: string | null)           => api.put('/leads-ai/admin/access', { userId, plan }),
 };
 
+// ─── MBN Local Growth (product) ───────────────────────────────────────────────
+export interface LocalGrowthAccount {
+  plan: 'starter' | 'pro' | 'agency';
+  reports: { used: number; limit: number | null; remaining: number | null };
+  hasGoogleKey: boolean;
+  hasOpenaiKey: boolean;
+  brandName: string;
+  brandUrl: string;
+}
+export interface LocalGrowthAction { priority: 'high' | 'medium' | 'low'; area: 'website' | 'reputation' | 'profile'; title: string; detail: string }
+export interface LocalGrowthCompetitor { placeId: string; name: string; rating: number | null; reviews: number; website: string | null; mapsUrl: string | null }
+export interface LocalGrowthData {
+  business: { name: string; address: string | null; type: string | null; rating: number | null; reviews: number; website: string | null; phone: string | null; hasHours: boolean; photos: number; lastReviewAt: string | null; mapsUrl: string | null };
+  scores: { overall: number; reputation: number; website: number; profile: number };
+  benchmark: { competitors: number; medianReviews: number | null; avgRating: number | null; withWebsite: number };
+  competitors: LocalGrowthCompetitor[];
+  websiteAudit: LeadsAiAudit;
+  websiteIssues: LeadsAiIssue[];
+  actions: LocalGrowthAction[];
+  summary?: string;
+  generatedAt: string;
+}
+export interface LocalGrowthReport { id: string; placeId: string; name: string; address: string | null; score: number; shareToken: string; createdAt: string; data?: LocalGrowthData }
+export interface ReportBrand { name: string; url: string | null }
+
+export const localGrowthAPI = {
+  me:           ()                                   => api.get('/local-growth/me'),
+  saveSettings: (data: { googleKey?: string; openaiKey?: string; brandName?: string; brandUrl?: string }) => api.put('/local-growth/settings', data),
+  search:       (query: string)                      => api.post('/local-growth/search', { query }),
+  create:       (placeId: string, lang: string)      => api.post('/local-growth/reports', { placeId, lang }),
+  list:         ()                                   => api.get('/local-growth/reports'),
+  get:          (id: string)                         => api.get(`/local-growth/reports/${id}`),
+  remove:       (id: string)                         => api.delete(`/local-growth/reports/${id}`),
+  publicReport: (token: string)                      => api.get(`/local-growth/public/${token}`),
+  adminAccounts:  ()                                 => api.get('/local-growth/admin/accounts'),
+  adminSetAccess: (userId: string, plan: string | null) => api.put('/local-growth/admin/access', { userId, plan }),
+};
+
 export interface ActivityListParams {
   page?:  number;
   limit?: number;

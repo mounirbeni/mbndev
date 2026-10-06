@@ -6,6 +6,6 @@ const PLANS = {
   agency:  { label: 'Agency', price: 97 },
 };
 
-export default function BuyLeadsAiPage() {
-  return <ProductBuy productId="leads-ai" name="MBN Leads AI" plans={PLANS} />;
+export default function BuyLocalGrowthPage() {
+  return <ProductBuy productId="local-growth" name="MBN Local Growth" plans={PLANS} />;
 }

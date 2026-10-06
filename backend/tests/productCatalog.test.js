@@ -3,7 +3,9 @@ const assert = require('node:assert/strict');
 const { parseProduct, higherPlan } = require('../src/lib/productCatalog');
 
 test('parseProduct prices products server-side', () => {
-  assert.deepEqual(parseProduct('leads-ai:pro'), { key: 'leads-ai:pro', productId: 'leads-ai', plan: 'pro', price: 67, title: 'MBN Leads AI — Pro', name: 'MBN Leads AI' });
+  const pro = parseProduct('leads-ai:pro');
+  assert.deepEqual([pro.key, pro.price, pro.title, pro.model, pro.path], ['leads-ai:pro', 67, 'MBN Leads AI — Pro', 'leadsAiAccount', '/leads-ai']);
+  assert.equal(parseProduct('local-growth:agency').model, 'localGrowthAccount');
   assert.equal(parseProduct('leads-ai:starter').price, 37);
   assert.equal(parseProduct('leads-ai:agency').price, 97);
 });

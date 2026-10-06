@@ -65,15 +65,14 @@ async function activateProductOrder(req, res, payment, { ip, ua, prePayment }) {
     await prisma.$transaction(async (tx) => {
       await tx.payment.update({ where: { id }, data: { status: 'paid', paidAt: new Date() } });
       await tx.order.update({ where: { id: payment.order.id }, data: { status: 'paid' } });
-      if (product.productId === 'leads-ai') {
-        const current = await tx.leadsAiAccount.findUnique({ where: { userId: payment.clientId }, select: { plan: true } });
-        const plan = higherPlan(current?.plan, product.plan);
-        await tx.leadsAiAccount.upsert({
-          where:  { userId: payment.clientId },
-          create: { userId: payment.clientId, plan },
-          update: { plan },
-        });
-      }
+      const accounts = tx[product.model];
+      const current = await accounts.findUnique({ where: { userId: payment.clientId }, select: { plan: true } });
+      const plan = higherPlan(current?.plan, product.plan);
+      await accounts.upsert({
+        where:  { userId: payment.clientId },
+        create: { userId: payment.clientId, plan },
+        update: { plan },
+      });
     });
   } catch (txErr) {
     await prisma.payment.updateMany({ where: { id, status: 'processing' }, data: { status: 'pending_verification' } }).catch(() => {});
@@ -98,8 +97,8 @@ async function activateProductOrder(req, res, payment, { ip, ua, prePayment }) {
   await notifyClient(payment.clientId, {
     type:    'payment_received',
     title:   `Payment verified — ${product.name} is active`,
-    message: `Your payment for ${product.title} was verified. Open ${product.name}, add your Google key in Settings and run your first search.`,
-    link:    '/leads-ai',
+    message: `Your payment for ${product.title} was verified. Open ${product.name}, ${product.firstStep}.`,
+    link:    product.path,
     metadata: { orderId: payment.orderId, product: product.key },
   }, { email: true });
 

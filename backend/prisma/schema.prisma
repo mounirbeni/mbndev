@@ -38,6 +38,8 @@ model User {
   pushSubscriptions PushSubscription[]
   leadsAiAccount LeadsAiAccount?
   prospects      Prospect[]
+  localGrowthAccount LocalGrowthAccount?
+  localGrowthReports LocalGrowthReport[]
 
   @@index([email])
   @@index([role, isActive])
@@ -489,5 +491,39 @@ model Prospect {
 
   @@unique([userId, placeId])
   @@index([userId, status])
+  @@index([userId, createdAt])
+}
+
+// ─── MBN Local Growth (product) ─────────────────────────────────────────────
+// Same shape as LeadsAiAccount, plus the agency branding shown on reports.
+model LocalGrowthAccount {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan         String   @default("starter") // starter | pro | agency
+  reportMonth  String   @default("")
+  reportCount  Int      @default(0)
+  googleKeyEnc String?
+  openaiKeyEnc String?
+  brandName    String?                       // agency plan: "Prepared by …"
+  brandUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// One generated growth report. `data` holds the full report snapshot so it
+// renders the same forever, even if the business changes later.
+model LocalGrowthReport {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  placeId    String
+  name       String
+  address    String?
+  score      Int
+  data       Json
+  shareToken String   @unique
+  createdAt  DateTime @default(now())
+
   @@index([userId, createdAt])
 }

@@ -1754,3 +1754,9 @@ html.intro-done .mbn-intro { display: none; }
 /* Phones: opening copy is visible on the first paint. A busy main thread
    during hydration would otherwise hold it at opacity 0 for seconds. */
 @media (max-width: 1023px), (prefers-reduced-motion: reduce) { .hero-enter, .hero-enter-blur { animation: none; } }
+
+/* Printing (e.g. MBN Local Growth "Save as PDF"): plain white page. Report
+   components add their own print: colour overrides. */
+@media print {
+  html, body { background: #fff !important; }
+}

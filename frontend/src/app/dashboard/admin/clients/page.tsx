@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { m as motion } from 'framer-motion';
-import { adminAPI, leadsAiAPI } from '@/lib/api';
+import { adminAPI, leadsAiAPI, localGrowthAPI } from '@/lib/api';
 import { User } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatDate, getInitials } from '@/lib/utils';
@@ -14,6 +14,13 @@ import { Users, AlertTriangle, RefreshCcw, UserCheck, UserX, Trash2, X, StickyNo
 import AccentText from '@/components/ui/AccentText';
 
 const PAGE_SIZE = 25;
+
+// Products whose access the admin can grant from the clients list.
+const PRODUCT_ADMIN = [
+  { id: 'leads-ai', name: 'MBN Leads AI', short: 'Leads AI', api: leadsAiAPI },
+  { id: 'local-growth', name: 'MBN Local Growth', short: 'Local Growth', api: localGrowthAPI },
+] as const;
+type ProductId = typeof PRODUCT_ADMIN[number]['id'];
 
 export default function AdminClientsPage() {
   const { t } = useLanguage();
@@ -28,25 +35,32 @@ export default function AdminClientsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState({ total: 0, activeCount: 0, inactiveCount: 0 });
-  // MBN Leads AI plan per client (userId → plan); absent = no access.
-  const [leadsPlans, setLeadsPlans] = useState<Record<string, string>>({});
+  // Product plans per client: { 'leads-ai': { userId: plan }, … }; absent = no access.
+  const [productPlans, setProductPlans] = useState<Record<ProductId, Record<string, string>>>({ 'leads-ai': {}, 'local-growth': {} });
 
   useEffect(() => {
-    leadsAiAPI.adminAccounts()
-      .then(({ data }) => setLeadsPlans(Object.fromEntries(data.accounts.map((a: { userId: string; plan: string }) => [a.userId, a.plan]))))
-      .catch(() => {});
+    for (const p of PRODUCT_ADMIN) {
+      p.api.adminAccounts()
+        .then(({ data }) => setProductPlans((m) => ({ ...m, [p.id]: Object.fromEntries(data.accounts.map((a: { userId: string; plan: string }) => [a.userId, a.plan])) })))
+        .catch(() => {});
+    }
   }, []);
 
-  const setLeadsPlan = async (c: User, plan: string) => {
+  const setProductPlan = async (product: typeof PRODUCT_ADMIN[number], c: User, plan: string) => {
     const id = c._id ?? c.id ?? '';
-    const prev = leadsPlans[id];
-    setLeadsPlans((m) => { const n = { ...m }; if (plan) n[id] = plan; else delete n[id]; return n; });
+    const prev = productPlans[product.id][id];
+    const apply = (value?: string) => setProductPlans((m) => {
+      const n = { ...m[product.id] };
+      if (value) n[id] = value; else delete n[id];
+      return { ...m, [product.id]: n };
+    });
+    apply(plan || undefined);
     try {
-      await leadsAiAPI.adminSetAccess(id, plan || null);
-      toast.success(plan ? `MBN Leads AI (${plan}) activated for ${c.name}` : `MBN Leads AI removed for ${c.name}`);
+      await product.api.adminSetAccess(id, plan || null);
+      toast.success(plan ? `${product.name} (${plan}) activated for ${c.name}` : `${product.name} removed for ${c.name}`);
     } catch {
-      setLeadsPlans((m) => { const n = { ...m }; if (prev) n[id] = prev; else delete n[id]; return n; });
-      toast.error('Could not change MBN Leads AI access.');
+      apply(prev);
+      toast.error(`Could not change ${product.name} access.`);
     }
   };
 
@@ -410,18 +424,21 @@ export default function AdminClientsPage() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <select
-                          value={leadsPlans[clientId] ?? ''}
-                          onChange={(e) => setLeadsPlan(c, e.target.value)}
-                          aria-label={`MBN Leads AI plan for ${c.name}`}
-                          title="MBN Leads AI"
-                          className={`text-xs rounded-lg border px-2 py-1.5 bg-[#0b0a14] ${leadsPlans[clientId] ? 'border-violet-500/40 text-violet-300' : 'border-white/10 text-slate-500'}`}
-                        >
-                          <option value="">Leads AI: off</option>
-                          <option value="starter">Leads AI: Starter</option>
-                          <option value="pro">Leads AI: Pro</option>
-                          <option value="agency">Leads AI: Agency</option>
-                        </select>
+                        {PRODUCT_ADMIN.map((p) => (
+                          <select
+                            key={p.id}
+                            value={productPlans[p.id][clientId] ?? ''}
+                            onChange={(e) => setProductPlan(p, c, e.target.value)}
+                            aria-label={`${p.name} plan for ${c.name}`}
+                            title={p.name}
+                            className={`text-xs rounded-lg border px-2 py-1.5 bg-[#0b0a14] ${productPlans[p.id][clientId] ? 'border-violet-500/40 text-violet-300' : 'border-white/10 text-slate-500'}`}
+                          >
+                            <option value="">{p.short}: off</option>
+                            <option value="starter">{p.short}: Starter</option>
+                            <option value="pro">{p.short}: Pro</option>
+                            <option value="agency">{p.short}: Agency</option>
+                          </select>
+                        ))}
                         <button
                           onClick={() => toggleStatus(clientId)}
                           className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"

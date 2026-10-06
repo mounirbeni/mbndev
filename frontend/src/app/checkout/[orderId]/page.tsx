@@ -12,6 +12,7 @@ import {
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { orderAPI, paymentAPI } from '@/lib/api';
+import { productFromKey } from '@/lib/products';
 import type { ChangeEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -195,8 +196,8 @@ export default function CheckoutPage() {
       {order.project && (
         <Link href={`/dashboard/client/projects/${order.project.id}`}><Button>{t('checkout.viewProject')} →</Button></Link>
       )}
-      {order.product?.startsWith('leads-ai') && (
-        <Link href="/leads-ai"><Button>Open MBN Leads AI →</Button></Link>
+      {productFromKey(order.product)?.appUrl && (
+        <Link href={productFromKey(order.product)!.appUrl!}><Button>Open {productFromKey(order.product)!.name} →</Button></Link>
       )}
     </div>
   );

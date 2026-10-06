@@ -600,7 +600,7 @@ const templates = {
               : `Payment of <strong style="color:${T.green};">${amountFmt}</strong> confirmed. All source code and assets will be delivered upon project completion.`, { type: 'success' })
             : notice(`To complete your payment, visit your client portal and follow the payment instructions. Contact us if you need assistance.`, { type: 'info' }),
           isPaid && order?.product
-            ? ctaButton('Open MBN Leads AI →', `${APP_URL}/leads-ai`)
+            ? ctaButton(order.product.startsWith('local-growth') ? 'Open MBN Local Growth →' : 'Open MBN Leads AI →', `${APP_URL}/${order.product.split(':')[0]}`)
             : ctaButton(
               isPaid ? 'Open my project →' : 'View my portal →',
               isPaid && project?.id

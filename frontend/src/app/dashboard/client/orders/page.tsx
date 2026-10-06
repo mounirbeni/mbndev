@@ -11,6 +11,7 @@ import { orderAPI } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Button from '@/components/ui/Button';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import { productFromKey } from '@/lib/products';
 import AccentText from '@/components/ui/AccentText';
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -178,9 +179,9 @@ export default function ClientOrdersPage() {
                           </Link>
                         )}
 
-                        {order.product?.startsWith('leads-ai') && order.status === 'paid' && (
-                          <Link href="/leads-ai" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
-                            Open MBN Leads AI <ArrowRight className="w-3 h-3" />
+                        {order.status === 'paid' && productFromKey(order.product)?.appUrl && (
+                          <Link href={productFromKey(order.product)!.appUrl!} className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+                            Open {productFromKey(order.product)!.name} <ArrowRight className="w-3 h-3" />
                           </Link>
                         )}
 

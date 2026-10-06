@@ -194,6 +194,7 @@ app.use('/api/payments',      require('./routes/payments'));
 app.use('/api/packages',      require('./routes/packages'));
 app.use('/api/offers',        require('./routes/offers'));
 app.use('/api/leads-ai',      require('./routes/leadsAi'));
+app.use('/api/local-growth',  require('./routes/localGrowth'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));

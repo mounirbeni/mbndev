@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Check, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, Sparkles, TrendingUp } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import { PRODUCTS, STATUS_LABEL } from '@/lib/products';
 
@@ -41,8 +41,8 @@ export default function ProductsPage() {
                 className="group flex flex-col rounded-3xl border border-white/10 bg-white/[0.02] p-7 transition-colors hover:border-violet-400/40 hover:bg-white/[0.04]"
               >
                 <div className="flex items-center justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-500">
-                    <Sparkles className="h-5 w-5 text-white" />
+                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${p.slug === 'local-growth' ? 'from-emerald-500 to-cyan-500' : 'from-violet-500 to-blue-500'}`}>
+                    {p.slug === 'local-growth' ? <TrendingUp className="h-5 w-5 text-white" /> : <Sparkles className="h-5 w-5 text-white" />}
                   </span>
                   <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-300">
                     {STATUS_LABEL[p.status]}
@@ -68,7 +68,7 @@ export default function ProductsPage() {
 
             <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 p-7 text-center">
               <p className="font-semibold text-white">More products on the way</p>
-              <p className="mt-2 max-w-xs text-sm text-slate-500">AI agents and automation, local business growth tools, and AI customer support.</p>
+              <p className="mt-2 max-w-xs text-sm text-slate-500">AI agents and automation, and AI customer support.</p>
             </div>
           </div>
         </div>
