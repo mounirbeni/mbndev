@@ -3,16 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { m as motion, AnimatePresence } from 'framer-motion';
-import { Home, Briefcase, FolderOpen, DollarSign, BookOpen, Sparkles } from 'lucide-react';
+import { Home, Briefcase, DollarSign, Sparkles } from 'lucide-react';
 import { useHaptic } from '@/hooks/useHaptic';
 
 const tabs = [
   { href: '/',          icon: Home,       label: 'Home'      },
   { href: '/services',  icon: Briefcase,  label: 'Services'  },
-  { href: '/portfolio', icon: FolderOpen, label: 'Portfolio' },
   { href: '/products',  icon: Sparkles,   label: 'Products'  },
   { href: '/pricing',   icon: DollarSign, label: 'Pricing'   },
-  { href: '/insights',  icon: BookOpen,   label: 'Insights'  },
 ];
 
 export default function LandingBottomNav() {
