@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import SiteChrome from '@/components/SiteChrome';
+import DebugOverlay from '@/components/DebugOverlay';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
 import PushPrompt from '@/components/mobile/PushPrompt';
 import Intro, { INTRO_HEAD_SCRIPT } from '@/components/ui/Intro';
@@ -131,6 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Intro />
           <LanguageProvider>
             <AuthProvider>
+              <DebugOverlay />
               <SiteChrome><ScrollProgressBar /></SiteChrome>
               {children}
               <Toaster
