@@ -33,6 +33,16 @@ export const PRODUCTS: Product[] = [
     highlights: ['Growth Score 0–100', 'Benchmark vs 5 nearby competitors', 'Website & Google profile check', 'Prioritised action plan', 'Shareable, printable reports'],
     appUrl: '/local-growth',
   },
+  {
+    slug: 'support-ai',
+    name: 'MBN Support AI',
+    tagline: 'An AI assistant that answers your website visitors 24/7 — and turns them into leads.',
+    description: 'Paste your website, the assistant learns it in a minute, then answers visitors in their language, captures their contact details and hands hot leads to you on WhatsApp or email.',
+    status: 'available',
+    priceFrom: 37,
+    highlights: ['Learns your website automatically', 'Answers in the visitor\'s language', 'Captures leads (email / phone)', 'WhatsApp hand-off', 'One-line install on any site'],
+    appUrl: '/support-ai',
+  },
 ];
 
 export const STATUS_LABEL: Record<Product['status'], string> = {

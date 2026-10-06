@@ -537,6 +537,48 @@ export const localGrowthAPI = {
   adminSetAccess: (userId: string, plan: string | null) => api.put('/local-growth/admin/access', { userId, plan }),
 };
 
+// ─── MBN Support AI (product) ─────────────────────────────────────────────────
+export interface SupportAiAccount {
+  plan: 'starter' | 'pro' | 'agency';
+  bots: { used: number; limit: number };
+  messages: { used: number; limit: number };
+  hasOpenaiKey: boolean;
+}
+export interface SupportBot {
+  id: string;
+  name: string;
+  websiteUrl: string;
+  welcome: string;
+  color: string;
+  allowedDomains: string[];
+  handoffWhatsapp: string | null;
+  handoffEmail: string | null;
+  notes: string | null;
+  active: boolean;
+  pageCount: number;
+  trainedAt: string | null;
+  createdAt: string;
+  _count?: { leads: number; conversations: number };
+}
+export interface SupportMessage { role: 'user' | 'assistant'; content: string; at: string }
+export interface SupportConversation { id: string; visitorId: string; messages: SupportMessage[]; createdAt: string; updatedAt: string }
+export interface SupportLead { id: string; name: string | null; email: string | null; phone: string | null; message: string | null; conversationId: string | null; createdAt: string }
+
+export const supportAiAPI = {
+  me:            ()                                        => api.get('/support-ai/me'),
+  saveSettings:  (openaiKey: string)                       => api.put('/support-ai/settings', { openaiKey }),
+  bots:          ()                                        => api.get('/support-ai/bots'),
+  createBot:     (name: string, websiteUrl: string)        => api.post('/support-ai/bots', { name, websiteUrl }, { timeout: 90000 }),
+  bot:           (id: string)                              => api.get(`/support-ai/bots/${id}`),
+  updateBot:     (id: string, data: Partial<Pick<SupportBot, 'name' | 'welcome' | 'color' | 'allowedDomains' | 'handoffWhatsapp' | 'handoffEmail' | 'notes' | 'active'>>) => api.put(`/support-ai/bots/${id}`, data),
+  retrain:       (id: string)                              => api.post(`/support-ai/bots/${id}/train`, {}, { timeout: 90000 }),
+  deleteBot:     (id: string)                              => api.delete(`/support-ai/bots/${id}`),
+  conversations: (id: string)                              => api.get(`/support-ai/bots/${id}/conversations`),
+  leads:         (id: string)                              => api.get(`/support-ai/bots/${id}/leads`),
+  adminAccounts:  ()                                       => api.get('/support-ai/admin/accounts'),
+  adminSetAccess: (userId: string, plan: string | null)    => api.put('/support-ai/admin/access', { userId, plan }),
+};
+
 export interface ActivityListParams {
   page?:  number;
   limit?: number;

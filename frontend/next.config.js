@@ -46,6 +46,11 @@ const csp = [
   "upgrade-insecure-requests",
 ].join('; ');
 
+// The MBN Support AI chat widget (/widget/*) runs in an iframe on customers'
+// websites, so it is the one place that may be framed. Everything else keeps
+// frame-ancestors 'none' + X-Frame-Options DENY.
+const widgetCsp = csp.replace("frame-ancestors 'none'", 'frame-ancestors *');
+
 // ─── Next.js config ───────────────────────────────────────────────────────────
 const nextConfig = {
   images: {
@@ -75,7 +80,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/((?!widget/).*)',
         headers: [
           { key: 'X-Frame-Options',        value: 'DENY' },
           { key: 'X-Content-Type-Options',  value: 'nosniff' },
@@ -90,6 +95,16 @@ const nextConfig = {
             value: 'max-age=63072000; includeSubDomains; preload',
           },
           { key: 'Content-Security-Policy', value: csp },
+        ],
+      },
+      {
+        source: '/widget/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options',  value: 'nosniff' },
+          { key: 'Referrer-Policy',         value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy',      value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'Content-Security-Policy', value: widgetCsp },
         ],
       },
     ];

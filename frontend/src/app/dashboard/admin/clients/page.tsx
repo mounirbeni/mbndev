@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { m as motion } from 'framer-motion';
-import { adminAPI, leadsAiAPI, localGrowthAPI } from '@/lib/api';
+import { adminAPI, leadsAiAPI, localGrowthAPI, supportAiAPI } from '@/lib/api';
 import { User } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatDate, getInitials } from '@/lib/utils';
@@ -19,6 +19,7 @@ const PAGE_SIZE = 25;
 const PRODUCT_ADMIN = [
   { id: 'leads-ai', name: 'MBN Leads AI', short: 'Leads AI', api: leadsAiAPI },
   { id: 'local-growth', name: 'MBN Local Growth', short: 'Local Growth', api: localGrowthAPI },
+  { id: 'support-ai', name: 'MBN Support AI', short: 'Support AI', api: supportAiAPI },
 ] as const;
 type ProductId = typeof PRODUCT_ADMIN[number]['id'];
 
@@ -36,7 +37,7 @@ export default function AdminClientsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState({ total: 0, activeCount: 0, inactiveCount: 0 });
   // Product plans per client: { 'leads-ai': { userId: plan }, … }; absent = no access.
-  const [productPlans, setProductPlans] = useState<Record<ProductId, Record<string, string>>>({ 'leads-ai': {}, 'local-growth': {} });
+  const [productPlans, setProductPlans] = useState<Record<ProductId, Record<string, string>>>({ 'leads-ai': {}, 'local-growth': {}, 'support-ai': {} });
 
   useEffect(() => {
     for (const p of PRODUCT_ADMIN) {

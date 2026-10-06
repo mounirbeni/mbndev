@@ -40,6 +40,8 @@ model User {
   prospects      Prospect[]
   localGrowthAccount LocalGrowthAccount?
   localGrowthReports LocalGrowthReport[]
+  supportAiAccount   SupportAiAccount?
+  supportBots        SupportBot[]
 
   @@index([email])
   @@index([role, isActive])
@@ -526,4 +528,79 @@ model LocalGrowthReport {
   createdAt  DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+// ─── MBN Support AI (product) ───────────────────────────────────────────────
+model SupportAiAccount {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          String   @default("starter") // starter | pro | agency
+  messageMonth  String   @default("")
+  messageCount  Int      @default(0)
+  openaiKeyEnc  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// One chat assistant, trained on one website.
+model SupportBot {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  websiteUrl      String
+  welcome         String   @default("Hi! How can I help you today?")
+  color           String   @default("#7c3aed")
+  allowedDomains  String[]
+  handoffWhatsapp String?
+  handoffEmail    String?
+  notes           String?  // owner-written FAQ / facts, always given to the AI
+  active          Boolean  @default(true)
+  pageCount       Int      @default(0)
+  trainedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  chunks          SupportChunk[]
+  conversations   SupportConversation[]
+  leads           SupportLead[]
+
+  @@index([userId])
+}
+
+model SupportChunk {
+  id    String     @id @default(cuid())
+  botId String
+  bot   SupportBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  url   String
+  title String?
+  text  String
+
+  @@index([botId])
+}
+
+model SupportConversation {
+  id        String     @id @default(cuid())
+  botId     String
+  bot       SupportBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  visitorId String
+  messages  Json       // [{ role: 'user'|'assistant', content, at }]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([botId, updatedAt])
+}
+
+model SupportLead {
+  id             String     @id @default(cuid())
+  botId          String
+  bot            SupportBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  conversationId String?
+  name           String?
+  email          String?
+  phone          String?
+  message        String?
+  createdAt      DateTime   @default(now())
+
+  @@index([botId, createdAt])
 }

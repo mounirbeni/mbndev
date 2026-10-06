@@ -16,6 +16,13 @@ const PRODUCTS = {
     path:  '/local-growth',
     firstStep: 'add your Google key in Settings and create your first report',
   },
+  'support-ai': {
+    name:  'MBN Support AI',
+    plans: { starter: 37, pro: 67, agency: 97 },
+    model: 'supportAiAccount',
+    path:  '/support-ai',
+    firstStep: 'add your OpenAI key in Settings and create your first assistant',
+  },
 };
 
 const PLAN_RANK = { starter: 1, pro: 2, agency: 3 };

@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import SiteChrome from '@/components/SiteChrome';
 import InstallPrompt from '@/components/mobile/InstallPrompt';
 import PushPrompt from '@/components/mobile/PushPrompt';
 import Intro, { INTRO_HEAD_SCRIPT } from '@/components/ui/Intro';
@@ -130,7 +131,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Intro />
           <LanguageProvider>
             <AuthProvider>
-              <ScrollProgressBar />
+              <SiteChrome><ScrollProgressBar /></SiteChrome>
               {children}
               <Toaster
                 position="top-center"
@@ -155,12 +156,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   error: { iconTheme: { primary: '#ef4444', secondary: '#e2e8f0' } },
                 }}
               />
-              <PushPrompt />
+              <SiteChrome><PushPrompt /></SiteChrome>
             </AuthProvider>
           </LanguageProvider>
-          <InstallPrompt />
-          <ServiceWorkerRegistration />
-          <Analytics />
+          <SiteChrome>
+            <InstallPrompt />
+            <ServiceWorkerRegistration />
+            <Analytics />
+          </SiteChrome>
         </MotionProvider>
       </body>
     </html>
