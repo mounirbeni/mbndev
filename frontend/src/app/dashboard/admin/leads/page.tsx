@@ -32,6 +32,8 @@ interface Lead {
   createdAt:     string;
 }
 
+const PAGE_SIZE = 30;
+
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   new:            { label: 'New',            color: '#6366f1' },
   emailed:        { label: 'Emailed',        color: '#f59e0b' },
@@ -75,6 +77,7 @@ export default function AdminLeadsPage() {
   const [filterPri,   setFilterPri]   = useState<string>('all');
   const [filterType,  setFilterType]  = useState<string>('all');
   const [filterStatus,setFilterStatus]= useState<string>('all');
+  const [shownFor,    setShownFor]    = useState<{ key: string; n: number }>({ key: '', n: PAGE_SIZE });
   const [emailTarget, setEmailTarget] = useState<Lead | null>(null);
   const [dmTarget,    setDmTarget]    = useState<Lead | null>(null);
   const [emailSubject,setEmailSubject]= useState('');
@@ -259,6 +262,13 @@ export default function AdminLeadsPage() {
     return true;
   });
 
+  // Render in batches: hundreds of rows at once froze phones. The batch size
+  // resets whenever a filter changes.
+  const filterKey = `${filterPri}|${filterType}|${filterStatus}`;
+  const limit = shownFor.key === filterKey ? shownFor.n : PAGE_SIZE;
+  const shown = filtered.slice(0, limit);
+  const showMore = () => setShownFor({ key: filterKey, n: limit + PAGE_SIZE });
+
   const hotCount  = leads.filter(l => l.priority === 'hot').length;
   const newCount  = leads.filter(l => l.status   === 'new').length;
   const convCount = leads.filter(l => l.status   === 'converted').length;
@@ -408,7 +418,7 @@ export default function AdminLeadsPage() {
       {/* ── Leads: cards on phones ── */}
       {filtered.length > 0 && (
         <div className="space-y-3 md:hidden">
-          {filtered.map((lead) => (
+          {shown.map((lead) => (
             <LeadCard key={lead.id} lead={lead}
               onStatus={(s) => updateStatus(lead.id, s)}
               onEmail={() => openEmail(lead)}
@@ -433,11 +443,11 @@ export default function AdminLeadsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((lead, i) => (
+                {shown.map((lead, i) => (
                   <motion.tr key={lead.id}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.03 }}
+                    transition={{ delay: Math.min(i, 15) * 0.03 }}
                     style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                     className="hover:bg-white/[0.02] transition-colors group">
 
@@ -573,6 +583,14 @@ export default function AdminLeadsPage() {
             </table>
           </div>
         </div>
+      )}
+
+      {filtered.length > shown.length && (
+        <button onClick={showMore}
+          className="w-full rounded-xl py-3 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          Show more · {filtered.length - shown.length} left
+        </button>
       )}
 
       {/* ── No results after filter ── */}
