@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 export const INTRO_SESSION_KEY = 'mbn-intro-played';
 
 // Never on embedded/shared pages: the chat widget (iframe on other sites) and shared reports.
-export const INTRO_HEAD_SCRIPT = `try{var d=document.documentElement;if(/^\\/(widget|report|r)\\//.test(location.pathname)||sessionStorage.getItem('${INTRO_SESSION_KEY}'))d.classList.add('intro-done');else{sessionStorage.setItem('${INTRO_SESSION_KEY}','1');d.classList.add('intro-playing')}}catch(e){document.documentElement.classList.add('intro-done')}`;
+export const INTRO_HEAD_SCRIPT = `try{var d=document.documentElement;if(/^\\/(widget|report|r|p)\\//.test(location.pathname)||sessionStorage.getItem('${INTRO_SESSION_KEY}'))d.classList.add('intro-done');else{sessionStorage.setItem('${INTRO_SESSION_KEY}','1');d.classList.add('intro-playing')}}catch(e){document.documentElement.classList.add('intro-done')}`;
 
 const WORD = ['M', 'B', 'N', ' ', 'D', 'E', 'V'];
 const STRANDS = [-18, -9, 0, 9, 18];

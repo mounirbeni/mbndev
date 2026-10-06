@@ -34,7 +34,8 @@
   ],
   "crons": [
     { "path": "/api/payments/cron-reconcile", "schedule": "0 3 * * *" },
-    { "path": "/api/review-booster/cron/monitor", "schedule": "0 7 * * *" }
+    { "path": "/api/review-booster/cron/monitor", "schedule": "0 7 * * *" },
+    { "path": "/api/proposal-ai/cron/follow-ups", "schedule": "0 9 * * *" }
   ],
   "headers": [
     {

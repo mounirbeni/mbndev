@@ -628,6 +628,68 @@ export const reviewBoosterAPI = {
   adminSetAccess: (userId: string, plan: string | null)    => api.put('/review-booster/admin/access', { userId, plan }),
 };
 
+// ─── MBN Proposal AI (product) ────────────────────────────────────────────────
+export type ProposalLanguage = 'en' | 'fr' | 'ar' | 'es';
+export type ProposalStatus = 'draft' | 'sent' | 'viewed' | 'accepted' | 'declined';
+export interface ProposalAccount {
+  plan: 'starter' | 'pro' | 'agency';
+  proposals: { used: number; limit: number | null };
+  templates: boolean;
+  hasOpenaiKey: boolean;
+  brandName: string;
+  brandColor: string;
+  brandEmail: string;
+  brandWebsite: string;
+  currency: string;
+}
+export interface ProposalPhase { title: string; description: string; duration: string }
+export interface ProposalContent { intro: string; solution: string; phases: ProposalPhase[]; terms: string }
+export interface ProposalItem { id: string; name: string; description: string; price: number; optional: boolean }
+export interface Proposal {
+  id: string;
+  title: string;
+  clientName: string;
+  clientCompany: string | null;
+  clientEmail: string | null;
+  clientPhone: string | null;
+  language: ProposalLanguage;
+  currency: string;
+  content: ProposalContent;
+  items: ProposalItem[];
+  status: ProposalStatus;
+  isTemplate: boolean;
+  shareToken: string;
+  validUntil: string | null;
+  viewCount: number;
+  firstViewedAt: string | null;
+  lastViewedAt: string | null;
+  sentAt: string | null;
+  acceptedAt: string | null;
+  acceptedName: string | null;
+  acceptedItems: string[] | null;
+  acceptedTotal: number | null;
+  declinedAt: string | null;
+  declineReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export type ProposalSummary = Pick<Proposal, 'id' | 'title' | 'clientName' | 'clientCompany' | 'status' | 'isTemplate' | 'currency' | 'viewCount' | 'sentAt' | 'acceptedAt' | 'acceptedTotal' | 'updatedAt' | 'createdAt'> & { total: number };
+export interface NewProposal { clientName: string; clientCompany?: string; clientEmail?: string; clientPhone?: string; brief?: string; language: ProposalLanguage; currency: string; templateId?: string; blank?: boolean }
+
+export const proposalAPI = {
+  me:             ()                                       => api.get('/proposal-ai/me'),
+  saveSettings:   (data: Partial<{ openaiKey: string; brandName: string; brandColor: string; brandEmail: string; brandWebsite: string; currency: string }>) => api.put('/proposal-ai/settings', data),
+  list:           ()                                       => api.get('/proposal-ai/proposals'),
+  create:         (data: NewProposal)                      => api.post('/proposal-ai/proposals', data, { timeout: 70000 }),
+  get:            (id: string)                             => api.get(`/proposal-ai/proposals/${id}`),
+  update:         (id: string, data: Partial<Pick<Proposal, 'title' | 'clientName' | 'clientCompany' | 'clientEmail' | 'clientPhone' | 'language' | 'currency' | 'content' | 'items' | 'validUntil' | 'isTemplate'>>) => api.put(`/proposal-ai/proposals/${id}`, data),
+  remove:         (id: string)                             => api.delete(`/proposal-ai/proposals/${id}`),
+  duplicate:      (id: string)                             => api.post(`/proposal-ai/proposals/${id}/duplicate`, {}),
+  markSent:       (id: string)                             => api.post(`/proposal-ai/proposals/${id}/sent`, {}),
+  adminAccounts:  ()                                       => api.get('/proposal-ai/admin/accounts'),
+  adminSetAccess: (userId: string, plan: string | null)    => api.put('/proposal-ai/admin/access', { userId, plan }),
+};
+
 export interface ActivityListParams {
   page?:  number;
   limit?: number;

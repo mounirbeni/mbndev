@@ -53,6 +53,16 @@ export const PRODUCTS: Product[] = [
     highlights: ['Alert for every new Google review', 'AI-written replies in any language', 'Weekly rating summary', 'QR poster + WhatsApp review requests', 'Private feedback before bad reviews'],
     appUrl: '/review-booster',
   },
+  {
+    slug: 'proposal-ai',
+    name: 'MBN Proposal AI',
+    tagline: 'Win more clients — AI-written proposals they can open, customise and sign online.',
+    description: 'Describe the project in a few lines and get a complete, branded proposal: scope, phases, pricing with optional extras, terms. Send a link, know when it’s opened, and get it signed online.',
+    status: 'available',
+    priceFrom: 37,
+    highlights: ['Full proposal from a short brief', 'Branded page with your logo colours', 'Optional extras the client can tick', 'Online signature & acceptance', 'Opened / accepted alerts + follow-up reminders'],
+    appUrl: '/proposal-ai',
+  },
 ];
 
 export const STATUS_LABEL: Record<Product['status'], string> = {

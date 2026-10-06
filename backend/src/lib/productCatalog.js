@@ -30,6 +30,13 @@ const PRODUCTS = {
     path:  '/review-booster',
     firstStep: 'add your business and print its QR poster',
   },
+  'proposal-ai': {
+    name:  'MBN Proposal AI',
+    plans: { starter: 37, pro: 67, agency: 97 },
+    model: 'proposalAccount',
+    path:  '/proposal-ai',
+    firstStep: 'add your brand and OpenAI key in Settings and write your first proposal',
+  },
 };
 
 const PLAN_RANK = { starter: 1, pro: 2, agency: 3 };

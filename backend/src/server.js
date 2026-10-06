@@ -197,6 +197,7 @@ app.use('/api/leads-ai',      require('./routes/leadsAi'));
 app.use('/api/local-growth',  require('./routes/localGrowth'));
 app.use('/api/support-ai',    require('./routes/supportAi'));
 app.use('/api/review-booster', require('./routes/reviewBooster'));
+app.use('/api/proposal-ai',   require('./routes/proposalAi'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));
