@@ -199,31 +199,33 @@ export default function InvoicePage() {
 
             {/* Line items */}
             <div className="mb-8">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-gray-100">
-                    <th className="text-left pb-3 text-[10px] font-black text-gray-400 uppercase tracking-[0.12em]">Description</th>
-                    <th className="text-center pb-3 text-[10px] font-black text-gray-400 uppercase tracking-[0.12em] w-12">Qty</th>
-                    <th className="text-right pb-3 text-[10px] font-black text-gray-400 uppercase tracking-[0.12em] w-32">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-gray-50">
-                    <td className="py-5">
-                      <p className="text-sm font-bold text-gray-900 mb-0.5">{projectTitle}</p>
-                      <p className="text-xs text-gray-400">{serviceLabel}</p>
-                      {order?.features?.length > 0 && (
-                        <p className="text-xs text-gray-400 mt-1">
-                          Includes: {order.features.slice(0, 4).join(', ')}
-                          {order.features.length > 4 ? ` +${order.features.length - 4} more` : ''}
-                        </p>
-                      )}
-                    </td>
-                    <td className="py-5 text-center text-sm text-gray-500">1</td>
-                    <td className="py-5 text-right text-sm font-bold text-gray-900">{formatCurrency(payment.amount)}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="overflow-x-auto overscroll-x-contain">
+                <table className="w-full min-w-[480px]">
+                  <thead>
+                    <tr className="border-b-2 border-gray-100">
+                      <th className="text-left pb-3 text-[10px] font-black text-gray-400 uppercase tracking-[0.12em]">Description</th>
+                      <th className="text-center pb-3 text-[10px] font-black text-gray-400 uppercase tracking-[0.12em] w-12">Qty</th>
+                      <th className="text-right pb-3 text-[10px] font-black text-gray-400 uppercase tracking-[0.12em] w-32">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-gray-50">
+                      <td className="py-5">
+                        <p className="text-sm font-bold text-gray-900 mb-0.5">{projectTitle}</p>
+                        <p className="text-xs text-gray-400">{serviceLabel}</p>
+                        {order?.features?.length > 0 && (
+                          <p className="text-xs text-gray-400 mt-1">
+                            Includes: {order.features.slice(0, 4).join(', ')}
+                            {order.features.length > 4 ? ` +${order.features.length - 4} more` : ''}
+                          </p>
+                        )}
+                      </td>
+                      <td className="py-5 text-center text-sm text-gray-500">1</td>
+                      <td className="py-5 text-right text-sm font-bold text-gray-900">{formatCurrency(payment.amount)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Totals */}

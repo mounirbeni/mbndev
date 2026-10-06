@@ -219,37 +219,39 @@ export default function PricingPage() {
             <p className="text-slate-400">{t('pricing.compare.sub')}</p>
           </div>
           <div className="glass rounded-2xl border border-white/5 overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/5">
-                  <th className="text-left p-4 text-slate-400 font-medium text-sm w-1/2">{t('pricing.compare.feature')}</th>
-                  {[t('pricing.compare.starter'), t('pricing.compare.pro'), t('pricing.compare.premium')].map((n) => (
-                    <th key={n} className="p-4 text-center text-sm font-semibold text-white">{n}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.map((row, i) => (
-                  <tr key={row.feature} className={`border-b border-white/5 ${i % 2 === 0 ? '' : 'bg-white/[0.02]'}`}>
-                    <td className="p-4 text-slate-400 text-sm">{row.feature}</td>
-                    {(['starter', 'pro', 'premium'] as const).map((key) => {
-                      const val = row[key as keyof typeof row];
-                      return (
-                        <td key={key} className="p-4 text-center">
-                          {typeof val === 'boolean' ? (
-                            val
-                              ? <Check className="w-4 h-4 text-primary-400 mx-auto" />
-                              : <span className="text-slate-700 text-lg">—</span>
-                          ) : (
-                            <span className="text-slate-300 text-sm">{val}</span>
-                          )}
-                        </td>
-                      );
-                    })}
+            <div className="overflow-x-auto overscroll-x-contain">
+              <table className="w-full min-w-[560px]">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-left p-4 text-slate-400 font-medium text-sm w-1/2">{t('pricing.compare.feature')}</th>
+                    {[t('pricing.compare.starter'), t('pricing.compare.pro'), t('pricing.compare.premium')].map((n) => (
+                      <th key={n} className="p-4 text-center text-sm font-semibold text-white">{n}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {comparison.map((row, i) => (
+                    <tr key={row.feature} className={`border-b border-white/5 ${i % 2 === 0 ? '' : 'bg-white/[0.02]'}`}>
+                      <td className="p-4 text-slate-400 text-sm">{row.feature}</td>
+                      {(['starter', 'pro', 'premium'] as const).map((key) => {
+                        const val = row[key as keyof typeof row];
+                        return (
+                          <td key={key} className="p-4 text-center">
+                            {typeof val === 'boolean' ? (
+                              val
+                                ? <Check className="w-4 h-4 text-primary-400 mx-auto" />
+                                : <span className="text-slate-700 text-lg">—</span>
+                            ) : (
+                              <span className="text-slate-300 text-sm">{val}</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

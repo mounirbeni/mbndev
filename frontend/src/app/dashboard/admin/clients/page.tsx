@@ -355,121 +355,123 @@ export default function AdminClientsPage() {
             <p className="text-slate-600 text-xs">Registered clients will appear here</p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/6">
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.clients')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('request.packageLabel')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('auth.signup.company')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('auth.field.phone')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.status')}</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((c, i) => {
-                const hasPendingDeletion = !!c.deletionRequestedAt;
-                const clientId = c._id ?? c.id ?? '';
-                return (
-                <motion.tr
-                  key={c._id || c.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.04 }}
-                  className={`border-b border-white/5 transition-colors ${hasPendingDeletion ? 'bg-orange-500/5 hover:bg-orange-500/8' : 'hover:bg-white/[0.02]'}`}
-                >
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                        style={{ background: hasPendingDeletion ? 'linear-gradient(135deg,#f97316,#ef4444)' : 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
-                      >
-                        {getInitials(c.name)}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white text-sm font-medium truncate">{c.name}</span>
-                          {hasPendingDeletion && (
-                            <span className="text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30 shrink-0">
-                              DELETE REQ
-                            </span>
-                          )}
+          <div className="overflow-x-auto overscroll-x-contain">
+            <table className="w-full min-w-[720px]">
+              <thead>
+                <tr className="border-b border-white/6">
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.clients')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden sm:table-cell">{t('request.packageLabel')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden md:table-cell">{t('auth.signup.company')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest hidden lg:table-cell">{t('auth.field.phone')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('admin.status')}</th>
+                  <th className="px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {clients.map((c, i) => {
+                  const hasPendingDeletion = !!c.deletionRequestedAt;
+                  const clientId = c._id ?? c.id ?? '';
+                  return (
+                  <motion.tr
+                    key={c._id || c.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.04 }}
+                    className={`border-b border-white/5 transition-colors ${hasPendingDeletion ? 'bg-orange-500/5 hover:bg-orange-500/8' : 'hover:bg-white/[0.02]'}`}
+                  >
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                          style={{ background: hasPendingDeletion ? 'linear-gradient(135deg,#f97316,#ef4444)' : 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
+                        >
+                          {getInitials(c.name)}
                         </div>
-                        <div className="text-slate-500 text-xs truncate">{c.email}</div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white text-sm font-medium truncate">{c.name}</span>
+                            {hasPendingDeletion && (
+                              <span className="text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30 shrink-0">
+                                DELETE REQ
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-slate-500 text-xs truncate">{c.email}</div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="p-4 hidden sm:table-cell"><PlanBadge plan={c.plan} /></td>
-                  <td className="p-4 text-sm text-slate-400 hidden md:table-cell">{c.company || '—'}</td>
-                  <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
-                    {c.createdAt ? formatDate(c.createdAt) : '—'}
-                  </td>
-                  <td className="p-4">
-                    <Badge color={c.isActive ? 'green' : 'red'}>
-                      {c.isActive ? t('status.active') : t('status.inactive')}
-                    </Badge>
-                  </td>
-                  <td className="p-4">
-                    {hasPendingDeletion ? (
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => approveDeletion(clientId)}
-                          className="text-xs text-red-400 hover:text-red-300 font-semibold transition-colors px-2.5 py-1.5 rounded-lg hover:bg-red-500/12 border border-red-500/25 hover:border-red-500/40"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => rejectDeletion(clientId)}
-                          className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        {PRODUCT_ADMIN.map((p) => (
-                          <select
-                            key={p.id}
-                            value={productPlans[p.id][clientId] ?? ''}
-                            onChange={(e) => setProductPlan(p, c, e.target.value)}
-                            aria-label={`${p.name} plan for ${c.name}`}
-                            title={p.name}
-                            className={`text-xs rounded-lg border px-2 py-1.5 bg-[#0b0a14] ${productPlans[p.id][clientId] ? 'border-violet-500/40 text-violet-300' : 'border-white/10 text-slate-500'}`}
+                    </td>
+                    <td className="p-4 hidden sm:table-cell"><PlanBadge plan={c.plan} /></td>
+                    <td className="p-4 text-sm text-slate-400 hidden md:table-cell">{c.company || '—'}</td>
+                    <td className="p-4 text-sm text-slate-400 hidden lg:table-cell">
+                      {c.createdAt ? formatDate(c.createdAt) : '—'}
+                    </td>
+                    <td className="p-4">
+                      <Badge color={c.isActive ? 'green' : 'red'}>
+                        {c.isActive ? t('status.active') : t('status.inactive')}
+                      </Badge>
+                    </td>
+                    <td className="p-4">
+                      {hasPendingDeletion ? (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => approveDeletion(clientId)}
+                            className="text-xs text-red-400 hover:text-red-300 font-semibold transition-colors px-2.5 py-1.5 rounded-lg hover:bg-red-500/12 border border-red-500/25 hover:border-red-500/40"
                           >
-                            <option value="">{p.short}: off</option>
-                            <option value="starter">{p.short}: Starter</option>
-                            <option value="pro">{p.short}: Pro</option>
-                            <option value="agency">{p.short}: Agency</option>
-                          </select>
-                        ))}
-                        <button
-                          onClick={() => toggleStatus(clientId)}
-                          className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
-                        >
-                          {t('admin.toggle')}
-                        </button>
-                        <button
-                          onClick={() => openNotes(c)}
-                          className={`text-xs transition-colors p-1.5 rounded-lg border border-transparent hover:border-yellow-500/20 hover:bg-yellow-500/10 ${(c as any).adminNotes ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}`}
-                          title={(c as any).adminNotes ? 'Edit notes' : 'Add notes'}
-                        >
-                          <StickyNote className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(c)}
-                          className="text-xs text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
-                          title="Delete client"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </motion.tr>
-                );
-              })}
-            </tbody>
-          </table>
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => rejectDeletion(clientId)}
+                            className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex min-w-[300px] max-w-[560px] flex-wrap items-center gap-2">
+                          {PRODUCT_ADMIN.map((p) => (
+                            <select
+                              key={p.id}
+                              value={productPlans[p.id][clientId] ?? ''}
+                              onChange={(e) => setProductPlan(p, c, e.target.value)}
+                              aria-label={`${p.name} plan for ${c.name}`}
+                              title={p.name}
+                              className={`text-xs rounded-lg border px-2 py-1.5 bg-[#0b0a14] ${productPlans[p.id][clientId] ? 'border-violet-500/40 text-violet-300' : 'border-white/10 text-slate-500'}`}
+                            >
+                              <option value="">{p.short}: off</option>
+                              <option value="starter">{p.short}: Starter</option>
+                              <option value="pro">{p.short}: Pro</option>
+                              <option value="agency">{p.short}: Agency</option>
+                            </select>
+                          ))}
+                          <button
+                            onClick={() => toggleStatus(clientId)}
+                            className="text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/8"
+                          >
+                            {t('admin.toggle')}
+                          </button>
+                          <button
+                            onClick={() => openNotes(c)}
+                            className={`text-xs transition-colors p-1.5 rounded-lg border border-transparent hover:border-yellow-500/20 hover:bg-yellow-500/10 ${(c as any).adminNotes ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}`}
+                            title={(c as any).adminNotes ? 'Edit notes' : 'Add notes'}
+                          >
+                            <StickyNote className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget(c)}
+                            className="text-xs text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
+                            title="Delete client"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </motion.tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
