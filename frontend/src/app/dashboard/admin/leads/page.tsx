@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { m as motion } from 'framer-motion';
 import { leadsAPI } from '@/lib/api';
@@ -33,6 +33,16 @@ interface Lead {
 }
 
 const PAGE_SIZE = 30;
+
+// Phones get the card list only; the table (with per-row animation) is built
+// only on wider screens so a phone never renders both.
+const WIDE_QUERY = '(min-width: 768px)';
+const subscribeWide = (cb: () => void) => {
+  const mq = window.matchMedia(WIDE_QUERY);
+  mq.addEventListener('change', cb);
+  return () => mq.removeEventListener('change', cb);
+};
+const useWideScreen = () => useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE_QUERY).matches, () => false);
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   new:            { label: 'New',            color: '#6366f1' },
@@ -78,6 +88,7 @@ export default function AdminLeadsPage() {
   const [filterType,  setFilterType]  = useState<string>('all');
   const [filterStatus,setFilterStatus]= useState<string>('all');
   const [shownFor,    setShownFor]    = useState<{ key: string; n: number }>({ key: '', n: PAGE_SIZE });
+  const wide = useWideScreen();
   const [emailTarget, setEmailTarget] = useState<Lead | null>(null);
   const [dmTarget,    setDmTarget]    = useState<Lead | null>(null);
   const [emailSubject,setEmailSubject]= useState('');
@@ -416,8 +427,8 @@ export default function AdminLeadsPage() {
       )}
 
       {/* ── Leads: cards on phones ── */}
-      {filtered.length > 0 && (
-        <div className="space-y-3 md:hidden">
+      {!wide && filtered.length > 0 && (
+        <div className="space-y-3">
           {shown.map((lead) => (
             <LeadCard key={lead.id} lead={lead}
               onStatus={(s) => updateStatus(lead.id, s)}
@@ -428,8 +439,8 @@ export default function AdminLeadsPage() {
       )}
 
       {/* ── Leads table ── */}
-      {filtered.length > 0 && (
-        <div className="hidden md:block rounded-2xl overflow-hidden"
+      {wide && filtered.length > 0 && (
+        <div className="rounded-2xl overflow-hidden"
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
