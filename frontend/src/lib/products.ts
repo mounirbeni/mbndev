@@ -46,11 +46,11 @@ export const PRODUCTS: Product[] = [
   {
     slug: 'review-booster',
     name: 'MBN Review Booster',
-    tagline: 'Get more Google reviews — with a QR poster, a review link and messages ready to send.',
-    description: 'Each business gets a branded review page, a printable QR poster and review requests for WhatsApp and email in four languages, plus private feedback so you hear about problems first.',
+    tagline: 'Your Google reputation on autopilot — get more reviews, know about every new one, reply in seconds.',
+    description: 'Collect reviews with a QR poster and one-tap WhatsApp requests, get an alert for every new Google review, reply with AI-written drafts in the reviewer\'s language, and see your rating trend every week.',
     status: 'available',
     priceFrom: 37,
-    highlights: ['Branded review page + QR poster', 'WhatsApp & email requests in 4 languages', 'Private feedback, instant alerts', 'Visits & clicks tracking', 'No API keys, no monthly fee'],
+    highlights: ['Alert for every new Google review', 'AI-written replies in any language', 'Weekly rating summary', 'QR poster + WhatsApp review requests', 'Private feedback before bad reviews'],
     appUrl: '/review-booster',
   },
 ];

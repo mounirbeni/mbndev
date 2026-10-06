@@ -584,6 +584,8 @@ export type ReviewLanguage = 'en' | 'fr' | 'ar' | 'es';
 export interface ReviewBoosterAccount {
   plan: 'starter' | 'pro' | 'agency';
   businesses: { used: number; limit: number };
+  hasGoogleKey: boolean;
+  hasOpenaiKey: boolean;
 }
 export interface ReviewBusiness {
   id: string;
@@ -595,20 +597,33 @@ export interface ReviewBusiness {
   views: number;
   googleClicks: number;
   requestsSent: number;
+  placeId: string | null;
+  rating: number | null;
+  ratingCount: number | null;
+  monitoredAt: string | null;
+  monitorError: string | null;
   createdAt: string;
   _count?: { feedback: number };
 }
+export interface GoogleReview { id: string; author: string | null; rating: number; text: string | null; language: string | null; publishedAt: string | null; replyDraft: string | null; createdAt: string }
+export interface ReviewSnapshot { rating: number | null; ratingCount: number; createdAt: string }
+export interface PlaceResult { placeId: string; name: string; address: string | null; rating: number | null; reviews: number | null }
 export interface ReviewFeedback { id: string; rating: number | null; message: string; name: string | null; contact: string | null; createdAt: string }
 
 export const reviewBoosterAPI = {
   me:             ()                                       => api.get('/review-booster/me'),
+  saveSettings:   (data: { googleKey?: string; openaiKey?: string }) => api.put('/review-booster/settings', data),
   businesses:     ()                                       => api.get('/review-booster/businesses'),
   createBusiness: (data: { name: string; googleReviewUrl: string; language: ReviewLanguage }) => api.post('/review-booster/businesses', data),
   business:       (id: string)                             => api.get(`/review-booster/businesses/${id}`),
-  updateBusiness: (id: string, data: Partial<Pick<ReviewBusiness, 'name' | 'googleReviewUrl' | 'color' | 'language' | 'active'>>) => api.put(`/review-booster/businesses/${id}`, data),
+  updateBusiness: (id: string, data: Partial<Pick<ReviewBusiness, 'name' | 'googleReviewUrl' | 'color' | 'language' | 'active' | 'placeId'>>) => api.put(`/review-booster/businesses/${id}`, data),
   deleteBusiness: (id: string)                             => api.delete(`/review-booster/businesses/${id}`),
   markSent:       (id: string)                             => api.post(`/review-booster/businesses/${id}/sent`, {}),
   feedback:       (id: string)                             => api.get(`/review-booster/businesses/${id}/feedback`),
+  placeSearch:    (id: string, query: string)              => api.post(`/review-booster/businesses/${id}/place-search`, { query }),
+  checkNow:       (id: string)                             => api.post(`/review-booster/businesses/${id}/check`, {}, { timeout: 30000 }),
+  reviews:        (id: string)                             => api.get(`/review-booster/businesses/${id}/reviews`),
+  replyDraft:     (id: string, reviewId: string)           => api.post(`/review-booster/businesses/${id}/reviews/${reviewId}/reply`, {}, { timeout: 40000 }),
   adminAccounts:  ()                                       => api.get('/review-booster/admin/accounts'),
   adminSetAccess: (userId: string, plan: string | null)    => api.put('/review-booster/admin/access', { userId, plan }),
 };

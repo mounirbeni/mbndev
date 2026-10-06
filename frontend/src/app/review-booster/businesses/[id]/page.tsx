@@ -8,11 +8,12 @@ import QRCode from 'qrcode';
 import { ArrowLeft, Copy, Download, ExternalLink, Loader2, Mail, MessageCircle, Printer, Star, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useReviewBooster } from '@/components/review-booster/ReviewBoosterShell';
+import GoogleReviewsTab from '@/components/review-booster/GoogleReviewsTab';
 import { reviewBoosterAPI, type ReviewBusiness, type ReviewFeedback, type ReviewLanguage } from '@/lib/api';
 import { REVIEW_LANGUAGES, requestMessage, requestSubject } from '@/lib/reviewBooster';
 
-type Tab = 'share' | 'feedback' | 'setup';
-const TABS: [Tab, string][] = [['share', 'Share & ask'], ['feedback', 'Private feedback'], ['setup', 'Setup']];
+type Tab = 'share' | 'reviews' | 'feedback' | 'setup';
+const TABS: [Tab, string][] = [['share', 'Share & ask'], ['reviews', 'Google reviews'], ['feedback', 'Private feedback'], ['setup', 'Setup']];
 const errMsg = (err: unknown, fallback: string) =>
   (err as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback;
 const fieldCls = 'mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-amber-400/50 focus:outline-none';
@@ -167,6 +168,8 @@ export default function ReviewBusinessPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
       )}
+
+      {tab === 'reviews' && <GoogleReviewsTab business={business} onChange={(b) => fill({ ...b, _count: business._count })} />}
 
       {tab === 'feedback' && (
         <section className="mt-5 space-y-3">

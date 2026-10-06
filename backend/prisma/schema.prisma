@@ -613,9 +613,11 @@ model ReviewBoosterAccount {
   id        String   @id @default(cuid())
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan      String   @default("starter") // starter | pro | agency
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  plan         String   @default("starter") // starter | pro | agency
+  googleKeyEnc String?
+  openaiKeyEnc String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model ReviewBusiness {
@@ -630,9 +632,17 @@ model ReviewBusiness {
   views           Int              @default(0)
   googleClicks    Int              @default(0)
   requestsSent    Int              @default(0)
+  // Google monitoring (Places API, owner's key)
+  placeId         String?
+  rating          Float?
+  ratingCount     Int?
+  monitoredAt     DateTime?
+  monitorError    String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   feedback        ReviewFeedback[]
+  googleReviews   GoogleReview[]
+  snapshots       ReviewSnapshot[]
 
   @@index([userId])
 }
@@ -646,6 +656,36 @@ model ReviewFeedback {
   name       String?
   contact    String?
   createdAt  DateTime       @default(now())
+
+  @@index([businessId, createdAt])
+}
+
+/// A Google review seen while monitoring (Google returns up to 5 per check).
+model GoogleReview {
+  id          String         @id @default(cuid())
+  businessId  String
+  business    ReviewBusiness @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  googleId    String
+  author      String?
+  rating      Int
+  text        String?
+  language    String?
+  publishedAt DateTime?
+  replyDraft  String?
+  createdAt   DateTime       @default(now())
+
+  @@unique([businessId, googleId])
+  @@index([businessId, publishedAt])
+}
+
+/// Rating and review count at each monitoring check — the trend line.
+model ReviewSnapshot {
+  id          String         @id @default(cuid())
+  businessId  String
+  business    ReviewBusiness @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  rating      Float?
+  ratingCount Int
+  createdAt   DateTime       @default(now())
 
   @@index([businessId, createdAt])
 }

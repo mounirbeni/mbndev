@@ -1,36 +1,37 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Store, QrCode, Send, BellRing, Check, ArrowRight, Star, ShieldCheck, BadgeCheck } from 'lucide-react';
+import { QrCode, BellRing, Sparkles, LineChart, Check, ArrowRight, Star, ShieldCheck, BadgeCheck } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import { productQuestionWA } from '@/lib/products';
 
 export const metadata: Metadata = {
-  title: 'MBN Review Booster — Get more Google reviews',
-  description: 'A branded review page, a printable QR poster and ready-to-send WhatsApp & email review requests in four languages. Private feedback alerts. One-time price, no API keys.',
+  title: 'MBN Review Booster — Google review monitoring, AI replies & review collection',
+  description: 'Get an alert for every new Google review, reply with AI-written drafts, track your rating weekly — and collect more reviews with a QR poster and WhatsApp requests. One-time price.',
   alternates: { canonical: 'https://mbndev.ma/products/review-booster' },
   openGraph: {
     title: 'MBN Review Booster',
-    description: 'Get more Google reviews — with a QR poster, a review link and messages ready to send.',
+    description: 'Your Google reputation on autopilot — more reviews, instant alerts, AI replies.',
     url: 'https://mbndev.ma/products/review-booster',
     type: 'website',
   },
 };
 
 const STEPS = [
-  { icon: Store, title: 'Add the business', text: 'Paste its Google review link (or Place ID) and pick the customers’ language.' },
-  { icon: QrCode, title: 'Print the QR poster', text: 'A ready-to-print A4 poster for the counter, tables or reception — customers scan and review.' },
-  { icon: Send, title: 'Ask after every visit', text: 'One tap sends a friendly review request on WhatsApp or email, in English, French, Arabic or Spanish.' },
-  { icon: BellRing, title: 'Hear problems first', text: 'Unhappy customers can also message you privately — you get an instant notification and email.' },
+  { icon: BellRing, title: 'Know about every review', text: 'Your Google profile is checked every day. New review? You get an alert — and an email right away when it’s 3★ or less.' },
+  { icon: Sparkles, title: 'Reply in seconds', text: 'An AI-written reply in the reviewer’s language, specific to what they said. Edit, copy, post on Google.' },
+  { icon: LineChart, title: 'See the trend', text: 'Rating and review count over 7 and 30 days, plus a weekly summary by email every Monday.' },
+  { icon: QrCode, title: 'Get more reviews', text: 'QR poster for the counter, one-tap WhatsApp & email requests in 4 languages, and private feedback before a bad review.' },
 ];
 
 const PLANS = [
-  { id: 'starter', name: 'Starter', price: 37, features: ['1 business', 'Review page + QR poster', 'WhatsApp & email requests', 'Private feedback alerts', 'Visits & clicks tracking'] },
+  { id: 'starter', name: 'Starter', price: 37, features: ['1 business', 'New-review alerts + weekly summary', 'AI-written replies', 'QR poster + WhatsApp & email requests', 'Private feedback alerts'] },
   { id: 'pro', name: 'Pro', price: 67, featured: true, features: ['Everything in Starter', '5 businesses'] },
   { id: 'agency', name: 'Agency', price: 97, features: ['Everything in Pro', '25 businesses — one per client', 'No “Powered by” branding'] },
 ];
 
 const FAQ = [
-  { q: 'Do I need any API key or subscription?', a: 'No. Review Booster works with the free review link Google gives every business. Pay once, use it as long as you like.' },
+  { q: 'Why not just use Google\'s own review link?', a: 'Google gives you a link. Review Booster tells you the moment a new review lands, drafts the reply for you, shows whether your rating is going up or down, gets you more reviews with ready-to-send requests — and lets unhappy customers reach you privately first.' },
+  { q: 'Do I need API keys?', a: 'Collecting reviews needs none. Monitoring uses your own Google Places key (Google\'s free monthly allowance usually covers it) and AI replies use your OpenAI key (about a cent per hundred replies). Keys already saved in our other products are reused. No monthly fee to us.' },
   { q: 'Is it allowed by Google?', a: 'Yes. Every customer sees the same “Leave a review on Google” button — we never hide it from unhappy customers or filter who can review (“review gating”), which Google does not allow. Private feedback is just an extra option.' },
   { q: 'Can I use it for my clients?', a: 'Yes. The Agency plan covers 25 businesses without our branding — a simple service to sell to restaurants, riads, clinics and salons.' },
   { q: 'Does it send messages automatically?', a: 'You stay in control: one tap opens WhatsApp or your email with the message ready, so requests come from your own number or address — which customers trust more.' },
@@ -47,10 +48,10 @@ export default function ReviewBoosterProductPage() {
               <Star className="h-3 w-3" /> MBN Review Booster
             </span>
             <h1 className="mt-6 text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-              Turn happy customers into <span className="gradient-text">Google reviews</span>
+              Your Google reputation, <span className="gradient-text">on autopilot</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-400">
-              A review page, a QR poster and ready-to-send requests — so every satisfied customer leaves a review, and problems reach you privately first.
+              Know about every new Google review, reply in seconds with AI, and turn happy customers into more 5★ reviews — for one business or all your clients.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a href="#pricing" className="inline-flex items-center gap-2 rounded-full bg-[#ede6ff] px-6 py-3 text-sm font-semibold text-[#14092b] hover:bg-white">
@@ -75,7 +76,7 @@ export default function ReviewBoosterProductPage() {
 
       <section className="px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">More reviews in four steps</h2>
+          <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">What it does for you</h2>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map(({ icon: Icon, title, text }, i) => (
               <div key={title} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
@@ -94,7 +95,7 @@ export default function ReviewBoosterProductPage() {
           <BadgeCheck className="h-10 w-10 shrink-0 text-amber-300" />
           <div>
             <h2 className="text-xl font-bold text-white">Follows Google&apos;s rules</h2>
-            <p className="mt-1.5 text-slate-400">Every customer gets the same Google review button — nothing is filtered or hidden. No API keys, no monthly fee: it works with the free review link of any Google Business Profile.</p>
+            <p className="mt-1.5 text-slate-400">Every customer gets the same Google review button — nothing is filtered or hidden. Replies are drafted for you, but you approve and post them yourself. Pay once, no monthly fee.</p>
           </div>
         </div>
       </section>

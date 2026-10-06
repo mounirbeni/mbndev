@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Star, ArrowLeft, Loader2 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Star, Store, Settings, ArrowLeft, Loader2 } from 'lucide-react';
 import { reviewBoosterAPI, type ReviewBoosterAccount } from '@/lib/api';
 
 type Status = 'loading' | 'ready' | 'no-access' | 'error';
@@ -16,7 +17,13 @@ export function useReviewBooster() {
   return ctx;
 }
 
+const TABS = [
+  { href: '/review-booster',          label: 'Businesses', icon: Store    },
+  { href: '/review-booster/settings', label: 'Settings',   icon: Settings },
+];
+
 export default function ReviewBoosterShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const [status, setStatus] = useState<Status>('loading');
   const [account, setAccount] = useState<ReviewBoosterAccount | null>(null);
 
@@ -38,6 +45,19 @@ export default function ReviewBoosterShell({ children }: { children: ReactNode }
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-500"><Star className="h-4 w-4" /></span>
             <span className="hidden sm:inline">MBN Review Booster</span>
           </Link>
+          {status === 'ready' && (
+            <nav className="ml-2 flex items-center gap-1" aria-label="Review Booster">
+              {TABS.map(({ href, label, icon: Icon }) => {
+                const active = href === '/review-booster' ? pathname === href || pathname.startsWith('/review-booster/businesses') : pathname.startsWith(href);
+                return (
+                  <Link key={href} href={href} aria-current={active ? 'page' : undefined}
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition-colors ${active ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}>
+                    <Icon className="h-4 w-4" /><span className="hidden sm:inline">{label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
           <div className="ml-auto flex items-center gap-3 text-xs text-slate-400">
             {account && (
               <span className="hidden rounded-full border border-white/10 px-2.5 py-1 sm:inline">
