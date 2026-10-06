@@ -493,6 +493,8 @@ export const leadsAiAPI = {
   update:    (id: string, data: Partial<Pick<LeadsAiProspect, 'status' | 'notes' | 'message' | 'email'>>) => api.put(`/leads-ai/prospects/${id}`, data),
   remove:    (id: string)                                         => api.delete(`/leads-ai/prospects/${id}`),
   exportCsv: ()                                                   => api.get('/leads-ai/prospects/export', { responseType: 'blob' }),
+  adminAccounts:  ()                                              => api.get('/leads-ai/admin/accounts'),
+  adminSetAccess: (userId: string, plan: string | null)           => api.put('/leads-ai/admin/access', { userId, plan }),
 };
 
 export interface ActivityListParams {

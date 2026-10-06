@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { protect, authorize } = require('../middleware/auth');
 const c = require('../controllers/leadsAiController');
 
+router.get('/admin/accounts', protect, authorize('admin'), c.adminListAccounts);
 router.put('/admin/access', protect, authorize('admin'), c.adminSetAccess);
 
 router.use(protect, c.requireAccess);

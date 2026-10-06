@@ -1,4 +1,5 @@
 const prisma = require('../lib/prisma');
+const { notifyClient } = require('../lib/notifications');
 const { encrypt, decrypt } = require('../lib/leadsAi/crypto');
 const { searchPlaces, PlacesError } = require('../lib/leadsAi/places');
 const { auditWebsite } = require('../lib/leadsAi/audit');
@@ -236,19 +237,41 @@ exports.exportProspects = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// PUT /api/leads-ai/admin/access — { email, plan } (plan null revokes) — admin
+// GET /api/leads-ai/admin/accounts — who has which plan — admin
+exports.adminListAccounts = async (req, res, next) => {
+  try {
+    const accounts = await prisma.leadsAiAccount.findMany({ select: { userId: true, plan: true } });
+    res.json({ success: true, accounts });
+  } catch (err) { next(err); }
+};
+
+// PUT /api/leads-ai/admin/access — { userId | email, plan } (plan null revokes) — admin
 exports.adminSetAccess = async (req, res, next) => {
   try {
-    const email = String(req.body?.email || '').trim().toLowerCase();
     const plan = req.body?.plan ?? null;
     if (plan !== null && !PLANS.includes(plan)) return res.status(400).json({ success: false, message: `plan must be one of ${PLANS.join(', ')} or null` });
-    const user = await prisma.user.findUnique({ where: { email }, select: { id: true } });
-    if (!user) return res.status(404).json({ success: false, message: 'No user with that email.' });
+    const where = req.body?.userId
+      ? { id: String(req.body.userId) }
+      : { email: String(req.body?.email || '').trim().toLowerCase() };
+    const user = await prisma.user.findUnique({ where, select: { id: true } });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
     if (plan === null) {
       await prisma.leadsAiAccount.deleteMany({ where: { userId: user.id } });
       return res.json({ success: true, access: false });
     }
+    const existing = await prisma.leadsAiAccount.findUnique({ where: { userId: user.id }, select: { plan: true } });
     const account = await prisma.leadsAiAccount.upsert({ where: { userId: user.id }, create: { userId: user.id, plan }, update: { plan } });
+    if (!existing || existing.plan !== plan) {
+      const label = plan[0].toUpperCase() + plan.slice(1);
+      await notifyClient(user.id, {
+        type:    'status_update',
+        title:   existing ? `MBN Leads AI: you're now on ${label}` : 'MBN Leads AI is active on your account',
+        message: existing
+          ? `Your MBN Leads AI plan is now ${label}.`
+          : `Your ${label} plan is active. Open MBN Leads AI, add your Google key in Settings and run your first search.`,
+        link:    '/leads-ai',
+      }, { email: true });
+    }
     res.json({ success: true, access: true, account: publicAccount(account) });
   } catch (err) { next(err); }
 };
