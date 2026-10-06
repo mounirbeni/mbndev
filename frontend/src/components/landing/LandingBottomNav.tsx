@@ -5,7 +5,11 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { m as motion, AnimatePresence } from 'framer-motion';
-import { Home, Briefcase, DollarSign, Sparkles, LayoutGrid, MapPin, Mail, MessageCircle, ArrowUpRight, ShieldCheck, Zap } from 'lucide-react';
+import {
+  Home, Briefcase, DollarSign, Sparkles, LayoutGrid, MapPin, Mail, MessageCircle, ChevronRight, X,
+  FolderOpen, BookOpen, Info, Users, Globe, ShoppingBag, AppWindow, LayoutTemplate, Wrench, Shield, FileText,
+  type LucideIcon,
+} from 'lucide-react';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFooterLinks } from '@/components/landing/Footer';
@@ -155,129 +159,131 @@ export default function LandingBottomNav() {
       </div>
 
       {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>{moreOpen && <MoreSheet onClose={() => setMoreOn(null)} />}</AnimatePresence>,
+        <AnimatePresence>{moreOpen && <MoreSheet pathname={pathname} onClose={() => setMoreOn(null)} />}</AnimatePresence>,
         document.body,
       )}
     </nav>
   );
 }
 
-/** Phone-only sheet with the footer's links, contact and legal info. */
-function MoreSheet({ onClose }: { onClose: () => void }) {
+const PAGE_ICONS: Record<string, LucideIcon> = {
+  '/': Home, '/services': Briefcase, '/portfolio': FolderOpen, '/insights': BookOpen, '/products': Sparkles,
+  '/pricing': DollarSign, '/about': Info, '/contact': Mail, '/careers': Users,
+};
+const SERVICE_ICONS: LucideIcon[] = [Globe, ShoppingBag, AppWindow, LayoutTemplate, Wrench];
+
+/** One settings-style row: icon + label, optional trailing chevron. */
+function Row({ icon: Icon, label, href, external, active, onClick }: {
+  icon: LucideIcon | (() => React.JSX.Element); label: string; href?: string; external?: boolean; active?: boolean; onClick?: () => void;
+}) {
+  const inner = (
+    <>
+      <span className={`flex h-6 w-6 shrink-0 items-center justify-center ${active ? 'text-violet-300' : 'text-violet-300/70'}`}>
+        <Icon className="h-[22px] w-[22px]" strokeWidth={1.6} />
+      </span>
+      <span className={`flex-1 text-[15px] ${active ? 'font-semibold text-white' : 'text-slate-200'}`}>{label}</span>
+      {href && <ChevronRight className="h-4 w-4 text-slate-600" />}
+    </>
+  );
+  const cls = `flex items-center gap-5 px-5 py-3.5 transition-colors active:bg-white/[0.06] ${active ? 'bg-violet-500/[0.08]' : ''}`;
+  if (!href) return <div className={cls}>{inner}</div>;
+  return external
+    ? <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>{inner}</a>
+    : <Link href={href} onClick={onClick} aria-current={active ? 'page' : undefined} className={cls}>{inner}</Link>;
+}
+
+function Section({ title, children, first }: { title: string; children: React.ReactNode; first?: boolean }) {
+  return (
+    <section className={first ? '' : 'mt-2 border-t border-white/[0.08]'}>
+      <h2 className="px-5 pb-1 pt-5 text-[17px] font-semibold text-white">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+/** Phone-only full-screen menu with everything that is in the desktop footer. */
+function MoreSheet({ pathname, onClose }: { pathname: string; onClose: () => void }) {
   const { t } = useLanguage();
   const { quickLinks, serviceLinks, legalLinks, socialLinks, cityLinks } = useFooterLinks();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
   }, [onClose]);
 
-  const navBottom = 'calc(max(env(safe-area-inset-bottom, 0px), 10px) + 58px)';
-  const heading = 'text-[11px] font-semibold uppercase tracking-widest text-slate-500';
+  const isHere = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   return (
-    <>
-      <motion.div
-        key="more-backdrop"
-        className="lg:hidden fixed inset-0 z-[9985]"
-        style={{ background: 'rgba(0,0,0,0.6)' }}
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <motion.div
-        key="more-sheet"
-        role="dialog"
-        aria-label="More"
-        className="lg:hidden fixed inset-x-0 z-[9990] overflow-y-auto overscroll-contain rounded-t-3xl px-5 pb-6 pt-5"
-        style={{
-          bottom: navBottom,
-          maxHeight: `calc(100dvh - ${navBottom} - 64px)`,
-          background: '#0a0a10',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 -16px 60px rgba(0,0,0,0.6)',
-        }}
-        initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
-        transition={{ type: 'spring', damping: 30, stiffness: 320, mass: 0.8 }}
-      >
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15" />
+    <motion.div
+      role="dialog"
+      aria-modal="true"
+      aria-label="More"
+      className="lg:hidden fixed inset-0 z-[9990] flex flex-col"
+      style={{ background: '#08080b' }}
+      initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+      transition={{ type: 'spring', damping: 34, stiffness: 340, mass: 0.9 }}
+    >
+      {/* Header */}
+      <header className="flex shrink-0 items-center gap-4 border-b border-white/[0.06] px-3 pb-3" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)' }}>
+        <button type="button" onClick={onClose} aria-label="Close" className="flex h-11 w-11 items-center justify-center rounded-full text-slate-200 active:bg-white/[0.08]">
+          <X className="h-6 w-6" strokeWidth={1.8} />
+        </button>
+        <p className="text-[20px] font-semibold text-white">More</p>
+        <span className="ml-auto mr-2 h-2 w-2 rounded-full bg-gradient-to-br from-violet-400 to-blue-400 shadow-[0_0_10px_rgba(139,92,246,0.7)]" aria-hidden="true" />
+      </header>
 
-        <p className={heading}>{t('footer.nav')}</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
+      <div className="flex-1 overflow-y-auto overscroll-contain pb-10">
+        <Section title={t('footer.nav')} first>
           {quickLinks.map((l) => (
-            <Link key={l.href} href={l.href} onClick={onClose}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-sm text-slate-200 active:bg-white/[0.08]">
-              {l.label}
-            </Link>
+            <Row key={l.href} icon={PAGE_ICONS[l.href] ?? LayoutGrid} label={l.label} href={l.href} active={isHere(l.href)} onClick={onClose} />
           ))}
-        </div>
+        </Section>
 
-        <p className={`${heading} mt-6`}>{t('footer.services')}</p>
-        <ul className="mt-2 space-y-1">
-          {serviceLinks.map((l) => (
-            <li key={l.label}><Link href={l.href} onClick={onClose} className="block py-1.5 text-sm text-slate-400">{l.label}</Link></li>
+        <Section title={t('footer.services')}>
+          {serviceLinks.map((l, i) => (
+            <Row key={l.label} icon={SERVICE_ICONS[i] ?? Briefcase} label={l.label} href={l.href} onClick={onClose} />
           ))}
-        </ul>
+        </Section>
 
-        <p className={`${heading} mt-6`}>{t('footer.contact')}</p>
-        <ul className="mt-2 space-y-2 text-sm text-slate-400">
-          <li className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 shrink-0" />{t('footer.location')}</li>
-          <li className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 shrink-0" /><a href="mailto:contact@mbndev.ma">contact@mbndev.ma</a></li>
-        </ul>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-[#25D366]/20 bg-[#25D366]/10 px-3 py-2.5 text-xs font-semibold text-[#25D366]">
-            <MessageCircle className="h-3.5 w-3.5" />{t('footer.chat')}<ArrowUpRight className="h-3 w-3 opacity-60" />
-          </a>
-          <Link href="/contact" onClick={onClose}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-primary-500/15 bg-primary-500/8 px-3 py-2.5 text-xs font-semibold text-primary-400">
-            <Mail className="h-3.5 w-3.5" />{t('footer.email')}
-          </Link>
-        </div>
+        <Section title={t('footer.contact')}>
+          <Row icon={MessageCircle} label={t('footer.chat')} href="https://wa.me/212705914424" external />
+          <Row icon={Mail} label="contact@mbndev.ma" href="mailto:contact@mbndev.ma" external />
+          <Row icon={FileText} label={t('footer.email')} href="/contact" onClick={onClose} />
+          <Row icon={MapPin} label={t('footer.location')} />
+        </Section>
 
-        <div className="mt-6 flex items-center gap-3">
+        <Section title="Follow us">
           {socialLinks.map(({ href, label, Icon }) => (
-            <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-slate-400">
-              <Icon />
-            </a>
+            <Row key={label} icon={() => <Icon />} label={label} href={href} external />
           ))}
-        </div>
+        </Section>
 
-        <p className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-600">
-          <span>Serving:</span>
-          {cityLinks.map((c, i) => (
-            <span key={c.href} className="flex items-center gap-2">
-              {i > 0 && <span>·</span>}
-              <Link href={c.href} onClick={onClose} className="text-slate-500">{c.label}</Link>
-            </span>
+        <Section title="We work in">
+          {cityLinks.map((c) => (
+            <Row key={c.href} icon={MapPin} label={c.label} href={c.href} active={isHere(c.href)} onClick={onClose} />
           ))}
-        </p>
+        </Section>
 
-        <p className={`${heading} mt-6`}>{t('footer.payments')}</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {['PAYPAL', 'BANK TRANSFER', 'TAPTAPSEND'].map((p) => (
-            <span key={p} className="rounded border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-semibold tracking-wide text-slate-400">{p}</span>
+        <Section title="Legal">
+          {legalLinks.map((l, i) => (
+            <Row key={l.href} icon={i === 0 ? Shield : FileText} label={l.label} href={l.href} active={isHere(l.href)} onClick={onClose} />
           ))}
-        </div>
-        <ul className="mt-3 space-y-1.5 text-xs">
-          {[
-            { Icon: ShieldCheck, label: t('footer.secure'),   sub: 'End-to-end encrypted' },
-            { Icon: Zap,         label: t('footer.response'), sub: 'Guaranteed' },
-            { Icon: MapPin,      label: 'Morocco & Worldwide', sub: t('footer.remote') },
-          ].map(({ Icon, label, sub }) => (
-            <li key={label} className="flex items-center gap-1.5"><Icon className="h-3.5 w-3.5 shrink-0 text-primary-400" /><span className="font-semibold text-slate-400">{label}</span><span className="text-slate-600">— {sub}</span></li>
-          ))}
-        </ul>
+        </Section>
 
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-4 text-xs text-slate-600">
-          <span>© {new Date().getFullYear()} MBN DEV. {t('footer.rights')}</span>
-          <span className="flex gap-4">
-            {legalLinks.map((l) => <Link key={l.href} href={l.href} onClick={onClose} className="text-slate-500">{l.label}</Link>)}
-          </span>
+        <div className="mt-4 border-t border-white/[0.08] px-5 pt-5 text-xs text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600">{t('footer.payments')}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {['PAYPAL', 'BANK TRANSFER', 'TAPTAPSEND'].map((m) => (
+              <span key={m} className="rounded border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-semibold tracking-wide text-slate-400">{m}</span>
+            ))}
+          </div>
+          <p className="mt-4 leading-relaxed">{t('footer.secure')} · {t('footer.response')} · Morocco &amp; Worldwide</p>
+          <p className="mt-3 text-slate-600">© {new Date().getFullYear()} MBN DEV. {t('footer.rights')}</p>
         </div>
-      </motion.div>
-    </>
+      </div>
+    </motion.div>
   );
 }
