@@ -19,6 +19,8 @@ export default function DebugOverlay() {
     if (q.has('nowill'))   css.push('.layout-frame{will-change:auto!important;transition:none!important}');
     if (q.has('noiso'))    css.push('main{isolation:auto!important}');
     if (q.has('notouch'))  css.push('.inertial-scroll{-webkit-overflow-scrolling:auto!important}');
+    if (q.has('gpu'))      css.push('main > div:last-child{transform:translateZ(0)!important}');
+    if (q.has('nofix'))    css.push('main > div:last-child{position:static!important;z-index:auto!important}');
     if (q.has('short'))    css.push('main article:nth-of-type(n+6){display:none!important}');
     if (css.length) {
       const el = document.createElement('style');

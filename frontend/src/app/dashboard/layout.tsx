@@ -223,7 +223,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="p-4 lg:p-6 min-h-full"
+              /* relative z-0: its own layer above the silk backdrop — without it
+                 iPhone Safari painted the WebGL ribbons over plain page content. */
+              className="relative z-0 p-4 lg:p-6 min-h-full"
             >
               <ErrorBoundary scope="Dashboard" resetLabel="Reload section">
                 {children}
