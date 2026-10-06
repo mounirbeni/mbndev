@@ -58,6 +58,7 @@ export default function Footer() {
     { label: t('nav.home'),      href: '/'          },
     { label: t('nav.services'),  href: '/services'  },
     { label: t('nav.portfolio'), href: '/portfolio' },
+    { label: 'Insights',         href: '/insights'  },
     { label: 'Products',         href: '/products'  },
     { label: t('nav.pricing'),   href: '/pricing'   },
     { label: t('nav.about'),     href: '/about'     },
