@@ -18,7 +18,7 @@ export const PRODUCTS: Product[] = [
     name: 'MBN Leads AI',
     tagline: 'Find businesses that need your service — and know exactly what to say to them.',
     description: 'Search any niche in any city, get every business audited automatically, see who needs you most with an opportunity score, and send a personalised message in one click.',
-    status: 'early-access',
+    status: 'available',
     priceFrom: 37,
     highlights: ['Business search worldwide', 'Automatic website audit', 'Opportunity score 0–100', 'AI-written outreach', 'Built-in lead tracker'],
     appUrl: '/leads-ai',
@@ -31,5 +31,5 @@ export const STATUS_LABEL: Record<Product['status'], string> = {
   'coming-soon': 'Coming soon',
 };
 
-export const EARLY_ACCESS_WA = (product: string) =>
-  `https://wa.me/212705914424?text=${encodeURIComponent(`Hi Mounir, I'd like early access to ${product}.`)}`;
+export const productQuestionWA = (product: string) =>
+  `https://wa.me/212705914424?text=${encodeURIComponent(`Hi Mounir, I have a question about ${product}.`)}`;

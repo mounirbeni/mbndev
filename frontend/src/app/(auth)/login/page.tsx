@@ -5,6 +5,7 @@ import { m as motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { CountUpText } from '@/components/ui/CountUp';
 import { useRouter } from 'next/navigation';
+import { safeNext } from '@/lib/safeNext';
 import {
   Mail, Lock, ArrowRight, Eye, EyeOff, ChevronLeft,
   AlertCircle, ShieldAlert, Loader2, XCircle, Sparkles,
@@ -267,13 +268,6 @@ function LeftPanel() {
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
-
-/** `?next=` target after sign-in — same-site paths only (no open redirect). */
-function safeNext(): string | null {
-  if (typeof window === 'undefined') return null;
-  const next = new URLSearchParams(window.location.search).get('next');
-  return next && next.startsWith('/') && !next.startsWith('//') && !next.includes('\\') ? next : null;
-}
 
 export default function LoginPage() {
   const [email,        setEmail]        = useState('');

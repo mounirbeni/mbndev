@@ -20,7 +20,8 @@
 const { Prisma } = require('@prisma/client');
 const prisma = require('../lib/prisma');
 const { fmt } = require('../lib/format');
-const { notify, notifyAdmins, logActivity } = require('../lib/notifications');
+const { notify, notifyClient, notifyAdmins, logActivity } = require('../lib/notifications');
+const { parseProduct, higherPlan } = require('../lib/productCatalog');
 const { SM }   = require('../lib/systemMessages');
 const { sendEmail, templates } = require('../lib/email');
 const { telegram }   = require('../lib/telegram');
@@ -51,6 +52,66 @@ const SERVICE_TYPE_LABELS = {
  * Auto-create a Project from a paid Order.
  * MUST be called inside a Prisma $transaction — tx is required.
  */
+/**
+ * Approve a payment for a software product order ("leads-ai:pro"): mark the
+ * payment and order paid and grant/upgrade the licence in one transaction,
+ * then tell the client. The payment is already locked in "processing".
+ */
+async function activateProductOrder(req, res, payment, { ip, ua, prePayment }) {
+  const id = payment.id;
+  const product = parseProduct(payment.order.product);
+  try {
+    if (!product) throw new Error(`Unknown product "${payment.order.product}"`);
+    await prisma.$transaction(async (tx) => {
+      await tx.payment.update({ where: { id }, data: { status: 'paid', paidAt: new Date() } });
+      await tx.order.update({ where: { id: payment.order.id }, data: { status: 'paid' } });
+      if (product.productId === 'leads-ai') {
+        const current = await tx.leadsAiAccount.findUnique({ where: { userId: payment.clientId }, select: { plan: true } });
+        const plan = higherPlan(current?.plan, product.plan);
+        await tx.leadsAiAccount.upsert({
+          where:  { userId: payment.clientId },
+          create: { userId: payment.clientId, plan },
+          update: { plan },
+        });
+      }
+    });
+  } catch (txErr) {
+    await prisma.payment.updateMany({ where: { id, status: 'processing' }, data: { status: 'pending_verification' } }).catch(() => {});
+    throw txErr;
+  }
+
+  logPaymentEvent({
+    paymentId: id, actorId: req.user.id, actorRole: 'admin',
+    event: 'approved', fromStatus: 'pending_verification', toStatus: 'paid',
+    note: `Product activated: ${product.key} | Order: ${payment.orderId}`,
+    metadata: { product: product.key, amount: payment.amount, method: payment.method },
+    ip,
+  }).catch(() => {});
+  logAdminAction({
+    adminId: req.user.id, action: 'approve_payment',
+    targetType: 'payment', targetId: id,
+    before: { status: 'pending_verification', amount: prePayment.amount, externalRef: prePayment.externalRef },
+    after:  { status: 'paid', product: product.key, paidAt: new Date().toISOString() },
+    ip, userAgent: ua,
+  }).catch(() => {});
+
+  await notifyClient(payment.clientId, {
+    type:    'payment_received',
+    title:   `Payment verified — ${product.name} is active`,
+    message: `Your payment for ${product.title} was verified. Open ${product.name}, add your Google key in Settings and run your first search.`,
+    link:    '/leads-ai',
+    metadata: { orderId: payment.orderId, product: product.key },
+  }, { email: true });
+
+  const paidPayment = await prisma.payment.findUnique({ where: { id } });
+  await sendEmail({
+    to: payment.client.email,
+    ...templates.invoiceEmail({ client: payment.client, payment: { ...paidPayment, _id: id }, order: payment.order, project: null }),
+  }).catch(() => {});
+
+  return res.json({ success: true, payment: fmt(paidPayment), project: null, product: product.key });
+}
+
 async function createProjectFromOrder(order, tx) {
   const project = await tx.project.create({
     data: {
@@ -520,6 +581,11 @@ exports.approveManualPayment = async (req, res, next) => {
       });
     }
 
+    // ── Software product order: activate the licence instead of a project ────
+    if (payment.order.product) {
+      return activateProductOrder(req, res, payment, { ip, ua, prePayment });
+    }
+
     // ── Atomic: create project + mark order paid + mark payment paid ──────────
     let project;
     try {
@@ -780,6 +846,8 @@ exports.mockPayment = async (req, res, next) => {
 
     const order = await prisma.order.findUnique({ where: { id: orderId } });
     if (!order) return res.status(404).json({ success: false, message: 'Order not found.' });
+    if (order.product)
+      return res.status(400).json({ success: false, message: 'Mock payments create projects; use a manual payment for product orders.' });
     if (order.status !== 'pending')
       return res.status(400).json({ success: false, message: 'Order is not pending.' });
 

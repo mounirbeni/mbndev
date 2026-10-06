@@ -147,8 +147,12 @@ export default function ClientOrdersPage() {
                         <div>
                           <h3 className="text-white font-semibold text-sm truncate">{order.title}</h3>
                           <p className="text-slate-500 text-xs mt-0.5">
-                            {SERVICE_LABELS[order.serviceType] || order.serviceType} ·{' '}
-                            {order.deliveryDays}{t('common.days')} · {order.features?.length || 0} {t('common.features')}
+                            {order.product ? 'Software licence' : (
+                              <>
+                                {SERVICE_LABELS[order.serviceType] || order.serviceType} ·{' '}
+                                {order.deliveryDays}{t('common.days')} · {order.features?.length || 0} {t('common.features')}
+                              </>
+                            )}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
@@ -171,6 +175,12 @@ export default function ClientOrdersPage() {
                             className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1"
                           >
                             {t('orders.viewProject')} <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        )}
+
+                        {order.product?.startsWith('leads-ai') && order.status === 'paid' && (
+                          <Link href="/leads-ai" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+                            Open MBN Leads AI <ArrowRight className="w-3 h-3" />
                           </Link>
                         )}
 

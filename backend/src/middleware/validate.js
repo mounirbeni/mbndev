@@ -157,8 +157,10 @@ const VALID_SERVICES = ['website', 'ecommerce', 'dashboard', 'mobile', 'custom']
 const VALID_PLANS    = ['starter', 'pro', 'premium', 'custom'];
 
 const createOrderRules = [
-  body('serviceType').isIn(VALID_SERVICES).withMessage('Invalid service type.'),
-  body('title').trim().isLength({ min: 3, max: 200 }).withMessage('Title must be 3–200 characters.'),
+  // Product orders ("leads-ai:pro") carry no project fields.
+  body('product').optional().isString().isLength({ max: 50 }),
+  body('serviceType').if(body('product').not().exists()).isIn(VALID_SERVICES).withMessage('Invalid service type.'),
+  body('title').if(body('product').not().exists()).trim().isLength({ min: 3, max: 200 }).withMessage('Title must be 3–200 characters.'),
   body('description').optional().trim().isLength({ max: 5000 }),
   body('pages').optional().isInt({ min: 1, max: 100 }),
   body('features').optional().isArray({ max: 20 }),

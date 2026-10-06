@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { safeNext } from '@/lib/safeNext';
 import {
   Mail, Lock, User, Building2, Phone, ArrowRight,
   Eye, EyeOff, ChevronLeft, CheckCircle2, XCircle,
@@ -287,7 +288,7 @@ export default function SignupPage() {
       haptic('success');
       trackEvent('sign_up');
       toast.success('Welcome to MBN DEV!');
-      router.push('/dashboard/client');
+      router.push(safeNext() ?? '/dashboard/client');
     } catch (err: any) {
       haptic('error');
       const data = err?.response?.data;

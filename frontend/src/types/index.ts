@@ -172,6 +172,8 @@ export interface Order {
   addons: string[];
   totalPrice: number;
   discountPct?: number | null;
+  /** Software product order ("leads-ai:pro"); null for project orders. */
+  product?: string | null;
   deliveryDays: number;
   notes?: string;
   status: 'pending' | 'paid' | 'cancelled';

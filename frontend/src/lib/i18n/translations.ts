@@ -710,7 +710,7 @@ const en: Dict = {
   'checkout.txRef':            'Transaction reference',
   'checkout.txRefHint':        '(optional but speeds up verification)',
   'checkout.done.title':       'Payment submitted',
-  'checkout.done.sub1':        'We received your payment notification. We\'ll verify it and activate your project within a few hours — usually faster.',
+  'checkout.done.sub1':        'We received your payment notification. We\'ll verify it and activate your order within a few hours — usually faster.',
   'checkout.done.sub2':        'You\'ll get a notification (and an email if configured) the moment it\'s confirmed.',
   'checkout.done.viewOrders':  'View my orders',
   'checkout.done.whatsApp':    'Contact on WhatsApp',

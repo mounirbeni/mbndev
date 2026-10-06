@@ -3,6 +3,7 @@ const { fmt } = require('../lib/format');
 const { notifyAdmins, notifyClient } = require('../lib/notifications');
 const { calculatePrice, VALID_PLANS } = require('../lib/pricing');
 const { verifyOffer, applyDiscount } = require('../lib/offers');
+const { parseProduct } = require('../lib/productCatalog');
 const { sendEmail, templates } = require('../lib/email');
 const { telegram } = require('../lib/telegram');
 const { assertOrderTransition, ACTIVE_PAYMENT_STATUSES } = require('../lib/orderGuard');
@@ -28,9 +29,50 @@ async function assertNoActivePayment(orderId) {
   }
 }
 
+// Software product order ("leads-ai:pro"): fixed server-side price, no
+// project fields. Re-uses the client's open order for the same product.
+async function createProductOrder(req, res, product) {
+  const existing = await prisma.order.findFirst({
+    where: { clientId: req.user.id, product: product.key, status: 'pending' },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (existing) return res.status(200).json({ success: true, order: fmt(existing) });
+
+  const order = await prisma.order.create({
+    data: {
+      clientId:     req.user.id,
+      serviceType:  'custom',
+      title:        product.title,
+      description:  `${product.name} licence (${product.plan} plan), activated as soon as the payment is verified.`,
+      pages:        0,
+      features:     [],
+      addons:       [],
+      totalPrice:   product.price,
+      deliveryDays: 0,
+      product:      product.key,
+    },
+  });
+
+  await notifyAdmins({
+    type:    'order_placed',
+    title:   'New Product Order',
+    message: `${req.user.name} ordered ${product.title} ($${product.price}).`,
+    link:    `/dashboard/admin/orders/${order.id}`,
+    metadata: { orderId: order.id, clientId: req.user.id, product: product.key },
+  });
+
+  res.status(201).json({ success: true, order: fmt(order) });
+}
+
 // POST /api/orders — Create a new order (client)
 exports.createOrder = async (req, res, next) => {
   try {
+    if (req.body?.product !== undefined) {
+      const product = parseProduct(req.body.product);
+      if (!product) return res.status(400).json({ success: false, message: 'Unknown product.' });
+      return await createProductOrder(req, res, product);
+    }
+
     const {
       serviceType, title, description, pages, features, addons, notes,
       designStyle, designColors, designRefs, plan, offerToken,
@@ -179,6 +221,7 @@ exports.updateOrder = async (req, res, next) => {
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
     if (order.clientId !== req.user.id) return res.status(403).json({ success: false, message: 'Not authorized' });
     if (order.status !== 'pending') return res.status(400).json({ success: false, message: 'Only pending orders can be modified' });
+    if (order.product) return res.status(400).json({ success: false, message: 'Product orders have a fixed price and cannot be edited.' });
 
     // A payment already submitted against this order locks its price/contents —
     // editing it here would silently invalidate the amount the client already

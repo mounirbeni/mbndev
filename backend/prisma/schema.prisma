@@ -87,6 +87,9 @@ model Order {
   // Personal offer (lib/offers.js) applied at creation, as a percentage.
   // Null = no offer. Re-applied when a pending order is edited.
   discountPct  Int?
+  // Software product orders ("leads-ai:pro"): paying activates the product
+  // instead of creating a Project. Null for every project order.
+  product      String?
   designStyle  String?
   designColors String[]
   designRefs   String[]

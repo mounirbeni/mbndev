@@ -195,6 +195,9 @@ export default function CheckoutPage() {
       {order.project && (
         <Link href={`/dashboard/client/projects/${order.project.id}`}><Button>{t('checkout.viewProject')} →</Button></Link>
       )}
+      {order.product?.startsWith('leads-ai') && (
+        <Link href="/leads-ai"><Button>Open MBN Leads AI →</Button></Link>
+      )}
     </div>
   );
 
@@ -280,7 +283,7 @@ export default function CheckoutPage() {
               </div>
               <div>
                 <h1 className="text-white font-bold text-lg leading-tight">{order.title}</h1>
-                <p className="text-slate-500 text-sm">{getProjectTypeLabel(order.serviceType, t)}</p>
+                <p className="text-slate-500 text-sm">{order.product ? 'Software licence · one-time payment' : getProjectTypeLabel(order.serviceType, t)}</p>
               </div>
             </div>
 
@@ -304,11 +307,18 @@ export default function CheckoutPage() {
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-white/5">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <Clock className="w-3.5 h-3.5 text-primary-400" />
-                {t('checkout.estDelivery')}: <span className="text-slate-300">{order.deliveryDays} {t('checkout.businessDays')}</span>
-              </div>
-              {!pendingPayment && (
+              {order.product ? (
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Clock className="w-3.5 h-3.5 text-primary-400" />
+                  Activated as soon as your payment is verified
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Clock className="w-3.5 h-3.5 text-primary-400" />
+                  {t('checkout.estDelivery')}: <span className="text-slate-300">{order.deliveryDays} {t('checkout.businessDays')}</span>
+                </div>
+              )}
+              {!pendingPayment && !order.product && (
                 <button
                   onClick={() => setEditing((v) => !v)}
                   className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/6 border border-transparent hover:border-white/10"

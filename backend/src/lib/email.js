@@ -595,14 +595,18 @@ const templates = {
             ['Amount',     amountFmt, { bold: true, color: isPaid ? T.green : T.purpleLight }],
           ]),
           isPaid
-            ? notice(`Payment of <strong style="color:${T.green};">${amountFmt}</strong> confirmed. All source code and assets will be delivered upon project completion.`, { type: 'success' })
+            ? notice(order?.product
+              ? `Payment of <strong style="color:${T.green};">${amountFmt}</strong> confirmed. Your licence is active.`
+              : `Payment of <strong style="color:${T.green};">${amountFmt}</strong> confirmed. All source code and assets will be delivered upon project completion.`, { type: 'success' })
             : notice(`To complete your payment, visit your client portal and follow the payment instructions. Contact us if you need assistance.`, { type: 'info' }),
-          ctaButton(
-            isPaid ? 'Open my project →' : 'View my portal →',
-            isPaid && project?.id
-              ? `${APP_URL}/dashboard/client/projects/${project.id}`
-              : `${APP_URL}/dashboard/client/payments`
-          ),
+          isPaid && order?.product
+            ? ctaButton('Open MBN Leads AI →', `${APP_URL}/leads-ai`)
+            : ctaButton(
+              isPaid ? 'Open my project →' : 'View my portal →',
+              isPaid && project?.id
+                ? `${APP_URL}/dashboard/client/projects/${project.id}`
+                : `${APP_URL}/dashboard/client/payments`
+            ),
           textBlock(`View or print your invoice at any time from your <a href="${APP_URL}/invoice/${payment._id || payment.id}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">client portal →</a>`, { mt: '0' }),
         ].join(''),
         footer: `This invoice was sent to ${e(client.email)} for services provided by MBN DEV.`,

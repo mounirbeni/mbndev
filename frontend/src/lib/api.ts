@@ -354,6 +354,8 @@ export const projectAPI = {
 
 export const orderAPI = {
   create:   (data: CreateOrderPayload)      => api.post('/orders', data),
+  /** Software product order, e.g. "leads-ai:pro" — priced by the server. */
+  buyProduct: (product: string)             => api.post('/orders', { product }),
   getAll:   (params?: OrderListParams)      => api.get('/orders', { params }),
   getOne:   (id: string)                    => api.get(`/orders/${id}`),
   update:   (id: string, data: UpdateOrderPayload) => api.put(`/orders/${id}`, data),

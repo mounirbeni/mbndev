@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import ScoreBadge from '@/components/leads-ai/ScoreBadge';
-import { EARLY_ACCESS_WA } from '@/lib/products';
+import { productQuestionWA } from '@/lib/products';
 
 export const metadata: Metadata = {
   title: 'MBN Leads AI — Find clients who need your services',
@@ -50,7 +50,7 @@ const FAQ = [
 ];
 
 export default function LeadsAiProductPage() {
-  const wa = EARLY_ACCESS_WA('MBN Leads AI');
+  const wa = productQuestionWA('MBN Leads AI');
   return (
     <PublicLayout>
       {/* Hero */}
@@ -58,7 +58,7 @@ export default function LeadsAiProductPage() {
         <div className="mx-auto max-w-5xl text-center">
           <div className="hero-enter">
             <span className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-300">
-              <Sparkles className="h-3 w-3" /> MBN Leads AI · Early access
+              <Sparkles className="h-3 w-3" /> MBN Leads AI
             </span>
             <h1 className="mt-6 text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
               Find businesses that <span className="gradient-text">need your service</span>
@@ -67,8 +67,8 @@ export default function LeadsAiProductPage() {
               …and know exactly what to say to them. Search any niche in any city, get every website audited, see who needs you most and send a personalised message in one click.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#ede6ff] px-6 py-3 text-sm font-semibold text-[#14092b] hover:bg-white">
-                Get early access <ArrowRight className="h-4 w-4" />
+              <a href="#pricing" className="inline-flex items-center gap-2 rounded-full bg-[#ede6ff] px-6 py-3 text-sm font-semibold text-[#14092b] hover:bg-white">
+                See plans &amp; buy <ArrowRight className="h-4 w-4" />
               </a>
               <Link href="/leads-ai" className="rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-slate-200 hover:border-white/30">
                 I have access — open the app
@@ -146,14 +146,14 @@ export default function LeadsAiProductPage() {
                 <ul className="mt-6 flex-1 space-y-2.5">
                   {p.features.map((f) => <li key={f} className="flex items-start gap-2 text-sm text-slate-300"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-400" />{f}</li>)}
                 </ul>
-                <a href={wa} target="_blank" rel="noopener noreferrer" className={`mt-7 rounded-full px-5 py-3 text-center text-sm font-semibold ${p.featured ? 'bg-[#ede6ff] text-[#14092b] hover:bg-white' : 'border border-white/15 text-slate-200 hover:border-white/30'}`}>
-                  Get early access
-                </a>
+                <Link href={`/products/leads-ai/buy?plan=${p.name.toLowerCase()}`} className={`mt-7 rounded-full px-5 py-3 text-center text-sm font-semibold ${p.featured ? 'bg-[#ede6ff] text-[#14092b] hover:bg-white' : 'border border-white/15 text-slate-200 hover:border-white/30'}`}>
+                  Buy {p.name} — ${p.price}
+                </Link>
               </div>
             ))}
           </div>
           <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-slate-500">
-            <ShieldCheck className="h-3.5 w-3.5" /> Early access is opening gradually — message us and we&apos;ll set up your account.
+            <ShieldCheck className="h-3.5 w-3.5" /> Pay by bank transfer, PayPal or TapTapSend — your tool is activated as soon as the payment is verified. Questions? <a href={wa} target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-300">Chat on WhatsApp</a>
           </p>
         </div>
       </section>

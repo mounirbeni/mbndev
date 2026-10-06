@@ -192,6 +192,8 @@ async function detectOrphanedPaid(report) {
         status:    'paid',
         projectId: null,
         orderId:   { not: null },
+        // Product orders (MBN Leads AI…) never get a project by design.
+        order:     { is: { product: null } },
       },
       include: {
         order:  { select: { id: true, title: true, status: true } },
