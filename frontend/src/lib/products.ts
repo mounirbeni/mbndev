@@ -43,6 +43,16 @@ export const PRODUCTS: Product[] = [
     highlights: ['Learns your website automatically', 'Answers in the visitor\'s language', 'Captures leads (email / phone)', 'WhatsApp hand-off', 'One-line install on any site'],
     appUrl: '/support-ai',
   },
+  {
+    slug: 'review-booster',
+    name: 'MBN Review Booster',
+    tagline: 'Get more Google reviews — with a QR poster, a review link and messages ready to send.',
+    description: 'Each business gets a branded review page, a printable QR poster and review requests for WhatsApp and email in four languages, plus private feedback so you hear about problems first.',
+    status: 'available',
+    priceFrom: 37,
+    highlights: ['Branded review page + QR poster', 'WhatsApp & email requests in 4 languages', 'Private feedback, instant alerts', 'Visits & clicks tracking', 'No API keys, no monthly fee'],
+    appUrl: '/review-booster',
+  },
 ];
 
 export const STATUS_LABEL: Record<Product['status'], string> = {

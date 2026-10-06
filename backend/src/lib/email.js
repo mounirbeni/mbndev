@@ -600,7 +600,7 @@ const templates = {
               : `Payment of <strong style="color:${T.green};">${amountFmt}</strong> confirmed. All source code and assets will be delivered upon project completion.`, { type: 'success' })
             : notice(`To complete your payment, visit your client portal and follow the payment instructions. Contact us if you need assistance.`, { type: 'info' }),
           isPaid && order?.product
-            ? ctaButton(`Open ${({ 'leads-ai': 'MBN Leads AI', 'local-growth': 'MBN Local Growth', 'support-ai': 'MBN Support AI' })[order.product.split(':')[0]] || 'your product'} →`, `${APP_URL}/${order.product.split(':')[0]}`)
+            ? ctaButton(`Open ${({ 'leads-ai': 'MBN Leads AI', 'local-growth': 'MBN Local Growth', 'support-ai': 'MBN Support AI', 'review-booster': 'MBN Review Booster' })[order.product.split(':')[0]] || 'your product'} →`, `${APP_URL}/${order.product.split(':')[0]}`)
             : ctaButton(
               isPaid ? 'Open my project →' : 'View my portal →',
               isPaid && project?.id

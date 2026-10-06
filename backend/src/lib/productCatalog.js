@@ -23,6 +23,13 @@ const PRODUCTS = {
     path:  '/support-ai',
     firstStep: 'add your OpenAI key in Settings and create your first assistant',
   },
+  'review-booster': {
+    name:  'MBN Review Booster',
+    plans: { starter: 37, pro: 67, agency: 97 },
+    model: 'reviewBoosterAccount',
+    path:  '/review-booster',
+    firstStep: 'add your business and print its QR poster',
+  },
 };
 
 const PLAN_RANK = { starter: 1, pro: 2, agency: 3 };

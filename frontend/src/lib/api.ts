@@ -579,6 +579,40 @@ export const supportAiAPI = {
   adminSetAccess: (userId: string, plan: string | null)    => api.put('/support-ai/admin/access', { userId, plan }),
 };
 
+// ─── MBN Review Booster (product) ─────────────────────────────────────────────
+export type ReviewLanguage = 'en' | 'fr' | 'ar' | 'es';
+export interface ReviewBoosterAccount {
+  plan: 'starter' | 'pro' | 'agency';
+  businesses: { used: number; limit: number };
+}
+export interface ReviewBusiness {
+  id: string;
+  name: string;
+  googleReviewUrl: string;
+  color: string;
+  language: ReviewLanguage;
+  active: boolean;
+  views: number;
+  googleClicks: number;
+  requestsSent: number;
+  createdAt: string;
+  _count?: { feedback: number };
+}
+export interface ReviewFeedback { id: string; rating: number | null; message: string; name: string | null; contact: string | null; createdAt: string }
+
+export const reviewBoosterAPI = {
+  me:             ()                                       => api.get('/review-booster/me'),
+  businesses:     ()                                       => api.get('/review-booster/businesses'),
+  createBusiness: (data: { name: string; googleReviewUrl: string; language: ReviewLanguage }) => api.post('/review-booster/businesses', data),
+  business:       (id: string)                             => api.get(`/review-booster/businesses/${id}`),
+  updateBusiness: (id: string, data: Partial<Pick<ReviewBusiness, 'name' | 'googleReviewUrl' | 'color' | 'language' | 'active'>>) => api.put(`/review-booster/businesses/${id}`, data),
+  deleteBusiness: (id: string)                             => api.delete(`/review-booster/businesses/${id}`),
+  markSent:       (id: string)                             => api.post(`/review-booster/businesses/${id}/sent`, {}),
+  feedback:       (id: string)                             => api.get(`/review-booster/businesses/${id}/feedback`),
+  adminAccounts:  ()                                       => api.get('/review-booster/admin/accounts'),
+  adminSetAccess: (userId: string, plan: string | null)    => api.put('/review-booster/admin/access', { userId, plan }),
+};
+
 export interface ActivityListParams {
   page?:  number;
   limit?: number;

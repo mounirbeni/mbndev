@@ -42,6 +42,8 @@ model User {
   localGrowthReports LocalGrowthReport[]
   supportAiAccount   SupportAiAccount?
   supportBots        SupportBot[]
+  reviewBoosterAccount ReviewBoosterAccount?
+  reviewBusinesses     ReviewBusiness[]
 
   @@index([email])
   @@index([role, isActive])
@@ -603,4 +605,47 @@ model SupportLead {
   createdAt      DateTime   @default(now())
 
   @@index([botId, createdAt])
+}
+
+// ─── MBN Review Booster (product) ───────────────────────────────────────────
+
+model ReviewBoosterAccount {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan      String   @default("starter") // starter | pro | agency
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReviewBusiness {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  googleReviewUrl String
+  color           String           @default("#7c3aed")
+  language        String           @default("en") // en | fr | ar | es
+  active          Boolean          @default(true)
+  views           Int              @default(0)
+  googleClicks    Int              @default(0)
+  requestsSent    Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  feedback        ReviewFeedback[]
+
+  @@index([userId])
+}
+
+model ReviewFeedback {
+  id         String         @id @default(cuid())
+  businessId String
+  business   ReviewBusiness @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  rating     Int?
+  message    String
+  name       String?
+  contact    String?
+  createdAt  DateTime       @default(now())
+
+  @@index([businessId, createdAt])
 }
