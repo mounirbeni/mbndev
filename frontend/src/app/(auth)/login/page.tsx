@@ -268,6 +268,13 @@ function LeftPanel() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+/** `?next=` target after sign-in — same-site paths only (no open redirect). */
+function safeNext(): string | null {
+  if (typeof window === 'undefined') return null;
+  const next = new URLSearchParams(window.location.search).get('next');
+  return next && next.startsWith('/') && !next.startsWith('//') && !next.includes('\\') ? next : null;
+}
+
 export default function LoginPage() {
   const [email,        setEmail]        = useState('');
   const [password,     setPassword]     = useState('');
@@ -291,7 +298,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (mounted && user) {
-      router.push(user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
+      router.push(safeNext() ?? (user.role === 'admin' ? '/dashboard/admin' : '/dashboard/client'));
     }
   }, [mounted, user, router]);
 
@@ -320,7 +327,7 @@ export default function LoginPage() {
       // Use AuthContext user after login resolves — avoids localStorage race condition
       const stored = JSON.parse(localStorage.getItem('mbndev_user') || '{}');
       const role = stored.role ?? 'client';
-      router.push(role === 'admin' ? '/dashboard/admin' : '/dashboard/client');
+      router.push(safeNext() ?? (role === 'admin' ? '/dashboard/admin' : '/dashboard/client'));
     } catch (err: any) {
       haptic('error');
       const data = err?.response?.data;

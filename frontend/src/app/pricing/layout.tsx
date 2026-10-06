@@ -3,11 +3,11 @@ import JsonLd from '@/components/JsonLd';
 
 export const metadata: Metadata = {
   title:       'Pricing',
-  description: 'Simple, transparent pricing for custom web development. Starter, Pro, and Premium plans — save up to 47% vs. average freelancer market rates.',
+  description: 'Simple, transparent pricing for custom web development. Starter, Pro and Premium plans with fixed scope and no hidden fees.',
   alternates: { canonical: 'https://mbndev.ma/pricing' },
   openGraph: {
     title:       'Pricing — MBN DEV',
-    description: 'Transparent pricing for web development. Save up to 47% vs market rates.',
+    description: 'Transparent, fixed-scope pricing for web development.',
     url:         'https://mbndev.ma/pricing',
     type:        'website',
   },

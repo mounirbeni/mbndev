@@ -22,6 +22,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: base,                   lastModified: SITE, changeFrequency: 'weekly',  priority: 1 },
     { url: `${base}/services`,     lastModified: SITE, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${base}/portfolio`,    lastModified: SITE, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/products`,     lastModified: SITE, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/products/leads-ai`, lastModified: SITE, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/pricing`,      lastModified: SITE, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/about`,        lastModified: SITE, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${base}/contact`,      lastModified: SITE, changeFrequency: 'monthly', priority: 0.7 },

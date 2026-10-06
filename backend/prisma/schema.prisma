@@ -36,6 +36,8 @@ model User {
   activityLogs   ActivityLog[]
   resetTokens    PasswordResetToken[]
   pushSubscriptions PushSubscription[]
+  leadsAiAccount LeadsAiAccount?
+  prospects      Prospect[]
 
   @@index([email])
   @@index([role, isActive])
@@ -440,5 +442,49 @@ model ActivityLog {
   createdAt   DateTime @default(now())
 
   @@index([projectId, createdAt])
+  @@index([userId, createdAt])
+}
+
+// ─── MBN Leads AI (product) ─────────────────────────────────────────────────
+// One row per buyer: plan, usage counter and their own API keys (encrypted
+// with lib/leadsAi/crypto.js — never stored or returned in plain text).
+model LeadsAiAccount {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan           String   @default("starter") // starter | pro | agency
+  searchMonth    String   @default("")        // "2026-10" — resets searchCount
+  searchCount    Int      @default(0)
+  googleKeyEnc   String?
+  openaiKeyEnc   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// A business the buyer saved from a search, with its website audit.
+model Prospect {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  placeId   String
+  name      String
+  address   String?
+  phone     String?
+  website   String?
+  email     String?
+  rating    Float?
+  reviews   Int?
+  mapsUrl   String?
+  query     String?
+  score     Int      @default(0)
+  audit     Json?
+  message   String?
+  status    String   @default("new")   // new | contacted | replied | won | lost
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, placeId])
+  @@index([userId, status])
   @@index([userId, createdAt])
 }

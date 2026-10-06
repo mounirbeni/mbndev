@@ -430,6 +430,71 @@ export const leadsAPI = {
   getTemplate:     (type: string, name: string)            => api.get('/leads/templates', { params: { type, name } }),
 };
 
+// ─── MBN Leads AI (product) ───────────────────────────────────────────────────
+export interface LeadsAiAccount {
+  plan: 'starter' | 'pro' | 'agency';
+  searches: { used: number; limit: number | null; remaining: number | null };
+  hasGoogleKey: boolean;
+  hasOpenaiKey: boolean;
+}
+export interface LeadsAiBusiness {
+  placeId: string;
+  name: string;
+  address: string | null;
+  phone: string | null;
+  website: string | null;
+  rating: number | null;
+  reviews: number | null;
+  mapsUrl: string | null;
+  saved?: boolean;
+}
+export interface LeadsAiIssue { key: string; label: string; points: number }
+export interface LeadsAiAudit {
+  hasWebsite: boolean;
+  reachable?: boolean;
+  https?: boolean;
+  mobileFriendly?: boolean;
+  responseMs?: number;
+  title?: string | null;
+  hasMetaDescription?: boolean;
+  outdatedSignals?: string[];
+  hasBooking?: boolean;
+  bookingProviders?: string[];
+  thirdPartyBookingOnly?: boolean;
+  hasContactForm?: boolean;
+  emails?: string[];
+  social?: Record<string, string>;
+  platform?: string | null;
+  copyrightYear?: number | null;
+  error?: string;
+}
+export interface LeadsAiAnalysis { id: string; audit: LeadsAiAudit; score: number; level: 'hot' | 'warm' | 'low'; issues: LeadsAiIssue[] }
+export interface LeadsAiProspect extends Omit<LeadsAiBusiness, 'saved'> {
+  id: string;
+  email: string | null;
+  score: number;
+  audit: LeadsAiAudit | null;
+  message: string | null;
+  status: 'new' | 'contacted' | 'replied' | 'won' | 'lost';
+  notes: string | null;
+  query: string | null;
+  issues: LeadsAiIssue[];
+  createdAt: string;
+}
+
+export const leadsAiAPI = {
+  me:        ()                                                   => api.get('/leads-ai/me'),
+  saveKeys:  (data: { googleKey?: string; openaiKey?: string })   => api.put('/leads-ai/keys', data),
+  search:    (query: string)                                      => api.post('/leads-ai/search', { query }),
+  analyze:   (items: { id: string; website: string | null }[])    => api.post('/leads-ai/analyze', { items }),
+  message:   (data: { business: LeadsAiBusiness; audit: LeadsAiAudit; lang?: string; tone?: string; senderName?: string; service?: string }) => api.post('/leads-ai/message', data),
+  prospects: (status?: string)                                    => api.get('/leads-ai/prospects', { params: status ? { status } : {} }),
+  save:      (data: LeadsAiBusiness & { audit?: LeadsAiAudit; message?: string; query?: string }) => api.post('/leads-ai/prospects', data),
+  update:    (id: string, data: Partial<Pick<LeadsAiProspect, 'status' | 'notes' | 'message' | 'email'>>) => api.put(`/leads-ai/prospects/${id}`, data),
+  remove:    (id: string)                                         => api.delete(`/leads-ai/prospects/${id}`),
+  exportCsv: ()                                                   => api.get('/leads-ai/prospects/export', { responseType: 'blob' }),
+};
+
 export interface ActivityListParams {
   page?:  number;
   limit?: number;

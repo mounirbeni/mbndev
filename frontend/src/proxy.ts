@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // This is a UX guard based on the role cookie. The backend still validates the
 // JWT on every protected API call, so this proxy is not a security boundary.
-const PROTECTED_PREFIXES = ['/dashboard'];
+const PROTECTED_PREFIXES = ['/dashboard', '/leads-ai'];
 const ADMIN_PREFIX = '/dashboard/admin';
 const CLIENT_PREFIX = '/dashboard/client';
 const AUTH_PAGES = ['/login', '/signup'];
@@ -23,7 +23,11 @@ export function proxy(req: NextRequest) {
 
   if (isAuthPage && auth) {
     const url = req.nextUrl.clone();
-    url.pathname = auth === 'admin' ? '/dashboard/admin' : '/dashboard/client';
+    const next = req.nextUrl.searchParams.get('next');
+    url.search = '';
+    url.pathname = next && next.startsWith('/') && !next.startsWith('//') && !next.includes('\\')
+      ? next
+      : auth === 'admin' ? '/dashboard/admin' : '/dashboard/client';
     return NextResponse.redirect(url);
   }
 
@@ -42,5 +46,5 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/signup'],
+  matcher: ['/dashboard/:path*', '/leads-ai/:path*', '/login', '/signup'],
 };
