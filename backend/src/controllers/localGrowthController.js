@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { adminOpenaiKey } = require('../lib/adminKeys');
 const prisma = require('../lib/prisma');
 const { notifyClient } = require('../lib/notifications');
 const { encrypt, decrypt } = require('../lib/leadsAi/crypto');
@@ -22,7 +23,7 @@ async function getKeys(account) {
     google = google || decrypt(leads?.googleKeyEnc);
     openai = openai || decrypt(leads?.openaiKeyEnc);
   }
-  return { google, openai };
+  return { google, openai: openai || await adminOpenaiKey(account.userId) };
 }
 
 async function publicAccount(a) {

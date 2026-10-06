@@ -1,3 +1,4 @@
+const { adminOpenaiKey } = require('../lib/adminKeys');
 const prisma = require('../lib/prisma');
 const { notifyClient } = require('../lib/notifications');
 const { encrypt, decrypt } = require('../lib/leadsAi/crypto');
@@ -25,7 +26,7 @@ async function openaiKeyFor(account) {
     prisma.leadsAiAccount.findUnique({ where: { userId: account.userId }, select: { openaiKeyEnc: true } }),
     prisma.localGrowthAccount.findUnique({ where: { userId: account.userId }, select: { openaiKeyEnc: true } }),
   ]);
-  return decrypt(leads?.openaiKeyEnc) || decrypt(lg?.openaiKeyEnc) || null;
+  return decrypt(leads?.openaiKeyEnc) || decrypt(lg?.openaiKeyEnc) || await adminOpenaiKey(account.userId);
 }
 
 async function publicAccount(a) {

@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { adminOpenaiKey } = require('../lib/adminKeys');
 const prisma = require('../lib/prisma');
 const { notifyClient } = require('../lib/notifications');
 const { encrypt, decrypt } = require('../lib/leadsAi/crypto');
@@ -30,7 +31,7 @@ async function openaiKeyFor(account) {
     prisma.reviewBoosterAccount.findUnique(where),
   ]);
   for (const r of rows) { const k = decrypt(r?.openaiKeyEnc); if (k) return k; }
-  return null;
+  return adminOpenaiKey(account.userId);
 }
 
 async function publicAccount(a) {

@@ -1,3 +1,4 @@
+const { adminOpenaiKey } = require('../lib/adminKeys');
 const prisma = require('../lib/prisma');
 const { notifyClient } = require('../lib/notifications');
 const { encrypt, decrypt } = require('../lib/leadsAi/crypto');
@@ -28,20 +29,20 @@ exports.requireAccess = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-function publicAccount(a) {
+function publicAccount(a, adminKey = null) {
   const used = a.searchMonth === monthKey() ? a.searchCount : 0;
   const limit = PLAN_LIMITS[a.plan] ?? null;
   return {
     plan: a.plan,
     searches: { used, limit, remaining: limit === null ? null : Math.max(0, limit - used) },
     hasGoogleKey: Boolean(a.googleKeyEnc),
-    hasOpenaiKey: Boolean(a.openaiKeyEnc),
+    hasOpenaiKey: Boolean(a.openaiKeyEnc || adminKey),
   };
 }
 
 // GET /api/leads-ai/me
 exports.me = async (req, res) => {
-  res.json({ success: true, account: publicAccount(req.leadsAccount), languages: Object.keys(LANGS) });
+  res.json({ success: true, account: publicAccount(req.leadsAccount, await adminOpenaiKey(req.user)), languages: Object.keys(LANGS) });
 };
 
 // PUT /api/leads-ai/keys — { googleKey?, openaiKey? }; '' clears a key
@@ -130,7 +131,7 @@ exports.message = async (req, res, next) => {
     if (!business?.name) return res.status(400).json({ success: false, message: 'Missing business.' });
     const { issues } = scoreAudit(audit);
     const out = await generateMessage({
-      apiKey:     decrypt(req.leadsAccount.openaiKeyEnc),
+      apiKey:     decrypt(req.leadsAccount.openaiKeyEnc) || await adminOpenaiKey(req.user),
       business:   { name: String(business.name).slice(0, 120), address: business.address, rating: business.rating, reviews: business.reviews, website: business.website },
       audit,
       issues,
