@@ -487,7 +487,8 @@ export interface LeadsAiProspect extends Omit<LeadsAiBusiness, 'saved'> {
 export const leadsAiAPI = {
   me:        ()                                                   => api.get('/leads-ai/me'),
   saveKeys:  (data: { googleKey?: string; openaiKey?: string })   => api.put('/leads-ai/keys', data),
-  search:    (query: string)                                      => api.post('/leads-ai/search', { query }),
+  // Free OpenStreetMap search (no Google key) can take ~45 s on a busy day.
+  search:    (query: string)                                      => api.post('/leads-ai/search', { query }, { timeout: 60_000 }),
   analyze:   (items: { id: string; website: string | null }[])    => api.post('/leads-ai/analyze', { items }),
   message:   (data: { business: LeadsAiBusiness; audit: LeadsAiAudit; lang?: string; tone?: string; senderName?: string; service?: string }) => api.post('/leads-ai/message', data),
   prospects: (status?: string)                                    => api.get('/leads-ai/prospects', { params: status ? { status } : {} }),

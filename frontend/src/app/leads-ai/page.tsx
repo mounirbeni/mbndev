@@ -78,6 +78,7 @@ export default function LeadsAiSearchPage() {
     return list.sort((a, b) => (analysis[b.placeId]?.score ?? -1) - (analysis[a.placeId]?.score ?? -1));
   }, [results, analysis, filter]);
 
+  const fromOsm = results.some((b) => b.placeId.startsWith('osm:'));
   const analyzed = Object.keys(analysis).length;
   const hot = results.filter((b) => (analysis[b.placeId]?.score ?? 0) >= 70).length;
   const noSite = results.filter((b) => !b.website).length;
@@ -87,10 +88,10 @@ export default function LeadsAiSearchPage() {
       <h1 className="text-2xl font-bold text-white sm:text-3xl">Find businesses that need you</h1>
       <p className="mt-1 text-slate-400">Describe the businesses and the place. We find them, audit their websites and score the opportunity.</p>
 
-      {!account?.hasGoogleKey && (
-        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
-          <KeyRound className="mt-0.5 h-4 w-4 shrink-0" />
-          <p>Add your Google Places API key to start searching. <Link href="/leads-ai/settings" className="font-semibold underline">Open Settings</Link> — it takes about 3 minutes.</p>
+      {account && !account.hasGoogleKey && (
+        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-300">
+          <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" />
+          <p>Searching with free OpenStreetMap data. For fuller results with ratings and reviews, add a Google Places API key in <Link href="/leads-ai/settings" className="font-semibold text-white underline">Settings</Link> (optional).</p>
         </div>
       )}
 
@@ -105,11 +106,11 @@ export default function LeadsAiSearchPage() {
             className="w-full rounded-xl border border-white/10 bg-white/[0.03] py-3 pl-10 pr-3 text-white placeholder:text-slate-500 focus:border-violet-400/50 focus:outline-none"
           />
         </div>
-        <Button type="submit" loading={searching} disabled={!account?.hasGoogleKey || query.trim().length < 3}>Find leads</Button>
+        <Button type="submit" loading={searching} disabled={query.trim().length < 3}>Find leads</Button>
       </form>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {EXAMPLES.map((ex) => (
-          <button key={ex} type="button" onClick={() => { setQuery(ex); if (account?.hasGoogleKey) search(ex); }} className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-400 hover:border-white/25 hover:text-white">
+          <button key={ex} type="button" onClick={() => { setQuery(ex); search(ex); }} className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-400 hover:border-white/25 hover:text-white">
             {ex}
           </button>
         ))}
@@ -177,6 +178,11 @@ export default function LeadsAiSearchPage() {
           onClose={() => setOpen(null)}
           onSaved={(id) => setResults((prev) => prev.map((b) => (b.placeId === id ? { ...b, saved: true } : b)))}
         />
+      )}
+      {fromOsm && (
+        <p className="mt-4 text-[11px] text-slate-600">
+          Business data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-400">OpenStreetMap contributors</a>
+        </p>
       )}
     </div>
   );

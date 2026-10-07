@@ -111,7 +111,7 @@ export default function LeadPanel({ business, analysis, query, initialMessage, o
           {business.phone && <a href={`tel:${business.phone}`} className="flex items-center gap-1.5 text-slate-300"><Phone className="h-3.5 w-3.5" />{business.phone}</a>}
           {email && <a href={`mailto:${email}`} className="flex items-center gap-1.5 truncate text-slate-300"><Mail className="h-3.5 w-3.5 shrink-0" />{email}</a>}
           {business.rating != null && <span className="flex items-center gap-1.5 text-slate-300"><Star className="h-3.5 w-3.5 text-amber-400" />{business.rating} ({business.reviews ?? 0} reviews)</span>}
-          {business.mapsUrl && <a href={business.mapsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-slate-300 hover:text-white"><MapPin className="h-3.5 w-3.5" />Google Maps</a>}
+          {business.mapsUrl && <a href={business.mapsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-slate-300 hover:text-white"><MapPin className="h-3.5 w-3.5" />{business.mapsUrl.includes('openstreetmap.org') ? 'Map' : 'Google Maps'}</a>}
         </div>
 
         <section className="mt-6">
