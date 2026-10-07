@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation';
 /**
  * Site-wide extras (scroll bar, install / push prompts, analytics banner,
  * service worker) — left out of the chat widget, which runs in an iframe on
- * other people's websites, and of the public review / proposal pages customers open.
+ * other people's websites, and of the public review / proposal / menu pages customers open.
  */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  if (pathname?.startsWith('/widget/') || pathname?.startsWith('/r/') || pathname?.startsWith('/p/')) return null;
+  if (pathname?.startsWith('/widget/') || pathname?.startsWith('/r/') || pathname?.startsWith('/p/') || pathname?.startsWith('/m/')) return null;
   return <>{children}</>;
 }

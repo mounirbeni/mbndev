@@ -630,6 +630,55 @@ export const reviewBoosterAPI = {
   adminSetAccess: (userId: string, plan: string | null)    => api.put('/review-booster/admin/access', { userId, plan }),
 };
 
+// ─── MBN Menu (product) ───────────────────────────────────────────────────────
+export type MenuLang = 'en' | 'fr' | 'es' | 'pt' | 'it' | 'de' | 'ar';
+export type Localized = Partial<Record<MenuLang, string>>;
+export interface MenuChoice { id: string; name: Localized; price: number }
+export interface MenuItem {
+  id: string; name: Localized; desc: Localized; price: number; photo: string | null; allergens: number[];
+  veg: boolean; vegan: boolean; spicy: number; chef: boolean; isNew: boolean; available: boolean; kcal: number | null;
+  options: MenuChoice[]; extras: MenuChoice[];
+}
+export interface MenuCategory { id: string; name: Localized; items: MenuItem[] }
+export interface MenuDoc { categories: MenuCategory[] }
+export type MenuHours = Record<string, [number, number][]>;
+export interface MenuRestaurant {
+  id: string; name: string; tagline: Localized; about: Localized; color: string;
+  languages: MenuLang[]; defaultLanguage: MenuLang; currency: string; timezone: string;
+  address: string | null; phone: string | null; whatsapp: string | null; email: string | null; instagram: string | null; website: string | null;
+  wifiName: string | null; wifiPassword: string | null; logoPhotoId: string | null; coverPhotoId: string | null;
+  hours: MenuHours; payments: string[]; ordering: boolean; booking: boolean; waiterCall: boolean; coverCharge: number;
+  menu: MenuDoc; active?: boolean; views?: number; branding?: boolean; createdAt?: string; updatedAt?: string;
+}
+export interface MenuRestaurantSummary {
+  id: string; name: string; color: string; languages: MenuLang[]; active: boolean; views: number; logoPhotoId: string | null;
+  dishes: number; newRequests: number; createdAt: string; updatedAt: string;
+}
+export interface MenuAccount { plan: 'starter' | 'pro' | 'agency'; restaurants: { used: number; limit: number }; hasOpenaiKey: boolean }
+export type MenuRequestKind = 'order' | 'booking' | 'waiter' | 'bill';
+export interface MenuOrderLine { itemId: string; name: Localized; qty: number; unit: number; option: { id: string; name: Localized } | null; extras: { id: string; name: Localized }[]; note: string | null }
+export interface MenuGuestRequest {
+  id: string; kind: MenuRequestKind; status: string; tableLabel: string | null; items: MenuOrderLine[] | null; total: number | null;
+  name: string | null; phone: string | null; guests: number | null; date: string | null; time: string | null; notes: string | null;
+  language: MenuLang | null; createdAt: string; updatedAt: string;
+}
+
+export const menuAPI = {
+  me:               ()                                        => api.get('/menu/me'),
+  saveSettings:     (openaiKey: string)                       => api.put('/menu/settings', { openaiKey }),
+  restaurants:      ()                                        => api.get('/menu/restaurants'),
+  createRestaurant: (data: { name: string; sample?: boolean; languages?: MenuLang[]; currency?: string }) => api.post('/menu/restaurants', data),
+  restaurant:       (id: string)                              => api.get(`/menu/restaurants/${id}`),
+  updateRestaurant: (id: string, data: Partial<MenuRestaurant>) => api.put(`/menu/restaurants/${id}`, data),
+  deleteRestaurant: (id: string)                              => api.delete(`/menu/restaurants/${id}`),
+  uploadPhoto:      (id: string, data: string)                => api.post(`/menu/restaurants/${id}/photos`, { data }, { timeout: 30000 }),
+  translate:        (id: string, from: MenuLang, to: MenuLang) => api.post(`/menu/restaurants/${id}/translate`, { from, to }, { timeout: 60000 }),
+  requests:         (id: string, scope: 'open' | 'all' = 'open') => api.get(`/menu/restaurants/${id}/requests`, { params: { scope } }),
+  updateRequest:    (id: string, requestId: string, status: string) => api.put(`/menu/restaurants/${id}/requests/${requestId}`, { status }),
+  adminAccounts:    ()                                        => api.get('/menu/admin/accounts'),
+  adminSetAccess:   (userId: string, plan: string | null)     => api.put('/menu/admin/access', { userId, plan }),
+};
+
 // ─── MBN Proposal AI (product) ────────────────────────────────────────────────
 export type ProposalLanguage = 'en' | 'fr' | 'ar' | 'es';
 export type ProposalStatus = 'draft' | 'sent' | 'viewed' | 'accepted' | 'declined';

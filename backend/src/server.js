@@ -115,6 +115,8 @@ app.use('/api/auth',  express.json({ limit: '32kb' }));
 app.use('/api/auth',  express.urlencoded({ extended: false, limit: '32kb' }));
 // File upload routes handled by multer — no global body parsing needed there
 // Everything else: 256kb (generous but bounded)
+// A whole menu (hundreds of dishes in several languages) is saved in one request.
+app.use('/api/menu', express.json({ limit: '1mb' }));
 app.use(express.json({ limit: '256kb' }));
 app.use(express.urlencoded({ extended: true, limit: '256kb' }));
 
@@ -198,6 +200,7 @@ app.use('/api/local-growth',  require('./routes/localGrowth'));
 app.use('/api/support-ai',    require('./routes/supportAi'));
 app.use('/api/review-booster', require('./routes/reviewBooster'));
 app.use('/api/proposal-ai',   require('./routes/proposalAi'));
+app.use('/api/menu',          require('./routes/menu'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));
