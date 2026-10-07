@@ -92,12 +92,14 @@ function normalizeOsm(el) {
   const street = [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' ');
   const address = [street, t['addr:postcode'], t['addr:city']].filter(Boolean).join(', ') || null;
   const phone = (t.phone || t['contact:phone'] || t['contact:mobile'] || '').split(';')[0].trim() || null;
+  const email = (t.email || t['contact:email'] || '').split(/[;,\s]/)[0].trim().toLowerCase();
   return {
     placeId: `osm:${el.type}/${el.id}`,
     name:    t.name,
     address,
     phone,
     website: site(t.website || t['contact:website'] || t.url),
+    email:   /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email) ? email : null,   // listed on the map (Google never returns emails)
     rating:  null,
     reviews: null,
     mapsUrl: `https://www.openstreetmap.org/${el.type}/${el.id}`,

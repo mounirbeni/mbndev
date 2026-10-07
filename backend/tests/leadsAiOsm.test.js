@@ -32,14 +32,14 @@ test('buildQuery escapes the name filter and uses the box', () => {
 test('parseResults returns the Places shape, dedupes, contactable first', () => {
   const r = parseResults({ elements: [
     { type: 'node', id: 1, tags: { name: 'Quiet Clinic' } },
-    { type: 'way', id: 2, tags: { name: 'Smile Dental', website: 'smile.co.uk', phone: '+44 20 1234; +44 20 9999', 'addr:street': 'High St', 'addr:housenumber': '5', 'addr:city': 'London' } },
+    { type: 'way', id: 2, tags: { name: 'Smile Dental', website: 'smile.co.uk', 'contact:email': 'Hello@Smile.co.uk', phone: '+44 20 1234; +44 20 9999', 'addr:street': 'High St', 'addr:housenumber': '5', 'addr:city': 'London' } },
     { type: 'node', id: 3, tags: { name: 'smile dental' } },
     { type: 'node', id: 4, tags: { name: 'Closed Co', disused: 'yes' } },
   ] }, 10);
   assert.equal(r.length, 2);
   assert.deepEqual(r[0], {
     placeId: 'osm:way/2', name: 'Smile Dental', address: '5 High St, London', phone: '+44 20 1234',
-    website: 'https://smile.co.uk/', rating: null, reviews: null, mapsUrl: 'https://www.openstreetmap.org/way/2', closed: false,
+    website: 'https://smile.co.uk/', email: 'hello@smile.co.uk', rating: null, reviews: null, mapsUrl: 'https://www.openstreetmap.org/way/2', closed: false,
   });
 });
 

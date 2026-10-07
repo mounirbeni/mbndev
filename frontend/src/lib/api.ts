@@ -445,6 +445,7 @@ export interface LeadsAiBusiness {
   address: string | null;
   phone: string | null;
   website: string | null;
+  email?: string | null;          // only from OpenStreetMap listings; Google never returns one
   rating: number | null;
   reviews: number | null;
   mapsUrl: string | null;

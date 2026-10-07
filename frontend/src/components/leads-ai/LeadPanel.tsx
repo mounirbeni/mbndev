@@ -48,7 +48,16 @@ export default function LeadPanel({ business, analysis, query, initialMessage, o
   }, [onClose]);
 
   const audit = analysis?.audit;
-  const email = audit?.emails?.[0] || null;
+  // Emails: read from the business's own website (homepage + contact page),
+  // or listed on OpenStreetMap. Google Places never returns emails.
+  const siteEmails = audit?.emails ?? [];
+  const emails = [...new Set([...siteEmails, ...(business.email ? [business.email] : [])])];
+  const email = emails[0] || null;
+  const fromMap = business.mapsUrl?.includes('openstreetmap.org') ? 'map listing' : 'Google listing';
+  const searchEmail = `https://www.google.com/search?q=${encodeURIComponent(`"${business.name}" ${business.address?.split(',').pop()?.trim() || ''} email`)}`;
+  const copyText = async (t: string) => {
+    try { await navigator.clipboard.writeText(t); toast.success('Copied'); } catch { toast.error('Copy failed'); }
+  };
 
   const generate = async () => {
     if (!audit) return;
@@ -108,11 +117,45 @@ export default function LeadPanel({ business, analysis, query, initialMessage, o
           {business.website
             ? <a href={business.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 truncate text-violet-300 hover:underline"><Globe className="h-3.5 w-3.5 shrink-0" />{host(business.website)}</a>
             : <span className="flex items-center gap-1.5 text-rose-300"><Globe className="h-3.5 w-3.5" />No website</span>}
-          {business.phone && <a href={`tel:${business.phone}`} className="flex items-center gap-1.5 text-slate-300"><Phone className="h-3.5 w-3.5" />{business.phone}</a>}
-          {email && <a href={`mailto:${email}`} className="flex items-center gap-1.5 truncate text-slate-300"><Mail className="h-3.5 w-3.5 shrink-0" />{email}</a>}
           {business.rating != null && <span className="flex items-center gap-1.5 text-slate-300"><Star className="h-3.5 w-3.5 text-amber-400" />{business.rating} ({business.reviews ?? 0} reviews)</span>}
           {business.mapsUrl && <a href={business.mapsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-slate-300 hover:text-white"><MapPin className="h-3.5 w-3.5" />{business.mapsUrl.includes('openstreetmap.org') ? 'Map' : 'Google Maps'}</a>}
         </div>
+
+        <section className="mt-6">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">Contact</h3>
+          <ul className="mt-2 space-y-2 text-sm">
+            {emails.map((e) => (
+              <li key={e} className="flex items-center gap-2">
+                <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                <a href={`mailto:${e}`} className="min-w-0 truncate text-slate-200 hover:underline">{e}</a>
+                <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-slate-500">{siteEmails.includes(e) ? 'from their website' : `from ${fromMap}`}</span>
+                <button onClick={() => copyText(e)} aria-label={`Copy ${e}`} className="ml-auto shrink-0 rounded p-1 text-slate-500 hover:bg-white/10 hover:text-white"><Copy className="h-3.5 w-3.5" /></button>
+              </li>
+            ))}
+            {!analysis && !emails.length && <li className="text-slate-500">Looking for an email on their website…</li>}
+            {analysis && !emails.length && (
+              <li className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3 text-[13px] text-amber-100/90">
+                No email found{business.website ? ' on their website' : ' — they have no website to read it from'}. Reach them by phone or WhatsApp, or:
+                <span className="mt-2 flex flex-wrap gap-1.5">
+                  {Object.entries(audit?.social || {}).map(([k, url]) => (
+                    <a key={k} href={url} target="_blank" rel="noopener noreferrer" className="rounded-md bg-white/10 px-2 py-1 text-xs capitalize text-white hover:bg-white/15">{k}</a>
+                  ))}
+                  <a href={searchEmail} target="_blank" rel="noopener noreferrer" className="rounded-md bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/15">Search Google for their email</a>
+                </span>
+              </li>
+            )}
+            {business.phone && (
+              <li className="flex items-center gap-2">
+                <Phone className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                <a href={`tel:${business.phone}`} className="text-slate-200 hover:underline">{business.phone}</a>
+                <span className="shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-slate-500">from {fromMap}</span>
+              </li>
+            )}
+          </ul>
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+            Contact details come from public listings and the business’s own website — they’re not verified. Check them before you send, and use WhatsApp only for mobile numbers.
+          </p>
+        </section>
 
         <section className="mt-6">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">Opportunities found</h3>
