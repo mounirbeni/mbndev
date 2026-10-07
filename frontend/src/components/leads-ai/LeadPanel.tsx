@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
-import { X, Copy, Mail, MessageCircle, Star, MapPin, Globe, Phone, Check, AlertTriangle, Sparkles, Bookmark } from 'lucide-react';
+import { X, Copy, Mail, MessageCircle, Star, MapPin, Globe, Phone, Check, AlertTriangle, Sparkles, Bookmark, ArrowLeft } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ScoreBadge from './ScoreBadge';
 import { useLeadsAi } from './LeadsAiShell';
@@ -92,7 +92,7 @@ export default function LeadPanel({ business, analysis, query, initialMessage, o
         role="dialog"
         aria-modal="true"
         aria-label={business.name}
-        className="h-full w-full max-w-xl overflow-y-auto border-l border-white/10 bg-[#0d0b18] p-5 sm:p-7"
+        className="h-[100dvh] w-full max-w-xl overflow-y-auto overscroll-contain border-l border-white/10 bg-[#0d0b18] px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-7 sm:pb-7 sm:pt-7"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3">
@@ -144,23 +144,23 @@ export default function LeadPanel({ business, analysis, query, initialMessage, o
         <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold text-white"><Sparkles className="h-4 w-4 text-violet-300" />Outreach message</h3>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <select value={prefs.lang} onChange={(e) => setPrefs({ ...prefs, lang: e.target.value })} aria-label="Language" className="rounded-lg border border-white/10 bg-[#07060f] px-2 py-2 text-sm">
+            <select value={prefs.lang} onChange={(e) => setPrefs({ ...prefs, lang: e.target.value })} aria-label="Language" className="min-w-0 rounded-lg border border-white/10 bg-[#07060f] px-2 py-2 text-sm text-white">
               {languages.map((l) => <option key={l} value={l}>{LANG_NAMES[l] || l}</option>)}
             </select>
-            <select value={prefs.tone} onChange={(e) => setPrefs({ ...prefs, tone: e.target.value })} aria-label="Tone" className="rounded-lg border border-white/10 bg-[#07060f] px-2 py-2 text-sm">
+            <select value={prefs.tone} onChange={(e) => setPrefs({ ...prefs, tone: e.target.value })} aria-label="Tone" className="min-w-0 rounded-lg border border-white/10 bg-[#07060f] px-2 py-2 text-sm text-white">
               <option value="friendly">Friendly</option>
               <option value="professional">Professional</option>
               <option value="direct">Direct</option>
             </select>
-            <input value={prefs.senderName} onChange={(e) => setPrefs({ ...prefs, senderName: e.target.value })} placeholder="Your name" aria-label="Your name" className="rounded-lg border border-white/10 bg-[#07060f] px-3 py-2 text-sm" />
-            <input value={prefs.service} onChange={(e) => setPrefs({ ...prefs, service: e.target.value })} placeholder="Your service (e.g. website redesign)" aria-label="Your service" className="rounded-lg border border-white/10 bg-[#07060f] px-3 py-2 text-sm" />
+            <input value={prefs.senderName} onChange={(e) => setPrefs({ ...prefs, senderName: e.target.value })} placeholder="Your name" aria-label="Your name" autoComplete="name" className="min-w-0 rounded-lg border border-white/10 bg-[#07060f] px-3 py-2 text-sm text-white placeholder:text-slate-500" />
+            <input value={prefs.service} onChange={(e) => setPrefs({ ...prefs, service: e.target.value })} placeholder="Your service (e.g. website redesign)" aria-label="Your service" autoComplete="off" className="min-w-0 rounded-lg border border-white/10 bg-[#07060f] px-3 py-2 text-sm text-white placeholder:text-slate-500" />
           </div>
           <Button className="mt-3" size="sm" onClick={generate} loading={generating} disabled={!analysis}>
             {message ? 'Regenerate' : 'Generate message'}
           </Button>
           {message && (
             <>
-              <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={10} aria-label="Message" className="mt-3 w-full rounded-xl border border-white/10 bg-[#07060f] p-3 text-sm leading-relaxed text-slate-200" />
+              <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={14} aria-label="Message" className="mt-3 w-full resize-y rounded-xl border border-white/10 bg-[#07060f] p-3 text-sm leading-relaxed text-slate-200" />
               <div className="mt-2 flex flex-wrap gap-2">
                 <Button size="sm" variant="secondary" onClick={copy}><Copy className="h-3.5 w-3.5" />Copy</Button>
                 <a href={mailto} className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-sm text-slate-200 hover:bg-white/5"><Mail className="h-3.5 w-3.5" />Email</a>
@@ -175,6 +175,9 @@ export default function LeadPanel({ business, analysis, query, initialMessage, o
             <Bookmark className="h-4 w-4" />{business.saved ? 'Update saved lead' : 'Save lead'}
           </Button>
         )}
+        <Button className={onSaved ? 'mt-2' : 'mt-5'} variant="secondary" fullWidth onClick={onClose}>
+          <ArrowLeft className="h-4 w-4" />Back
+        </Button>
       </aside>
     </div>,
     document.body,

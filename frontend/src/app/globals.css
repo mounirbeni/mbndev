@@ -1760,3 +1760,16 @@ html.intro-done .mbn-intro { display: none; }
 @media print {
   html, body { background: #fff !important; }
 }
+
+/* Browser autofill (Safari/Chrome) paints a pale yellow box — keep fields dark */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #f1f5f9;
+  caret-color: #f1f5f9;
+  -webkit-box-shadow: 0 0 0 1000px #07060f inset;
+  box-shadow: 0 0 0 1000px #07060f inset;
+  transition: background-color 9999s ease-out 0s;
+}
