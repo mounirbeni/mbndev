@@ -46,6 +46,8 @@ model User {
   reviewBusinesses     ReviewBusiness[]
   proposalAccount      ProposalAccount?
   proposals            Proposal[]
+  menuAccount          MenuAccount?
+  menuRestaurants      MenuRestaurant[]
 
   @@index([email])
   @@index([role, isActive])
@@ -744,6 +746,95 @@ model Proposal {
 
   @@index([userId, updatedAt])
   @@index([status, sentAt])
+}
+
+// ─── MBN Menu (product) ─────────────────────────────────────────────────────
+
+model MenuAccount {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan         String   @default("starter") // starter | pro | agency
+  openaiKeyEnc String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/// One restaurant's digital menu. `menu` holds categories → dishes (see lib/menu/validate.js).
+model MenuRestaurant {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  tagline         Json          @default("{}")
+  about           Json          @default("{}")
+  color           String        @default("#1f4fd1")
+  languages       String[]
+  defaultLanguage String        @default("en")
+  currency        String        @default("EUR")
+  timezone        String        @default("Europe/Lisbon")
+  address         String?
+  phone           String?
+  whatsapp        String?
+  email           String?
+  instagram       String?
+  website         String?
+  wifiName        String?
+  wifiPassword    String?
+  logoPhotoId     String?
+  coverPhotoId    String?
+  hours           Json          @default("{}")
+  payments        String[]
+  ordering        Boolean       @default(true)
+  booking         Boolean       @default(true)
+  waiterCall      Boolean       @default(true)
+  coverCharge     Float         @default(0)
+  menu            Json          @default("{\"categories\":[]}")
+  active          Boolean       @default(true)
+  views           Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  requests        MenuRequest[]
+  photos          MenuPhoto[]
+
+  @@index([userId])
+}
+
+/// Something a guest sent from the public menu: a table order, a booking, a waiter call or a bill request.
+model MenuRequest {
+  id           String         @id @default(cuid())
+  restaurantId String
+  restaurant   MenuRestaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  kind         String // order | booking | waiter | bill
+  status       String         @default("new") // order: new|preparing|ready|done|cancelled · booking: new|confirmed|declined · waiter/bill: new|done
+  tableLabel   String?
+  items        Json?
+  total        Float?
+  name         String?
+  phone        String?
+  guests       Int?
+  date         String?
+  time         String?
+  notes        String?
+  language     String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([restaurantId, createdAt])
+  @@index([restaurantId, status])
+}
+
+/// Dish / logo / cover photos, resized in the browser and served publicly with long caching.
+model MenuPhoto {
+  id           String         @id @default(cuid())
+  restaurantId String
+  restaurant   MenuRestaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  mime         String
+  size         Int
+  data         Bytes
+  createdAt    DateTime       @default(now())
+
+  @@index([restaurantId])
 }
 
 // ─── Careers: job applications from /careers ────────────────────────────────

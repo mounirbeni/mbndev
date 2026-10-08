@@ -83,7 +83,7 @@ export default function LeadsAiSettingsPage() {
             if (Object.keys(payload).length) save(payload);
           }}
         >
-          <KeyField label="Google Places API key (required)" has={account.hasGoogleKey} placeholder="AIza…" value={googleKey} onChange={setGoogleKey} />
+          <KeyField label="Google Places API key (optional — fuller results with ratings)" has={account.hasGoogleKey} placeholder="AIza…" value={googleKey} onChange={setGoogleKey} />
           <KeyField label="OpenAI API key (optional — AI-written messages)" has={account.hasOpenaiKey} placeholder="sk-…" value={openaiKey} onChange={setOpenaiKey} />
           <div className="flex flex-wrap gap-2">
             <Button type="submit" loading={saving} disabled={!googleKey.trim() && !openaiKey.trim()}>Save keys</Button>

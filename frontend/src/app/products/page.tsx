@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Check, FileSignature, MessagesSquare, Sparkles, Star, TrendingUp } from 'lucide-react';
+import { ArrowRight, Check, FileSignature, MessagesSquare, Sparkles, Star, TrendingUp, UtensilsCrossed } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import { PRODUCTS, STATUS_LABEL } from '@/lib/products';
 
@@ -41,8 +41,8 @@ export default function ProductsPage() {
                 className="group flex flex-col rounded-3xl border border-white/10 bg-white/[0.02] p-7 transition-colors hover:border-violet-400/40 hover:bg-white/[0.04]"
               >
                 <div className="flex items-center justify-between">
-                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${p.slug === 'local-growth' ? 'from-emerald-500 to-cyan-500' : p.slug === 'support-ai' ? 'from-sky-500 to-indigo-500' : p.slug === 'review-booster' ? 'from-amber-400 to-orange-500' : p.slug === 'proposal-ai' ? 'from-fuchsia-500 to-violet-600' : 'from-violet-500 to-blue-500'}`}>
-                    {p.slug === 'local-growth' ? <TrendingUp className="h-5 w-5 text-white" /> : p.slug === 'support-ai' ? <MessagesSquare className="h-5 w-5 text-white" /> : p.slug === 'review-booster' ? <Star className="h-5 w-5 text-white" /> : p.slug === 'proposal-ai' ? <FileSignature className="h-5 w-5 text-white" /> : <Sparkles className="h-5 w-5 text-white" />}
+                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${p.slug === 'local-growth' ? 'from-emerald-500 to-cyan-500' : p.slug === 'support-ai' ? 'from-sky-500 to-indigo-500' : p.slug === 'review-booster' ? 'from-amber-400 to-orange-500' : p.slug === 'proposal-ai' ? 'from-fuchsia-500 to-violet-600' : p.slug === 'menu' ? 'from-blue-600 to-violet-600' : 'from-violet-500 to-blue-500'}`}>
+                    {p.slug === 'local-growth' ? <TrendingUp className="h-5 w-5 text-white" /> : p.slug === 'support-ai' ? <MessagesSquare className="h-5 w-5 text-white" /> : p.slug === 'review-booster' ? <Star className="h-5 w-5 text-white" /> : p.slug === 'proposal-ai' ? <FileSignature className="h-5 w-5 text-white" /> : p.slug === 'menu' ? <UtensilsCrossed className="h-5 w-5 text-white" /> : <Sparkles className="h-5 w-5 text-white" />}
                   </span>
                   <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-300">
                     {STATUS_LABEL[p.status]}

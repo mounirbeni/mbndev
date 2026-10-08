@@ -37,6 +37,13 @@ const PRODUCTS = {
     path:  '/proposal-ai',
     firstStep: 'add your brand and OpenAI key in Settings and write your first proposal',
   },
+  'menu': {
+    name:  'MBN Menu',
+    plans: { starter: 37, pro: 67, agency: 97 },
+    model: 'menuAccount',
+    path:  '/menu',
+    firstStep: 'create your restaurant (or start from the sample menu) and print the table QR codes',
+  },
 };
 
 const PLAN_RANK = { starter: 1, pro: 2, agency: 3 };

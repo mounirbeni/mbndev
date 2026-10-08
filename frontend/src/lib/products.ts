@@ -63,6 +63,16 @@ export const PRODUCTS: Product[] = [
     highlights: ['Full proposal from a short brief', 'Branded page with your logo colours', 'Optional extras the client can tick', 'Online signature & acceptance', 'Opened / accepted alerts + follow-up reminders'],
     appUrl: '/proposal-ai',
   },
+  {
+    slug: 'menu',
+    name: 'MBN Menu',
+    tagline: 'A digital QR menu in 7 languages — with the 14 allergens, table ordering and bookings.',
+    description: 'Guests scan the table QR code, read the menu in their language, filter out their allergens, order from the table, call the waiter or book a table. You see every order live and edit prices in seconds.',
+    status: 'available',
+    priceFrom: 37,
+    highlights: ['Menu in 7 languages, AI translation', 'The 14 EU allergens + filters', 'Order & call the waiter from the table', 'Table bookings with confirmation', 'Live orders screen + table QR codes'],
+    appUrl: '/menu',
+  },
 ];
 
 export const STATUS_LABEL: Record<Product['status'], string> = {

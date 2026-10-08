@@ -42,11 +42,11 @@ const PLANS = [
 ];
 
 const FAQ = [
-  { q: 'Do I need my own API keys?', a: 'Yes — a Google Places API key (required) and optionally an OpenAI key. That is why there is no monthly fee: you pay Google and OpenAI directly, usually little or nothing at normal volumes. A step-by-step guide is included.' },
-  { q: 'Where does the business data come from?', a: 'From Google Places, through your own key, plus each business\'s public website. Nothing is scraped from Google Maps.' },
+  { q: 'Do I need my own API keys?', a: 'No — searching works out of the box with free OpenStreetMap data. For fuller results with ratings and reviews you can add your own Google Places API key, and optionally an OpenAI key for AI-written messages. You pay Google and OpenAI directly, usually little or nothing at normal volumes, so there is no monthly fee to us. A step-by-step guide is included.' },
+  { q: 'Where does the business data come from?', a: 'From OpenStreetMap (free), or from Google Places through your own key when you add one, plus each business\'s public website. Nothing is scraped from Google Maps.' },
   { q: 'Does it send emails for me?', a: 'No — and that is on purpose. Messages open in your own email or WhatsApp, so they come from you and your sender reputation stays clean.' },
   { q: 'Is cold outreach legal?', a: 'Business-to-business outreach is allowed in most countries when it is relevant and easy to opt out of. Every message includes an opt-out line; you remain responsible for following the rules where you and your prospects are.' },
-  { q: 'Which countries does it work in?', a: 'Anywhere Google Maps has businesses.' },
+  { q: 'Which countries does it work in?', a: 'Worldwide — anywhere OpenStreetMap or, with your key, Google Maps lists businesses.' },
 ];
 
 export default function LeadsAiProductPage() {
@@ -127,7 +127,7 @@ export default function LeadsAiProductPage() {
           <KeyRound className="h-10 w-10 shrink-0 text-violet-300" />
           <div>
             <h2 className="text-xl font-bold text-white">No monthly fee — you use your own keys</h2>
-            <p className="mt-1.5 text-slate-400">MBN Leads AI runs on your own Google and OpenAI keys, so you pay once for the tool and the providers directly for what you use. Your keys are encrypted and never shared.</p>
+            <p className="mt-1.5 text-slate-400">MBN Leads AI searches free OpenStreetMap data out of the box, and can run on your own Google and OpenAI keys for fuller results — you pay once for the tool and the providers directly for what you use. Your keys are encrypted and never shared.</p>
           </div>
         </div>
       </section>

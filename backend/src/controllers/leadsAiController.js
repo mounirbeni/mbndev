@@ -3,6 +3,7 @@ const prisma = require('../lib/prisma');
 const { notifyClient } = require('../lib/notifications');
 const { encrypt, decrypt } = require('../lib/leadsAi/crypto');
 const { searchPlaces, PlacesError } = require('../lib/leadsAi/places');
+const { searchOsm, OsmError } = require('../lib/leadsAi/osm');
 const { auditWebsite } = require('../lib/leadsAi/audit');
 const { scoreAudit } = require('../lib/leadsAi/score');
 const { generateMessage, LANGS } = require('../lib/leadsAi/message');
@@ -75,8 +76,10 @@ exports.search = async (req, res, next) => {
     if (query.length < 3) return res.status(400).json({ success: false, message: 'Describe the businesses you are looking for, e.g. "dentists in London".' });
 
     const account = req.leadsAccount;
+    // With a Google Places key: Google (ratings, reviews, best coverage).
+    // Without one: free OpenStreetMap search, so Leads AI works at no cost.
     const apiKey = decrypt(account.googleKeyEnc);
-    if (!apiKey) return res.status(400).json({ success: false, code: 'NO_GOOGLE_KEY', message: 'Add your Google Places API key in Settings first.' });
+    const source = apiKey ? 'google' : 'osm';
 
     const usage = publicAccount(account).searches;
     if (usage.limit !== null && usage.remaining <= 0) {
@@ -85,9 +88,10 @@ exports.search = async (req, res, next) => {
 
     let places;
     try {
-      places = await searchPlaces({ query, apiKey, max });
+      places = source === 'google' ? await searchPlaces({ query, apiKey, max }) : await searchOsm({ query, max });
     } catch (err) {
       if (err instanceof PlacesError) return res.status(err.status).json({ success: false, message: `Google: ${err.message}` });
+      if (err instanceof OsmError) return res.status(err.status).json({ success: false, message: err.message });
       throw err;
     }
 
@@ -105,6 +109,7 @@ exports.search = async (req, res, next) => {
     res.json({
       success: true,
       query,
+      source,
       results: places.map((p) => ({ ...p, saved: savedIds.has(p.placeId) })),
       account: publicAccount(updated),
     });
