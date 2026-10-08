@@ -185,10 +185,10 @@ function viewPeople() {
 function seeded(d) { let x = Math.sin(d * 9301 + 49297) * 233280; return x - Math.floor(x); }
 function viewStats() {
   const s = db.get(); const st = todayStats();
-  const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - (13 - i)); return d; });
-  const vals = days.map((d, i) => (i === 13 ? st.rev : Math.round(2200 + seeded(d.getTime() / 864e5) * 1600 + ([0, 6].includes(d.getDay()) ? 900 : 0))));
+  const range = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - (13 - i)); return d; });
+  const vals = range.map((d, i) => (i === 13 ? st.rev : Math.round(2200 + seeded(d.getTime() / 864e5) * 1600 + ([0, 6].includes(d.getDay()) ? 900 : 0))));
   const max = Math.max(...vals, 1);
-  const bars = days.map((d, i) => `<div class="${i === 13 ? 'today' : ''}" title="${money(vals[i])}"><i style="height:${Math.max(4, (vals[i] / max) * 150)}px"></i><span>${days()[d.getDay()].slice(0, 2)}</span></div>`).join('');
+  const bars = range.map((d, i) => `<div class="${i === 13 ? 'today' : ''}" title="${money(vals[i])}"><i style="height:${Math.max(4, (vals[i] / max) * 150)}px"></i><span>${days()[d.getDay()].slice(0, 2)}</span></div>`).join('');
   const counts = {};
   s.orders.filter((o) => o.status !== 'cancelled').forEach((o) => o.items.forEach((i) => { counts[i.id] = (counts[i.id] || 0) + i.qty; }));
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6); const tmax = top[0]?.[1] || 1;
