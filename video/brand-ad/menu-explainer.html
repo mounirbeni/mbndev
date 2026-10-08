@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN Menu — Explainer (9:16)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    MBN Menu — the detailed walkthrough, 68 s, 1080 × 1920, paced on the voice-over (window.__vo).
+    Every screen inside the phone and the tablet is a real screenshot of the product
+    (assets/menu/*): the guest side is the live demo at /m/demo, the owner side a real
+    restaurant's Live orders and Menu tabs and its printable QR codes.
+    Layout: 96px side margins · headline top 296 · sub-line top 404 ·
+    phone x 274 → 806, y 470 → 1584 · tablet x 50 → 1030, y 560 → 1260.
+  */
+  :root { --bg: #08080b; --primary: #7c3aed; --primary-light: #a855f7; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; background: var(--bg); overflow: hidden; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .abs { position: absolute; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); perspective: 2200px; }
+  #ambient { inset: -10%; opacity: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 62%, rgba(124,58,237,0.20) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 15% 22%, rgba(59,130,246,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 28% at 85% 85%, rgba(6,182,212,0.05) 0%, transparent 55%); }
+  #halo { left: 540px; top: 1030px; width: 1100px; height: 1100px; margin: -550px 0 0 -550px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 62%); opacity: 0; }
+
+  .w { display: inline-block; will-change: transform, opacity, filter; }
+  .hl { color: var(--primary-light); }
+  .h1 { font-weight: 800; font-size: 92px; line-height: 1.06; letter-spacing: -0.035em; color: #fff; }
+  .eyebrow { font-weight: 700; font-size: 26px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary-light); }
+  .center { left: 96px; width: 888px; top: 920px; transform: translateY(-50%); text-align: center; }
+  #eyebrow { left: 96px; width: 888px; top: 250px; text-align: center; }
+  .head { left: 60px; width: 960px; top: 296px; text-align: center; white-space: nowrap; font-size: 76px; }
+  .sub { left: 60px; width: 960px; top: 404px; text-align: center; white-space: nowrap; font-size: 32px; font-weight: 500; color: var(--muted); }
+  .sub b { color: #fff; font-weight: 700; }
+
+  #hook2 { left: 96px; width: 888px; top: 1060px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 30px; color: var(--dim); letter-spacing: 0.02em; }
+  #hook2 s { text-decoration-color: rgba(168,85,247,0.8); text-decoration-thickness: 3px; }
+
+  /* Intro — what's inside */
+  #meet { left: 60px; width: 960px; top: 470px; text-align: center; white-space: nowrap; }
+  #meetSub { left: 60px; width: 960px; top: 590px; text-align: center; font-size: 36px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+  #tiles { left: 96px; width: 888px; top: 720px; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  #tiles > div { height: 168px; border-radius: 30px; padding: 0 32px; display: flex; align-items: center; gap: 24px; opacity: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+  #tiles i { width: 76px; height: 76px; border-radius: 22px; flex-shrink: 0; display: grid; place-items: center; background: linear-gradient(135deg, rgba(124,58,237,0.45), rgba(79,70,229,0.3)); border: 1px solid rgba(168,85,247,0.5); }
+  #tiles b { display: block; font-size: 34px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+  #tiles span { display: block; margin-top: 6px; font-size: 23px; color: var(--muted); }
+
+  /* Table tent with the real QR code (opens mbndev.ma/m/demo) */
+  #tent { left: 300px; top: 600px; width: 480px; height: 700px; border-radius: 40px; background: #f8f7fc; color: #0b0b12; text-align: center; padding: 46px 40px 0;
+    box-shadow: 0 50px 120px rgba(0,0,0,0.7), 0 0 120px rgba(124,58,237,0.25); opacity: 0; }
+  #tent .rn { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  #tent .tb { margin-top: 6px; font-size: 22px; font-weight: 600; color: #6b7280; letter-spacing: 0.12em; text-transform: uppercase; }
+  #tent .qrw { position: relative; margin: 34px auto 0; width: 340px; height: 340px; }
+  #tent .qrw img { width: 340px; height: 340px; display: block; }
+  #tent .sc { margin-top: 30px; font-size: 26px; font-weight: 700; }
+  .brk { position: absolute; width: 70px; height: 70px; border: 7px solid #7c3aed; opacity: 0; }
+  #bk1 { left: -22px; top: -22px; border-right: 0; border-bottom: 0; border-top-left-radius: 22px; }
+  #bk2 { right: -22px; top: -22px; border-left: 0; border-bottom: 0; border-top-right-radius: 22px; }
+  #bk3 { left: -22px; bottom: -22px; border-right: 0; border-top: 0; border-bottom-left-radius: 22px; }
+  #bk4 { right: -22px; bottom: -22px; border-left: 0; border-top: 0; border-bottom-right-radius: 22px; }
+  #scanline { position: absolute; left: -8px; right: -8px; top: 0; height: 6px; border-radius: 3px; background: linear-gradient(90deg, transparent, #a855f7, transparent); box-shadow: 0 0 22px #a855f7; opacity: 0; }
+
+  /* Phone (screen matches the 390 × 844 screenshots exactly: 500 × 1082) */
+  #phone { left: 274px; top: 470px; width: 532px; height: 1114px; border-radius: 80px; background: #050508; transform-style: preserve-3d;
+    border: 2px solid rgba(255,255,255,0.14);
+    box-shadow: 0 50px 140px rgba(0,0,0,0.75), 0 0 100px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.14); opacity: 0; }
+  #screen { left: 16px; top: 16px; width: 500px; height: 1082px; border-radius: 64px; overflow: hidden; background: #eef0f6; }
+  #screen img.s { position: absolute; left: 0; top: 0; width: 500px; height: 1082px; opacity: 0; }
+  #island { left: 50%; top: 30px; width: 136px; height: 38px; margin-left: -68px; border-radius: 20px; background: #000; z-index: 20; }
+  .tap { position: absolute; width: 74px; height: 74px; margin: -37px 0 0 -37px; border-radius: 50%; background: rgba(124,58,237,0.28); border: 3px solid rgba(255,255,255,0.9); box-shadow: 0 0 24px rgba(124,58,237,0.6); opacity: 0; z-index: 15; }
+
+  #langs { left: 96px; width: 888px; top: 1632px; display: flex; justify-content: center; gap: 14px; }
+  #langs span { width: 96px; height: 62px; border-radius: 18px; display: grid; place-items: center; font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 500; color: var(--dim); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); opacity: 0; }
+
+  /* Tablet — the owner's screens (real screenshots, 1024 css px wide → 948 px) */
+  #tablet { left: 50px; top: 560px; width: 980px; height: 700px; border-radius: 46px; background: #050508; border: 2px solid rgba(255,255,255,0.14);
+    box-shadow: 0 50px 140px rgba(0,0,0,0.75), 0 0 110px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.14); opacity: 0; }
+  #tscreen { left: 16px; top: 16px; width: 948px; height: 668px; border-radius: 30px; overflow: hidden; background: #08080b; }
+  #tz { position: absolute; left: 0; top: 0; width: 948px; height: 975px; transform-origin: 0 0; }
+  #tz img { position: absolute; left: 0; top: 0; width: 948px; opacity: 0; }
+  .hi { position: absolute; border-radius: 20px; border: 3px solid #a855f7; box-shadow: 0 0 34px rgba(168,85,247,0.7), inset 0 0 24px rgba(168,85,247,0.25); opacity: 0; z-index: 4; }
+  #notif { left: 140px; top: 600px; width: 800px; padding: 22px 26px; border-radius: 28px; display: flex; gap: 18px; align-items: center; z-index: 5;
+    background: rgba(24,22,34,0.97); border: 1px solid rgba(124,58,237,0.45); box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(124,58,237,0.3); opacity: 0; }
+  #notif .ni { width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg,#7c3aed,#4f46e5); display: grid; place-items: center; flex-shrink: 0; }
+  #notif b { display: block; font-size: 27px; color: #fff; font-weight: 700; }
+  #notif span { display: block; margin-top: 4px; font-size: 22px; color: var(--muted); }
+  #notif em { margin-left: auto; align-self: flex-start; font-style: normal; font-size: 20px; color: var(--dim); }
+  .chips { left: 60px; width: 960px; top: 1330px; display: flex; justify-content: center; gap: 14px; }
+  .chips span { height: 60px; padding: 0 24px; border-radius: 18px; display: inline-flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; color: var(--text); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); opacity: 0; white-space: nowrap; }
+  .chips i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+
+  /* Printable QR codes — real print pages */
+  .paper { width: 560px; height: 526px; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(124,58,237,0.18); opacity: 0; }
+  .paper img { width: 560px; height: 526px; display: block; }
+  #paperA { left: 70px; top: 610px; }
+  #paperB { left: 450px; top: 800px; }
+
+  /* Pricing */
+  .plan { left: 96px; width: 888px; height: 196px; border-radius: 34px; padding: 0 44px; display: flex; align-items: center; justify-content: space-between; opacity: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+  .plan.f { background: linear-gradient(135deg, rgba(124,58,237,0.32), rgba(79,70,229,0.16)); border-color: rgba(168,85,247,0.6); box-shadow: 0 24px 60px rgba(0,0,0,0.45), 0 0 50px rgba(124,58,237,0.3); }
+  .plan b { display: block; font-size: 44px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+  .plan span { display: block; margin-top: 8px; font-size: 26px; color: var(--muted); }
+  .plan em { font-style: normal; text-align: right; }
+  .plan em strong { display: block; font-size: 72px; font-weight: 900; color: #fff; letter-spacing: -0.03em; line-height: 1; }
+  .plan em small { display: block; margin-top: 8px; font-size: 22px; font-weight: 600; color: #c4b5fd; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tag { position: absolute; top: -18px; left: 44px; height: 36px; padding: 0 16px; border-radius: 18px; background: #7c3aed; color: #fff; font-size: 19px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: grid; place-items: center; }
+  #pl1 { top: 560px; } #pl2 { top: 790px; } #pl3 { top: 1020px; }
+  #vsApps { left: 96px; width: 888px; top: 1290px; text-align: center; font-size: 30px; color: var(--muted); white-space: nowrap; }
+  #vsApps b { color: var(--text); font-weight: 600; }
+
+  /* End card — official logo file + live wordmark (Logo3D.tsx spec), nothing redrawn */
+  #endglow { left: 540px; top: 820px; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 62%); opacity: 0; }
+  #logoIcon { left: 452px; top: 520px; width: 176px; height: 176px; object-fit: contain; opacity: 0; }
+  #logoWord { left: 96px; width: 888px; top: 720px; text-align: center; white-space: nowrap; font-weight: 900; font-size: 76px; line-height: 1; letter-spacing: -0.015em; opacity: 0; }
+  #logoWord .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  #logoWord .b { color: #a855f7; margin-left: 0.33em; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  #sweep { left: 452px; top: 520px; width: 176px; height: 176px; overflow: hidden; opacity: 0; -webkit-mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; }
+  #sweep i { position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent); transform: skewX(-18deg); display: block; }
+  #rule { left: 390px; width: 300px; top: 860px; height: 2px; background: linear-gradient(90deg, transparent, #7c3aed, #a855f7, #818cf8, transparent); opacity: 0; }
+  #prod { left: 96px; width: 888px; top: 912px; text-align: center; font-size: 66px; font-weight: 800; letter-spacing: -0.03em; color: #fff; opacity: 0; }
+  #feat { left: 96px; width: 888px; top: 1010px; text-align: center; font-size: 30px; font-weight: 500; color: var(--muted); opacity: 0; white-space: nowrap; }
+  #price { left: 290px; width: 500px; top: 1100px; height: 84px; border-radius: 42px; display: grid; place-items: center; font-size: 32px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, rgba(124,58,237,0.35), rgba(109,40,217,0.25)); border: 1px solid rgba(168,85,247,0.55); box-shadow: 0 0 40px rgba(124,58,237,0.35); opacity: 0; }
+  #price span { color: #c4b5fd; font-weight: 600; }
+
+  #grain { inset: -50%; width: 200%; height: 200%; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 260px 260px; }
+  #vignette { inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 60% at 50% 50%, transparent 55%, rgba(0,0,0,0.65) 100%); }
+  #fade { inset: 0; background: #000; opacity: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ambient" class="abs"></div>
+  <div id="halo" class="abs"></div>
+
+  <!-- Hook -->
+  <div id="hook" class="abs center h1">
+    <div><span class="w">Your</span> <span class="w">menu</span> <span class="w">is</span></div>
+    <div><span class="w">losing</span> <span class="w hl">tourists.</span></div>
+  </div>
+  <div id="hook2" class="abs"><span class="w">One language.</span> <span class="w">No allergens.</span> <span class="w"><s>Paper.</s></span></div>
+
+  <!-- Intro: what's inside -->
+  <div id="meet" class="abs h1"><span class="w">Meet</span> <span class="w hl">MBN Menu.</span></div>
+  <div id="meetSub" class="abs"><span class="w">Your whole restaurant,</span> <span class="w">in one QR code.</span></div>
+  <div id="tiles" class="abs">
+    <div><i><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></i><div><b>7 languages</b><span>AI translation</span></div></div>
+    <div><i><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></i><div><b>14 allergens</b><span>EU 1169/2011</span></div></div>
+    <div><i><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></i><div><b>Table orders</b><span>Live tracking</span></div></div>
+    <div><i><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></i><div><b>Waiter &amp; bill</b><span>One tap</span></div></div>
+    <div><i><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></i><div><b>Bookings</b><span>In your hours</span></div></div>
+    <div><i><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="14" height="11" rx="2"/><path d="M6 18h6M9 14v4"/><rect x="17" y="9" width="5" height="12" rx="1.5"/></svg></i><div><b>Live screen</b><span>For the team</span></div></div>
+  </div>
+
+  <!-- Headline zone -->
+  <div id="eyebrow" class="abs eyebrow"><span class="w">MBN Menu</span></div>
+  <div id="hA" class="abs head h1"><span class="w">Scan</span> <span class="w">the</span> <span class="w hl">table.</span></div>
+  <div id="sA" class="abs sub"><span class="w">No app to install.</span> <span class="w"><b>Just the camera.</b></span></div>
+  <div id="hB" class="abs head h1"><span class="w">In</span> <span class="w">their</span> <span class="w hl">language.</span></div>
+  <div id="sB" class="abs sub"><span class="w">Write it once —</span> <span class="w"><b>AI translates the rest.</b></span></div>
+  <div id="hC" class="abs head h1"><span class="w">Allergens,</span> <span class="w hl">filtered.</span></div>
+  <div id="sC" class="abs sub"><span class="w">All</span> <span class="w"><b>14 EU allergens</b></span> <span class="w">on every dish.</span></div>
+  <div id="hD" class="abs head h1"><span class="w">Order</span> <span class="w">from</span> <span class="w">the</span> <span class="w hl">table.</span></div>
+  <div id="sD" class="abs sub"><span class="w">Options, extras</span> <span class="w">and a</span> <span class="w"><b>note for the kitchen.</b></span></div>
+  <div id="hT" class="abs head h1"><span class="w">Track</span> <span class="w">it</span> <span class="w hl">live.</span></div>
+  <div id="sT" class="abs sub"><span class="w">Received</span> <span class="w">→ Preparing</span> <span class="w">→ <b>On its way.</b></span></div>
+  <div id="hW" class="abs head h1"><span class="w">Waiter?</span> <span class="w">Bill?</span> <span class="w hl">One tap.</span></div>
+  <div id="sW" class="abs sub"><span class="w">With the table number</span> <span class="w"><b>and how they’ll pay.</b></span></div>
+  <div id="hK" class="abs head h1"><span class="w">Bookings,</span> <span class="w hl">built in.</span></div>
+  <div id="sK" class="abs sub"><span class="w">Inside your opening hours.</span> <span class="w"><b>You confirm.</b></span></div>
+  <div id="hL" class="abs head h1"><span class="w">One</span> <span class="w">live</span> <span class="w hl">screen.</span></div>
+  <div id="sL" class="abs sub"><span class="w">Orders, calls and bookings —</span> <span class="w"><b>with a sound.</b></span></div>
+  <div id="hE" class="abs head h1"><span class="w">Edit</span> <span class="w">in</span> <span class="w hl">seconds.</span></div>
+  <div id="sE" class="abs sub"><span class="w">Prices, allergens,</span> <span class="w"><b>sold out.</b></span></div>
+  <div id="hQ" class="abs head h1"><span class="w">Print</span> <span class="w">your</span> <span class="w hl">QR codes.</span></div>
+  <div id="sQ" class="abs sub"><span class="w">One per table,</span> <span class="w"><b>plus a window poster.</b></span></div>
+  <div id="hP" class="abs head h1"><span class="w">Pay</span> <span class="w hl">once.</span></div>
+  <div id="sP" class="abs sub"><span class="w">No monthly fee.</span> <span class="w"><b>No commission on orders.</b></span></div>
+
+  <!-- Table tent with the real QR code -->
+  <div id="tent" class="abs">
+    <div class="rn">MBN Restaurant</div>
+    <div class="tb">Table 7</div>
+    <div class="qrw"><img src="assets/menu/qr-demo.png" alt="" /><i class="brk" id="bk1"></i><i class="brk" id="bk2"></i><i class="brk" id="bk3"></i><i class="brk" id="bk4"></i><i id="scanline"></i></div>
+    <div class="sc">Scan for the menu</div>
+  </div>
+
+  <!-- Phone with the real guest screens -->
+  <div id="phone" class="abs">
+    <div id="island" class="abs"></div>
+    <div id="screen" class="abs">
+      <img class="s" id="s01" src="assets/menu/01_home.png" alt="" />
+      <img class="s" id="s02" src="assets/menu/02_langsheet.png" alt="" />
+      <img class="s" id="sEN" src="assets/menu/03_en.png" alt="" />
+      <img class="s" id="sFR" src="assets/menu/03_fr.png" alt="" />
+      <img class="s" id="sES" src="assets/menu/03_es.png" alt="" />
+      <img class="s" id="sIT" src="assets/menu/03_it.png" alt="" />
+      <img class="s" id="sPT" src="assets/menu/03_pt.png" alt="" />
+      <img class="s" id="sF1" src="assets/menu/04_filters.png" alt="" />
+      <img class="s" id="sF2a" src="assets/menu/04b1_gluten.png" alt="" />
+      <img class="s" id="sF2b" src="assets/menu/04b2_crust.png" alt="" />
+      <img class="s" id="sF2" src="assets/menu/04b_filters_on.png" alt="" />
+      <img class="s" id="sF3" src="assets/menu/05_filtered.png" alt="" />
+      <img class="s" id="sM" src="assets/menu/10_mains.png" alt="" />
+      <img class="s" id="sR1" src="assets/menu/10a_ribeye.png" alt="" />
+      <img class="s" id="sR2" src="assets/menu/10b_medium.png" alt="" />
+      <img class="s" id="sR3" src="assets/menu/10c_pepper.png" alt="" />
+      <img class="s" id="sR4" src="assets/menu/10d_note.png" alt="" />
+      <img class="s" id="sCart" src="assets/menu/11_cart.png" alt="" />
+      <img class="s" id="sT1" src="assets/menu/12_new.png" alt="" />
+      <img class="s" id="sT2" src="assets/menu/12_preparing.png" alt="" />
+      <img class="s" id="sT3" src="assets/menu/12_ready.png" alt="" />
+      <img class="s" id="sW1" src="assets/menu/13_actions.png" alt="" />
+      <img class="s" id="sW2" src="assets/menu/13_waiter.png" alt="" />
+      <img class="s" id="sW3" src="assets/menu/14_billsheet.png" alt="" />
+      <img class="s" id="sW4" src="assets/menu/14b_bill.png" alt="" />
+      <img class="s" id="sK1" src="assets/menu/15_book.png" alt="" />
+      <img class="s" id="sK2" src="assets/menu/15a_form.png" alt="" />
+      <img class="s" id="sK3" src="assets/menu/15b_slot.png" alt="" />
+      <img class="s" id="sK4" src="assets/menu/15c_filled.png" alt="" />
+      <img class="s" id="sK5" src="assets/menu/16_booked.png" alt="" />
+      <img class="s" id="sK6" src="assets/menu/16b_confirmed.png" alt="" />
+      <i class="tap" id="tap"></i>
+    </div>
+  </div>
+  <div id="langs" class="abs"><span>EN</span><span>FR</span><span>ES</span><span>IT</span><span>PT</span><span>DE</span><span>AR</span></div>
+
+  <!-- Tablet with the real owner screens -->
+  <div id="tablet" class="abs">
+    <div id="tscreen" class="abs"><div id="tz">
+      <img id="oLive" src="assets/menu/20_live_full.png" alt="" />
+      <img id="oEd" src="assets/menu/21_editor.png" alt="" />
+      <img id="oSold" src="assets/menu/21b_soldout.png" alt="" />
+      <img id="oDish" src="assets/menu/21c_dish.png" alt="" />
+      <!-- highlight boxes in tablet-screen px (css px × 948/1024) -->
+      <i id="hiT7" class="hi" style="left:20px;top:440px;width:440px;height:160px"></i>
+      <i id="hiBk" class="hi" style="left:20px;top:836px;width:450px;height:92px"></i>
+      <i id="hiRow" class="hi" style="left:20px;top:612px;width:908px;height:44px;border-radius:12px"></i>
+      <i id="hiAl" class="hi" style="left:172px;top:364px;width:600px;height:132px;border-radius:16px"></i>
+    </div></div>
+  </div>
+  <div id="notif" class="abs">
+    <span class="ni"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+    <div><b>New order · table 7 · €24.00</b><span>1× Rib-eye 300 g · Medium, + Pepper sauce</span></div><em>now</em>
+  </div>
+  <div id="chipsL" class="abs chips">
+    <span><i style="background:#a855f7"></i>Table 7 · order</span>
+    <span><i style="background:#f43f5e"></i>Table 5 · bill</span>
+    <span><i style="background:#22d3ee"></i>Sophie · 20:00 · 4</span>
+  </div>
+  <div id="chipsE" class="abs chips">
+    <span><i style="background:#a855f7"></i>Change a price</span>
+    <span><i style="background:#f59e0b"></i>Sold out</span>
+    <span><i style="background:#10b981"></i>Allergens</span>
+  </div>
+
+  <!-- Real print pages -->
+  <div id="paperA" class="abs paper"><img src="assets/menu/23_qr_cards_crop.png" alt="" /></div>
+  <div id="paperB" class="abs paper"><img src="assets/menu/23b_poster_crop.png" alt="" /></div>
+
+  <!-- Pricing (products/menu: one-time) -->
+  <div id="pl1" class="abs plan"><div><b>Starter</b><span>1 restaurant · everything included</span></div><em><strong>$37</strong><small>one-time</small></em></div>
+  <div id="pl2" class="abs plan f"><i class="tag">Popular</i><div><b>Pro</b><span>3 restaurants</span></div><em><strong>$67</strong><small>one-time</small></em></div>
+  <div id="pl3" class="abs plan"><div><b>Agency</b><span>25 restaurants · your brand</span></div><em><strong>$97</strong><small>one-time</small></em></div>
+  <div id="vsApps" class="abs"><span class="w">Delivery apps take</span> <span class="w"><b>25–35% of every order.</b></span></div>
+
+  <!-- End card -->
+  <div id="endglow" class="abs"></div>
+  <img id="logoIcon" class="abs" src="assets/brand-icon-transparent.webp" alt="MBN DEV" />
+  <div id="sweep" class="abs"><i></i></div>
+  <div id="logoWord" class="abs"><span class="a">MBN</span><span class="b">DEV</span></div>
+  <div id="rule" class="abs"></div>
+  <div id="prod" class="abs">MBN Menu</div>
+  <div id="feat" class="abs">Languages · Allergens · Orders · Bookings</div>
+  <div id="price" class="abs"><div>From $37 <span>· mbndev.ma</span></div></div>
+
+  <div id="grain" class="abs"></div>
+  <div id="vignette" class="abs"></div>
+  <div id="fade" class="abs"></div>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+  const EXPO = 'expo.out';
+  gsap.defaults({ ease: EXPO });
+  const tl = gsap.timeline({ paused: true });
+  const SFX = [];
+  const S = (type, t, o = {}) => SFX.push({ type, t: Math.round(t * 1000) / 1000, ...o });
+  // Voice-over: one clip per line (ids match the narration script), placed at these times.
+  const VO = { hook: 0.4, intro: 3.5, scan: 7.9, lang: 13.7, allerg: 19.0, order: 24.8, track: 30.1, waiter: 34.0, book: 39.1, live: 45.1, edit: 49.5, qr: 54.1, price: 58.2, end: 63.8 };
+  const IN = (targets, at, extra = {}) => tl.to(targets, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.07, ...extra }, at);
+  const OUT = (targets, at, extra = {}) => tl.to(targets, { opacity: 0, y: -40, filter: 'blur(12px)', duration: 0.38, ease: 'power2.in', stagger: 0, ...extra }, at);
+  // A scene's headline + sub-line in, and the previous one out.
+  let head = null;
+  const HEAD = (h, s, at) => {
+    if (head) OUT(head, at - 0.25);
+    IN(`${h} .w`, at);
+    IN(`${s} .w`, at + 0.25, { stagger: 0.1 });
+    head = `${h} .w, ${s} .w`;
+  };
+
+  // Screen changes inside the phone: quick cross-fade (app-like), sheets rise a little.
+  let current = null;
+  const SHOW = (id, at, { dur = 0.22, rise = 0 } = {}) => {
+    if (current) tl.to(current, { opacity: 0, duration: dur * 0.9, ease: 'power1.in' }, at + dur * 0.4);
+    tl.fromTo(id, { opacity: 0, y: rise }, { opacity: 1, y: 0, duration: dur, ease: rise ? EXPO : 'power1.out' }, at);
+    current = id;
+  };
+  // Owner screens inside the tablet.
+  let tcur = null;
+  const TSHOW = (id, at, dur = 0.3) => {
+    if (tcur) tl.to(tcur, { opacity: 0, duration: dur, ease: 'power1.in' }, at + dur * 0.4);
+    tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: dur, ease: 'power1.out' }, at);
+    tcur = id;
+  };
+  const HI = (id, at, hold = 1.2) => tl.fromTo(id, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(2)' }, at).to(id, { opacity: 0, duration: 0.3, ease: 'power1.in' }, at + hold);
+  // A finger tap at a point of the 390 × 844 screen (× 500/390 in the phone).
+  const K = 500 / 390;
+  let tapV = 0;
+  const TAP = (x, y, at) => {
+    tl.set('#tap', { left: x * K, top: y * K }, at)
+      .fromTo('#tap', { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 0.85, duration: 0.14, ease: 'power2.out' }, at)
+      .to('#tap', { scale: 1.25, opacity: 0, duration: 0.32, ease: 'power2.out' }, at + 0.16);
+    S('tap', at + 0.1, { v: tapV++ % 2 });
+  };
+
+  gsap.set('.w', { opacity: 0, y: 40, filter: 'blur(12px)' });
+  gsap.set('#tiles > div', { y: 40, scale: 0.96, filter: 'blur(10px)' });
+  gsap.set('#tent', { y: 140, rotationX: 18, filter: 'blur(14px)', transformPerspective: 2200, transformOrigin: '50% 100%' });
+  gsap.set('#phone', { y: 220, rotationX: 14, filter: 'blur(14px)', transformPerspective: 2200, transformOrigin: '50% 100%' });
+  gsap.set('#tablet', { y: 120, scale: 0.94, filter: 'blur(14px)' });
+  gsap.set('#notif', { y: -50, scale: 0.96 });
+  gsap.set('#langs span, .chips span', { y: 20 });
+  gsap.set('#paperA', { y: 160, rotation: -7, filter: 'blur(12px)' });
+  gsap.set('#paperB', { y: 160, rotation: 6, filter: 'blur(12px)' });
+  gsap.set('.plan', { y: 60, filter: 'blur(10px)' });
+  gsap.set('#logoIcon', { scale: 0.94, filter: 'blur(8px)' });
+  gsap.set('#logoWord, #prod, #feat, #price', { y: 14 });
+
+  // ── Hook · 0–3.3 ────────────────────────────────────────────────────────────
+  tl.to('#fade', { opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+    .to('#ambient', { opacity: 0.55, duration: 1.4, ease: 'power2.out' }, 0.2);
+  S('impactSoft', 0.25);
+  IN('#hook .w', 0.25);
+  IN('#hook2 .w', 1.2, { stagger: 0.32, duration: 0.6 });
+  S('tick', 1.25); S('tick', 1.57, { v: 1 }); S('cut', 1.9);
+  OUT('#hook .w, #hook2 .w', 3.05);
+
+  // ── Intro · what's inside · 3.3–7.6 ─────────────────────────────────────────
+  S('whoosh', 3.35);
+  tl.to('#ambient', { opacity: 1, duration: 1.2 }, 3.3).to('#halo', { opacity: 0.8, duration: 1.4 }, 3.3);
+  IN('#meet .w', 3.4);
+  IN('#meetSub .w', 4.3, { stagger: 0.15 });
+  tl.to('#tiles > div', { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.7, stagger: 0.16 }, 5.0);
+  [0, 1, 2, 3, 4, 5].forEach((k) => S('tick', 5.05 + k * 0.16, { v: k % 2 }));
+  OUT('#meet .w, #meetSub .w', 7.3);
+  tl.to('#tiles > div', { opacity: 0, y: -30, scale: 0.97, filter: 'blur(10px)', duration: 0.4, stagger: 0.03, ease: 'power2.in' }, 7.3);
+
+  // ── A · Scan the table · 7.6–13.4 ───────────────────────────────────────────
+  IN('#eyebrow .w', 7.65);
+  HEAD('#hA', '#sA', 7.75);
+  S('whoosh', 7.7, { v: 1 });
+  tl.to('#halo', { opacity: 1, duration: 1.4 }, 7.7)
+    .to('#tent', { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1.1 }, 7.85);
+  tl.fromTo('.brk', { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.45, stagger: 0.04, ease: 'back.out(2)' }, 8.7)
+    .to('#scanline', { opacity: 1, duration: 0.1 }, 8.95)
+    .fromTo('#scanline', { top: 0 }, { top: 334, duration: 0.7, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 8.95)
+    .to('#scanline', { opacity: 0, duration: 0.15 }, 10.35)
+    .to('.brk', { borderColor: '#10b981', duration: 0.2 }, 10.2);
+  S('snap', 8.75); S('ticks', 8.95, { d: 1.2 }); S('confirm', 10.2);
+  tl.to('#tent', { opacity: 0, y: -60, scale: 0.86, filter: 'blur(16px)', duration: 0.55, ease: 'power2.in' }, 10.5);
+  SHOW('#s01', 10.5, { dur: 0.01 });
+  tl.to('#phone', { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1.0 }, 10.6)
+    .to('#phone', { y: -14, duration: 33, ease: 'sine.inOut' }, 11.6);
+  S('whoosh', 10.6);
+
+  // ── B · In their language · 13.4–18.8 ──────────────────────────────────────
+  HEAD('#hB', '#sB', 13.5);
+  IN('#langs span', 13.65, { stagger: 0.04, duration: 0.6 });
+  const chip = (i, on, at) => tl.to(`#langs span:nth-child(${i + 1})`, on
+    ? { color: '#ffffff', backgroundColor: 'rgba(124,58,237,0.28)', borderColor: 'rgba(168,85,247,0.75)', boxShadow: '0 0 22px rgba(124,58,237,0.45)', duration: 0.2 }
+    : { color: '#64748b', backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.09)', boxShadow: '0 0 0 rgba(0,0,0,0)', duration: 0.2 }, at);
+  chip(0, true, 13.9);
+  TAP(293, 39, 14.0);
+  SHOW('#s02', 14.15, { dur: 0.32, rise: 60 });
+  S('swipe', 14.15);
+  [['#sFR', 1], ['#sES', 2], ['#sIT', 3], ['#sPT', 4]].forEach(([id, i], k) => {
+    const at = 15.05 + k * 0.78;
+    chip(i - 1, false, at); chip(i, true, at);
+    SHOW(id, at, { dur: k ? 0.16 : 0.26 });
+    S('click', at, { v: k % 2 });
+  });
+  chip(4, false, 18.5);
+  OUT('#langs span', 18.55, { y: 20 });
+
+  // ── C · Allergens, filtered · 18.8–24.4 ────────────────────────────────────
+  HEAD('#hC', '#sC', 18.95);
+  SHOW('#sEN', 18.75, { dur: 0.2 });
+  TAP(325, 35, 19.7);
+  SHOW('#sF1', 19.88, { dur: 0.32, rise: 60 });
+  S('swipe', 19.88);
+  TAP(63, 569, 20.7);  SHOW('#sF2a', 20.77, { dur: 0.01 });
+  TAP(179, 569, 21.2); SHOW('#sF2b', 21.27, { dur: 0.01 });
+  TAP(319, 609, 21.7); SHOW('#sF2', 21.77, { dur: 0.01 });
+  TAP(287, 799, 22.5); SHOW('#sF3', 22.65, { dur: 0.14 });
+  S('settle', 22.7);
+
+  // ── D · Order from the table · 24.4–29.9 ───────────────────────────────────
+  HEAD('#hD', '#sD', 24.55);
+  SHOW('#sM', 24.45, { dur: 0.22 });
+  TAP(195, 781, 25.2);
+  SHOW('#sR1', 25.35, { dur: 0.34, rise: 70 });
+  S('swipe', 25.35);
+  TAP(195, 477, 26.1); SHOW('#sR2', 26.17, { dur: 0.01 });
+  TAP(195, 620, 26.75); SHOW('#sR3', 26.82, { dur: 0.01 });
+  TAP(195, 833, 27.4); SHOW('#sR4', 27.55, { dur: 0.18 });
+  S('typing', 27.6, { d: 0.6 });
+  TAP(256, 799, 28.35); S('pop', 28.5);
+  TAP(329, 813, 29.0); SHOW('#sCart', 29.15, { dur: 0.16 });
+
+  // ── E · Track it live · 29.9–33.7 ──────────────────────────────────────────
+  HEAD('#hT', '#sT', 30.05);
+  TAP(195, 725, 30.45);
+  SHOW('#sT1', 30.6, { dur: 0.16 });
+  S('send', 30.6);
+  SHOW('#sT2', 31.55, { dur: 0.2 }); S('confirmSoft', 31.6);
+  SHOW('#sT3', 32.55, { dur: 0.2 }); S('confirmSoft', 32.6, { v: 1 });
+
+  // ── F · Waiter / bill · 33.7–38.8 ──────────────────────────────────────────
+  HEAD('#hW', '#sW', 33.85);
+  SHOW('#sW1', 33.75, { dur: 0.25 });
+  TAP(113, 690, 34.6); SHOW('#sW2', 34.72, { dur: 0.16 }); S('notify', 34.8);
+  TAP(277, 690, 35.95); SHOW('#sW3', 36.1, { dur: 0.32, rise: 60 }); S('swipe', 36.1);
+  TAP(75, 678, 36.75); S('click', 36.8);
+  TAP(195, 799, 37.35); SHOW('#sW4', 37.5, { dur: 0.18 }); S('notify', 37.55, { v: 1 });
+
+  // ── G · Bookings · 38.8–44.7 ────────────────────────────────────────────────
+  HEAD('#hK', '#sK', 38.95);
+  TAP(150, 813, 38.8);
+  SHOW('#sK1', 38.95, { dur: 0.22 });
+  SHOW('#sK2', 39.75, { dur: 0.4, rise: 90 }); S('swipe', 39.75, { v: 1 });
+  TAP(306, 279, 40.45); TAP(306, 279, 40.75);
+  TAP(198, 359, 41.25); SHOW('#sK3', 41.35, { dur: 0.01 });
+  SHOW('#sK4', 41.95, { dur: 0.2 }); S('typing', 41.9, { d: 0.5 });
+  TAP(195, 690, 42.75);
+  SHOW('#sK5', 42.9, { dur: 0.22 }); S('send', 42.9);
+  SHOW('#sK6', 43.9, { dur: 0.25 }); S('confirm', 43.95);
+
+  // ── H · One live screen · 44.7–49.3 ────────────────────────────────────────
+  tl.to('#phone', { opacity: 0, y: '+=120', scale: 0.9, filter: 'blur(14px)', duration: 0.5, ease: 'power2.in' }, 44.6);
+  HEAD('#hL', '#sL', 45.0);
+  TSHOW('#oLive', 44.9, 0.01);
+  tl.to('#tablet', { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.0 }, 45.0);
+  S('whoosh', 45.0);
+  tl.to('#notif', { opacity: 1, y: 0, scale: 1, duration: 0.7 }, 45.75)
+    .to('#notif', { opacity: 0, y: -30, duration: 0.35, ease: 'power2.in' }, 46.85);
+  S('notify', 45.8);
+  // zoom into Table 7, then glide down to the bookings (full-page capture, 975 px tall)
+  tl.to('#tz', { scale: 1.45, x: -10, y: -458, duration: 0.9, ease: 'power3.inOut' }, 46.05);
+  HI('#hiT7', 46.6, 0.8);
+  tl.to('#tz', { y: -746, duration: 1.0, ease: 'power3.inOut' }, 47.45);
+  S('swipe', 47.45, { v: 1 });
+  HI('#hiBk', 48.35, 0.75);
+  IN('#chipsL span', 46.4, { stagger: 0.12, duration: 0.6 });
+  OUT('#chipsL span', 49.1, { y: 20 });
+
+  // ── I · Edit in seconds · 49.3–53.8 ────────────────────────────────────────
+  HEAD('#hE', '#sE', 49.45);
+  TSHOW('#oEd', 49.35, 0.3); S('swipe', 49.35);
+  tl.to('#tz', { scale: 1, x: 0, y: 0, duration: 0.5, ease: 'power3.inOut' }, 49.2)
+    .to('#tz', { scale: 1.2, x: -95, y: -132, duration: 0.8, ease: 'power3.inOut' }, 49.75);
+  IN('#chipsE span', 49.9, { stagger: 0.12, duration: 0.6 });
+  HI('#hiRow', 50.4, 1.2);
+  TSHOW('#oSold', 50.8, 0.12); S('click', 50.8);
+  TSHOW('#oDish', 51.75, 0.3); S('swipe', 51.75, { v: 1 });
+  tl.to('#tz', { scale: 1.3, x: -164, y: -199, duration: 0.8, ease: 'power3.inOut' }, 51.9);
+  HI('#hiAl', 52.5, 1.0);
+  OUT('#chipsE span', 53.6, { y: 20 });
+  tl.to('#tablet', { opacity: 0, y: '+=80', filter: 'blur(14px)', duration: 0.45, ease: 'power2.in' }, 53.6);
+
+  // ── J · QR codes · 53.8–57.9 ───────────────────────────────────────────────
+  HEAD('#hQ', '#sQ', 54.0);
+  tl.to('#paperA', { opacity: 1, y: 0, rotation: -5, filter: 'blur(0px)', duration: 1.0 }, 54.2)
+    .to('#paperB', { opacity: 1, y: 0, rotation: 4, filter: 'blur(0px)', duration: 1.0 }, 54.75)
+    .to('#paperA', { y: -16, rotation: -4, duration: 3, ease: 'sine.inOut' }, 55.2)
+    .to('#paperB', { y: -10, rotation: 3, duration: 3, ease: 'sine.inOut' }, 55.75);
+  S('swipe', 54.2); S('swipe', 54.75, { v: 1 });
+  tl.to('#paperA, #paperB', { opacity: 0, y: '+=80', filter: 'blur(14px)', duration: 0.45, ease: 'power2.in', stagger: 0.05 }, 57.7);
+
+  // ── K · Pricing · 57.9–63.5 ────────────────────────────────────────────────
+  HEAD('#hP', '#sP', 58.05);
+  tl.to('.plan', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.28 }, 58.6);
+  S('tick', 58.65, { v: 0 % 2 }); S('tick', 58.93, { v: 1 % 2 }); S('tick', 59.21, { v: 2 % 2 });
+  IN('#vsApps .w', 60.9, { stagger: 0.15 });
+  OUT('#eyebrow .w', 63.3);
+  OUT(head, 63.3); head = null;
+  tl.to('.plan', { opacity: 0, y: -30, filter: 'blur(10px)', duration: 0.4, stagger: 0.04, ease: 'power2.in' }, 63.3);
+  OUT('#vsApps .w', 63.3);
+
+  // ── End card · 63.6–68 ─────────────────────────────────────────────────────
+  tl.to('#halo, #ambient', { opacity: 0.25, duration: 0.6 }, 63.4)
+    .to('#endglow', { opacity: 1, duration: 1.0, ease: 'power2.out' }, 63.75)
+    .to('#logoIcon', { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.9 }, 63.8)
+    .set('#sweep', { opacity: 1 }, 64.15)
+    .fromTo('#sweep i', { left: '-60%' }, { left: '130%', duration: 0.9, ease: 'power2.inOut' }, 64.15)
+    .to('#logoWord', { opacity: 1, y: 0, duration: 0.8 }, 64.0)
+    .to('#rule', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 64.25)
+    .to('#prod', { opacity: 1, y: 0, duration: 0.8 }, 64.3)
+    .to('#feat', { opacity: 1, y: 0, duration: 0.8 }, 64.5)
+    .to('#price', { opacity: 1, y: 0, duration: 0.8 }, 64.75)
+    .to('#endglow', { opacity: 0.6, duration: 0.6, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 65.2)
+    .to('#fade', { opacity: 1, duration: 0.6, ease: 'power1.in' }, 67.4);
+  S('impactSoft', 63.8);
+
+  window.__sfx = SFX.sort((a, b) => a.t - b.t);
+  window.__vo = Object.entries(VO).map(([id, t]) => ({ id, t }));
+  window.__render = (t, frame) => {
+    tl.seek(t, false);
+    const r = (n) => ((Math.sin(frame * 12.9898 + n * 78.233) * 43758.5453) % 1);
+    gsap.set('#grain', { x: r(1) * 60, y: r(2) * 60 });
+  };
+  window.__duration = 68;
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>

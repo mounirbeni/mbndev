@@ -177,3 +177,30 @@ Render with `--blur 3`, then add the synthesised sound (`cues.mjs` → `sfx.py`)
 | 14.0–18.4s | Order from the table · dish → ×2 → Add → order → Send to the kitchen → order tracker |
 | 18.4–21.2s | The kitchen sees it · owner's Live orders tab, Table 7 €40.50 highlighted, new-order notification |
 | 21.2–24s | Official logo end card · MBN Menu · 7 languages · 14 allergens · Table ordering · From $37 |
+
+## menu-explainer.html — MBN Menu walkthrough (68s, voice-over, no music)
+
+The detailed product video: every feature on the MBN Menu page, paced on a female voice-over
+(`window.__vo` gives one clip id + start time per line; the clips are Kokoro-82M `af_heart`, generated locally).
+Real screenshots only: the extra guest and owner screens come from
+`node menu-explainer-shots.cjs --restaurant <id> --password …` (see the header of that file for the orders,
+bill and booking to place first). Sound is the UI sound design only — no ambience bed, no music.
+Render with `--blur 3`; `cues.mjs` → `sfx.py` for the sound; then lay the VO clips at their `__vo` times,
+duck the sound under the voice and mux.
+
+| Time | Scene | Voice-over |
+|---|---|---|
+| 0–3.3s | Hook · "Your menu is losing tourists." | Your menu is losing tourists. Here's the fix. |
+| 3.3–7.6s | Meet MBN Menu · six feature tiles | Meet MBN Menu. Your whole restaurant, in one QR code. |
+| 7.6–13.4s | Scan the table · real QR → phone opens the menu | Guests scan the code… No app to install. |
+| 13.4–18.8s | In their language · language sheet, EN → FR → ES → IT → PT | Seven languages, and AI translates your menu in a minute. |
+| 18.8–24.4s | Allergens, filtered · Filters → Gluten, Crustaceans, Milk | Every dish shows the 14 EU allergens… |
+| 24.4–29.9s | Order from the table · Rib-eye → Medium → Pepper sauce → note → Add → Order | They pick options and extras, add a note for the kitchen… |
+| 29.9–33.7s | Track it live · Received → Preparing → On its way | Then they follow it live… |
+| 33.7–38.8s | Waiter? Bill? One tap. · waiter toast, bill sheet (payment method) | Need the waiter, or the bill? One tap… |
+| 38.8–44.7s | Bookings, built in · slot, guests, name → request → Confirmed | They can book a table, too, inside your opening hours… |
+| 44.7–49.3s | One live screen · Live orders with the Table 7 rib-eye, zoom → bookings | Orders, calls and bookings arrive on one live screen… |
+| 49.3–53.8s | Edit in seconds · menu editor, sold out, Edit dish allergens | Change a price, edit allergens, or mark a dish sold out… |
+| 53.8–57.9s | Print your QR codes · real table cards + window poster | Print one QR code per table, plus a poster for your window. |
+| 57.9–63.5s | Pay once · Starter $37 / Pro $67 / Agency $97 one-time | Pay once, from $37. No monthly fee. No commission… |
+| 63.5–68s | Official logo end card · From $37 · mbndev.ma | MBN Menu. At mbndev.ma. |
