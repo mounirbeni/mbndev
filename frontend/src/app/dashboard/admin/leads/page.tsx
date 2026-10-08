@@ -8,10 +8,11 @@ import toast from 'react-hot-toast';
 import {
   Target, Mail, Phone, Instagram, Globe, Download, Plus,
   Flame, Star, X, Send, Copy, ExternalLink, Trash2, RefreshCcw,
-  ChevronDown, MessageCircle, Check, Zap, AlertTriangle, MapPin,
+  ChevronDown, MessageCircle, Check, Zap, AlertTriangle, MapPin, FileSpreadsheet,
 } from 'lucide-react';
 import { LEAD_GROUPS, LEAD_TYPES, leadType, type LeadGroupId } from '@/lib/leadTypes';
 import AccentText from '@/components/ui/AccentText';
+import { buildXlsx, downloadXlsx } from '@/lib/xlsx';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Lead {
@@ -170,6 +171,22 @@ export default function AdminLeadsPage() {
     } finally {
       setBulkResetting(false);
     }
+  };
+
+  // ── Export every lead (all filters ignored) to Excel ──────────────────────
+  const handleExport = () => {
+    if (!leads.length) { toast.error('No leads to export yet.'); return; }
+    const day = (iso?: string) => (iso ? iso.slice(0, 10) : '');
+    const rows = [
+      ['Name', 'Type', 'City', 'Country', 'Phone / WhatsApp', 'Email', 'Instagram', 'Website', 'Priority', 'Status', 'Outreach angle', 'Notes', 'Source', 'Email sent', 'Added'],
+      ...leads.map((l) => [
+        l.name, leadType(l.type).label, l.city, l.country ?? '', l.phone ?? '', l.email ?? '', l.instagram ?? '',
+        l.website ?? '', l.priority, l.status, l.outreachAngle ?? '', l.notes ?? '', l.source ?? '', day(l.emailSentAt), day(l.createdAt),
+      ]),
+    ];
+    downloadXlsx(`mbndev-leads-${new Date().toISOString().slice(0, 10)}.xlsx`,
+      buildXlsx(rows, { sheetName: 'Leads', widths: [32, 16, 16, 12, 18, 30, 22, 26, 9, 12, 60, 40, 20, 12, 12] }));
+    toast.success(`Exported ${leads.length} leads.`);
   };
 
   // ── Import defaults ───────────────────────────────────────────────────────
@@ -333,6 +350,11 @@ export default function AdminLeadsPage() {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-400 hover:text-white text-sm transition-colors"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <RefreshCcw className="w-3.5 h-3.5" /> Refresh
+          </button>
+          <button onClick={handleExport}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+            style={{ background: 'rgba(132,204,22,0.14)', border: '1px solid rgba(132,204,22,0.3)', color: '#a3e635' }}>
+            <FileSpreadsheet className="w-3.5 h-3.5" /> Export Excel
           </button>
           <button onClick={handleTestEmail} disabled={testSending}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
