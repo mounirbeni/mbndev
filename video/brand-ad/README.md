@@ -160,3 +160,20 @@ Taken from the live sites with headless Chrome (popups closed, page scrolled so 
 `tarique-hero.jpg`, `tarique-trust.jpg`, `tarique-mobile.jpg` (tarique.ma). Desktop 1440×900, mobile 1170×2532.
 Ready data: `data/showcase-riad.json`, `data/showcase-tarique.json`, `data/case-riad.json`, `data/case-tarique.json`.
 `case-study.html` accepts an optional `eyebrow` (defaults to "CASE STUDY").
+
+## menu.html — "Scan. Read. Order." · MBN Menu (24s)
+
+Product video for MBN Menu. Every screen in the phone and the tablet is a real screenshot of the
+product (`assets/menu/*`, captured with `node menu-shots.cjs --restaurant <id> --password …` against a
+local dev server). The QR code on the table card opens the live demo (mbndev.ma/m/demo).
+Render with `--blur 3`, then add the synthesised sound (`cues.mjs` → `sfx.py`) and mux.
+
+| Time | Scene |
+|---|---|
+| 0–2.6s | "Your menu is losing tourists." · One language. No allergens. ~~Paper.~~ |
+| 2.6–6.2s | Scan the table · table card with the real QR code, scan brackets, the phone opens the menu |
+| 6.2–10.2s | In their language · the same list in EN → FR → ES → IT → PT, language chips (7 supported) |
+| 10.2–14.0s | Allergens, filtered · Filters → Gluten, Crustaceans, Milk → filtered list |
+| 14.0–18.4s | Order from the table · dish → ×2 → Add → order → Send to the kitchen → order tracker |
+| 18.4–21.2s | The kitchen sees it · owner's Live orders tab, Table 7 €40.50 highlighted, new-order notification |
+| 21.2–24s | Official logo end card · MBN Menu · 7 languages · 14 allergens · Table ordering · From $37 |

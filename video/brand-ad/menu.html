@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MBN Menu — Scan. Read. Order. (9:16)</title>
+<!-- Brand fonts only (BRAND_GUIDE.md §4): Inter + JetBrains Mono -->
+<link rel="stylesheet" href="node_modules/@fontsource/inter/400.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/500.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/600.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/700.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/800.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/inter/900.css" />
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/500.css" />
+<style>
+  /*
+    "Scan. Read. Order." — MBN Menu, 24 s, 1080 × 1920.
+    Every screen inside the phone and the tablet is a real screenshot of the product:
+    the live demo at /m/demo (guest side) and the owner's Live orders tab with real orders
+    (assets/menu/*, captured by menu-shots.cjs). The QR code opens the real demo.
+    Layout: 96px side margins · header zone (eyebrow top 250, headline top 300) ·
+    phone x 274 → 806, y 470 → 1584 · caption row at y 1650 · end card on the optical centre.
+  */
+  :root { --bg: #08080b; --primary: #7c3aed; --primary-light: #a855f7; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; --hair: rgba(255,255,255,0.07); --cy: 920px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; background: var(--bg); overflow: hidden; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-feature-settings: 'cv02','cv03','cv04','cv11'; -webkit-font-smoothing: antialiased; color: var(--text); }
+  .abs { position: absolute; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); perspective: 2200px; }
+  #ambient { inset: -10%; opacity: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 62%, rgba(124,58,237,0.20) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 15% 22%, rgba(59,130,246,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 28% at 85% 85%, rgba(6,182,212,0.05) 0%, transparent 55%); }
+  #halo { left: 540px; top: 1030px; width: 1100px; height: 1100px; margin: -550px 0 0 -550px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 62%); opacity: 0; }
+
+  .w { display: inline-block; will-change: transform, opacity, filter; }
+  .hl { color: var(--primary-light); }
+  .h1 { font-weight: 800; font-size: 92px; line-height: 1.06; letter-spacing: -0.035em; color: #fff; }
+  .eyebrow { font-weight: 700; font-size: 26px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary-light); }
+  .center { left: 96px; width: 888px; top: var(--cy); transform: translateY(-50%); text-align: center; }
+  #eyebrow { left: 96px; width: 888px; top: 250px; text-align: center; }
+  .head { left: 60px; width: 960px; top: 296px; text-align: center; white-space: nowrap; font-size: 76px; }
+  .cap { left: 96px; width: 888px; top: 1640px; text-align: center; font-size: 34px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+  .cap b { color: #fff; font-weight: 700; }
+
+  /* Hook sub-line */
+  #hook2 { left: 96px; width: 888px; top: 1060px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 30px; color: var(--dim); letter-spacing: 0.02em; }
+  #hook2 s { text-decoration-color: rgba(168,85,247,0.8); text-decoration-thickness: 3px; }
+
+  /* Table tent with the real QR code (opens mbndev.ma/m/demo) */
+  #tent { left: 300px; top: 600px; width: 480px; height: 700px; border-radius: 40px; background: #f8f7fc; color: #0b0b12; text-align: center; padding: 46px 40px 0;
+    box-shadow: 0 50px 120px rgba(0,0,0,0.7), 0 0 120px rgba(124,58,237,0.25); opacity: 0; }
+  #tent .rn { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  #tent .tb { margin-top: 6px; font-size: 22px; font-weight: 600; color: #6b7280; letter-spacing: 0.12em; text-transform: uppercase; }
+  #tent .qrw { position: relative; margin: 34px auto 0; width: 340px; height: 340px; }
+  #tent .qrw img { width: 340px; height: 340px; display: block; }
+  #tent .sc { margin-top: 30px; font-size: 26px; font-weight: 700; }
+  .brk { position: absolute; width: 70px; height: 70px; border: 7px solid #7c3aed; opacity: 0; }
+  #bk1 { left: -22px; top: -22px; border-right: 0; border-bottom: 0; border-top-left-radius: 22px; }
+  #bk2 { right: -22px; top: -22px; border-left: 0; border-bottom: 0; border-top-right-radius: 22px; }
+  #bk3 { left: -22px; bottom: -22px; border-right: 0; border-top: 0; border-bottom-left-radius: 22px; }
+  #bk4 { right: -22px; bottom: -22px; border-left: 0; border-top: 0; border-bottom-right-radius: 22px; }
+  #scanline { position: absolute; left: -8px; right: -8px; top: 0; height: 6px; border-radius: 3px; background: linear-gradient(90deg, transparent, #a855f7, transparent); box-shadow: 0 0 22px #a855f7; opacity: 0; }
+
+  /* Phone (screen matches the 390 × 844 screenshots exactly: 500 × 1082) */
+  #phone { left: 274px; top: 470px; width: 532px; height: 1114px; border-radius: 80px; background: #050508; transform-style: preserve-3d;
+    border: 2px solid rgba(255,255,255,0.14);
+    box-shadow: 0 50px 140px rgba(0,0,0,0.75), 0 0 100px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.14); opacity: 0; }
+  #screen { left: 16px; top: 16px; width: 500px; height: 1082px; border-radius: 64px; overflow: hidden; background: #eef0f6; }
+  #screen img.s { position: absolute; left: 0; top: 0; width: 500px; height: 1082px; opacity: 0; }
+  #island { left: 50%; top: 30px; width: 136px; height: 38px; margin-left: -68px; border-radius: 20px; background: #000; z-index: 20; }
+  .tap { position: absolute; width: 74px; height: 74px; margin: -37px 0 0 -37px; border-radius: 50%; background: rgba(124,58,237,0.28); border: 3px solid rgba(255,255,255,0.9); box-shadow: 0 0 24px rgba(124,58,237,0.6); opacity: 0; z-index: 15; }
+
+  /* Language chips under the phone (the product supports 7) */
+  #langs { left: 96px; width: 888px; top: 1632px; display: flex; justify-content: center; gap: 14px; }
+  #langs span { width: 96px; height: 62px; border-radius: 18px; display: grid; place-items: center; font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 500; color: var(--dim); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); opacity: 0; }
+
+  /* Tablet — the owner's Live orders tab (real screenshot, 1024 × 720) */
+  #tablet { left: 50px; top: 560px; width: 980px; height: 700px; border-radius: 46px; background: #050508; border: 2px solid rgba(255,255,255,0.14);
+    box-shadow: 0 50px 140px rgba(0,0,0,0.75), 0 0 110px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.14); opacity: 0; }
+  #tscreen { left: 16px; top: 16px; width: 948px; height: 668px; border-radius: 30px; overflow: hidden; background: #08080b; }
+  #tscreen img { position: absolute; left: 0; top: 0; width: 948px; height: 667px; }
+  /* Table 7 card in the screenshot: x 48→988, y 956→1290 of 2048 × 1440 */
+  #t7 { left: 18px; top: 439px; width: 444px; height: 162px; border-radius: 22px; border: 3px solid #a855f7; box-shadow: 0 0 34px rgba(168,85,247,0.7), inset 0 0 24px rgba(168,85,247,0.25); opacity: 0; }
+  #notif { left: 140px; top: 440px; width: 800px; padding: 22px 26px; border-radius: 28px; display: flex; gap: 18px; align-items: center; z-index: 5;
+    background: rgba(24,22,34,0.97); border: 1px solid rgba(124,58,237,0.45); box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(124,58,237,0.3); opacity: 0; }
+  #notif .ni { width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg,#7c3aed,#4f46e5); display: grid; place-items: center; flex-shrink: 0; }
+  #notif b { display: block; font-size: 27px; color: #fff; font-weight: 700; }
+  #notif span { display: block; margin-top: 4px; font-size: 22px; color: var(--muted); }
+  #notif em { margin-left: auto; align-self: flex-start; font-style: normal; font-size: 20px; color: var(--dim); }
+  #kcap { top: 1330px; }
+  #kchips { left: 96px; width: 888px; top: 1420px; display: flex; justify-content: center; gap: 14px; }
+  #kchips span { height: 60px; padding: 0 24px; border-radius: 18px; display: inline-flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; color: var(--text); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); opacity: 0; }
+  #kchips i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+
+  /* End card — official logo file + live wordmark (Logo3D.tsx spec), nothing redrawn */
+  #endglow { left: 540px; top: 820px; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 62%); opacity: 0; }
+  #logoIcon { left: 452px; top: 520px; width: 176px; height: 176px; object-fit: contain; opacity: 0; }
+  #logoWord { left: 96px; width: 888px; top: 720px; text-align: center; white-space: nowrap; font-weight: 900; font-size: 76px; line-height: 1; letter-spacing: -0.015em; opacity: 0; }
+  #logoWord .a { color: #f4f0ff; text-shadow: 0 0 8px rgba(196,181,253,0.18); }
+  #logoWord .b { color: #a855f7; margin-left: 0.33em; text-shadow: 0 0 9px rgba(168,85,247,0.27); }
+  #sweep { left: 452px; top: 520px; width: 176px; height: 176px; overflow: hidden; opacity: 0; -webkit-mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; mask: url('assets/brand-icon-transparent.webp') no-repeat 0 0 / 176px 176px; }
+  #sweep i { position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent); transform: skewX(-18deg); display: block; }
+  #rule { left: 390px; width: 300px; top: 860px; height: 2px; background: linear-gradient(90deg, transparent, #7c3aed, #a855f7, #818cf8, transparent); opacity: 0; }
+  #prod { left: 96px; width: 888px; top: 912px; text-align: center; font-size: 66px; font-weight: 800; letter-spacing: -0.03em; color: #fff; opacity: 0; }
+  #feat { left: 96px; width: 888px; top: 1010px; text-align: center; font-size: 32px; font-weight: 500; color: var(--muted); opacity: 0; white-space: nowrap; }
+  #price { left: 290px; width: 500px; top: 1100px; height: 84px; border-radius: 42px; display: grid; place-items: center; font-size: 32px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, rgba(124,58,237,0.35), rgba(109,40,217,0.25)); border: 1px solid rgba(168,85,247,0.55); box-shadow: 0 0 40px rgba(124,58,237,0.35); opacity: 0; }
+  #price span { color: #c4b5fd; font-weight: 600; }
+
+  #grain { inset: -50%; width: 200%; height: 200%; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 260px 260px; }
+  #vignette { inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 60% at 50% 50%, transparent 55%, rgba(0,0,0,0.65) 100%); }
+  #fade { inset: 0; background: #000; opacity: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ambient" class="abs"></div>
+  <div id="halo" class="abs"></div>
+
+  <!-- Hook -->
+  <div id="hook" class="abs center h1">
+    <div><span class="w">Your</span> <span class="w">menu</span> <span class="w">is</span></div>
+    <div><span class="w">losing</span> <span class="w hl">tourists.</span></div>
+  </div>
+  <div id="hook2" class="abs"><span class="w">One language.</span> <span class="w">No allergens.</span> <span class="w"><s>Paper.</s></span></div>
+
+  <!-- Header zone -->
+  <div id="eyebrow" class="abs eyebrow"><span class="w">MBN Menu</span></div>
+  <div id="hA" class="abs head h1"><span class="w">Scan</span> <span class="w">the</span> <span class="w hl">table.</span></div>
+  <div id="hB" class="abs head h1"><span class="w">In</span> <span class="w">their</span> <span class="w hl">language.</span></div>
+  <div id="hC" class="abs head h1"><span class="w">Allergens,</span> <span class="w hl">filtered.</span></div>
+  <div id="hD" class="abs head h1"><span class="w">Order</span> <span class="w">from</span> <span class="w">the</span> <span class="w hl">table.</span></div>
+  <div id="hE" class="abs head h1"><span class="w">The</span> <span class="w">kitchen</span> <span class="w">sees</span> <span class="w hl">it.</span></div>
+
+  <!-- A · table tent with the real QR code -->
+  <div id="tent" class="abs">
+    <div class="rn">MBN Restaurant</div>
+    <div class="tb">Table 7</div>
+    <div class="qrw"><img src="assets/menu/qr-demo.png" alt="" /><i class="brk" id="bk1"></i><i class="brk" id="bk2"></i><i class="brk" id="bk3"></i><i class="brk" id="bk4"></i><i id="scanline"></i></div>
+    <div class="sc">Scan for the menu</div>
+  </div>
+  <div id="capA" class="abs cap"><span class="w">No app.</span> <span class="w">No download.</span> <span class="w"><b>Just the camera.</b></span></div>
+
+  <!-- Phone with the real guest screens -->
+  <div id="phone" class="abs">
+    <div id="island" class="abs"></div>
+    <div id="screen" class="abs">
+      <img class="s" id="s01" src="assets/menu/01_home.png" alt="" />
+      <img class="s" id="sEN" src="assets/menu/03_en.png" alt="" />
+      <img class="s" id="sFR" src="assets/menu/03_fr.png" alt="" />
+      <img class="s" id="sES" src="assets/menu/03_es.png" alt="" />
+      <img class="s" id="sIT" src="assets/menu/03_it.png" alt="" />
+      <img class="s" id="sPT" src="assets/menu/03_pt.png" alt="" />
+      <img class="s" id="sF1" src="assets/menu/04_filters.png" alt="" />
+      <img class="s" id="sF2a" src="assets/menu/04b1_gluten.png" alt="" />
+      <img class="s" id="sF2b" src="assets/menu/04b2_crust.png" alt="" />
+      <img class="s" id="sF2" src="assets/menu/04b_filters_on.png" alt="" />
+      <img class="s" id="sF3" src="assets/menu/05_filtered.png" alt="" />
+      <img class="s" id="sD1" src="assets/menu/06_dish.png" alt="" />
+      <img class="s" id="sD2" src="assets/menu/06b_dish_qty2.png" alt="" />
+      <img class="s" id="sD3" src="assets/menu/06c_added.png" alt="" />
+      <img class="s" id="sC1" src="assets/menu/07_cart.png" alt="" />
+      <img class="s" id="sC2" src="assets/menu/08_sent.png" alt="" />
+      <i class="tap" id="tap"></i>
+    </div>
+  </div>
+  <div id="langs" class="abs"><span>EN</span><span>FR</span><span>ES</span><span>IT</span><span>PT</span><span>DE</span><span>AR</span></div>
+  <div id="capC" class="abs cap"><span class="w">All</span> <span class="w"><b>14 EU allergens</b></span> <span class="w">on every dish.</span></div>
+  <div id="capD" class="abs cap"><span class="w">Table 7</span> <span class="w">·</span> <span class="w"><b>sent to the kitchen.</b></span></div>
+
+  <!-- Tablet with the real Live orders tab -->
+  <div id="tablet" class="abs">
+    <div id="tscreen" class="abs"><img src="assets/menu/09_kitchen_1024.png" alt="" /><i id="t7" class="abs"></i></div>
+  </div>
+  <div id="notif" class="abs">
+    <span class="ni"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+    <div><b>New order · table 7 · €40.50</b><span>2× Galician octopus, 1× Burrata &amp; tomatoes</span></div><em>now</em>
+  </div>
+  <div id="kcap" class="abs cap"><span class="w">Orders, waiter calls and bookings —</span> <span class="w"><b>live.</b></span></div>
+  <div id="kchips" class="abs">
+    <span><i style="background:#f43f5e"></i>Table 12 · waiter</span>
+    <span><i style="background:#a855f7"></i>Table 7 · new</span>
+    <span><i style="background:#f59e0b"></i>Table 3 · new</span>
+  </div>
+
+  <!-- End card -->
+  <div id="endglow" class="abs"></div>
+  <img id="logoIcon" class="abs" src="assets/brand-icon-transparent.webp" alt="MBN DEV" />
+  <div id="sweep" class="abs"><i></i></div>
+  <div id="logoWord" class="abs"><span class="a">MBN</span><span class="b">DEV</span></div>
+  <div id="rule" class="abs"></div>
+  <div id="prod" class="abs">MBN Menu</div>
+  <div id="feat" class="abs">7 languages · 14 allergens · Table ordering</div>
+  <div id="price" class="abs"><div>From $37 <span>· mbndev.ma</span></div></div>
+
+  <div id="grain" class="abs"></div>
+  <div id="vignette" class="abs"></div>
+  <div id="fade" class="abs"></div>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+  const EXPO = 'expo.out';
+  const SMOOTH = 'power3.inOut';
+  gsap.defaults({ ease: EXPO });
+  const tl = gsap.timeline({ paused: true });
+  const SFX = [];
+  const S = (type, t, o = {}) => SFX.push({ type, t: Math.round(t * 1000) / 1000, ...o });
+  const IN = (targets, at, extra = {}) => tl.to(targets, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.07, ...extra }, at);
+  const OUT = (targets, at, extra = {}) => tl.to(targets, { opacity: 0, y: -40, filter: 'blur(12px)', duration: 0.38, ease: 'power2.in', stagger: 0, ...extra }, at);
+
+  // Screen changes inside the phone: quick cross-fade (app-like), sheets rise a little.
+  let current = null;
+  const SHOW = (id, at, { dur = 0.22, rise = 0 } = {}) => {
+    if (current) tl.to(current, { opacity: 0, duration: dur * 0.9, ease: 'power1.in' }, at + dur * 0.4);
+    tl.fromTo(id, { opacity: 0, y: rise }, { opacity: 1, y: 0, duration: dur, ease: rise ? EXPO : 'power1.out' }, at);
+    current = id;
+  };
+  // A finger tap at a point of the 390 × 844 screen (× 500/390 in the phone).
+  const K = 500 / 390;
+  const TAP = (x, y, at, v = 0) => {
+    tl.set('#tap', { left: x * K, top: y * K }, at)
+      .fromTo('#tap', { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 0.85, duration: 0.14, ease: 'power2.out' }, at)
+      .to('#tap', { scale: 1.25, opacity: 0, duration: 0.32, ease: 'power2.out' }, at + 0.16);
+    S('tap', at + 0.1, { v });
+  };
+
+  gsap.set('.w', { opacity: 0, y: 40, filter: 'blur(12px)' });
+  gsap.set('#tent', { y: 140, rotationX: 18, filter: 'blur(14px)', transformPerspective: 2200, transformOrigin: '50% 100%' });
+  gsap.set('#phone', { y: 220, rotationX: 14, filter: 'blur(14px)', transformPerspective: 2200, transformOrigin: '50% 100%' });
+  gsap.set('#tablet', { y: 120, scale: 0.94, filter: 'blur(14px)' });
+  gsap.set('#notif', { y: -50, scale: 0.96 });
+  gsap.set('#langs span, #kchips span', { y: 20 });
+  gsap.set('#logoIcon', { scale: 0.94, filter: 'blur(8px)' });
+  gsap.set('#logoWord, #prod, #feat, #price', { y: 14 });
+
+  // ── Hook · 0–2.6 ────────────────────────────────────────────────────────────
+  tl.to('#fade', { opacity: 0, duration: 0.5, ease: 'power2.out' }, 0)
+    .to('#ambient', { opacity: 0.55, duration: 1.4, ease: 'power2.out' }, 0.2);
+  S('ambience', 0, { d: 24 });
+  S('impactSoft', 0.25);
+  IN('#hook .w', 0.25);
+  IN('#hook2 .w', 1.05, { stagger: 0.28, duration: 0.6 });
+  S('tick', 1.1); S('tick', 1.38, { v: 1 }); S('cut', 1.66);
+  OUT('#hook .w, #hook2 .w', 2.35);
+
+  // ── A · Scan the table · 2.6–6.2 ────────────────────────────────────────────
+  IN('#eyebrow .w', 2.6);
+  IN('#hA .w', 2.7);
+  S('whoosh', 2.6);
+  tl.to('#ambient', { opacity: 1, duration: 1.2 }, 2.6)
+    .to('#halo', { opacity: 1, duration: 1.4 }, 2.6)
+    .to('#tent', { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1.1 }, 2.75);
+  IN('#capA .w', 3.2, { stagger: 0.12 });
+  tl.fromTo('.brk', { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.45, stagger: 0.04, ease: 'back.out(2)' }, 3.55)
+    .to('#scanline', { opacity: 1, duration: 0.1 }, 3.8)
+    .fromTo('#scanline', { top: 0 }, { top: 334, duration: 0.7, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 3.8)
+    .to('#scanline', { opacity: 0, duration: 0.15 }, 5.2)
+    .to('.brk', { borderColor: '#10b981', duration: 0.2 }, 5.05);
+  S('snap', 3.6); S('ticks', 3.8, { d: 1.2 }); S('confirm', 5.05);
+  // The phone rises over the card with the real menu open.
+  tl.to('#tent', { opacity: 0, y: -60, scale: 0.86, filter: 'blur(16px)', duration: 0.55, ease: 'power2.in' }, 5.3);
+  OUT('#capA .w', 5.3);
+  SHOW('#s01', 5.3, { dur: 0.01 });
+  tl.to('#phone', { opacity: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: 1.0 }, 5.4)
+    .to('#phone', { y: -14, duration: 17, ease: 'sine.inOut' }, 6.3);
+  S('whoosh', 5.4, { v: 1 });
+
+  // ── B · In their language · 6.2–10.2 ───────────────────────────────────────
+  OUT('#hA .w', 6.2);
+  IN('#hB .w', 6.45);
+  SHOW('#sEN', 6.45, { dur: 0.35 });
+  S('swipe', 6.45);
+  IN('#langs span', 6.6, { stagger: 0.04, duration: 0.6 });
+  const LANG = [['#sEN', 0], ['#sFR', 1], ['#sES', 2], ['#sIT', 3], ['#sPT', 4]];
+  const chip = (i, on, at) => tl.to(`#langs span:nth-child(${i + 1})`, on
+    ? { color: '#ffffff', backgroundColor: 'rgba(124,58,237,0.28)', borderColor: 'rgba(168,85,247,0.75)', boxShadow: '0 0 22px rgba(124,58,237,0.45)', duration: 0.2 }
+    : { color: '#64748b', backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.09)', boxShadow: '0 0 0 rgba(0,0,0,0)', duration: 0.2 }, at);
+  chip(0, true, 6.9);
+  LANG.slice(1).forEach(([id, i], k) => {
+    const at = 7.45 + k * 0.62;
+    chip(i - 1, false, at); chip(i, true, at);
+    SHOW(id, at, { dur: 0.16 });
+    S('click', at, { v: k % 2 });
+  });
+  // back to English for the rest of the story
+  chip(4, false, 10.0);
+  OUT('#langs span', 10.05, { y: 20 });
+
+  // ── C · Allergens, filtered · 10.2–14.0 ────────────────────────────────────
+  OUT('#hB .w', 10.1);
+  IN('#hC .w', 10.35);
+  SHOW('#sEN', 10.15, { dur: 0.2 });
+  TAP(325, 35, 10.55);
+  SHOW('#sF1', 10.75, { dur: 0.32, rise: 60 });
+  S('swipe', 10.75);
+  IN('#capC .w', 10.8, { stagger: 0.1 });
+  // Gluten → Crustaceans → Milk, each tap shows the real selected state
+  TAP(63, 569, 11.35, 0);
+  SHOW('#sF2a', 11.42, { dur: 0.01 });
+  TAP(179, 569, 11.75, 1);
+  SHOW('#sF2b', 11.82, { dur: 0.01 });
+  TAP(319, 609, 12.15, 0);
+  SHOW('#sF2', 12.22, { dur: 0.01 });
+  TAP(287, 799, 12.7, 1);
+  SHOW('#sF3', 12.85, { dur: 0.14 });
+  S('settle', 12.9);
+  OUT('#capC .w', 13.8);
+
+  // ── D · Order from the table · 14.0–18.4 ───────────────────────────────────
+  OUT('#hC .w', 13.9);
+  IN('#hD .w', 14.15);
+  SHOW('#sD1', 14.1, { dur: 0.34, rise: 70 });
+  S('swipe', 14.1);
+  TAP(108, 799, 14.8, 0);
+  SHOW('#sD2', 14.88, { dur: 0.01 });
+  S('tickUp', 14.9);
+  TAP(256, 799, 15.35, 1);
+  SHOW('#sD3', 15.45, { dur: 0.14 });
+  S('pop', 15.5);
+  TAP(329, 813, 16.15, 0);
+  SHOW('#sC1', 16.25, { dur: 0.14 });
+  TAP(195, 562, 16.95, 1);
+  SHOW('#sC2', 17.1, { dur: 0.14 });
+  S('send', 17.05); S('confirmSoft', 17.3);
+  IN('#capD .w', 17.2, { stagger: 0.1 });
+
+  // ── E · The kitchen sees it · 18.4–21.2 ────────────────────────────────────
+  OUT('#hD .w, #capD .w', 18.3);
+  IN('#hE .w', 18.55);
+  tl.to('#phone', { opacity: 0, y: '+=120', scale: 0.9, filter: 'blur(14px)', duration: 0.5, ease: 'power2.in' }, 18.3)
+    .to('#tablet', { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.0 }, 18.6)
+    .to('#notif', { opacity: 1, y: 0, scale: 1, duration: 0.7 }, 19.25)
+    .to('#notif', { opacity: 0, y: -30, duration: 0.35, ease: 'power2.in' }, 20.5)
+    .fromTo('#t7', { opacity: 0 }, { opacity: 1, duration: 0.3, yoyo: true, repeat: 3, ease: 'sine.inOut' }, 19.6)
+    .to('#t7', { opacity: 1, duration: 0.2 }, 20.8);
+  S('whoosh', 18.6); S('notify', 19.3);
+  IN('#kcap .w', 19.5, { stagger: 0.1 });
+  IN('#kchips span', 19.8, { stagger: 0.09, duration: 0.6 });
+
+  // ── End card · 21.2–24 ─────────────────────────────────────────────────────
+  OUT('#eyebrow .w, #hE .w, #kcap .w, #kchips span', 21.1);
+  tl.to('#tablet, #t7', { opacity: 0, y: '+=80', filter: 'blur(14px)', duration: 0.45, ease: 'power2.in' }, 21.1)
+    .to('#halo, #ambient', { opacity: 0.25, duration: 0.6 }, 21.1)
+    .to('#endglow', { opacity: 1, duration: 1.0, ease: 'power2.out' }, 21.55)
+    .to('#logoIcon', { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.9 }, 21.6)
+    .set('#sweep', { opacity: 1 }, 21.95)
+    .fromTo('#sweep i', { left: '-60%' }, { left: '130%', duration: 0.9, ease: 'power2.inOut' }, 21.95)
+    .to('#logoWord', { opacity: 1, y: 0, duration: 0.8 }, 21.8)
+    .to('#rule', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 22.05)
+    .to('#prod', { opacity: 1, y: 0, duration: 0.8 }, 22.1)
+    .to('#feat', { opacity: 1, y: 0, duration: 0.8 }, 22.3)
+    .to('#price', { opacity: 1, y: 0, duration: 0.8 }, 22.55)
+    .to('#endglow', { opacity: 0.6, duration: 0.55, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 22.4)
+    .to('#fade', { opacity: 0, duration: 0.01 }, 23.99);
+  S('impactFinal', 21.6); S('shimmer', 21.95, { d: 1.2 }); S('appear', 22.55, { p: 1 });
+
+  window.__sfx = SFX.sort((a, b) => a.t - b.t);
+  window.__render = (t, frame) => {
+    tl.seek(t, false);
+    const r = (n) => ((Math.sin(frame * 12.9898 + n * 78.233) * 43758.5453) % 1);
+    gsap.set('#grain', { x: r(1) * 60, y: r(2) * 60 });
+  };
+  window.__duration = 24;
+  window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script>
+</body>
+</html>
