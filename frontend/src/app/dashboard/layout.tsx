@@ -62,6 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       '/dashboard/admin/analytics': 'Analytics',
       '/dashboard/admin/activity':  'Activity',
       '/dashboard/admin/broadcast': 'Broadcast',
+      '/dashboard/admin/careers':   'Careers',
       '/dashboard/client':          'Overview',
       '/dashboard/client/projects': 'My Projects',
       '/dashboard/client/orders':   'My Orders',

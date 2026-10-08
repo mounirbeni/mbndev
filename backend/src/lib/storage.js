@@ -36,7 +36,7 @@ if (process.env.VERCEL && !hasBlobToken()) {
  * Persist an uploaded file (multer memoryStorage file object).
  * Returns the public URL to store in the database.
  */
-async function saveUpload(file) {
+async function saveUpload(file, folder = 'project-files') {
   const ext      = path.extname(file.originalname).toLowerCase();
   const id       = crypto.randomBytes(16).toString('hex');
   const filename = `${Date.now()}-${id}${ext}`;
@@ -44,8 +44,9 @@ async function saveUpload(file) {
   if (hasBlobToken()) {
     const { put } = require('@vercel/blob');
     // The Blob store is private: files are only ever served through the
-    // authorised download route (projectController.downloadProjectFile).
-    const blob = await put(`project-files/${filename}`, file.buffer, {
+    // authorised download routes (projectController.downloadProjectFile,
+    // careersController.downloadCv).
+    const blob = await put(`${folder}/${filename}`, file.buffer, {
       access:      BLOB_ACCESS,
       contentType: file.mimetype,
     });

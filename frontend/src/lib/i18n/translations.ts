@@ -337,6 +337,7 @@ const en: Dict = {
   'dash.nav.analytics':   'Analytics',
   'dash.nav.activity':    'Activity Log',
   'dash.nav.leads':       'Leads',
+  'dash.nav.careers':     'Careers',
   'dash.nav.broadcast':   'Broadcast',
   'dash.nav.settings':    'Settings',
   'dash.nav.home':        'Home',

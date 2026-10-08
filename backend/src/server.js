@@ -203,6 +203,7 @@ app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/realtime',      require('./routes/realtime'));
 app.use('/api/search',        require('./routes/search'));
 app.use('/api/leads',         require('./routes/leads'));
+app.use('/api/careers',       require('./routes/careers'));
 
 // ─── Health check (verifies DB + realtime stats) ─────────────────────────────
 app.get('/api/health', async (req, res) => {
@@ -246,6 +247,9 @@ app.use((err, req, res, _next) => {
   // Multer errors (file upload validation)
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(413).json({ success: false, message: 'File too large. Maximum 4 MB.' });
+  }
+  if (err.code === 'LIMIT_UNEXPECTED_FILE' || err.code === 'LIMIT_FIELD_COUNT' || err.code === 'LIMIT_FIELD_VALUE') {
+    return res.status(400).json({ success: false, message: 'Invalid upload.' });
   }
   if (err.message?.startsWith('File extension') || err.message?.startsWith('MIME type')) {
     return res.status(400).json({ success: false, message: err.message });

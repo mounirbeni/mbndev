@@ -695,6 +695,44 @@ export interface ActivityListParams {
   limit?: number;
 }
 
+export interface JobApplication {
+  id: string;
+  role: import('./careers').CareerRole;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  location: string | null;
+  experienceYears: string;
+  availability: string;
+  weeklyHours: string | null;
+  expectedRate: string | null;
+  portfolioUrl: string | null;
+  linkedinUrl: string | null;
+  languages: string[];
+  answers: Record<string, string>;
+  message: string | null;
+  cvName: string;
+  cvSize: number;
+  status: import('./careers').ApplicationStatus;
+  adminNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const careersAPI = {
+  apply: (form: FormData, onProgress?: (percent: number) => void) =>
+    api.post('/careers/apply', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60_000,
+      onUploadProgress: (e) => { if (onProgress && e.total) onProgress(Math.min(99, Math.round((e.loaded / e.total) * 100))); },
+    }),
+  list:     (params: { role?: string; status?: string; q?: string; page?: number }) =>
+    api.get<{ applications: JobApplication[]; total: number; counts: Record<string, number> }>('/careers/applications', { params }),
+  update:   (id: string, data: { status?: string; adminNotes?: string }) => api.patch<{ application: JobApplication }>(`/careers/applications/${id}`, data),
+  remove:   (id: string) => api.delete(`/careers/applications/${id}`),
+  cv:       (id: string) => api.get(`/careers/applications/${id}/cv`, { responseType: 'blob' }),
+};
+
 export const searchAPI = {
   global:   (q: string)                  => api.get('/search', { params: { q } }),
   activity: (params?: ActivityListParams) => api.get('/search/activity', { params }),

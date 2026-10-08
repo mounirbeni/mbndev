@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import {
   Zap, ArrowRight, MapPin, Clock, Briefcase, Code2, Database,
   Smartphone, Palette, ChevronDown, Globe, Star, Users, Rocket,
-  MessageCircle, ArrowUpRight, CheckCircle2, Sparkles, Film, PenTool,
-  Megaphone, Video,
+  CheckCircle2, Sparkles, Film, PenTool, Megaphone, Video, Send,
 } from 'lucide-react';
 import PublicLayout from '@/components/landing/PublicLayout';
 import Button from '@/components/ui/Button';
+import ApplicationForm from '@/components/careers/ApplicationForm';
+import type { CareerRole } from '@/lib/careers';
 
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
@@ -21,6 +21,7 @@ const fadeUp = {
 
 type Role = {
   id: number;
+  slug: CareerRole;
   title: string;
   icon: React.ElementType;
   type: string;
@@ -38,6 +39,7 @@ type Role = {
 const roles: Role[] = [
   {
     id: 1,
+    slug: 'frontend-developer',
     title: 'Frontend Developer',
     icon: Code2,
     type: 'Freelance',
@@ -58,6 +60,7 @@ const roles: Role[] = [
   },
   {
     id: 2,
+    slug: 'backend-developer',
     title: 'Backend Developer',
     icon: Database,
     type: 'Freelance',
@@ -78,6 +81,7 @@ const roles: Role[] = [
   },
   {
     id: 3,
+    slug: 'mobile-developer',
     title: 'Mobile Developer',
     icon: Smartphone,
     type: 'Freelance',
@@ -98,6 +102,7 @@ const roles: Role[] = [
   },
   {
     id: 4,
+    slug: 'ui-ux-designer',
     title: 'UI/UX Designer',
     icon: Palette,
     type: 'Freelance',
@@ -118,6 +123,7 @@ const roles: Role[] = [
   },
   {
     id: 5,
+    slug: 'motion-designer',
     title: 'Motion Graphics Designer',
     icon: Film,
     type: 'Freelance',
@@ -138,6 +144,7 @@ const roles: Role[] = [
   },
   {
     id: 6,
+    slug: 'graphic-designer',
     title: 'Graphic Designer',
     icon: PenTool,
     type: 'Freelance',
@@ -158,6 +165,7 @@ const roles: Role[] = [
   },
   {
     id: 7,
+    slug: 'video-editor',
     title: 'Video Editor',
     icon: Video,
     type: 'Freelance',
@@ -178,6 +186,7 @@ const roles: Role[] = [
   },
   {
     id: 8,
+    slug: 'social-media-manager',
     title: 'Social Media & Content Manager',
     icon: Megaphone,
     type: 'Freelance',
@@ -208,7 +217,7 @@ const perks = [
 ];
 
 const process = [
-  { n: '01', title: 'Apply via WhatsApp or Email', desc: 'Send a short intro, your GitHub / portfolio link, and which role interests you.' },
+  { n: '01', title: 'Apply Online',                desc: 'Fill in the application form below and upload your CV — it takes about 3 minutes.' },
   { n: '02', title: 'Quick Intro Call',            desc: 'A 20-minute chat to align on skills, availability, and working style.' },
   { n: '03', title: 'Paid Trial Task',             desc: 'A small scoped task (paid) so we can both evaluate the fit before committing.' },
   { n: '04', title: 'First Project',               desc: 'Onboard to your first real client project with a clear brief and timeline.' },
@@ -217,7 +226,13 @@ const process = [
 export default function CareersPage() {
   const [openRole, setOpenRole] = useState<number | null>(null);
 
+  const [applyRole, setApplyRole] = useState<CareerRole | ''>('');
+
   const toggle = (id: number) => setOpenRole((prev) => (prev === id ? null : id));
+  const startApplication = (role: CareerRole) => {
+    setApplyRole(role);
+    document.getElementById('apply')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <PublicLayout>
@@ -246,14 +261,10 @@ export default function CareersPage() {
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
-              <a
-                href="https://wa.me/212705914424?text=Hi%20Mounir%2C%20I'm%20interested%20in%20a%20collaboration%20opportunity%20at%20MBN%20DEV."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="#apply">
                 <Button size="lg" variant="ghost" className="group">
-                  <MessageCircle className="w-4 h-4" />
-                  Chat on WhatsApp
+                  <Send className="w-4 h-4" />
+                  Apply Now
                 </Button>
               </a>
             </div>
@@ -403,23 +414,10 @@ export default function CareersPage() {
                           </div>
 
                           {/* Apply CTA */}
-                          <div className="flex flex-col sm:flex-row gap-3">
-                            <a
-                              href={`https://wa.me/212705914424?text=Hi%20Mounir%2C%20I'm%20interested%20in%20the%20${encodeURIComponent(role.title)}%20position%20at%20MBN%20DEV.`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Button size="sm" className="group w-full sm:w-auto">
-                                Apply via WhatsApp
-                                <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                              </Button>
-                            </a>
-                            <a href={`mailto:contact@mbndev.ma?subject=Application: ${role.title}&body=Hi Mounir,%0A%0AI'm interested in the ${role.title} role at MBN DEV.%0A%0AMy portfolio/GitHub: %0A%0AAbout me: `}>
-                              <Button size="sm" variant="ghost" className="w-full sm:w-auto">
-                                Apply via Email
-                              </Button>
-                            </a>
-                          </div>
+                          <Button size="sm" className="group w-full sm:w-auto" onClick={() => startApplication(role.slug)}>
+                            Apply for this role
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </Button>
                         </div>
                       </motion.div>
                     )}
@@ -471,6 +469,21 @@ export default function CareersPage() {
         </div>
       </section>
 
+      {/* ── Application form ── */}
+      <section id="apply" className="pb-24 px-4 sm:px-6 scroll-mt-24">
+        <div className="max-w-3xl mx-auto">
+          <motion.div {...fadeUp} className="text-center mb-10">
+            <span className="section-label mb-4">Apply</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white mt-4">
+              Send your{' '}
+              <span className="gradient-text">application</span>
+            </h2>
+            <p className="text-slate-500 mt-3 text-sm">A few questions and your CV — we read every application.</p>
+          </motion.div>
+          <ApplicationForm role={applyRole} onRoleChange={setApplyRole} />
+        </div>
+      </section>
+
       {/* ── Open application CTA ── */}
       <section className="pb-28 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
@@ -489,25 +502,13 @@ export default function CareersPage() {
               Send an open application
             </h2>
             <p className="text-slate-400 mb-8 max-w-lg mx-auto text-sm leading-relaxed relative">
-              If you are a skilled developer or designer and believe you&rsquo;d be a great fit for MBN DEV — even if your exact role isn&rsquo;t listed — reach out. We&rsquo;re always interested in talented people.
+              If you are a skilled developer or designer and believe you&rsquo;d be a great fit for MBN DEV — even if your exact role isn&rsquo;t listed — send us your CV. We&rsquo;re always interested in talented people.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center relative">
-              <a
-                href="https://wa.me/212705914424?text=Hi%20Mounir%2C%20I'd%20like%20to%20submit%20an%20open%20application%20to%20collaborate%20with%20MBN%20DEV."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button size="lg" className="group">
-                  Open Application — WhatsApp
-                  <MessageCircle className="w-4 h-4" />
-                </Button>
-              </a>
-              <Link href="/contact">
-                <Button size="lg" variant="ghost" className="group">
-                  Send a Message
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+            <div className="flex justify-center relative">
+              <Button size="lg" className="group" onClick={() => startApplication('open')}>
+                Send an Open Application
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </div>
           </motion.div>
         </div>

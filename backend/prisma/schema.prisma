@@ -745,3 +745,33 @@ model Proposal {
   @@index([userId, updatedAt])
   @@index([status, sentAt])
 }
+
+// ─── Careers: job applications from /careers ────────────────────────────────
+
+model JobApplication {
+  id              String   @id @default(cuid())
+  role            String   // role slug from lib/careers.js, or 'open'
+  fullName        String
+  email           String
+  phone           String?
+  location        String?
+  experienceYears String   // '<1' | '1-2' | '3-5' | '5+'
+  availability    String   // 'now' | '2-weeks' | '1-month' | 'later'
+  weeklyHours     String?
+  expectedRate    String?
+  portfolioUrl    String?
+  linkedinUrl     String?
+  languages       String[]
+  answers         Json     // role-specific answers { questionKey: value }
+  message         String?
+  cvUrl           String
+  cvName          String
+  cvSize          Int
+  status          String   @default("new") // new | reviewing | shortlisted | rejected | hired
+  adminNotes      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([role, createdAt])
+}
