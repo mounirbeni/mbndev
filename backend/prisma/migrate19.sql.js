@@ -1,4 +1,4 @@
-// SQL for migrate18.js (kept separate so it can be reviewed / run elsewhere).
+// SQL for migrate19.js (kept separate so it can be reviewed / run elsewhere).
 // lib/careers.js also runs these once per instance (all IF NOT EXISTS), so the
 // feature works even before this script is run by hand.
 module.exports = [

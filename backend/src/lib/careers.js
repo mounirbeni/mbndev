@@ -139,11 +139,11 @@ function validateApplication(body = {}) {
 }
 
 // Create the table on first use (idempotent) so the feature works on a fresh
-// deploy before prisma/migrate18.js has been run by hand.
+// deploy before prisma/migrate19.js has been run by hand.
 let ensured = null;
 function ensureTable(prisma) {
   if (!ensured) {
-    const statements = require('../../prisma/migrate18.sql.js');
+    const statements = require('../../prisma/migrate19.sql.js');
     ensured = (async () => { for (const sql of statements) await prisma.$executeRawUnsafe(sql); })()
       .catch((err) => { ensured = null; throw err; });
   }
