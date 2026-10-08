@@ -30,8 +30,7 @@ npm test             # Vitest (src/**/*.test.{ts,tsx}) — jsdom, no browser nee
 Schema changes that can't be handled by `db:push` (e.g. adding a nullable column to a live table) are done via one-off migration scripts in `backend/prisma/migrate*.js`. Run them directly with `node backend/prisma/migrateN.js`.
 
 ### Demo credentials (after seeding)
-- Admin: `admin@mbndev.com` / `admin123`
-- Client: `client@demo.com` / `client123`
+- Admin: `admin@mbndev.com` — password from `SEED_ADMIN_PASSWORD`, or a random one printed by `npm run seed`
 
 ---
 

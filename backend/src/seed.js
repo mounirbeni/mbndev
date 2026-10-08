@@ -1,5 +1,6 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const prisma = require('./lib/prisma');
 
 async function seed() {
@@ -18,12 +19,14 @@ async function seed() {
   await prisma.package.deleteMany();
   await prisma.user.deleteMany();
 
-  // Admin account only — no demo data
+  // Admin account only — no demo data. The password comes from
+  // SEED_ADMIN_PASSWORD, or a random one is generated and printed once.
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(12).toString('base64url');
   await prisma.user.create({
     data: {
       name: 'Mounir Banni',
       email: 'admin@mbndev.com',
-      password: await bcrypt.hash('admin123', 12),
+      password: await bcrypt.hash(adminPassword, 12),
       role: 'admin',
       company: 'MBN DEV',
     },
@@ -68,7 +71,7 @@ async function seed() {
     ],
   });
 
-  console.log('[seed] Done. Admin -> admin@mbndev.com / admin123');
+  console.log(`[seed] Done. Admin -> admin@mbndev.com / ${process.env.SEED_ADMIN_PASSWORD ? '(SEED_ADMIN_PASSWORD)' : adminPassword}`);
   console.log('[seed] No demo client or project seeded — real data only.');
 }
 

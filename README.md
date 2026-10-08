@@ -42,8 +42,7 @@ npm run dev          # Start the development server (default: port 5000)
 ```
 
 **Demo Credentials (after seeding):**
-- **Admin:** `admin@mbndev.com` / `admin123`
-- **Client:** `client@demo.com` / `client123`
+- **Admin:** `admin@mbndev.com` — password from `SEED_ADMIN_PASSWORD`, or a random one printed by `npm run seed`
 
 ### Running the Frontend
 
