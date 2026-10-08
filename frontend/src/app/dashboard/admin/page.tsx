@@ -5,11 +5,10 @@ import { m as motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   FolderOpen, Users, CreditCard, Clock, ArrowRight, TrendingUp,
-  AlertTriangle, RefreshCcw, DollarSign, Activity, CheckCircle2,
+  AlertTriangle, RefreshCcw, DollarSign, Activity,
   ArrowUpRight, ShoppingBag, Package, Mail,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
-import toast from 'react-hot-toast';
 import { Project, User, Payment } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ProjectCard from '@/components/dashboard/ProjectCard';
@@ -68,11 +67,6 @@ export default function AdminDashboard() {
   const [loading,       setLoading]       = useState(true);
   const [fetchError,    setFetchError]    = useState<string | null>(null);
   const [activeTab,     setActiveTab]     = useState<'projects' | 'clients' | 'payments'>('projects');
-  const [broadcasting,    setBroadcasting]    = useState(false);
-  const [broadcastDone,   setBroadcastDone]   = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState('platformUpdate');
-  const [showBroadcast,   setShowBroadcast]   = useState(false);
-  const [broadcastCount,  setBroadcastCount]  = useState<number | null>(null);
 
   const fetchAnalytics = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -96,39 +90,6 @@ export default function AdminDashboard() {
     document.addEventListener('visibilitychange', onVis);
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
   }, [fetchAnalytics]);
-
-  const TEMPLATES = [
-    { key: 'platformUpdate', label: 'v3.6.0 — Platform Update',      when: 'Now',    color: 'violet' },
-    { key: 'getStarted',     label: 'Week 1 — Get started nudge',    when: 'Week 1', color: 'green'  },
-    { key: 'checkIn',        label: 'Week 1 — Personal check-in',    when: 'Week 1', color: 'blue'   },
-    { key: 'comingSoon',     label: 'Week 2 — What\'s coming next',  when: 'Week 2', color: 'amber'  },
-    { key: 'specialOffer',   label: 'Week 2 — 10% discount offer',   when: 'Week 2', color: 'amber'  },
-  ];
-
-  const openBroadcast = async () => {
-    setShowBroadcast(true);
-    if (broadcastCount === null) {
-      try {
-        const { data } = await adminAPI.broadcastCount();
-        setBroadcastCount(data.count);
-      } catch { /* silent */ }
-    }
-  };
-
-  const sendBroadcast = async () => {
-    if (broadcastDone) return;
-    setBroadcasting(true);
-    try {
-      const { data } = await adminAPI.broadcast(selectedTemplate);
-      setBroadcastDone(true);
-      setShowBroadcast(false);
-      toast.success(data.message || 'Email sent to all users!');
-    } catch {
-      toast.error('Failed to send broadcast. Try again.');
-    } finally {
-      setBroadcasting(false);
-    }
-  };
 
   const a = analytics;
 
@@ -175,12 +136,6 @@ export default function AdminDashboard() {
     <div className="space-y-6 max-w-7xl">
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      {/* Outer wrapper is `relative` so the broadcast panel below can anchor to
-          the whole header without being clipped by the header's own
-          `overflow-hidden` (needed to keep the ambient-grid background inside
-          the rounded corners) — nesting the panel inside that box was cutting
-          it off and, on narrow phones, letting its fixed 288px width overlap
-          the title text to its left. */}
       <div className="relative">
         <motion.div
           initial={{ opacity: 0, y: -16 }}
@@ -206,13 +161,12 @@ export default function AdminDashboard() {
 
           <div className="flex items-center gap-2 shrink-0">
 
-            {/* Trigger button */}
-            <button
-              onClick={() => { setShowBroadcast((v) => !v); setBroadcastDone(false); }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border bg-violet-500/10 border-violet-500/20 text-violet-300 hover:bg-violet-500/20"
+            <Link
+              href="/dashboard/admin/broadcast"
+              className="inline-flex h-9 items-center gap-1.5 px-3.5 rounded-xl text-xs font-semibold transition-all border bg-violet-500/10 border-violet-500/20 text-violet-300 hover:bg-violet-500/20"
             >
               <Mail className="w-3.5 h-3.5" /> Send email
-            </button>
+            </Link>
 
             {/* Live indicator */}
             {!loading && !fetchError && (
@@ -228,84 +182,6 @@ export default function AdminDashboard() {
           </div>{/* closes relative flex wrapper */}
         </motion.div>
 
-        {/* ── Broadcast panel ────────────────────────────────────────────────── */}
-        {/* Sits outside the header's overflow-hidden box, anchored below the
-            whole header (never over the title) and capped to the viewport
-            width on mobile instead of a fixed 288px that had nowhere to go
-            but left. */}
-        <AnimatePresence>
-          {showBroadcast && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -6 }}
-              animate={{ opacity: 1, scale: 1,    y: 0  }}
-              exit={{   opacity: 0, scale: 0.95, y: -6  }}
-              transition={{ duration: 0.15 }}
-              className="absolute top-full mt-2 right-0 left-0 sm:left-auto z-50 mx-4 sm:mx-0 sm:w-72 bg-[#111118] border border-white/10 rounded-2xl shadow-2xl p-4"
-            >
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-                    Send email to all users
-                  </p>
-                  {broadcastCount !== null && (
-                    <span className="text-[11px] text-violet-300 font-semibold bg-violet-500/15 px-2 py-0.5 rounded-md">
-                      {broadcastCount} recipients
-                    </span>
-                  )}
-                </div>
-
-                {/* Template selector */}
-                <div className="space-y-1.5 mb-4">
-                  {TEMPLATES.map((tpl) => {
-                    const whenColors: Record<string, string> = {
-                      'Now':    'bg-violet-500/20 text-violet-300',
-                      'Week 1': 'bg-blue-500/20 text-blue-300',
-                      'Week 2': 'bg-amber-500/20 text-amber-300',
-                    };
-                    return (
-                      <button
-                        key={tpl.key}
-                        onClick={() => setSelectedTemplate(tpl.key)}
-                        className={[
-                          'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all border flex items-center gap-2',
-                          selectedTemplate === tpl.key
-                            ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
-                            : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10',
-                        ].join(' ')}
-                      >
-                        <Mail className="w-3.5 h-3.5 shrink-0 opacity-60" />
-                        <span className="flex-1 text-xs">{tpl.label}</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${whenColors[tpl.when] ?? ''}`}>
-                          {tpl.when}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Send / Cancel */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => { setShowBroadcast(false); setBroadcastDone(false); }}
-                    className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 bg-white/5 hover:bg-white/10 border border-white/5 transition-all"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={sendBroadcast}
-                    disabled={broadcasting || broadcastDone}
-                    className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold text-white bg-violet-600 hover:bg-violet-500 border border-violet-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
-                  >
-                    {broadcasting
-                      ? <><span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> Sending…</>
-                      : broadcastDone
-                        ? <><CheckCircle2 className="w-3.5 h-3.5" /> Sent!</>
-                        : <><Mail className="w-3.5 h-3.5" /> Send now</>
-                    }
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
       </div>
 
       {/* ── Error banner ────────────────────────────────────────────────────── */}

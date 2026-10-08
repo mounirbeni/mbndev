@@ -6,6 +6,7 @@ const { invalidateAdminCache, notifyClient } = require('../lib/notifications');
 const cache = require('../lib/cache');
 const { sendEmail, sendBroadcast, templates } = require('../lib/email');
 const { deleteStoredFiles } = require('../lib/storage');
+const { getCampaign, listCampaigns, campaignStatus } = require('../lib/broadcastCampaigns');
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
 
@@ -421,18 +422,42 @@ router.get('/analytics', protect, authorize('admin'), async (req, res, next) => 
 });
 
 // ─── Broadcast email to all active users ─────────────────────────────────────
-// POST /api/admin/broadcast
-// Body: { template: 'platformUpdate' }   (extend as needed)
-// Returns: { sent, failed, skipped, total }
+// Campaigns live in lib/broadcastCampaigns.js. Monthly ones can only be sent
+// during their month; past months are archived (preview only).
 
-const BROADCAST_TEMPLATES = {
-  juneUpdate:     (user) => templates.juneUpdate({ user }),
-  platformUpdate: (user) => templates.platformUpdate({ user }),
-  getStarted:     (user) => templates.getStarted({ user }),
-  checkIn:        (user) => templates.checkIn({ user }),
-  comingSoon:     (user) => templates.comingSoon({ user }),
-  specialOffer:   (user) => templates.specialOffer({ user }),
-};
+// GET /api/admin/broadcast/templates — every campaign with its current status
+router.get('/broadcast/templates', protect, authorize('admin'), (req, res, next) => {
+  try {
+    res.json({ success: true, templates: listCampaigns(req.user) });
+  } catch (err) { next(err); }
+});
+
+// GET /api/admin/broadcast/preview/:key — the exact email, rendered for the admin
+router.get('/broadcast/preview/:key', protect, authorize('admin'), (req, res, next) => {
+  try {
+    const campaign = getCampaign(req.params.key);
+    if (!campaign) return res.status(404).json({ success: false, message: 'Unknown template.' });
+    const { subject, preheader, html } = campaign.build(req.user);
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ success: true, subject, preheader, html, status: campaignStatus(campaign) });
+  } catch (err) { next(err); }
+});
+
+// POST /api/admin/broadcast/test — send one copy to the admin's own inbox
+router.post('/broadcast/test', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const campaign = getCampaign(req.body?.template);
+    if (!campaign) return res.status(404).json({ success: false, message: 'Unknown template.' });
+    if (campaignStatus(campaign) === 'archived') {
+      return res.status(409).json({ success: false, message: 'This email is archived — it can be previewed but not sent.' });
+    }
+    if (!req.user.email) return res.status(400).json({ success: false, message: 'Your account has no email address.' });
+    const { subject, html } = campaign.build(req.user);
+    const result = await sendEmail({ to: req.user.email, subject: `[Test] ${subject}`, html });
+    if (!result.sent) return res.status(502).json({ success: false, message: `Test email not sent (${result.reason || 'unknown error'}).` });
+    res.json({ success: true, message: `Test sent to ${req.user.email}.` });
+  } catch (err) { next(err); }
+});
 
 // Vercel's function has a hard duration ceiling (maxDuration: 60 in
 // vercel.json). sendBroadcast paces sends 350ms apart, so a batch bigger
@@ -444,12 +469,21 @@ const MAX_SYNC_BROADCAST_RECIPIENTS = 100;
 
 router.post('/broadcast', protect, authorize('admin'), async (req, res, next) => {
   try {
-    const { template: tplKey = 'platformUpdate' } = req.body;
-
-    const templateFn = BROADCAST_TEMPLATES[tplKey];
-    if (!templateFn) {
-      return res.status(400).json({ success: false, message: `Unknown template "${tplKey}". Available: ${Object.keys(BROADCAST_TEMPLATES).join(', ')}` });
+    const tplKey = req.body?.template;
+    const campaign = getCampaign(tplKey);
+    if (!campaign) {
+      return res.status(400).json({ success: false, message: `Unknown template "${tplKey}".` });
     }
+    const status = campaignStatus(campaign);
+    if (status !== 'live') {
+      return res.status(409).json({
+        success: false,
+        message: status === 'archived'
+          ? 'This email is archived — its month has passed, so it can no longer be sent.'
+          : 'This email opens at the start of its month — you can preview it and send yourself a test until then.',
+      });
+    }
+    const templateFn = (user) => campaign.build(user);
 
     // Fetch all active users (clients + admins)
     const users = await prisma.user.findMany({

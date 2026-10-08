@@ -971,7 +971,7 @@ ${textBlock(`Or simply reply to this email — I read everything and respond wit
           ctaButton('Open your dashboard →', dashUrl),
           textBlock(`Or <a href="${msgUrl}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">go straight to messages</a> if you have something in mind. And if you're ready to start a new project, <a href="${reqUrl}" style="color:${T.purpleLight};text-decoration:none;font-weight:500;">the request form is here</a>.`, { mt: '4' }),
 
-        ],
+        ].join(''),
       }),
     };
   },
@@ -1044,4 +1044,8 @@ async function sendBroadcast(recipients, templateFn, delayMs = 350) {
   return { sent, failed, skipped };
 }
 
-module.exports = { sendEmail, sendBroadcast, templates };
+// Building blocks for other email modules (e.g. lib/broadcastCampaigns.js),
+// so every email shares one layout and one visual language.
+const ui = { T, e, APP_URL, layout, badge, ctaButton, infoBox, steps, iconBadge, notice, divider, textBlock };
+
+module.exports = { sendEmail, sendBroadcast, templates, ui };

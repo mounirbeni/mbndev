@@ -31,6 +31,19 @@ let _refreshPromise: Promise<string | null> | null = null;
 // AuthProvider registers a listener here on mount so both stay in sync.
 type TokenRefreshListener = (token: string, user?: unknown) => void;
 let _onTokenRefreshed: TokenRefreshListener | null = null;
+export type BroadcastStatus = 'live' | 'upcoming' | 'archived';
+export interface BroadcastTemplate {
+  key: string;
+  kind: 'monthly' | 'evergreen' | 'retired';
+  month: string | null;
+  monthLabel: string | null;
+  label: string;
+  description: string;
+  status: BroadcastStatus;
+  subject: string;
+  preheader: string;
+}
+
 export function setTokenRefreshedListener(fn: TokenRefreshListener | null) {
   _onTokenRefreshed = fn;
 }
@@ -415,7 +428,10 @@ export const adminAPI = {
   getAnalytics:    ()                              => api.get('/admin/analytics'),
   // Long timeout: the backend now awaits the full send (up to ~100
   // recipients paced 350ms apart) instead of responding immediately.
-  broadcast:       (template = 'platformUpdate')   => api.post('/admin/broadcast', { template }, { timeout: 60_000 }),
+  broadcast:       (template: string)              => api.post('/admin/broadcast', { template }, { timeout: 60_000 }),
+  broadcastTemplates: ()                          => api.get<{ templates: BroadcastTemplate[] }>('/admin/broadcast/templates'),
+  broadcastPreview: (key: string)                 => api.get<{ subject: string; preheader: string; html: string; status: BroadcastStatus }>(`/admin/broadcast/preview/${encodeURIComponent(key)}`),
+  broadcastTest:   (template: string)             => api.post<{ message: string }>('/admin/broadcast/test', { template }, { timeout: 20_000 }),
 };
 
 export const leadsAPI = {
