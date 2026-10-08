@@ -306,6 +306,7 @@ export interface CreateLeadPayload {
 }
 
 export interface UpdateLeadPayload {
+  type?:      string;
   status?:    string;
   notes?:     string;
   priority?:  string;

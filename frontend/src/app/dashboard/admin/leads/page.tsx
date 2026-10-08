@@ -8,9 +8,9 @@ import toast from 'react-hot-toast';
 import {
   Target, Mail, Phone, Instagram, Globe, Download, Plus,
   Flame, Star, X, Send, Copy, ExternalLink, Trash2, RefreshCcw,
-  ChevronDown, MessageCircle, Check, Building2, Utensils, ShoppingBag,
-  Map, Zap, type LucideIcon,
+  ChevronDown, MessageCircle, Check, Zap,
 } from 'lucide-react';
+import { LEAD_GROUPS, LEAD_TYPES, leadType, type LeadGroupId } from '@/lib/leadTypes';
 import AccentText from '@/components/ui/AccentText';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -53,15 +53,8 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   not_interested: { label: 'Not interested', color: '#6b7280' },
 };
 
-const TYPE_ICONS: Record<string, LucideIcon> = {
-  riad:       Building2,
-  restaurant: Utensils,
-  boutique:   ShoppingBag,
-  tour_guide: Map,
-};
-
 const DM_TEMPLATE = (name: string, type: string) => {
-  const portfolioRef = type === 'riad'
+  const portfolioRef = leadType(type).group === 'stay'
     ? '• Riad Dar Kader : https://mbndemo.vercel.app/fr\n• Emll : https://emll.vercel.app'
     : type === 'boutique'
     ? '• TyyMaroc\n• Emll : https://emll.vercel.app'
@@ -85,6 +78,7 @@ export default function AdminLeadsPage() {
   const [leads,       setLeads]       = useState<Lead[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [filterPri,   setFilterPri]   = useState<string>('all');
+  const [filterGroup, setFilterGroup] = useState<'all' | LeadGroupId>('all');
   const [filterType,  setFilterType]  = useState<string>('all');
   const [filterStatus,setFilterStatus]= useState<string>('all');
   const [shownFor,    setShownFor]    = useState<{ key: string; n: number }>({ key: '', n: PAGE_SIZE });
@@ -206,6 +200,19 @@ export default function AdminLeadsPage() {
     }
   };
 
+  // ── Category update ───────────────────────────────────────────────────────
+  const updateType = async (id: string, type: string) => {
+    const prev = leads.find(l => l.id === id)?.type;
+    setLeads(list => list.map(l => l.id === id ? { ...l, type } : l));
+    try {
+      await leadsAPI.update(id, { type });
+      toast.success(`Moved to ${leadType(type).label}`);
+    } catch {
+      setLeads(list => list.map(l => l.id === id ? { ...l, type: prev ?? l.type } : l));
+      toast.error('Failed to change the category.');
+    }
+  };
+
   // ── Delete lead ───────────────────────────────────────────────────────────
   const deleteLead = async (id: string) => {
     try {
@@ -268,6 +275,7 @@ export default function AdminLeadsPage() {
   // ── Filter ────────────────────────────────────────────────────────────────
   const filtered = leads.filter(l => {
     if (filterPri    !== 'all' && l.priority !== filterPri)    return false;
+    if (filterGroup  !== 'all' && leadType(l.type).group !== filterGroup) return false;
     if (filterType   !== 'all' && l.type     !== filterType)   return false;
     if (filterStatus !== 'all' && l.status   !== filterStatus) return false;
     return true;
@@ -275,7 +283,7 @@ export default function AdminLeadsPage() {
 
   // Render in batches: hundreds of rows at once froze phones. The batch size
   // resets whenever a filter changes.
-  const filterKey = `${filterPri}|${filterType}|${filterStatus}`;
+  const filterKey = `${filterPri}|${filterGroup}|${filterType}|${filterStatus}`;
   const limit = shownFor.key === filterKey ? shownFor.n : PAGE_SIZE;
   const shown = filtered.slice(0, limit);
   const showMore = () => setShownFor({ key: filterKey, n: limit + PAGE_SIZE });
@@ -366,6 +374,45 @@ export default function AdminLeadsPage() {
         ))}
       </div>
 
+      {/* ── Categories ── */}
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-1.5">
+          {[{ id: 'all' as const, label: 'All leads' }, ...LEAD_GROUPS].map(g => {
+            const count = g.id === 'all' ? leads.length : leads.filter(l => leadType(l.type).group === g.id).length;
+            if (g.id !== 'all' && count === 0) return null;
+            const on = filterGroup === g.id;
+            return (
+              <button key={g.id} onClick={() => { setFilterGroup(g.id); setFilterType('all'); }}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all"
+                style={on
+                  ? { background: 'rgba(124,58,237,0.25)', color: '#c4b5fd', border: '1px solid rgba(124,58,237,0.45)' }
+                  : { background: 'rgba(255,255,255,0.04)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.07)' }}>
+                {g.label}
+                <span className="rounded-md px-1.5 py-0.5 text-[11px] font-semibold" style={{ background: 'rgba(255,255,255,0.08)' }}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        {filterGroup !== 'all' && LEAD_TYPES.filter(t => t.group === filterGroup).length > 1 && (
+          <div className="flex flex-wrap gap-1 rounded-xl p-1 w-fit" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            {[{ id: 'all', label: 'All', icon: null }, ...LEAD_TYPES.filter(t => t.group === filterGroup)].map(t => {
+              const count = t.id === 'all' ? leads.filter(l => leadType(l.type).group === filterGroup).length : leads.filter(l => l.type === t.id).length;
+              if (t.id !== 'all' && count === 0) return null;
+              const I = t.icon;
+              return (
+                <button key={t.id} onClick={() => setFilterType(t.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  style={filterType === t.id
+                    ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
+                    : { color: '#94a3b8', border: '1px solid transparent' }}>
+                  {I && <I className="w-3.5 h-3.5" />}{t.label} <span className="text-slate-500">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* ── Filters ── */}
       <div className="flex flex-wrap gap-2">
         {/* Priority */}
@@ -382,18 +429,6 @@ export default function AdminLeadsPage() {
                   {v === 'hot' ? 'Hot' : 'Warm'}
                 </span>
               )}
-            </button>
-          ))}
-        </div>
-        {/* Type */}
-        <div className="flex flex-wrap gap-1 rounded-xl p-1" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          {['all','riad','restaurant','boutique','tour_guide'].map(v => (
-            <button key={v} onClick={() => setFilterType(v)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={filterType === v
-                ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
-                : { color: '#94a3b8', border: '1px solid transparent' }}>
-              {v === 'all' ? 'All types' : (() => { const I = TYPE_ICONS[v]; return <span className="flex items-center gap-1.5">{I && <I className="w-3.5 h-3.5" />}{v.replace('_',' ')}</span>; })()}
             </button>
           ))}
         </div>
@@ -432,6 +467,7 @@ export default function AdminLeadsPage() {
           {shown.map((lead) => (
             <LeadCard key={lead.id} lead={lead}
               onStatus={(s) => updateStatus(lead.id, s)}
+              onType={(t) => updateType(lead.id, t)}
               onEmail={() => openEmail(lead)}
               onDelete={() => deleteLead(lead.id)} />
           ))}
@@ -446,7 +482,7 @@ export default function AdminLeadsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  {['Lead','Type','Contact','Status','Actions'].map(h => (
+                  {['Lead','Category','Contact','Status','Actions'].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                       {h}
                     </th>
@@ -465,7 +501,7 @@ export default function AdminLeadsPage() {
                     {/* Lead name + priority + angle */}
                     <td className="px-4 py-3 min-w-[200px]">
                       <div className="flex items-center gap-2">
-                        {(() => { const I = TYPE_ICONS[lead.type] ?? Building2; return <I className="w-4 h-4 text-slate-400 shrink-0" />; })()}
+                        {(() => { const I = leadType(lead.type).icon; return <I className="w-4 h-4 text-slate-400 shrink-0" />; })()}
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-white font-medium leading-tight">{lead.name}</span>
@@ -483,12 +519,9 @@ export default function AdminLeadsPage() {
                       </div>
                     </td>
 
-                    {/* Type badge */}
+                    {/* Category (change it from here) */}
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 rounded-lg text-[11px] font-medium capitalize"
-                        style={{ background: 'rgba(124,58,237,0.12)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.2)' }}>
-                        {lead.type.replace('_',' ')}
-                      </span>
+                      <TypeSelect type={lead.type} onChange={(t) => updateType(lead.id, t)} />
                     </td>
 
                     {/* Contact info */}
@@ -682,11 +715,27 @@ function StatusDropdown({ status, onChange }: { status: string; onChange: (s: st
   );
 }
 
+// ── Category picker ────────────────────────────────────────────────────────────
+function TypeSelect({ type, onChange }: { type: string; onChange: (t: string) => void }) {
+  return (
+    <select value={type} onChange={(e) => onChange(e.target.value)} aria-label="Category"
+      className="rounded-lg px-2 py-1 text-[11px] font-medium outline-none cursor-pointer"
+      style={{ background: 'rgba(124,58,237,0.12)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.2)' }}>
+      {LEAD_GROUPS.map(g => (
+        <optgroup key={g.id} label={g.label}>
+          {LEAD_TYPES.filter(t => t.group === g.id).map(t => <option key={t.id} value={t.id} style={{ background: '#0e0e16' }}>{t.label}</option>)}
+        </optgroup>
+      ))}
+      {!LEAD_TYPES.some(t => t.id === type) && <option value={type}>{leadType(type).label}</option>}
+    </select>
+  );
+}
+
 // ── Lead card (phones) ─────────────────────────────────────────────────────────
-function LeadCard({ lead, onStatus, onEmail, onDelete }: {
-  lead: Lead; onStatus: (s: string) => void; onEmail: () => void; onDelete: () => void;
+function LeadCard({ lead, onStatus, onType, onEmail, onDelete }: {
+  lead: Lead; onStatus: (s: string) => void; onType: (t: string) => void; onEmail: () => void; onDelete: () => void;
 }) {
-  const Icon = TYPE_ICONS[lead.type] ?? Building2;
+  const Icon = leadType(lead.type).icon;
   const wa = lead.phone ? lead.phone.replace(/\s+/g, '').replace('+', '') : '';
   return (
     <article className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -697,7 +746,7 @@ function LeadCard({ lead, onStatus, onEmail, onDelete }: {
             <span className="text-white font-medium truncate">{lead.name}</span>
             {lead.priority === 'hot' ? <Flame className="w-3.5 h-3.5 text-red-400 shrink-0" /> : <Star className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
           </div>
-          <p className="text-slate-500 text-xs mt-0.5 capitalize">{lead.type.replace('_', ' ')} · {lead.city}</p>
+          <p className="mt-1 flex items-center gap-2 text-slate-500 text-xs"><TypeSelect type={lead.type} onChange={onType} /> {lead.city}</p>
         </div>
         <StatusDropdown status={lead.status} onChange={onStatus} />
       </div>

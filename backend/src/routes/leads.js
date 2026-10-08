@@ -520,6 +520,9 @@ const DEFAULT_LEADS = [
   { name: 'Mounir Test iCloud',             type: 'riad', city: 'Marrakech', email: 'mobanunir@icloud.com',                   website: 'none',  priority: 'hot',  outreachAngle: 'Test lead — verify email delivery to iCloud.',  source: 'Test' },
 ];
 
+// Lead categories (Lead.type) — keep in sync with frontend/src/lib/leadTypes.ts.
+const LEAD_TYPES = ['riad', 'hotel', 'guesthouse', 'hostel', 'camp', 'agency', 'restaurant', 'cafe', 'boutique', 'tour_guide', 'other'];
+
 // ─── GET /api/leads — list all leads (admin only) ────────────────────────────
 router.get('/', protect, authorize('admin'), async (req, res, next) => {
   try {
@@ -592,6 +595,7 @@ router.post('/', protect, authorize('admin'), async (req, res, next) => {
   try {
     const { name, type, city, phone, email, instagram, website, priority, outreachAngle, source, notes } = req.body;
     if (!name) return res.status(400).json({ success: false, message: 'Name is required.' });
+    if (type && !LEAD_TYPES.includes(type)) return res.status(400).json({ success: false, message: `Category must be one of ${LEAD_TYPES.join(', ')}.` });
     const lead = await prisma.lead.create({
       data: { name, type: type || 'riad', city: city || '', phone, email, instagram, website, priority: priority || 'warm', outreachAngle, source, notes },
     });
@@ -602,8 +606,12 @@ router.post('/', protect, authorize('admin'), async (req, res, next) => {
 // ─── PUT /api/leads/:id — update lead (status, notes, etc.) ──────────────────
 router.put('/:id', protect, authorize('admin'), async (req, res, next) => {
   try {
-    const { status, notes, priority, email, phone, instagram } = req.body;
+    const { type, status, notes, priority, email, phone, instagram } = req.body;
     const data = {};
+    if (type !== undefined) {
+      if (!LEAD_TYPES.includes(type)) return res.status(400).json({ success: false, message: `Category must be one of ${LEAD_TYPES.join(', ')}.` });
+      data.type = type;
+    }
     if (status    !== undefined) data.status    = status;
     if (notes     !== undefined) data.notes     = notes;
     if (priority  !== undefined) data.priority  = priority;

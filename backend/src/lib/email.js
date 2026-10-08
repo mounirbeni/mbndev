@@ -839,7 +839,8 @@ const templates = {
     const APP_URL_LOCAL = process.env.CLIENT_URL || 'https://mbndev.ma';
     const firstName = name.split(' ')[0];
 
-    const riadProofSection = type === 'riad' ? `
+    // Riads, hotels, guest houses… all get the riad booking-site proof.
+    const riadProofSection = ['riad', 'hotel', 'guesthouse', 'hostel', 'camp', 'agency'].includes(type) ? `
 ${divider('16px 0')}
 ${textBlock(`<strong style="color:${T.textPrimary};">Live proof — websites I built for similar properties:</strong>`)}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:12px 0 0;">
