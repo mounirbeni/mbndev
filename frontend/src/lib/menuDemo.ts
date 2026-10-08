@@ -2,6 +2,7 @@
 // without the API (orders, calls and bookings are simulated in the browser).
 import type { MenuDoc, MenuRestaurant } from '@/lib/api';
 import SAMPLE from './menu-sample.json';
+import { CARAMELIO_DEMO } from './menuDemos/caramelio';
 
 export const DEMO_RESTAURANT: MenuRestaurant = {
   id: 'demo',
@@ -43,4 +44,10 @@ export const DEMO_RESTAURANT: MenuRestaurant = {
   coverCharge: 1.5,
   menu: SAMPLE as MenuDoc,
   branding: true,
+};
+
+// Sales demos served without the API, by URL id (/m/<id>).
+export const DEMO_MENUS: Record<string, MenuRestaurant> = {
+  demo: DEMO_RESTAURANT,
+  caramelio: CARAMELIO_DEMO,
 };

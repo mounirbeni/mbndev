@@ -5,6 +5,7 @@ import QRCode from 'qrcode';
 import { Loader2, Printer } from 'lucide-react';
 import type { MenuLang, MenuRestaurant } from '@/lib/api';
 import { photoUrl } from '@/lib/menu';
+import { DEMO_MENUS } from '@/lib/menuDemo';
 
 const SCAN: Record<MenuLang, [string, string]> = {
   en: ['Scan for the menu', 'Scan for the menu & to order'],
@@ -30,8 +31,9 @@ export default function MenuQrPage({ params }: { params: Promise<{ id: string }>
     const targets = n ? Array.from({ length: n }, (_, i) => ({ label: String(i + 1), url: `${base}?t=${i + 1}` })) : [{ label: null, url: base }];
     Promise.all(targets.map((tg) => QRCode.toDataURL(tg.url, { width: 600, margin: 1, errorCorrectionLevel: 'M' }).then((src) => ({ label: tg.label, src }))))
       .then(setCodes, () => setMissing(true));
-    fetch(`/api/menu/public/${encodeURIComponent(id)}`)
-      .then((r) => (r.ok ? r.json() : null))
+    (Object.hasOwn(DEMO_MENUS, id)
+      ? Promise.resolve({ restaurant: DEMO_MENUS[id] })
+      : fetch(`/api/menu/public/${encodeURIComponent(id)}`).then((r) => (r.ok ? r.json() : null)))
       .then((d) => (d?.restaurant ? setData(d.restaurant) : setMissing(true)))
       .catch(() => setMissing(true));
   }, [id]);
