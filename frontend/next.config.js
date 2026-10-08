@@ -68,13 +68,19 @@ const nextConfig = {
     removeConsole: isProd ? { exclude: ['error', 'warn'] } : false,
   },
   async rewrites() {
+    // Sales demo sites: static files in public/demos/*, served on clean URLs.
+    const demos = [
+      { source: '/demo/coffee',       destination: '/demos/coffee/index.html' },
+      { source: '/demo/coffee/admin', destination: '/demos/coffee/admin.html' },
+    ];
     return isProd
-      ? [] // handled by vercel.json rewrites in prod
+      ? demos // /api is handled by vercel.json rewrites in prod
       : [
           {
             source:      '/api/:path*',
             destination: 'http://localhost:5000/api/:path*',
           },
+          ...demos,
         ];
   },
   async headers() {

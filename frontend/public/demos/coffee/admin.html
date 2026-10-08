@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>NOUR · Owner dashboard (demo)</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#17120e" />
+<link rel="icon" href="/demos/coffee/icon.svg" type="image/svg+xml" />
+<link rel="preload" href="/demos/coffee/fonts/bricolage-grotesque-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/demos/coffee/css/fonts.css" />
+<link rel="stylesheet" href="/demos/coffee/css/admin.css" />
+</head>
+<body>
+<!-- PIN gate (demo) -->
+<div class="gate" id="gate">
+  <form class="gate-card" id="gateForm">
+    <div class="g-brand"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#ff5a1f"/><path d="M11 25c3-9 15-9 18 0" fill="none" stroke="#17120e" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="15" r="3.2" fill="#17120e"/></svg><b>NOUR</b><span data-a="owner">Owner dashboard</span></div>
+    <label for="pin" data-a="pinLabel">Enter your PIN</label>
+    <input id="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="4" pattern="[0-9]*" />
+    <p class="g-hint" data-a="pinHint">Demo PIN: 2468</p>
+    <p class="g-err" id="pinErr" role="alert"></p>
+    <button class="abtn sun" type="submit" data-a="unlock">Unlock</button>
+    <a class="g-back" href="/demo/coffee" data-a="backSite">← Back to the website</a>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <div class="s-brand"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#ff5a1f"/><path d="M11 25c3-9 15-9 18 0" fill="none" stroke="#17120e" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="15" r="3.2" fill="#17120e"/></svg><div><b>NOUR</b><small data-a="owner">Owner dashboard</small></div></div>
+    <nav class="tabs" id="tabs" aria-label="Dashboard"></nav>
+    <div class="s-foot">
+      <div class="seg mini" id="alang"></div>
+      <a href="/demo/coffee" target="_blank" rel="noopener" data-a="viewSite">View website ↗</a>
+      <span class="demo-tag" data-a="demoTag">Demo by MBN DEV</span>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="top">
+      <div><h1 id="pageTitle"></h1><p id="pageSub"></p></div>
+      <div class="top-r"><span class="live" id="liveState"></span><button class="abtn ghost sm" id="soundBtn"></button></div>
+    </header>
+    <section id="view"></section>
+  </main>
+</div>
+<div class="atoast" id="atoast" role="status" aria-live="polite"></div>
+<script type="module" src="/demos/coffee/js/admin.js"></script>
+</body>
+</html>
