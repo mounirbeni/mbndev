@@ -32,7 +32,7 @@ export default function ContactPage() {
 
   const contactInfo = [
     { icon: Mail,    label: t('contact.info.email'),    value: 'contact@mbndev.ma',           href: 'mailto:contact@mbndev.ma'   },
-    { icon: Phone,   label: t('contact.info.whatsapp'), value: t('contact.info.whatsappVal'), href: 'https://wa.me/212705914424' },
+    { icon: Phone,   label: t('contact.info.whatsapp'), value: t('contact.info.whatsappVal'), href: 'https://wa.me/212601439975' },
     { icon: MapPin,  label: t('contact.info.location'), value: t('contact.info.locationVal'), href: null                        },
     { icon: Clock,   label: t('contact.info.response'), value: t('contact.info.responseVal'), href: null                        },
   ];
@@ -56,7 +56,7 @@ export default function ContactPage() {
     const subject = form.subject ? `[${form.subject}] ` : '';
     const text = encodeURIComponent(`Hi Mounir, I'm ${form.name} (${form.email}).\n\n${subject}${form.message}`);
     trackEvent('contact_form_submitted', { subject: form.subject || 'none' });
-    window.open(`https://wa.me/212705914424?text=${text}`, '_blank');
+    window.open(`https://wa.me/212601439975?text=${text}`, '_blank');
   };
 
   const fieldStyle = (field: string) => ({
@@ -140,7 +140,7 @@ export default function ContactPage() {
               <h3 className="text-white font-semibold text-sm mb-4">{t('contact.quickActions')}</h3>
               <div className="space-y-2.5">
                 <a
-                  href="https://wa.me/212705914424?text=Hi%20Mounir,%20I'd%20like%20to%20discuss%20a%20project"
+                  href="https://wa.me/212601439975?text=Hi%20Mounir,%20I'd%20like%20to%20discuss%20a%20project"
                   target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-3 p-3.5 rounded-xl transition-all duration-200 group"
                   style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)' }}

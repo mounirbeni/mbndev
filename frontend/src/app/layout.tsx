@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     'mobile-web-app-capable': 'yes',
     'msapplication-TileColor': '#7c3aed',
     'msapplication-tap-highlight': 'no',
-    'contact:phone_number': '+212705914424',
+    'contact:phone_number': '+212601439975',
   },
 };
 

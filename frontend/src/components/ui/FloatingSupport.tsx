@@ -8,8 +8,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useIsClient } from '@/hooks/useIsClient';
 
-const WA_URL = 'https://wa.me/212705914424';
-const TEL    = 'tel:+212705914424';
+const WA_URL = 'https://wa.me/212601439975';
+const TEL    = 'tel:+212601439975';
 const MAILTO = 'mailto:contact@mbndev.ma';
 
 export default function FloatingSupport() {

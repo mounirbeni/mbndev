@@ -249,7 +249,7 @@ function MoreSheet({ pathname, onClose }: { pathname: string; onClose: () => voi
         </Section>
 
         <Section title={t('footer.contact')}>
-          <Row icon={MessageCircle} label={t('footer.chat')} href="https://wa.me/212705914424" external />
+          <Row icon={MessageCircle} label={t('footer.chat')} href="https://wa.me/212601439975" external />
           <Row icon={Mail} label="contact@mbndev.ma" href="mailto:contact@mbndev.ma" external />
           <Row icon={FileText} label={t('footer.email')} href="/contact" onClick={onClose} />
           <Row icon={MapPin} label={t('footer.location')} />

@@ -24,7 +24,7 @@ const contactSchema = {
     name: 'MBN DEV',
     url: 'https://mbndev.ma',
     email: 'contact@mbndev.ma',
-    telephone: '+212705914424',
+    telephone: '+212601439975',
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',

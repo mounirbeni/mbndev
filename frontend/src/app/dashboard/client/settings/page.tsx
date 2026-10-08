@@ -209,7 +209,7 @@ export default function SettingsPage() {
         </p>
         <div className="flex flex-wrap gap-3">
           <a
-            href="https://wa.me/212705914424"
+            href="https://wa.me/212601439975"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 text-[#25D366] text-sm font-semibold hover:bg-[#25D366]/25 transition-all"
@@ -219,7 +219,7 @@ export default function SettingsPage() {
             <ExternalLink className="w-3 h-3 opacity-60" />
           </a>
           <a
-            href="tel:+212705914424"
+            href="tel:+212601439975"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm font-semibold hover:bg-white/10 transition-all"
           >
             {t('settings.callSupport')}

@@ -98,7 +98,7 @@ export default function CTA() {
             </Link>
           </Magnetic>
           <a
-            href="https://wa.me/212705914424"
+            href="https://wa.me/212601439975"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-6 py-3.5 text-[15px] font-medium text-slate-200 backdrop-blur-md transition-colors hover:border-white/25 hover:bg-white/[0.06]"

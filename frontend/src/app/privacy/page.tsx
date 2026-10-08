@@ -33,8 +33,8 @@ export default function PrivacyPage() {
               We build custom websites, web applications, e-commerce stores, and digital solutions for businesses worldwide.
             </p>
             <p className="mt-2">
-              Contact: <a href="tel:+212705914424" className="text-primary-400 hover:text-primary-300">+212 705 914 424</a>
-              {' '}— <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">WhatsApp</a>
+              Contact: <a href="tel:+212601439975" className="text-primary-400 hover:text-primary-300">+212 601 439 975</a>
+              {' '}— <a href="https://wa.me/212601439975" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">WhatsApp</a>
             </p>
           </section>
 
@@ -109,8 +109,8 @@ export default function PrivacyPage() {
             </ul>
             <p className="mt-3">
               To exercise these rights, contact us at{' '}
-              <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">
-                WhatsApp +212 705 914 424
+              <a href="https://wa.me/212601439975" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300">
+                WhatsApp +212 601 439 975
               </a>.
             </p>
           </section>
@@ -154,7 +154,7 @@ export default function PrivacyPage() {
               <p><span className="text-slate-400">Country:</span> <span className="text-white">Morocco</span></p>
               <p>
                 <span className="text-slate-400">Phone / WhatsApp:</span>{' '}
-                <a href="tel:+212705914424" className="text-primary-400 hover:text-primary-300">+212 705 914 424</a>
+                <a href="tel:+212601439975" className="text-primary-400 hover:text-primary-300">+212 601 439 975</a>
               </p>
             </div>
           </section>

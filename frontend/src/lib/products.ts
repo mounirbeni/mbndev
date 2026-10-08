@@ -88,4 +88,4 @@ export function productFromKey(key?: string | null): Product | null {
 }
 
 export const productQuestionWA = (product: string) =>
-  `https://wa.me/212705914424?text=${encodeURIComponent(`Hi Mounir, I have a question about ${product}.`)}`;
+  `https://wa.me/212601439975?text=${encodeURIComponent(`Hi Mounir, I have a question about ${product}.`)}`;

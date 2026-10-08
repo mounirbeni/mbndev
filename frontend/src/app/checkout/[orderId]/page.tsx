@@ -218,7 +218,7 @@ export default function CheckoutPage() {
         <p className="text-slate-500 text-sm leading-relaxed mb-8">{t('checkout.done.sub2')}</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/dashboard/client/orders"><Button size="md">{t('checkout.done.viewOrders')}</Button></Link>
-          <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/212601439975" target="_blank" rel="noopener noreferrer">
             <Button size="md" variant="outline">{t('checkout.done.whatsApp')}</Button>
           </a>
         </div>
@@ -247,7 +247,7 @@ export default function CheckoutPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/dashboard/client/orders"><Button size="md">View My Orders</Button></Link>
-          <a href="https://wa.me/212705914424" target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/212601439975" target="_blank" rel="noopener noreferrer">
             <Button size="md" variant="outline">Contact on WhatsApp</Button>
           </a>
         </div>
