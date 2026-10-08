@@ -19,6 +19,7 @@ interface Lead {
   name:          string;
   type:          string;
   city:          string;
+  country?:      string | null;
   phone?:        string;
   email?:        string;
   instagram?:    string;
@@ -33,6 +34,14 @@ interface Lead {
 }
 
 const PAGE_SIZE = 30;
+
+// null = the original Moroccan list.
+const COUNTRIES: Record<string, { flag: string; label: string }> = {
+  MA: { flag: '🇲🇦', label: 'Morocco' }, ES: { flag: '🇪🇸', label: 'Spain' }, FR: { flag: '🇫🇷', label: 'France' },
+  PT: { flag: '🇵🇹', label: 'Portugal' }, IT: { flag: '🇮🇹', label: 'Italy' },
+};
+const countryOf = (l: { country?: string | null }) => l.country || 'MA';
+const place = (l: { city: string; country?: string | null }) => `${COUNTRIES[countryOf(l)]?.flag ?? ''} ${l.city}`.trim();
 
 // Phones get the card list only; the table (with per-row animation) is built
 // only on wider screens so a phone never renders both.
@@ -80,6 +89,7 @@ export default function AdminLeadsPage() {
   const [filterPri,   setFilterPri]   = useState<string>('all');
   const [filterGroup, setFilterGroup] = useState<'all' | LeadGroupId>('all');
   const [filterType,  setFilterType]  = useState<string>('all');
+  const [filterCountry, setFilterCountry] = useState<string>('all');
   const [filterStatus,setFilterStatus]= useState<string>('all');
   const [shownFor,    setShownFor]    = useState<{ key: string; n: number }>({ key: '', n: PAGE_SIZE });
   const wide = useWideScreen();
@@ -108,7 +118,7 @@ export default function AdminLeadsPage() {
 
   // ── Bulk email all new leads ──────────────────────────────────────────────
   const handleBulkEmail = async () => {
-    const eligible = leads.filter(l => l.email && l.status === 'new').length;
+    const eligible = leads.filter(l => l.email && l.status === 'new' && !l.country).length; // Moroccan list only (see the API)
     if (eligible === 0) { toast.error('No new leads with email addresses to contact.'); return; }
     if (!confirm(`Send outreach emails to ${eligible} new lead${eligible !== 1 ? 's' : ''}? This cannot be undone.`)) return;
     setBulkSending(true);
@@ -275,6 +285,7 @@ export default function AdminLeadsPage() {
   // ── Filter ────────────────────────────────────────────────────────────────
   const filtered = leads.filter(l => {
     if (filterPri    !== 'all' && l.priority !== filterPri)    return false;
+    if (filterCountry !== 'all' && countryOf(l) !== filterCountry) return false;
     if (filterGroup  !== 'all' && leadType(l.type).group !== filterGroup) return false;
     if (filterType   !== 'all' && l.type     !== filterType)   return false;
     if (filterStatus !== 'all' && l.status   !== filterStatus) return false;
@@ -283,7 +294,7 @@ export default function AdminLeadsPage() {
 
   // Render in batches: hundreds of rows at once froze phones. The batch size
   // resets whenever a filter changes.
-  const filterKey = `${filterPri}|${filterGroup}|${filterType}|${filterStatus}`;
+  const filterKey = `${filterCountry}|${filterPri}|${filterGroup}|${filterType}|${filterStatus}`;
   const limit = shownFor.key === filterKey ? shownFor.n : PAGE_SIZE;
   const shown = filtered.slice(0, limit);
   const showMore = () => setShownFor({ key: filterKey, n: limit + PAGE_SIZE });
@@ -376,9 +387,27 @@ export default function AdminLeadsPage() {
 
       {/* ── Categories ── */}
       <div className="space-y-2">
+        {new Set(leads.map(countryOf)).size > 1 && (
+          <div className="flex flex-wrap gap-1 rounded-xl p-1 w-fit" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            {['all', ...Object.keys(COUNTRIES)].map(c => {
+              const count = c === 'all' ? leads.length : leads.filter(l => countryOf(l) === c).length;
+              if (c !== 'all' && count === 0) return null;
+              return (
+                <button key={c} onClick={() => setFilterCountry(c)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  style={filterCountry === c
+                    ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
+                    : { color: '#94a3b8', border: '1px solid transparent' }}>
+                  {c === 'all' ? 'All countries' : `${COUNTRIES[c].flag} ${COUNTRIES[c].label}`} <span className="text-slate-500">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
         <div className="flex flex-wrap gap-1.5">
           {[{ id: 'all' as const, label: 'All leads' }, ...LEAD_GROUPS].map(g => {
-            const count = g.id === 'all' ? leads.length : leads.filter(l => leadType(l.type).group === g.id).length;
+            const inCountry = leads.filter(l => filterCountry === 'all' || countryOf(l) === filterCountry);
+            const count = g.id === 'all' ? inCountry.length : inCountry.filter(l => leadType(l.type).group === g.id).length;
             if (g.id !== 'all' && count === 0) return null;
             const on = filterGroup === g.id;
             return (
@@ -509,7 +538,7 @@ export default function AdminLeadsPage() {
                               ? <Flame className="w-3.5 h-3.5 text-red-400 shrink-0" />
                               : <Star  className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
                           </div>
-                          <div className="text-slate-500 text-xs mt-0.5">{lead.city}</div>
+                          <div className="text-slate-500 text-xs mt-0.5">{place(lead)}</div>
                           {lead.outreachAngle && (
                             <div className="text-slate-600 text-[10px] mt-0.5 max-w-[240px] truncate" title={lead.outreachAngle}>
                               {lead.outreachAngle}
@@ -746,7 +775,7 @@ function LeadCard({ lead, onStatus, onType, onEmail, onDelete }: {
             <span className="text-white font-medium truncate">{lead.name}</span>
             {lead.priority === 'hot' ? <Flame className="w-3.5 h-3.5 text-red-400 shrink-0" /> : <Star className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
           </div>
-          <p className="mt-1 flex items-center gap-2 text-slate-500 text-xs"><TypeSelect type={lead.type} onChange={onType} /> {lead.city}</p>
+          <p className="mt-1 flex items-center gap-2 text-slate-500 text-xs"><TypeSelect type={lead.type} onChange={onType} /> {place(lead)}</p>
         </div>
         <StatusDropdown status={lead.status} onChange={onStatus} />
       </div>

@@ -418,8 +418,9 @@ model LoginAttempt {
 model Lead {
   id             String    @id @default(cuid())
   name           String
-  type           String                              // riad | restaurant | boutique | tour_guide
+  type           String                              // see LEAD_TYPES in routes/leads.js
   city           String
+  country        String?                             // ISO code (ES, FR, PT, IT…); null = the original Moroccan list
   phone          String?
   email          String?
   instagram      String?
@@ -435,6 +436,7 @@ model Lead {
 
   @@index([status, priority])
   @@index([type])
+  @@index([country])
 }
 
 // ─── Activity Logs ────────────────────────────────────────────────────────────

@@ -665,7 +665,10 @@ router.post('/test-email', protect, authorize('admin'), async (req, res, next) =
 router.post('/bulk-email', protect, authorize('admin'), async (req, res, next) => {
   try {
     const leads = await prisma.lead.findMany({
-      where: { status: 'new', email: { not: null } },
+      // Only the Moroccan list: the bulk template is a French pitch for Moroccan
+      // businesses, and cold email to Spain/Italy needs prior consent — European
+      // leads are contacted one by one.
+      where: { status: 'new', email: { not: null }, country: null },
       orderBy: { priority: 'asc' },
     });
 
