@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import {
   Target, Mail, Phone, Instagram, Globe, Download, Plus,
   Flame, Star, X, Send, Copy, ExternalLink, Trash2, RefreshCcw,
-  ChevronDown, MessageCircle, Check, Zap,
+  ChevronDown, MessageCircle, Check, Zap, AlertTriangle, MapPin,
 } from 'lucide-react';
 import { LEAD_GROUPS, LEAD_TYPES, leadType, type LeadGroupId } from '@/lib/leadTypes';
 import AccentText from '@/components/ui/AccentText';
@@ -313,7 +313,7 @@ export default function AdminLeadsPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6">
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between flex-wrap gap-4">
@@ -327,7 +327,8 @@ export default function AdminLeadsPage() {
             <p className="text-slate-500 text-xs">{leads.length} prospects · {hotCount} hot · {convCount} converted</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Phones: an even 2-column grid of actions; sm+: one wrapping row */}
+        <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:flex-wrap [&>button]:justify-center [&>button]:h-10 [&>button]:whitespace-nowrap">
           <button onClick={() => fetchLeads(true)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-400 hover:text-white text-sm transition-colors"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -388,13 +389,13 @@ export default function AdminLeadsPage() {
       {/* ── Categories ── */}
       <div className="space-y-2">
         {new Set(leads.map(countryOf)).size > 1 && (
-          <div className="flex flex-wrap gap-1 rounded-xl p-1 w-fit" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex gap-1 rounded-xl p-1 max-w-full w-fit overflow-x-auto scrollbar-none sm:flex-wrap [&>*]:shrink-0 [&>*]:whitespace-nowrap" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
             {['all', ...Object.keys(COUNTRIES)].map(c => {
               const count = c === 'all' ? leads.length : leads.filter(l => countryOf(l) === c).length;
               if (c !== 'all' && count === 0) return null;
               return (
                 <button key={c} onClick={() => setFilterCountry(c)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  className="h-8 px-3 rounded-lg text-xs font-medium transition-all"
                   style={filterCountry === c
                     ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
                     : { color: '#94a3b8', border: '1px solid transparent' }}>
@@ -404,7 +405,7 @@ export default function AdminLeadsPage() {
             })}
           </div>
         )}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="chip-row">
           {[{ id: 'all' as const, label: 'All leads' }, ...LEAD_GROUPS].map(g => {
             const inCountry = leads.filter(l => filterCountry === 'all' || countryOf(l) === filterCountry);
             const count = g.id === 'all' ? inCountry.length : inCountry.filter(l => leadType(l.type).group === g.id).length;
@@ -412,7 +413,7 @@ export default function AdminLeadsPage() {
             const on = filterGroup === g.id;
             return (
               <button key={g.id} onClick={() => { setFilterGroup(g.id); setFilterType('all'); }}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all"
+                className="flex items-center gap-2 h-10 px-3.5 rounded-xl text-sm font-medium transition-all"
                 style={on
                   ? { background: 'rgba(124,58,237,0.25)', color: '#c4b5fd', border: '1px solid rgba(124,58,237,0.45)' }
                   : { background: 'rgba(255,255,255,0.04)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -423,14 +424,14 @@ export default function AdminLeadsPage() {
           })}
         </div>
         {filterGroup !== 'all' && LEAD_TYPES.filter(t => t.group === filterGroup).length > 1 && (
-          <div className="flex flex-wrap gap-1 rounded-xl p-1 w-fit" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex gap-1 rounded-xl p-1 max-w-full w-fit overflow-x-auto scrollbar-none sm:flex-wrap [&>*]:shrink-0 [&>*]:whitespace-nowrap" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
             {[{ id: 'all', label: 'All', icon: null }, ...LEAD_TYPES.filter(t => t.group === filterGroup)].map(t => {
               const count = t.id === 'all' ? leads.filter(l => leadType(l.type).group === filterGroup).length : leads.filter(l => l.type === t.id).length;
               if (t.id !== 'all' && count === 0) return null;
               const I = t.icon;
               return (
                 <button key={t.id} onClick={() => setFilterType(t.id)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium transition-all"
                   style={filterType === t.id
                     ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
                     : { color: '#94a3b8', border: '1px solid transparent' }}>
@@ -443,12 +444,12 @@ export default function AdminLeadsPage() {
       </div>
 
       {/* ── Filters ── */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
         {/* Priority */}
-        <div className="flex flex-wrap gap-1 rounded-xl p-1" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="flex gap-1 rounded-xl p-1 max-w-full overflow-x-auto scrollbar-none sm:flex-wrap [&>*]:shrink-0 [&>*]:whitespace-nowrap" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
           {['all','hot','warm'].map(v => (
             <button key={v} onClick={() => setFilterPri(v)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              className="h-8 px-3 rounded-lg text-xs font-medium transition-all"
               style={filterPri === v
                 ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
                 : { color: '#94a3b8', border: '1px solid transparent' }}>
@@ -462,10 +463,10 @@ export default function AdminLeadsPage() {
           ))}
         </div>
         {/* Status */}
-        <div className="flex flex-wrap gap-1 rounded-xl p-1" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="flex gap-1 rounded-xl p-1 max-w-full overflow-x-auto scrollbar-none sm:flex-wrap [&>*]:shrink-0 [&>*]:whitespace-nowrap" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
           {['all','new','emailed','dm_sent','replied','converted'].map(v => (
             <button key={v} onClick={() => setFilterStatus(v)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              className="h-8 px-3 rounded-lg text-xs font-medium transition-all"
               style={filterStatus === v
                 ? { background: 'rgba(124,58,237,0.25)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.35)' }
                 : { color: '#94a3b8', border: '1px solid transparent' }}>
@@ -544,6 +545,7 @@ export default function AdminLeadsPage() {
                               {lead.outreachAngle}
                             </div>
                           )}
+                          <LeadNotes notes={lead.notes} compact />
                         </div>
                       </div>
                     </td>
@@ -626,7 +628,7 @@ export default function AdminLeadsPage() {
                         {lead.email && (
                           <button onClick={() => openEmail(lead)}
                             title="Send email"
-                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-105"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-105"
                             style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.25)' }}>
                             <Mail className="w-3.5 h-3.5 text-indigo-400" />
                           </button>
@@ -637,14 +639,14 @@ export default function AdminLeadsPage() {
                           <a href={`https://wa.me/${lead.phone.replace(/\s+/g,'').replace('+','')}`}
                             target="_blank" rel="noreferrer"
                             title="WhatsApp (no pre-fill)"
-                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-105"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-105"
                             style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.22)' }}>
                             <Phone className="w-3.5 h-3.5 text-emerald-400" />
                           </a>
                         )}
                         <button onClick={() => deleteLead(lead.id)}
                           title="Delete lead"
-                          className="w-7 h-7 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                           style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
                           <Trash2 className="w-3.5 h-3.5 text-red-400" />
                         </button>
@@ -715,7 +717,7 @@ function StatusDropdown({ status, onChange }: { status: string; onChange: (s: st
   return (
     <>
       <button onClick={toggle} aria-haspopup="menu" aria-expanded={Boolean(pos)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+        className="flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-all"
         style={{ background: `${meta.color}18`, border: `1px solid ${meta.color}35`, color: meta.color }}>
         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: meta.color }} />
         {meta.label}
@@ -748,7 +750,7 @@ function StatusDropdown({ status, onChange }: { status: string; onChange: (s: st
 function TypeSelect({ type, onChange }: { type: string; onChange: (t: string) => void }) {
   return (
     <select value={type} onChange={(e) => onChange(e.target.value)} aria-label="Category"
-      className="rounded-lg px-2 py-1 text-[11px] font-medium outline-none cursor-pointer"
+      className="h-8 max-w-[150px] shrink-0 rounded-lg px-2 text-[11px] font-medium outline-none cursor-pointer"
       style={{ background: 'rgba(124,58,237,0.12)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.2)' }}>
       {LEAD_GROUPS.map(g => (
         <optgroup key={g.id} label={g.label}>
@@ -757,6 +759,37 @@ function TypeSelect({ type, onChange }: { type: string; onChange: (t: string) =>
       ))}
       {!LEAD_TYPES.some(t => t.id === type) && <option value={type}>{leadType(type).label}</option>}
     </select>
+  );
+}
+
+// ── Notes (research notes; "⚠ …" lines are warnings, e.g. an unverified email) ──
+function LeadNotes({ notes, compact = false }: { notes?: string; compact?: boolean }) {
+  if (!notes?.trim()) return null;
+  return (
+    <div className={compact ? 'mt-1 space-y-1 max-w-[280px]' : 'mt-3 space-y-1.5'}>
+      {notes.split('\n').filter((l) => l.trim()).map((line, i) => {
+        if (line.startsWith('⚠')) {
+          return (
+            <p key={i} className="flex gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] leading-snug text-amber-300"
+              style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)' }}>
+              <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+              <span>{line.replace(/^⚠\s*/, '')}</span>
+            </p>
+          );
+        }
+        const map = line.match(/(.*?)(?:\s*·\s*)?Map:\s*(https?:\/\/\S+)/);
+        return (
+          <p key={i} className="text-[11px] leading-snug text-slate-500 break-words">
+            {map ? map[1] : line}
+            {map && (
+              <a href={map[2]} target="_blank" rel="noreferrer" className="ml-1.5 inline-flex items-center gap-0.5 text-violet-300 hover:text-violet-200 py-1">
+                <MapPin className="w-3 h-3" /> Map
+              </a>
+            )}
+          </p>
+        );
+      })}
+    </div>
   );
 }
 
@@ -775,36 +808,38 @@ function LeadCard({ lead, onStatus, onType, onEmail, onDelete }: {
             <span className="text-white font-medium truncate">{lead.name}</span>
             {lead.priority === 'hot' ? <Flame className="w-3.5 h-3.5 text-red-400 shrink-0" /> : <Star className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
           </div>
-          <p className="mt-1 flex items-center gap-2 text-slate-500 text-xs"><TypeSelect type={lead.type} onChange={onType} /> {place(lead)}</p>
+          <div className="mt-1.5 flex items-center gap-2 text-slate-500 text-xs min-w-0"><TypeSelect type={lead.type} onChange={onType} /><span className="truncate">{place(lead)}</span></div>
         </div>
         <StatusDropdown status={lead.status} onChange={onStatus} />
       </div>
 
-      {lead.outreachAngle && <p className="mt-2 text-slate-500 text-xs">{lead.outreachAngle}</p>}
+      {lead.outreachAngle && <p className="mt-2 text-slate-500 text-xs leading-relaxed">{lead.outreachAngle}</p>}
 
-      <div className="mt-3 space-y-1.5 text-xs">
-        {lead.email && <p className="flex items-center gap-1.5 text-slate-400 min-w-0"><Mail className="w-3 h-3 text-slate-600 shrink-0" /><span className="truncate">{lead.email}</span></p>}
-        {lead.phone && <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-emerald-400"><Phone className="w-3 h-3 text-slate-600 shrink-0" />{lead.phone}<ExternalLink className="w-2.5 h-2.5" /></a>}
-        {lead.instagram && <a href={`https://instagram.com/${lead.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-pink-400"><Instagram className="w-3 h-3 text-slate-600 shrink-0" />{lead.instagram}<ExternalLink className="w-2.5 h-2.5" /></a>}
-        {!lead.email && !lead.phone && !lead.instagram && <p className="text-slate-700">No contact info</p>}
+      <LeadNotes notes={lead.notes} />
+
+      <div className="mt-2 text-xs">
+        {lead.email && <p className="flex items-center gap-2 min-h-8 text-slate-400 min-w-0"><Mail className="w-3.5 h-3.5 text-slate-600 shrink-0" /><span className="truncate">{lead.email}</span></p>}
+        {lead.phone && <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer" className="flex w-fit items-center gap-2 min-h-8 text-emerald-400"><Phone className="w-3.5 h-3.5 text-slate-600 shrink-0" />{lead.phone}<ExternalLink className="w-3 h-3" /></a>}
+        {lead.instagram && <a href={`https://instagram.com/${lead.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="flex w-fit items-center gap-2 min-h-8 text-pink-400"><Instagram className="w-3.5 h-3.5 text-slate-600 shrink-0" />{lead.instagram}<ExternalLink className="w-3 h-3" /></a>}
+        {!lead.email && !lead.phone && !lead.instagram && <p className="min-h-8 flex items-center text-slate-600">No contact info</p>}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-3 pt-3 flex items-center gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         {lead.phone ? (
           <a href={`https://wa.me/${wa}?text=${encodeURIComponent(DM_TEMPLATE(lead.name, lead.type))}`} target="_blank" rel="noreferrer"
             onClick={() => onStatus('emailed')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold"
+            className="flex items-center gap-1.5 h-9 px-3.5 rounded-lg text-xs font-semibold"
             style={{ background: 'linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.2))', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' }}>
             <Zap className="w-3 h-3" /> WhatsApp
           </a>
         ) : null}
         {lead.email && (
-          <button onClick={onEmail} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold"
+          <button onClick={onEmail} className="flex items-center gap-1.5 h-9 px-3.5 rounded-lg text-xs font-semibold"
             style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8' }}>
             <Mail className="w-3 h-3" /> Email
           </button>
         )}
-        <button onClick={onDelete} aria-label={`Delete ${lead.name}`} className="ml-auto w-8 h-8 rounded-lg flex items-center justify-center"
+        <button onClick={onDelete} aria-label={`Delete ${lead.name}`} className="ml-auto w-9 h-9 rounded-lg flex items-center justify-center"
           style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
           <Trash2 className="w-3.5 h-3.5 text-red-400" />
         </button>

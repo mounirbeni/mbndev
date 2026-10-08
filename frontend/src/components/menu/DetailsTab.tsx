@@ -86,7 +86,7 @@ export default function DetailsTab({ restaurant, onSaved, onDelete }: { restaura
         <label className="block"><span className={labelCls}>Name</span>
           <input value={f.name} onChange={(e) => set({ name: e.target.value })} maxLength={80} required className={`${fieldCls} mt-1.5`} /></label>
         <div className="flex flex-wrap gap-1">
-          {langs.map((l) => <button type="button" key={l} onClick={() => setLang(l)} className={`rounded-md px-2 py-1 font-mono text-[11px] font-semibold ${lang === l ? 'bg-violet-500 text-white' : 'bg-white/[0.05] text-slate-400'}`}>{l.toUpperCase()}</button>)}
+          {langs.map((l) => <button type="button" key={l} onClick={() => setLang(l)} className={`h-8 min-w-9 rounded-md px-2 font-mono text-[11px] font-semibold ${lang === l ? 'bg-violet-500 text-white' : 'bg-white/[0.05] text-slate-400'}`}>{l.toUpperCase()}</button>)}
         </div>
         <LocalizedField label="Tagline" value={f.tagline} lang={lang} fallback={f.defaultLanguage} maxLength={140} onChange={(tagline) => set({ tagline })} />
         <LocalizedField label="About" value={f.about} lang={lang} fallback={f.defaultLanguage} maxLength={800} multiline onChange={(about) => set({ about })} />
@@ -132,7 +132,7 @@ export default function DetailsTab({ restaurant, onSaved, onDelete }: { restaura
                     if (!next.length) return;
                     set({ languages: next, defaultLanguage: next.includes(f.defaultLanguage) ? f.defaultLanguage : next[0] });
                   }}>{l.label}</button>
-                  {on && <button type="button" title="Main language" onClick={() => set({ defaultLanguage: l.id })} className={`border-l border-white/10 px-2 py-1.5 ${f.defaultLanguage === l.id ? 'text-amber-300' : 'text-slate-500 hover:text-amber-200'}`}>★</button>}
+                  {on && <button type="button" title="Main language" onClick={() => set({ defaultLanguage: l.id })} className={`flex min-w-9 items-center justify-center border-l border-white/10 px-2 py-1.5 ${f.defaultLanguage === l.id ? 'text-amber-300' : 'text-slate-500 hover:text-amber-200'}`}>★</button>}
                 </span>
               );
             })}
@@ -178,7 +178,7 @@ export default function DetailsTab({ restaurant, onSaved, onDelete }: { restaura
                   </span>
                 ))}
                 {ranges.length < 3 && (
-                  <button type="button" onClick={() => set({ hours: { ...f.hours, [d]: [...ranges, ranges.length ? [1140, 1380] : [720, 900]] } })} className="flex items-center gap-1 text-xs font-semibold text-violet-300 hover:text-white"><Plus className="h-3.5 w-3.5" />{ranges.length ? 'Add evening' : 'Add hours'}</button>
+                  <button type="button" onClick={() => set({ hours: { ...f.hours, [d]: [...ranges, ranges.length ? [1140, 1380] : [720, 900]] } })} className="flex h-8 items-center gap-1 text-xs font-semibold text-violet-300 hover:text-white"><Plus className="h-3.5 w-3.5" />{ranges.length ? 'Add evening' : 'Add hours'}</button>
                 )}
               </div>
             );
@@ -212,7 +212,7 @@ export default function DetailsTab({ restaurant, onSaved, onDelete }: { restaura
       </section>
 
       <div className="sticky bottom-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0d0b18]/95 p-3 backdrop-blur">
-        <button type="button" onClick={onDelete} className="flex items-center gap-1.5 px-2 text-sm text-slate-400 hover:text-rose-300"><Trash2 className="h-4 w-4" />Delete restaurant</button>
+        <button type="button" onClick={onDelete} className="flex h-10 items-center gap-1.5 px-2 text-sm text-slate-400 hover:text-rose-300"><Trash2 className="h-4 w-4" />Delete restaurant</button>
         <Button type="submit" loading={saving} icon={<Save className="h-4 w-4" />}>Save details</Button>
       </div>
     </form>

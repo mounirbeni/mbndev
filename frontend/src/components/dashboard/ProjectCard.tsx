@@ -138,7 +138,7 @@ const ProjectCard = memo(function ProjectCard({ project, href, index = 0, compac
                   if (!d) return null;
                   const Icon = d.icon;
                   return (
-                    <span className={cn('flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded-md', d.color, d.bg)}>
+                    <span className={cn('flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded-md whitespace-nowrap shrink-0', d.color, d.bg)}>
                       <Icon className="w-3 h-3 shrink-0" />
                       {d.label}
                     </span>

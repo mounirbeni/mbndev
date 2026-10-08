@@ -64,7 +64,7 @@ export default function MenuShell({ children }: { children: ReactNode }) {
                 {account.plan.toUpperCase()} · {account.restaurants.used}/{account.restaurants.limit} restaurants
               </span>
             )}
-            <Link href="/dashboard" className="flex items-center gap-1 hover:text-white"><ArrowLeft className="h-3.5 w-3.5" /> MBN DEV</Link>
+            <Link href="/dashboard" className="flex h-9 items-center gap-1 rounded-lg px-2 -mr-2 hover:text-white"><ArrowLeft className="h-3.5 w-3.5" /> MBN DEV</Link>
           </div>
         </div>
       </header>

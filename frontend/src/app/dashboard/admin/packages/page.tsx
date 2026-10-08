@@ -156,10 +156,10 @@ export default function AdminPackagesPage() {
                     {pkg.popular && <Badge color="purple" className="mt-1">{t('pricing.popular')}</Badge>}
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => openEdit(pkg)} className="p-1.5 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-colors">
+                    <button onClick={() => openEdit(pkg)} className="w-9 h-9 flex items-center justify-center hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-colors">
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => handleDelete(pkg._id ?? pkg.id ?? '')} className="p-1.5 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors">
+                    <button onClick={() => handleDelete(pkg._id ?? pkg.id ?? '')} className="w-9 h-9 flex items-center justify-center hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>

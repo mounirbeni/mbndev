@@ -8,6 +8,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Fine opacity steps used across the dashboard (e.g. border-white/6,
+      // bg-white/3). Tailwind only ships multiples of 5, so without these the
+      // classes were silently dropped — borders fell back to the light-grey
+      // default and subtle card fills disappeared.
+      opacity: {
+        2: '0.02', 3: '0.03', 4: '0.04', 6: '0.06', 7: '0.07', 8: '0.08',
+        12: '0.12', 14: '0.14', 18: '0.18', 22: '0.22',
+      },
       colors: {
         // Secondary-text greys lifted from Tailwind's defaults (#64748b / #475569)
         // so they meet WCAG AA (4.5:1) on the site's near-black backgrounds.

@@ -555,7 +555,7 @@ export default function AdminAnalyticsPage() {
         <div className="glass rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-white font-semibold">{t('admin.recentPayments')}</h3>
-            <Link href="/dashboard/admin/payments" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+            <Link href="/dashboard/admin/payments" className="-mr-2 px-2 py-2 text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
               {t('admin.analytics.viewAll')} <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -603,7 +603,7 @@ export default function AdminAnalyticsPage() {
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-white/5">
           <h3 className="text-white font-semibold">{t('admin.recentProjects')}</h3>
-          <Link href="/dashboard/admin/projects" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+          <Link href="/dashboard/admin/projects" className="-mr-2 px-2 py-2 text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
             {t('admin.analytics.viewAll')} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
@@ -649,7 +649,7 @@ export default function AdminAnalyticsPage() {
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-white/5">
           <h3 className="text-white font-semibold">{t('admin.recentClients')}</h3>
-          <Link href="/dashboard/admin/clients" className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+          <Link href="/dashboard/admin/clients" className="-mr-2 px-2 py-2 text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
             {t('admin.analytics.viewAll')} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>

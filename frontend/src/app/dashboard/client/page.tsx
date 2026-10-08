@@ -8,7 +8,6 @@ import {
   Sparkles, CheckCircle2, Package, RotateCcw, Zap, AlertTriangle,
   RefreshCcw, TrendingUp, Bell, ArrowUpRight,
 } from 'lucide-react';
-import { useHaptic } from '@/hooks/useHaptic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { projectAPI, messageAPI } from '@/lib/api';
@@ -42,22 +41,21 @@ function QuickAction({
   color: string;
 }) {
   return (
-    <Link href={href}>
+    <Link href={href} className="block h-full">
       <motion.div
-        whileHover={{ y: -2 }}
-        whileTap={{ scale: 0.96 }}
+        whileTap={{ scale: 0.97 }}
         className={cn(
-          'flex flex-col gap-2.5 p-4 rounded-2xl border border-white/6',
-          'hover:border-white/12 transition-all duration-150 cursor-pointer',
-          'bg-white/3 hover:bg-white/6 active:bg-white/8',
+          'h-full flex items-center gap-3 p-3.5 rounded-2xl border border-white/8',
+          'hover:border-white/15 transition-colors duration-150 cursor-pointer',
+          'bg-white/4 hover:bg-white/6 active:bg-white/8',
         )}
       >
-        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center', color)}>
-          <Icon className="w-4 h-4" strokeWidth={1.8} />
+        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center shrink-0', color)}>
+          <Icon className="w-[18px] h-[18px]" strokeWidth={1.8} />
         </div>
-        <div>
-          <div className="text-white text-xs font-semibold leading-tight">{label}</div>
-          {sublabel && <div className="text-slate-600 text-[10px] mt-0.5">{sublabel}</div>}
+        <div className="min-w-0">
+          <div className="text-white text-sm font-semibold leading-tight truncate">{label}</div>
+          {sublabel && <div className="text-slate-500 text-xs mt-0.5 truncate">{sublabel}</div>}
         </div>
       </motion.div>
     </Link>
@@ -67,7 +65,6 @@ function QuickAction({
 export default function ClientDashboard() {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const haptic = useHaptic();
   const [projects, setProjects] = useState<Project[]>([]);
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -243,7 +240,7 @@ export default function ClientDashboard() {
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
           Quick actions
         </h2>
-        <div className="grid grid-cols-4 sm:grid-cols-4 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
           <QuickAction
             href="/request"
             icon={Plus}
@@ -287,9 +284,9 @@ export default function ClientDashboard() {
               Active now
             </h2>
             <Link href="/dashboard/client/projects">
-              <button className="text-[11px] text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+              <span className="-mr-2 px-2 py-2 text-xs font-medium text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
                 View all <ArrowRight className="w-3 h-3" />
-              </button>
+              </span>
             </Link>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -313,9 +310,9 @@ export default function ClientDashboard() {
           </h2>
           {projects.length > 0 && (
             <Link href="/dashboard/client/projects">
-              <button className="text-[11px] text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+              <span className="-mr-2 px-2 py-2 text-xs font-medium text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
                 View all <ArrowRight className="w-3 h-3" />
-              </button>
+              </span>
             </Link>
           )}
         </div>
@@ -435,20 +432,6 @@ export default function ClientDashboard() {
         )}
       </div>
 
-      {/* FAB — mobile only */}
-      <Link
-        href="/request"
-        onClick={() => haptic('medium')}
-        aria-label="New project"
-        className="sm:hidden fab fixed right-4 z-[100]"
-        style={{
-          bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 66px)',
-          background: 'linear-gradient(135deg, #6d28d9, #7c3aed)',
-          boxShadow: '0 4px 24px rgba(124,58,237,0.45), 0 0 0 1px rgba(255,255,255,0.1)',
-        }}
-      >
-        <Plus className="w-6 h-6 text-white" />
-      </Link>
     </div>
   );
 }

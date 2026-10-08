@@ -115,7 +115,12 @@ export default function AdminProjectWorkspace() {
   usePolling(silentRefresh, { interval: 10_000, immediate: false, disabled: !id });
 
   useEffect(() => {
-    if (tab === 'messages') setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+    if (tab === 'messages') setTimeout(() => {
+      // Scroll the page's own scroller only (scrollIntoView also shifts the fixed dashboard frame).
+      const end = messagesEndRef.current;
+      const main = end?.closest('main');
+      if (end && main) main.scrollTo({ top: main.scrollTop + end.getBoundingClientRect().bottom - main.getBoundingClientRect().bottom, behavior: 'smooth' });
+    }, 100);
   }, [tab, messages]);
 
   const saveEdits = async () => {
@@ -218,16 +223,17 @@ export default function AdminProjectWorkspace() {
 
   return (
     <div className="space-y-5 max-w-5xl">
-      <div className="flex items-center justify-between">
-        <Link href="/dashboard/admin/projects" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <Link href="/dashboard/admin/projects" className="inline-flex h-9 items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors self-start">
           <ArrowLeft className="w-4 h-4" /> {t('admin.allProjects')}
         </Link>
         {!editing ? (
-          <div className="flex items-center gap-2">
+          /* Phones: one swipeable row of actions instead of overflowing the screen */
+          <div className="flex items-center gap-2 -mx-4 px-4 overflow-x-auto scrollbar-none sm:mx-0 sm:px-0 sm:overflow-visible [&>*]:shrink-0">
             <button
               onClick={handleShare}
               disabled={sharing}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all disabled:opacity-50"
             >
               {copied
                 ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> {t('common.copied')}</>
@@ -239,7 +245,7 @@ export default function AdminProjectWorkspace() {
             <button
               onClick={handleRevokeShare}
               title="Revoke all previously issued share links for this project"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-red-400 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-xl transition-all"
+              className="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-slate-400 hover:text-red-400 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-xl transition-all"
             >
               <ShieldOff className="w-3.5 h-3.5" /> Revoke
             </button>
@@ -251,14 +257,14 @@ export default function AdminProjectWorkspace() {
                 <button
                   onClick={() => setDeleteConfirm(false)}
                   disabled={deleting}
-                  className="inline-flex items-center px-2.5 py-1.5 text-xs font-semibold text-slate-400 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all disabled:opacity-50"
+                  className="inline-flex items-center h-9 px-3 text-xs font-semibold text-slate-400 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all disabled:opacity-50"
                 >
                   {t('common.cancel')}
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-500 border border-red-500/50 rounded-xl transition-all disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-white bg-red-600 hover:bg-red-500 border border-red-500/50 rounded-xl transition-all disabled:opacity-50"
                 >
                   {deleting
                     ? <><span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" /> Deleting…</>
@@ -269,7 +275,7 @@ export default function AdminProjectWorkspace() {
             ) : (
               <button
                 onClick={handleDelete}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all"
+                className="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
@@ -287,11 +293,11 @@ export default function AdminProjectWorkspace() {
 
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-        className="glass rounded-2xl p-6 border border-white/5">
+        className="glass rounded-2xl p-4 sm:p-6 border border-white/5">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2 flex-wrap">
-              <h1 className="text-2xl font-bold text-white">{project.title}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug break-words min-w-0">{project.title}</h1>
               <StatusBadge status={project.status} />
               {project.package && <PlanBadge plan={project.package} size="sm" />}
             </div>
@@ -304,12 +310,12 @@ export default function AdminProjectWorkspace() {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-4 shrink-0">
-            <div className="text-right">
+          <div className="flex items-center gap-6 shrink-0 pt-3 border-t border-white/5 sm:pt-0 sm:border-0">
+            <div className="sm:text-right">
               <div className="text-slate-400 text-xs mb-0.5">{t('request.field.budget')}</div>
               <div className="text-white font-bold">{formatCurrency(project.budget)}</div>
             </div>
-            <div className="text-right">
+            <div className="sm:text-right">
               <div className="text-slate-400 text-xs mb-0.5">{t('status.paid')}</div>
               <div className="text-green-400 font-bold">{formatCurrency(paidTotal)}</div>
             </div>
@@ -379,8 +385,8 @@ export default function AdminProjectWorkspace() {
         {TABS.map((tabItem) => {
           const Icon = tabItem.icon;
           return (
-            <button key={tabItem.id} onClick={() => setTab(tabItem.id)}
-              className={`flex-shrink-0 sm:flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all press-scale ${
+            <button key={tabItem.id} onClick={() => setTab(tabItem.id)} aria-label={tabItem.label}
+              className={`flex-1 min-w-11 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all press-scale ${
                 tab === tabItem.id ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' : 'text-slate-400 hover:text-white'
               }`}>
               <Icon className="w-4 h-4" /><span className="hidden sm:inline">{tabItem.label}</span>

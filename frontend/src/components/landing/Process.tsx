@@ -162,7 +162,7 @@ function HorizontalStep({ step, index, total }: {
             boxShadow: `0 0 28px ${color}12`,
           }}
         >
-          <Icon className="w-5.5 h-5.5" style={{ color }} strokeWidth={1.8} />
+          <Icon className="w-[22px] h-[22px]" style={{ color }} strokeWidth={1.8} />
         </motion.div>
         {!isLast && (
           <motion.div

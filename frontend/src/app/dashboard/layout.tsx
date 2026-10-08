@@ -206,13 +206,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* ── Page content ─────────────────────────────────────────── */}
+        {/* overflow-x-hidden: pages scroll vertically only — sideways scrolling
+            belongs to the explicit chip/card rows inside them. */}
         <main
           ref={scrollRef}
-          className="flex-1 overflow-y-auto inertial-scroll relative isolate"
+          className="flex-1 overflow-y-auto overflow-x-hidden inertial-scroll relative isolate"
           onScroll={onScroll}
           style={{
-            paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 8px) + 74px)',
-          // Note: 74px clears the mobile bottom nav — MobileNav hides itself at lg: breakpoints
+            // Clears the mobile bottom nav (74px) and, for clients, the floating
+            // support button above it (+64px) so the last card is never covered.
+            paddingBottom: `calc(max(env(safe-area-inset-bottom, 0px), 8px) + ${user.role === 'client' ? 138 : 74}px)`,
           }}
         >
           {/* Faint silk ribbon across the top of every dashboard page */}
@@ -239,8 +242,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── Mobile navigation (BottomBar + NavSheet) ─────────────── */}
       <MobileNav />
 
-      {/* ── Floating support button ──────────────────────────────── */}
-      <FloatingSupport />
+      {/* ── Floating support button (clients only — it contacts MBN DEV) ── */}
+      {user.role === 'client' && <FloatingSupport />}
 
       {/* ── What's New popup (once per version) ──────────────────── */}
       <WhatsNewModal />

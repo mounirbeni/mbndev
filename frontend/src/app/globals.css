@@ -623,6 +623,34 @@ input, textarea, select {
 .tab-scroll::-webkit-scrollbar { display: none; }
 .tab-scroll > * { scroll-snap-align: start; flex-shrink: 0; }
 
+/* Hide a scroller's bar but keep it scrollable (chip rows, segmented tabs). */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* Horizontal chip/filter row on phones: one line that scrolls sideways,
+   bleeding to the screen edges; wraps normally from sm: up. */
+.chip-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  margin-inline: -16px;
+  padding-inline: 16px;
+  scroll-padding-inline: 16px;
+}
+.chip-row::-webkit-scrollbar { display: none; }
+.chip-row > * { flex-shrink: 0; scroll-snap-align: start; white-space: nowrap; }
+@media (min-width: 640px) {
+  .chip-row { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
+}
+
+/* Grid children may shrink below their content's width — otherwise a long
+   title or a wide row inside any grid cell stretches the whole page sideways. */
+:where(.grid > *) { min-width: 0; }
+
 /* ── Horizontal scroll fade hint ─────────────────────────────────────────── */
 .scroll-fade-right {
   -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%);

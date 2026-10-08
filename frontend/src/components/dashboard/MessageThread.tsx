@@ -132,7 +132,7 @@ function UserMessage({ msg, isOwn, youLabel, adminLabel, timeAgo }: { msg: Messa
         )}
         <div
           className={cn(
-            'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed break-words',
+            'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed [overflow-wrap:anywhere] min-w-0 max-w-full',
             isOwn
               ? 'bg-primary-500 text-white rounded-tr-sm shadow-lg shadow-primary-500/20'
               : 'bg-white/8 text-slate-200 rounded-tl-sm border border-white/5'
@@ -160,7 +160,6 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
   const [cursor,      setCursor]      = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const bottomRef    = useRef<HTMLDivElement>(null);
   const inputRef     = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -173,8 +172,11 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
     return el.scrollHeight - el.scrollTop - el.clientHeight < 120;
   };
 
+  // Scroll only the thread itself — scrollIntoView would also scroll every
+  // ancestor (the page and the dashboard frame), pushing the header out of view.
   const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
-    bottomRef.current?.scrollIntoView({ behavior });
+    const el = containerRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior });
   }, []);
 
   // ── Load messages ──────────────────────────────────────────────────────────
@@ -357,7 +359,7 @@ export default function MessageThread({ projectId, projectTitle, onUnreadChange 
           })}
         </AnimatePresence>
 
-        <div ref={bottomRef} />
+
       </div>
 
       {/* ── Input bar ──────────────────────────────────────────────────── */}

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   FolderOpen, Users, CreditCard, Clock, ArrowRight, TrendingUp,
   AlertTriangle, RefreshCcw, DollarSign, Activity, CheckCircle2,
-  ArrowUpRight, ShoppingBag, Package, Mail, ChevronLeft, ChevronRight,
+  ArrowUpRight, ShoppingBag, Package, Mail,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -73,7 +73,6 @@ export default function AdminDashboard() {
   const [selectedTemplate, setSelectedTemplate] = useState('platformUpdate');
   const [showBroadcast,   setShowBroadcast]   = useState(false);
   const [broadcastCount,  setBroadcastCount]  = useState<number | null>(null);
-  const [stackIndex,      setStackIndex]      = useState(0);
 
   const fetchAnalytics = useCallback((silent = false) => {
     if (!silent) { setLoading(true); setFetchError(null); }
@@ -330,99 +329,34 @@ export default function AdminDashboard() {
         )}
       </AnimatePresence>
 
-      {/* ── Card Stack Overview ───────────────────────────────────────────────── */}
-      <div className="flex gap-4 items-center overflow-hidden">
-
-        {/* Stack */}
-        {/* min-w-0 lets this flex-1 box actually shrink to its share of the
-            row on narrow phones — without it, flex items default to
-            min-width:auto and the stacked cards' peeking offset (up to ~42px)
-            could push the whole row wider than the viewport, shoving the
-            nav controls to the right past the screen edge. */}
-        <div className="relative flex-1 min-w-0 h-36 sm:h-32">
-          {stackCards.map((card, i) => {
-            const offset   = i - stackIndex;
-            const isFront  = i === stackIndex;
-            const distance = Math.abs(offset);
-            return (
-              <motion.div
-                key={card.title}
-                animate={{
-                  x:       offset * 14,
-                  y:       distance * 4,
-                  scale:   1 - distance * 0.04,
-                  zIndex:  stackCards.length - distance,
-                  opacity: distance > 2 ? 0 : 1 - distance * 0.18,
-                }}
-                transition={{ type: 'spring', stiffness: 340, damping: 28 }}
-                className="absolute inset-0 cursor-pointer"
-                onClick={() => !isFront && setStackIndex(i)}
-              >
-                <div
-                  className={`h-full rounded-2xl bg-gradient-to-br ${card.gradient} p-5 flex flex-col justify-between overflow-hidden`}
-                  style={{ boxShadow: isFront ? `0 8px 32px ${card.glow}, 0 1px 0 rgba(255,255,255,0.12) inset` : 'none' }}
-                >
-                  {/* noise texture overlay */}
-                  <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
-                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }} />
-
-                  <div className="relative flex items-start justify-between">
-                    <div>
-                      <p className="text-white/70 text-xs font-semibold uppercase tracking-widest">{card.title}</p>
-                      <p className="text-white text-3xl font-black mt-1 tabular-nums leading-none">{card.value}</p>
-                    </div>
-                    <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
-                      <card.icon className="w-4.5 h-4.5 text-white" strokeWidth={1.8} />
-                    </div>
-                  </div>
-
-                  <div className="relative flex items-end justify-between">
-                    <p className="text-white/60 text-xs">{card.sub}</p>
-                    {isFront && (
-                      <Link href={card.href} onClick={(e) => e.stopPropagation()}>
-                        <span className="text-[11px] text-white/80 hover:text-white font-semibold flex items-center gap-0.5 transition-colors">
-                          View all <ArrowUpRight className="w-3 h-3" />
-                        </span>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Nav controls */}
-        <div className="flex flex-col items-center gap-3 shrink-0">
-          <button
-            onClick={() => setStackIndex((v) => Math.max(0, v - 1))}
-            disabled={stackIndex === 0}
-            className="w-7 h-7 rounded-full bg-white/5 border border-white/8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-25"
+      {/* ── Key numbers ─────────────────────────────────────────────────────────
+          Phones: one swipeable row (each card ~82% wide so the next one peeks).
+          sm+: a 2- then 4-column grid. */}
+      <div className="-mx-4 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory scroll-px-4 scrollbar-none
+                      sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 xl:grid-cols-4 sm:overflow-visible">
+        {stackCards.map((card) => (
+          <Link
+            key={card.title}
+            href={card.href}
+            className={`relative snap-start shrink-0 w-[82%] sm:w-auto h-32 rounded-2xl bg-gradient-to-br ${card.gradient}
+                        p-4 flex flex-col justify-between overflow-hidden active:scale-[0.98] transition-transform`}
+            style={{ boxShadow: `0 8px 28px ${card.glow}, 0 1px 0 rgba(255,255,255,0.12) inset` }}
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-
-          <div className="flex flex-col gap-1.5">
-            {stackCards.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setStackIndex(i)}
-                className={cn(
-                  'w-1 rounded-full transition-all duration-200',
-                  i === stackIndex ? 'h-5 bg-primary-400' : 'h-1.5 bg-white/20 hover:bg-white/35'
-                )}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={() => setStackIndex((v) => Math.min(stackCards.length - 1, v + 1))}
-            disabled={stackIndex === stackCards.length - 1}
-            className="w-7 h-7 rounded-full bg-white/5 border border-white/8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-25"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
+            <div className="relative flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-white/75 text-[11px] font-semibold uppercase tracking-widest truncate">{card.title}</p>
+                <p className="text-white text-[28px] font-black mt-1.5 tabular-nums leading-none truncate">{card.value}</p>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                <card.icon className="w-[18px] h-[18px] text-white" strokeWidth={1.8} />
+              </div>
+            </div>
+            <div className="relative flex items-end justify-between gap-3">
+              <p className="text-white/70 text-xs truncate">{card.sub}</p>
+              <ArrowUpRight className="w-4 h-4 text-white/70 shrink-0" />
+            </div>
+          </Link>
+        ))}
       </div>
 
       {/* ── Revenue highlight ─────────────────────────────────────────────────── */}
@@ -469,7 +403,7 @@ export default function AdminDashboard() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={cn(
-                    'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 capitalize',
+                    'px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 capitalize',
                     activeTab === tab
                       ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
                       : 'text-slate-500 hover:text-slate-300'
@@ -484,9 +418,9 @@ export default function AdminDashboard() {
               activeTab === 'clients'   ? '/dashboard/admin/clients'   :
               '/dashboard/admin/payments'
             }>
-              <button className="text-[11px] text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+              <span className="-mr-2 px-2 py-2 text-xs font-medium text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
                 View all <ArrowRight className="w-3 h-3" />
-              </button>
+              </span>
             </Link>
           </div>
 

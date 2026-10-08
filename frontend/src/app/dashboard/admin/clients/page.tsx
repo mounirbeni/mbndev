@@ -193,39 +193,39 @@ export default function AdminClientsPage() {
 
       {/* Stats */}
       {!loading && stats.total > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
           <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
             <div className="h-[3px] bg-gradient-to-r from-primary-600 via-primary-500 to-violet-500" />
-            <div className="p-4 flex items-center justify-between">
+            <div className="p-3.5 sm:p-4 flex items-center justify-between gap-2">
               <div>
                 <p className="text-slate-400 text-xs mb-0.5">{t('admin.clients')}</p>
                 <p className="text-2xl font-black text-white">{stats.total}</p>
               </div>
-              <div className="w-9 h-9 rounded-xl bg-primary-500/15 flex items-center justify-center">
+              <div className="hidden sm:flex w-9 h-9 shrink-0 rounded-xl bg-primary-500/15 items-center justify-center">
                 <Users className="w-4.5 h-4.5 text-primary-400" strokeWidth={1.8} />
               </div>
             </div>
           </div>
           <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
             <div className="h-[3px] bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500" />
-            <div className="p-4 flex items-center justify-between">
+            <div className="p-3.5 sm:p-4 flex items-center justify-between gap-2">
               <div>
                 <p className="text-slate-400 text-xs mb-0.5">{t('status.active')}</p>
                 <p className="text-2xl font-black text-emerald-400">{stats.activeCount}</p>
               </div>
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+              <div className="hidden sm:flex w-9 h-9 shrink-0 rounded-xl bg-emerald-500/15 items-center justify-center">
                 <UserCheck className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.8} />
               </div>
             </div>
           </div>
-          <div className="relative glass rounded-2xl border border-white/5 overflow-hidden col-span-2 sm:col-span-1">
+          <div className="relative glass rounded-2xl border border-white/5 overflow-hidden">
             <div className="h-[3px] bg-gradient-to-r from-red-600 via-red-500 to-rose-500" />
-            <div className="p-4 flex items-center justify-between">
+            <div className="p-3.5 sm:p-4 flex items-center justify-between gap-2">
               <div>
                 <p className="text-slate-400 text-xs mb-0.5">{t('status.inactive')}</p>
                 <p className="text-2xl font-black text-red-400">{stats.inactiveCount}</p>
               </div>
-              <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center">
+              <div className="hidden sm:flex w-9 h-9 shrink-0 rounded-xl bg-red-500/15 items-center justify-center">
                 <UserX className="w-4.5 h-4.5 text-red-400" strokeWidth={1.8} />
               </div>
             </div>
@@ -356,7 +356,83 @@ export default function AdminClientsPage() {
             <p className="text-slate-600 text-xs">Registered clients will appear here</p>
           </div>
         ) : (
-          <div className="overflow-x-auto overscroll-x-contain">
+          <>
+          {/* Phones: one card per client — a vertical list instead of a 720px table */}
+          <ul className="sm:hidden divide-y divide-white/5">
+            {clients.map((c) => {
+              const hasPendingDeletion = !!c.deletionRequestedAt;
+              const clientId = c._id ?? c.id ?? '';
+              return (
+                <li key={clientId} className={`p-4 space-y-3 ${hasPendingDeletion ? 'bg-orange-500/5' : ''}`}>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                      style={{ background: hasPendingDeletion ? 'linear-gradient(135deg,#f97316,#ef4444)' : 'linear-gradient(135deg,#7c3aed,#3b82f6)' }}
+                    >
+                      {getInitials(c.name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white text-sm font-semibold truncate">{c.name}</p>
+                      <p className="text-slate-500 text-xs truncate">{c.email}</p>
+                      {c.company && <p className="text-slate-500 text-xs truncate mt-0.5">{c.company}</p>}
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <Badge color={c.isActive ? 'green' : 'red'}>
+                        {c.isActive ? t('status.active') : t('status.inactive')}
+                      </Badge>
+                      <PlanBadge plan={c.plan} />
+                    </div>
+                  </div>
+                  {hasPendingDeletion ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black tracking-widest px-2 py-1 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30">DELETE REQ</span>
+                      <button onClick={() => approveDeletion(clientId)} className="ml-auto h-9 px-3.5 text-xs font-semibold text-red-300 rounded-lg bg-red-500/10 border border-red-500/25">Approve</button>
+                      <button onClick={() => rejectDeletion(clientId)} className="h-9 px-3.5 text-xs font-semibold text-slate-300 rounded-lg bg-white/5 border border-white/10">Reject</button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        {PRODUCT_ADMIN.map((p) => (
+                          <select
+                            key={p.id}
+                            value={productPlans[p.id][clientId] ?? ''}
+                            onChange={(e) => setProductPlan(p, c, e.target.value)}
+                            aria-label={`${p.name} plan for ${c.name}`}
+                            className={`h-9 w-full min-w-0 text-xs rounded-lg border px-2 bg-[#0b0a14] ${productPlans[p.id][clientId] ? 'border-violet-500/40 text-violet-300' : 'border-white/10 text-slate-500'}`}
+                          >
+                            <option value="">{p.short}: off</option>
+                            <option value="starter">{p.short}: Starter</option>
+                            <option value="pro">{p.short}: Pro</option>
+                            <option value="agency">{p.short}: Agency</option>
+                          </select>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => toggleStatus(clientId)} className="flex-1 h-9 text-xs font-medium text-slate-300 rounded-lg bg-white/5 border border-white/10">
+                          {t('admin.toggle')}
+                        </button>
+                        <button
+                          onClick={() => openNotes(c)}
+                          aria-label={(c as any).adminNotes ? 'Edit notes' : 'Add notes'}
+                          className={`w-9 h-9 flex items-center justify-center rounded-lg border ${(c as any).adminNotes ? 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' : 'text-slate-400 border-white/10 bg-white/5'}`}
+                        >
+                          <StickyNote className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(c)}
+                          aria-label="Delete client"
+                          className="w-9 h-9 flex items-center justify-center rounded-lg text-red-400 border border-red-500/20 bg-red-500/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hidden sm:block overflow-x-auto overscroll-x-contain">
             <table className="w-full min-w-[720px]">
               <thead>
                 <tr className="border-b border-white/6">
@@ -452,14 +528,14 @@ export default function AdminClientsPage() {
                           </button>
                           <button
                             onClick={() => openNotes(c)}
-                            className={`text-xs transition-colors p-1.5 rounded-lg border border-transparent hover:border-yellow-500/20 hover:bg-yellow-500/10 ${(c as any).adminNotes ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}`}
+                            className={`text-xs transition-colors p-2 rounded-lg border border-transparent hover:border-yellow-500/20 hover:bg-yellow-500/10 ${(c as any).adminNotes ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}`}
                             title={(c as any).adminNotes ? 'Edit notes' : 'Add notes'}
                           >
                             <StickyNote className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setDeleteTarget(c)}
-                            className="text-xs text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
+                            className="text-xs text-red-500 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
                             title="Delete client"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -473,6 +549,7 @@ export default function AdminClientsPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
 

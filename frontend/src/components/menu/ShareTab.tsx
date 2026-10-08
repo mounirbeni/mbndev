@@ -33,7 +33,7 @@ export default function ShareTab({ restaurant }: { restaurant: MenuRestaurant })
             <button onClick={() => copy(link)} className="flex items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#14092b]"><Copy className="h-4 w-4" />Copy</button>
             <a href={`/m/${restaurant.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 px-4 py-2.5 text-sm text-slate-200"><ExternalLink className="h-4 w-4" />Open</a>
           </div>
-          <p className="mt-3 text-xs text-slate-500">Booking page directly: <button onClick={() => copy(`${link}#book`)} className="font-mono text-violet-300 underline">{link}#book</button></p>
+          <p className="mt-3 text-xs text-slate-500">Booking page directly: <button onClick={() => copy(`${link}#book`)} className="py-1 font-mono text-violet-300 underline break-all text-left">{link}#book</button></p>
         </section>
 
         <section className={card}>

@@ -142,7 +142,7 @@ export default function Sidebar() {
 
       {/* ── Nav items ───────────────────────────────────────────────────────── */}
       <nav
-        className="flex-1 overflow-y-auto px-3 pb-2 space-y-0.5"
+        className="flex-1 min-h-0 overflow-y-auto scrollbar-none px-3 pb-2 space-y-0.5"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {navDef.map((item) => {

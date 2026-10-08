@@ -68,7 +68,7 @@ function InlineStatusPicker({
     <div ref={ref} className="relative inline-flex">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1.5 group"
+        className="flex items-center gap-1.5 min-h-8 py-1 group"
         disabled={saving}
       >
         <StatusBadge status={current as ProjectStatus} />
@@ -92,7 +92,7 @@ function InlineStatusPicker({
               <button
                 key={s}
                 onClick={() => pick(s)}
-                className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors hover:bg-white/8 ${
+                className={`w-full text-left px-3 py-2.5 text-xs font-medium capitalize transition-colors hover:bg-white/8 ${
                   s === current ? 'bg-white/6 ' + (STATUS_COLORS[s] ?? 'text-slate-300') : STATUS_COLORS[s] ?? 'text-slate-400'
                 }`}
               >
@@ -193,8 +193,8 @@ export default function AdminProjectsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-xs">
+      <div className="flex gap-2.5">
+        <div className="relative flex-1 min-w-0 sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           <input
             value={search}
@@ -218,7 +218,7 @@ export default function AdminProjectsPage() {
       </div>
 
       {/* Table */}
-      <div className="glass rounded-2xl border border-white/5 overflow-hidden">
+      <div className="glass rounded-2xl border border-white/5 sm:overflow-hidden">
         {loading ? (
           <div className="divide-y divide-white/5">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -246,7 +246,50 @@ export default function AdminProjectsPage() {
             <p className="text-slate-600 text-xs">Try adjusting your search or filters</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Phones: one card per project (vertical list, nothing to scroll sideways) */}
+          <ul className="sm:hidden divide-y divide-white/5">
+            {projects.map((p) => {
+              const client = typeof p.client === 'object' ? p.client : null;
+              return (
+                <li key={p._id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <Link href={`/dashboard/admin/projects/${p._id}`} className="min-w-0">
+                      <p className="text-white text-sm font-semibold leading-snug line-clamp-2">{p.title}</p>
+                      <p className="text-slate-500 text-xs mt-1 truncate">
+                        {client?.name || '—'} · {getProjectTypeLabel(p.type, t)}
+                      </p>
+                    </Link>
+                    <span className="text-white text-sm font-semibold tabular-nums shrink-0">{formatCurrency(p.budget)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary-500 rounded-full" style={{ width: `${p.progress}%` }} />
+                    </div>
+                    <span className="text-xs text-slate-400 tabular-nums w-9 text-right">{p.progress}%</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <InlineStatusPicker projectId={p._id ?? p.id ?? ''} current={p.status} onSaved={quickStatusSaved} />
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/dashboard/admin/projects/${p._id}`}
+                        className="h-9 px-3.5 inline-flex items-center rounded-lg text-xs font-medium text-slate-300 bg-white/5 border border-white/8"
+                      >
+                        {t('common.view')}
+                      </Link>
+                      <button
+                        onClick={() => openEdit(p)}
+                        className="h-9 px-3.5 inline-flex items-center rounded-lg text-xs font-medium text-primary-300 bg-primary-500/10 border border-primary-500/20"
+                      >
+                        {t('common.edit')}
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/6">
@@ -319,6 +362,7 @@ export default function AdminProjectsPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
 

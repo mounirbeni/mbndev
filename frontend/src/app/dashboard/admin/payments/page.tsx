@@ -552,7 +552,66 @@ export default function AdminPaymentsPage() {
             <p className="text-slate-600 text-xs">Payment records will appear here</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Phones: one card per payment (vertical list) */}
+          <ul className="sm:hidden divide-y divide-white/5">
+            {payments.map((pay) => {
+              const client    = typeof pay.client  === 'object' ? pay.client  : null;
+              const project   = typeof pay.project === 'object' ? pay.project : null;
+              const order     = typeof pay.order   === 'object' ? pay.order   : null;
+              const isVerif   = pay.status === 'pending_verification';
+              const riskScore = pay.riskScore ?? 0;
+              const isRisk    = riskScore >= 60;
+              return (
+                <li key={pay._id} className={`p-4 space-y-3 ${riskScore >= 80 ? 'bg-red-500/5' : isRisk ? 'bg-amber-500/4' : isVerif ? 'bg-yellow-500/4' : ''}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-white text-sm font-semibold truncate flex items-center gap-1.5">
+                        {client?.name || '—'}
+                        {isRisk && <ShieldAlert className={`w-3.5 h-3.5 shrink-0 ${riskScore >= 80 ? 'text-red-400' : 'text-amber-400'}`} />}
+                      </p>
+                      <p className="text-slate-500 text-xs truncate mt-0.5">{order?.title || project?.title || '—'}</p>
+                      <p className="text-slate-500 text-xs mt-0.5">
+                        {pay.method ? METHOD_LABELS[pay.method] || pay.method : '—'} · {pay.paidAt ? formatDate(pay.paidAt) : formatDate(pay.createdAt)}
+                        {isRisk && <span className="text-amber-500/90"> · Risk {riskScore}/100</span>}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <span className="text-white text-sm font-bold tabular-nums">{formatCurrency(pay.amount)}</span>
+                      <StatusBadge status={pay.status} />
+                    </div>
+                  </div>
+                  {isVerif && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button size="sm" onClick={() => openModal(pay, 'approve')} disabled={modalLoading}>
+                        <CheckCircle className="w-3.5 h-3.5" /> {t('admin.approve')}
+                      </Button>
+                      <button
+                        onClick={() => openModal(pay, 'reject')}
+                        disabled={modalLoading}
+                        className="h-9 inline-flex items-center justify-center gap-1.5 px-3 text-xs font-medium text-red-300 rounded-full border border-red-500/25 bg-red-500/10 disabled:opacity-50"
+                      >
+                        <XCircle className="w-3.5 h-3.5" /> Reject
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Link href={`/invoice/${pay._id}`} className="ml-auto h-9 inline-flex items-center gap-1.5 px-3 text-xs font-medium text-primary-300 rounded-lg bg-primary-500/10 border border-primary-500/20">
+                      <FileText className="w-3.5 h-3.5" /> Invoice
+                    </Link>
+                    <button
+                      onClick={() => setDrawerPaymentId(pay._id as string)}
+                      aria-label="View audit trail"
+                      className="w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-slate-400 bg-white/5 border border-white/10"
+                    >
+                      <History className="w-4 h-4" />
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/6">
@@ -676,6 +735,7 @@ export default function AdminPaymentsPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>

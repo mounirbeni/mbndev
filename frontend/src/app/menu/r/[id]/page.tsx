@@ -46,7 +46,7 @@ export default function MenuRestaurantPage({ params }: { params: Promise<{ id: s
 
   return (
     <div>
-      <Link href="/menu" className="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-white"><ArrowLeft className="h-4 w-4" />Restaurants</Link>
+      <Link href="/menu" className="-ml-1 inline-flex h-9 items-center gap-1 rounded-lg px-1 text-sm text-slate-400 hover:text-white"><ArrowLeft className="h-4 w-4" />Restaurants</Link>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <span className="h-9 w-9 shrink-0 rounded-xl" style={{ background: restaurant.color }} />
         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-white sm:text-3xl">{restaurant.name}</h1>
@@ -55,7 +55,8 @@ export default function MenuRestaurantPage({ params }: { params: Promise<{ id: s
         </a>
       </div>
 
-      <nav className="mt-5 flex gap-1 overflow-x-auto border-b border-white/[0.06]" aria-label="Restaurant">
+      {/* Sideways-scrolling tab strip on phones; bleeds to the screen edges */}
+      <nav className="mt-5 -mx-4 flex gap-1 overflow-x-auto scrollbar-none border-b border-white/[0.06] px-4 sm:mx-0 sm:px-0" aria-label="Restaurant">
         {TABS.map(([k, label]) => (
           <button key={k} onClick={() => switchTab(k)} aria-current={tab === k ? 'page' : undefined}
             className={`-mb-px shrink-0 border-b-2 px-3.5 py-2.5 text-sm ${tab === k ? 'border-violet-400 text-white' : 'border-transparent text-slate-400 hover:text-white'}`}>{label}</button>

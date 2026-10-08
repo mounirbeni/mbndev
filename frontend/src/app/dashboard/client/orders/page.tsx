@@ -92,10 +92,11 @@ export default function ClientOrdersPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        {stats.map((s) => (
-          <div key={s.label} className="glass rounded-xl p-4 border border-white/5 text-center">
-            <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+      {/* Phones: two counters side by side, the amount on its own full-width row */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {stats.map((s, i) => (
+          <div key={s.label} className={`glass rounded-xl p-4 border border-white/5 text-center ${i === 2 ? 'col-span-2 sm:col-span-1' : ''}`}>
+            <div className={`text-xl sm:text-2xl font-bold tabular-nums truncate ${s.color}`}>{s.value}</div>
             <div className="text-slate-500 text-xs mt-0.5">{s.label}</div>
           </div>
         ))}
@@ -139,14 +140,14 @@ export default function ClientOrdersPage() {
                   transition={{ delay: i * 0.04 }}
                   className="p-4 sm:p-5 hover:bg-white/2 transition-colors"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     <div className="w-10 h-10 rounded-xl bg-primary-500/15 flex items-center justify-center shrink-0">
                       <ShoppingBag className="w-5 h-5 text-primary-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 flex-wrap">
-                        <div>
-                          <h3 className="text-white font-semibold text-sm truncate">{order.title}</h3>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <h3 className="text-white font-semibold text-sm leading-snug line-clamp-2">{order.title}</h3>
                           <p className="text-slate-500 text-xs mt-0.5">
                             {order.product ? 'Software licence' : (
                               <>
@@ -173,27 +174,26 @@ export default function ClientOrdersPage() {
                         {order.project && (
                           <Link
                             href={`/dashboard/client/projects/${order.project.id}`}
-                            className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1"
+                            className="py-2 text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1"
                           >
                             {t('orders.viewProject')} <ArrowRight className="w-3 h-3" />
                           </Link>
                         )}
 
                         {order.status === 'paid' && productFromKey(order.product)?.appUrl && (
-                          <Link href={productFromKey(order.product)!.appUrl!} className="text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
+                          <Link href={productFromKey(order.product)!.appUrl!} className="py-2 text-xs text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1">
                             Open {productFromKey(order.product)!.name} <ArrowRight className="w-3 h-3" />
                           </Link>
                         )}
 
                         {/* Pay now button — hidden while payment is under review */}
                         {order.status === 'pending' && !hasPaymentUnderReview && (
-                          <Link href={`/checkout/${order.id}`} className="ml-auto">
-                            <button
-                              className="btn-silk flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold active:scale-95"
-                            >
-                              <CreditCard className="w-3.5 h-3.5" />
-                              {t('orders.payNow')}
-                            </button>
+                          <Link
+                            href={`/checkout/${order.id}`}
+                            className="ml-auto btn-silk flex items-center gap-1.5 h-9 px-4 text-xs font-semibold active:scale-95"
+                          >
+                            <CreditCard className="w-3.5 h-3.5" />
+                            {t('orders.payNow')}
                           </Link>
                         )}
                       </div>

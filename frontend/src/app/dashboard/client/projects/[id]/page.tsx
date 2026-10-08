@@ -154,7 +154,7 @@ export default function ClientProjectWorkspace() {
       {/* Back */}
       <Link
         href="/dashboard/client/projects"
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors"
+        className="inline-flex h-9 items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors"
       >
         <ArrowLeft className="w-4 h-4" /> {t('client.allProjects')}
       </Link>
@@ -218,7 +218,8 @@ export default function ClientProjectWorkspace() {
             <button
               key={tabDef.id}
               onClick={() => setTab(tabDef.id)}
-              className={`flex-shrink-0 sm:flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap press-scale ${
+              aria-label={tabDef.label}
+              className={`flex-1 min-w-11 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap press-scale ${
                 tab === tabDef.id
                   ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
                   : 'text-slate-400 hover:text-white'

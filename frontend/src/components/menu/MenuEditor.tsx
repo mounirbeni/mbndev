@@ -112,7 +112,7 @@ export default function MenuEditor({ restaurant, onSaved }: { restaurant: MenuRe
         <span className="text-xs text-slate-400">Editing</span>
         <div className="flex flex-wrap gap-1">
           {restaurant.languages.map((l) => (
-            <button key={l} onClick={() => setLang(l)} className={`rounded-lg px-2.5 py-1.5 font-mono text-xs font-semibold ${lang === l ? 'bg-violet-500 text-white' : 'bg-white/[0.05] text-slate-300 hover:bg-white/10'}`}>
+            <button key={l} onClick={() => setLang(l)} className={`h-9 min-w-10 rounded-lg px-2.5 font-mono text-xs font-semibold ${lang === l ? 'bg-violet-500 text-white' : 'bg-white/[0.05] text-slate-300 hover:bg-white/10'}`}>
               {l.toUpperCase()}{l === fallback ? ' ★' : ''}
             </button>
           ))}
@@ -276,7 +276,7 @@ function DishModal({ restaurant, initial, lang, fallback, isNew, onCancel, onSav
           <h2 className="flex-1 text-lg font-semibold text-white">{isNew ? 'New dish' : 'Edit dish'}</h2>
           <div className="flex gap-1">
             {restaurant.languages.map((l) => (
-              <button type="button" key={l} onClick={() => setEditLang(l)} className={`rounded-md px-2 py-1 font-mono text-[11px] font-semibold ${editLang === l ? 'bg-violet-500 text-white' : 'bg-white/[0.05] text-slate-400'}`}>{l.toUpperCase()}</button>
+              <button type="button" key={l} onClick={() => setEditLang(l)} className={`h-8 min-w-9 rounded-md px-2 font-mono text-[11px] font-semibold ${editLang === l ? 'bg-violet-500 text-white' : 'bg-white/[0.05] text-slate-400'}`}>{l.toUpperCase()}</button>
             ))}
           </div>
           <IconBtn label="Close" onClick={onCancel}><X /></IconBtn>
