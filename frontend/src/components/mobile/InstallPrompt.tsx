@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Star } from 'lucide-react';
+import { X, Download } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -93,12 +93,8 @@ export default function InstallPrompt() {
 
               <div className="flex-1 min-w-0">
                 <div className="text-white text-[15px] font-bold leading-tight">{t('install.title')}</div>
-                {/* Star rating */}
-                <div className="flex items-center gap-0.5 mt-0.5 mb-1">
-                  {[1,2,3,4,5].map(i => (
-                    <Star key={i} className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />
-                  ))}
-                  <span className="text-slate-500 text-[10px] ml-1">Free</span>
+                <div className="mt-0.5 mb-1">
+                  <span className="text-slate-500 text-[10px]">Free</span>
                 </div>
                 <div className="text-slate-400 text-xs leading-snug">
                   {t('install.subtitle')}

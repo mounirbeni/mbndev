@@ -3,13 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { CountUpText } from '@/components/ui/CountUp';
 import { useRouter } from 'next/navigation';
 import { safeNext } from '@/lib/safeNext';
 import {
   Mail, Lock, ArrowRight, Eye, EyeOff, ChevronLeft,
   AlertCircle, ShieldAlert, Loader2, XCircle, Sparkles,
-  CheckCircle2, Globe2, Zap, Shield,
+  Globe2, Zap, Shield,
 } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import toast from 'react-hot-toast';
@@ -124,13 +123,6 @@ const features = [
   { icon: Zap,          label: 'Lightning Fast',    desc: 'Optimized for speed & performance' },
   { icon: Shield,       label: 'Fully Secure',      desc: 'Enterprise-grade security protocols' },
   { icon: Globe2,       label: 'Global Delivery',   desc: 'Deployed worldwide on edge network' },
-  { icon: CheckCircle2, label: '100% Satisfaction', desc: 'Guaranteed on every project' },
-];
-
-const stats = [
-  { val: '48+', label: 'Clients' },
-  { val: '98%', label: 'On Time' },
-  { val: '5.0', label: 'Rating'  },
 ];
 
 function LeftPanel() {
@@ -246,13 +238,6 @@ function LeftPanel() {
           transition={{ duration: 0.6, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
           className="flex items-center gap-6 flex-wrap"
         >
-          {stats.map((s) => (
-            <div key={s.label}>
-              <div className="text-xl font-black text-white tabular-nums"><CountUpText text={s.val} /></div>
-              <div className="text-[11px] text-slate-500 mt-0.5">{s.label}</div>
-            </div>
-          ))}
-          <div className="w-px h-8 bg-white/8 shrink-0" />
           <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
             style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}>
             <span className="relative flex w-1.5 h-1.5">

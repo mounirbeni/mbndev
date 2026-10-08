@@ -5,7 +5,7 @@ import { m as motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowRight, Zap, Code2, Database, Globe, Server, Layers,
-  GitBranch, Terminal, Star, Users, FolderOpen, Clock,
+  GitBranch, Terminal, Clock,
   MapPin, Wifi, Sparkles, Shield, Rocket, Handshake,
   MessageSquare, DollarSign, UserCheck, Timer, ChevronDown,
   Check,
@@ -48,9 +48,6 @@ export default function AboutPage() {
 
   const stats = [
     { icon: Clock, value: '5+', label: t('about.stats.experience') },
-    { icon: FolderOpen, value: '145+', label: t('about.stats.projects') },
-    { icon: Users, value: '48+', label: t('about.stats.clients') },
-    { icon: Star, value: '100%', label: t('about.stats.satisfaction') },
   ];
 
   const values = [
@@ -108,7 +105,7 @@ export default function AboutPage() {
       {/* ── STATS ────────────────────────────────────────────────────── */}
       <section className="pb-24 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 max-w-xs mx-auto gap-4">
             {stats.map((s, i) => {
               const Icon = s.icon;
               return (
@@ -199,10 +196,9 @@ export default function AboutPage() {
                   </div>
 
                   {/* Mini stats row */}
-                  <div className="mt-8 pt-7 border-t border-violet-500/20 grid grid-cols-3 gap-4">
+                  <div className="mt-8 pt-7 border-t border-violet-500/20 grid grid-cols-2 gap-4">
                     {[
                       { val: '5+', lab: 'Years' },
-                      { val: '145+', lab: 'Projects' },
                       { val: '3', lab: 'Languages' },
                     ].map(({ val, lab }) => (
                       <div key={lab} className="text-center">
