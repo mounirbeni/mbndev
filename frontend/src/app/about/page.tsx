@@ -5,7 +5,7 @@ import { m as motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowRight, Zap, Code2, Database, Globe, Server, Layers,
-  GitBranch, Terminal, Clock,
+  GitBranch, Terminal,
   MapPin, Wifi, Sparkles, Shield, Rocket, Handshake,
   MessageSquare, DollarSign, UserCheck, Timer, ChevronDown,
   Check,
@@ -44,10 +44,6 @@ export default function AboutPage() {
     { icon: GitBranch, label: 'Prisma ORM' },
     { icon: Globe, label: 'Tailwind CSS' },
     { icon: Zap, label: 'TypeScript' },
-  ];
-
-  const stats = [
-    { icon: Clock, value: '5+', label: t('about.stats.experience') },
   ];
 
   const values = [
@@ -98,32 +94,6 @@ export default function AboutPage() {
             <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
               {t('about.hero.subtitle')}
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── STATS ────────────────────────────────────────────────────── */}
-      <section className="pb-24 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 max-w-xs mx-auto gap-4">
-            {stats.map((s, i) => {
-              const Icon = s.icon;
-              return (
-                <motion.div
-                  key={s.label}
-                  {...fadeUp}
-                  transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="premium-surface rounded-2xl p-6 text-center"
-                >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-                    style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)' }}>
-                    <Icon className="w-5 h-5 text-violet-400" />
-                  </div>
-                  <div className="text-4xl font-black text-white mb-1 tracking-tight"><CountUpText text={s.value} /></div>
-                  <div className="text-slate-500 text-sm">{s.label}</div>
-                </motion.div>
-              );
-            })}
           </div>
         </div>
       </section>

@@ -6,12 +6,7 @@ import { ArrowUpRight, Check, Play, MessageSquare } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import Magnetic from '@/components/ui/Magnetic';
 import SilkRibbons from '@/components/ui/SilkRibbons';
-import CountUp from '@/components/ui/CountUp';
 import RotatingPhrase from './RotatingPhrase';
-
-const STATS = [
-  { val: 5,   suffix: '+', label: 'Years of experience' },
-];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -235,28 +230,6 @@ export default function Hero() {
             <PortalPanel />
           </div>
         </div>
-
-        {/* stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: EASE }}
-          className="w-full border-t border-white/[0.07] bg-[#07060f]/60 backdrop-blur-xl"
-        >
-          <div className="max-w-[1320px] mx-auto px-6 sm:px-10 lg:px-14 grid grid-cols-2 lg:grid-cols-4">
-            {STATS.map((s, i) => (
-              <div
-                key={s.label}
-                className={`py-5 lg:py-7 ${i % 2 === 1 ? 'pl-6' : ''} lg:pl-0 ${i > 0 ? 'lg:pl-8 lg:border-l lg:border-white/[0.07]' : ''} ${i > 1 ? 'border-t border-white/[0.07] lg:border-t-0' : ''}`}
-              >
-                <div className="text-[clamp(1.6rem,2.4vw,2.2rem)] font-semibold tracking-tight text-white tabular-nums leading-none">
-                  <CountUp value={s.val} suffix={s.suffix} duration={1.8} />
-                </div>
-                <div className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-slate-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
       </motion.div>
     </section>
   );

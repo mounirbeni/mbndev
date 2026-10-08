@@ -387,6 +387,10 @@ export default function PortfolioPage() {
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
               {t('portfolio.pageSub')}
             </p>
+            <div className="mt-8 inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/[0.04] border border-white/10">
+              <span className="text-2xl font-black text-white tabular-nums">5+</span>
+              <span className="text-sm text-slate-400">{t('about.stats.experience')}</span>
+            </div>
           </div>
         </div>
       </section>
