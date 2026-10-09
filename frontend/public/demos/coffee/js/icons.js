@@ -22,6 +22,8 @@ const P = {
   arrowLeft: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
   external: '<path d="M7 17 17 7"/><path d="M7 7h10v10"/>',
   phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  chevron: '<path d="m6 9 6 6 6-6"/>',
   bean: '<ellipse cx="12" cy="12" rx="6" ry="8.5" transform="rotate(30 12 12)"/><path d="M9 6c3 3 3 9 6 12"/>',
 };
 
@@ -31,3 +33,16 @@ export const icon = (name, cls = '', label = '') =>
 
 /** Inline icon + text, used in buttons and labels. */
 export const withIcon = (name, text, cls = '') => `${icon(name, cls)}<span>${text}</span>`;
+
+/**
+ * Language dropdown: a compact button (globe + current code) that opens a short listbox.
+ * Options are <button data-lang> so callers can reuse their existing delegated click handlers;
+ * the toggle carries [data-ddtoggle] and the wrapper is `.dd`.
+ */
+export const langDropdown = ({ options, current, open = false, label = 'Language', cls = '' }) => {
+  const cur = options.find((o) => o.id === current) || options[0];
+  return `<div class="dd ${cls} ${open ? 'open' : ''}">
+    <button type="button" class="dd-btn" data-ddtoggle aria-haspopup="listbox" aria-expanded="${open}" aria-label="${label}: ${cur.name}">${icon('globe')}<span class="dd-cur">${cur.short}</span>${icon('chevron', 'dd-chev')}</button>
+    <div class="dd-menu" role="listbox" aria-label="${label}">${options.map((o) => `<button type="button" role="option" aria-selected="${o.id === current}" data-lang="${o.id}" lang="${o.id}"><span>${o.name}</span>${o.id === current ? icon('check') : ''}</button>`).join('')}</div>
+  </div>`;
+};

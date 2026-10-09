@@ -1,8 +1,8 @@
 // UI copy for the NOUR demo in English, French and Arabic (Arabic is rendered RTL).
 export const LANGS = [
-  { id: 'en', label: 'EN', dir: 'ltr', locale: 'en-GB' },
-  { id: 'fr', label: 'FR', dir: 'ltr', locale: 'fr-FR' },
-  { id: 'ar', label: 'ع', dir: 'rtl', locale: 'ar-MA' },
+  { id: 'en', label: 'EN', name: 'English', dir: 'ltr', locale: 'en-GB' },
+  { id: 'fr', label: 'FR', name: 'Français', dir: 'ltr', locale: 'fr-FR' },
+  { id: 'ar', label: 'AR', name: 'العربية', dir: 'rtl', locale: 'ar-MA' },
 ];
 
 const en = {
@@ -35,7 +35,7 @@ const en = {
   process: 'Process', altitude: 'Altitude', roast: 'Roast', r_light: 'Light', r_medium: 'Medium', 'r_medium-dark': 'Medium-dark',
   b_today: 'On the bar today', b_espresso: 'House espresso', size: 'Size', grind: 'Grind', plan: 'Delivery', addBag: 'Add to bag · {p}', subNote: 'Subscriptions: pause, skip or cancel any time.', perBag: 'per bag',
   brewK: '03 — Brew guide', brewT: 'Brew it at home.', brewS: 'Pick your method and cups — we do the maths and walk you through it with a timer.',
-  cups: 'Cups', coffee: 'Coffee', water: 'Water', temp: 'Water temp', start: 'Start', pause: 'Pause', reset: 'Reset', ratio: 'Ratio', brewTime: 'Brew time',
+  cups: 'Cups', coffee: 'Coffee', water: 'Water', temp: 'Water temp', start: 'Start', pause: 'Pause', reset: 'Reset', ratio: 'Ratio', brewTime: 'Brew time', language: 'Language',
   loyK: '04 — Stamp card', loyT: 'The card that lives in your phone.', loyS: 'Every drink is a stamp, automatically. The tenth one is on us — no paper, no app to install.',
   phoneLabel: 'Your phone number', showCard: 'Show my card', join: 'Join free', stampsOf: '{n} of {m} stamps', reward: 'Free drink unlocked', toGo: '{n} more for a free drink',
   how1: 'Order ahead or at the bar', how2: 'Your phone number collects the stamps', how3: 'The tenth drink is free', loyDemo: 'Demo member: 06 12 34 56 78', member: 'Member since {d}', cardNotFound: 'No card yet for this number — join in one tap.', joined: 'Welcome! Your first stamp is waiting.',
@@ -83,7 +83,7 @@ const fr = {
   process: 'Process', altitude: 'Altitude', roast: 'Torréfaction', r_light: 'Claire', r_medium: 'Moyenne', 'r_medium-dark': 'Moyenne-foncée',
   b_today: 'Au bar aujourd’hui', b_espresso: 'Espresso maison', size: 'Format', grind: 'Mouture', plan: 'Livraison', addBag: 'Ajouter · {p}', subNote: 'Abonnements : pause, saut ou arrêt à tout moment.', perBag: 'le sachet',
   brewK: '03 — Guide', brewT: 'Faites-le chez vous.', brewS: 'Choisissez la méthode et le nombre de tasses — on fait les calculs et on vous guide avec un minuteur.',
-  cups: 'Tasses', coffee: 'Café', water: 'Eau', temp: 'Température', start: 'Démarrer', pause: 'Pause', reset: 'Réinitialiser', ratio: 'Ratio', brewTime: 'Temps d’infusion',
+  cups: 'Tasses', coffee: 'Café', water: 'Eau', temp: 'Température', start: 'Démarrer', pause: 'Pause', reset: 'Réinitialiser', ratio: 'Ratio', brewTime: 'Temps d’infusion', language: 'Langue',
   loyK: '04 — Carte de fidélité', loyT: 'La carte qui vit dans votre téléphone.', loyS: 'Chaque boisson est un tampon, automatiquement. La dixième est offerte — sans papier, sans appli.',
   phoneLabel: 'Votre numéro de téléphone', showCard: 'Voir ma carte', join: 'Rejoindre', stampsOf: '{n} sur {m} tampons', reward: 'Boisson offerte débloquée', toGo: 'Encore {n} pour une boisson offerte',
   how1: 'Commandez en ligne ou au bar', how2: 'Votre numéro collecte les tampons', how3: 'La dixième boisson est offerte', loyDemo: 'Membre démo : 06 12 34 56 78', member: 'Membre depuis {d}', cardNotFound: 'Pas encore de carte pour ce numéro — rejoignez en un clic.', joined: 'Bienvenue ! Votre premier tampon vous attend.',
@@ -131,7 +131,7 @@ const ar = {
   process: 'المعالجة', altitude: 'الارتفاع', roast: 'التحميص', r_light: 'فاتح', r_medium: 'متوسط', 'r_medium-dark': 'متوسط-داكن',
   b_today: 'على البار اليوم', b_espresso: 'إسبريسو البيت', size: 'الحجم', grind: 'الطحن', plan: 'التوصيل', addBag: 'أضف للسلة · {p}', subNote: 'الاشتراك: أوقفه أو تخطَّه أو ألغِه متى شئت.', perBag: 'للكيس',
   brewK: '03 — دليل التحضير', brewT: 'حضّرها في البيت.', brewS: 'اختر الطريقة وعدد الأكواب — نحسب لك الكميات ونرافقك بمؤقّت.',
-  cups: 'الأكواب', coffee: 'البن', water: 'الماء', temp: 'حرارة الماء', start: 'ابدأ', pause: 'إيقاف', reset: 'إعادة', ratio: 'النسبة', brewTime: 'مدة التحضير',
+  cups: 'الأكواب', coffee: 'البن', water: 'الماء', temp: 'حرارة الماء', start: 'ابدأ', pause: 'إيقاف', reset: 'إعادة', ratio: 'النسبة', brewTime: 'مدة التحضير', language: 'اللغة',
   loyK: '04 — بطاقة الأختام', loyT: 'البطاقة التي تعيش في هاتفك.', loyS: 'كل مشروب ختم تلقائياً. العاشر علينا — بدون ورق وبدون تطبيق.',
   phoneLabel: 'رقم هاتفك', showCard: 'أظهر بطاقتي', join: 'انضم مجاناً', stampsOf: '{n} من {m} أختام', reward: 'مشروب مجاني متاح', toGo: 'بقي {n} للمشروب المجاني',
   how1: 'اطلب مسبقاً أو من البار', how2: 'رقم هاتفك يجمع الأختام', how3: 'المشروب العاشر مجاني', loyDemo: 'عضو تجريبي: 06 12 34 56 78', member: 'عضو منذ {d}', cardNotFound: 'لا توجد بطاقة لهذا الرقم — انضم بنقرة.', joined: 'مرحباً بك! ختمك الأول في انتظارك.',

@@ -3,7 +3,7 @@ import { CAFE, CATEGORIES, MENU, OPTS, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, BRE
 import { LANGS, STR } from './i18n.js';
 import { drinkSVG, foodSVG, artFor, bagSVG } from './art.js';
 import * as db from './store.js';
-import { icon } from './icons.js';
+import { icon, langDropdown } from './icons.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -30,7 +30,7 @@ function applyStatic() {
   document.documentElement.dir = L0.dir;
   $$('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
   $$('[data-t-ph]').forEach((el) => { el.placeholder = t(el.dataset.tPh); });
-  $('#langs').innerHTML = LANGS.map((x) => `<button aria-pressed="${x.id === lang}" data-lang="${x.id}" aria-label="${x.id.toUpperCase()}">${x.label}</button>`).join('');
+  $('#langs').innerHTML = langDropdown({ options: LANGS.map((x) => ({ id: x.id, short: x.label, name: x.name })), current: lang, label: t('language') });
 }
 function setLang(l) {
   lang = l;
@@ -707,6 +707,8 @@ function renderAll() {
 
 function wire() {
   document.addEventListener('click', (e) => {
+    const dd = e.target.closest('[data-ddtoggle]'); if (dd) { const box = dd.closest('.dd'); const on = box.classList.toggle('open'); dd.setAttribute('aria-expanded', on); return; }
+    if (!e.target.closest('.dd')) $$('.dd.open').forEach((x) => { x.classList.remove('open'); x.querySelector('[data-ddtoggle]').setAttribute('aria-expanded', 'false'); });
     const lb = e.target.closest('[data-lang]'); if (lb) { setLang(lb.dataset.lang); return; }
     if (e.target.closest('[data-close]')) { close(); return; }
     const fv = e.target.closest('[data-fav]'); if (fv) { e.stopPropagation(); toggleFav(fv.dataset.fav); return; }
@@ -732,7 +734,7 @@ function wire() {
   // phone: the header slides away while scrolling down, like an app
   let lastY = scrollY;
   window.addEventListener('scroll', () => { const y = scrollY; document.body.classList.toggle('navhide', y > 260 && y > lastY + 2 ? true : y < lastY - 2 ? false : document.body.classList.contains('navhide')); lastY = y; }, { passive: true });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $$('.dd.open').forEach((x) => { x.classList.remove('open'); x.querySelector('[data-ddtoggle]').setAttribute('aria-expanded', 'false'); }); close(); } });
   $('#builder').addEventListener('click', builderClick);
   $('#bag').addEventListener('click', bagClick);
   $('#bag').addEventListener('change', (e) => { if (e.target.id === 'coReward') { readCo(); co.useReward = e.target.checked; renderBag(); } });

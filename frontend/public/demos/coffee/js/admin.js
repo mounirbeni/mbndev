@@ -2,7 +2,7 @@
 // so orders, bookings and sign-ups made on the website appear here live (and back).
 import { CAFE, CATEGORIES, MENU, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, EVENTS, GIFT_DESIGNS } from './data.js';
 import * as db from './store.js';
-import { icon } from './icons.js';
+import { icon, langDropdown } from './icons.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -10,7 +10,7 @@ const PIN = '2468';
 
 const A = {
   en: {
-    owner: 'Owner dashboard', pinLabel: 'Enter your PIN', pinHint: 'Demo PIN: 2468', unlock: 'Unlock', backSite: 'Back to the website', badPin: 'Wrong PIN — try 2468.',
+    owner: 'Owner dashboard', pinLabel: 'Enter your PIN', pinHint: 'Demo PIN: 2468', unlock: 'Unlock', backSite: 'Back to the website', language: 'Language', badPin: 'Wrong PIN — try 2468.',
     viewSite: 'View website', demoTag: 'Demo by MBN DEV', live: 'Live', soundOn: 'Sound on', soundOff: 'Sound off',
     t_live: 'Live orders', t_menu: 'Menu & stock', t_book: 'Bookings', t_people: 'Customers', t_stats: 'Insights', t_set: 'Settings',
     s_live: 'New orders arrive here instantly — tap to move them along.', s_menu: 'Prices and sold-out items update on the website immediately.', s_book: 'Workshop seats and catering requests.', s_people: 'Stamp cards, gift cards, bean subscriptions and newsletter.', s_stats: 'How the café is doing.', s_set: 'Opening hours, online ordering and the banner.',
@@ -28,7 +28,7 @@ const A = {
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], cur: '{n} dh', free: 'Free', sub_once: 'One-time', sub_w2: 'Every 2 weeks', sub_w4: 'Every 4 weeks', ty_office: 'Office', ty_event: 'Event', ty_wedding: 'Wedding',
   },
   fr: {
-    owner: 'Espace gérant', pinLabel: 'Entrez votre code', pinHint: 'Code démo : 2468', unlock: 'Déverrouiller', backSite: 'Retour au site', badPin: 'Code incorrect — essayez 2468.',
+    owner: 'Espace gérant', pinLabel: 'Entrez votre code', pinHint: 'Code démo : 2468', unlock: 'Déverrouiller', backSite: 'Retour au site', language: 'Langue', badPin: 'Code incorrect — essayez 2468.',
     viewSite: 'Voir le site', demoTag: 'Démo par MBN DEV', live: 'En direct', soundOn: 'Son activé', soundOff: 'Son coupé',
     t_live: 'Commandes', t_menu: 'Carte & stock', t_book: 'Réservations', t_people: 'Clients', t_stats: 'Statistiques', t_set: 'Réglages',
     s_live: 'Les nouvelles commandes arrivent ici instantanément — touchez pour les faire avancer.', s_menu: 'Prix et ruptures sont mis à jour immédiatement sur le site.', s_book: 'Places aux ateliers et demandes traiteur.', s_people: 'Cartes de fidélité, cartes cadeaux, abonnements café et newsletter.', s_stats: 'Comment va le café.', s_set: 'Horaires, commande en ligne et bandeau.',
@@ -76,11 +76,13 @@ function ding() {
 }
 
 // ── chrome ────────────────────────────────────────────────────────────────
+let ddOpen = null; // which language dropdown is open (survives re-renders)
 function applyStatic() {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-a]').forEach((el) => { el.textContent = t(el.dataset.a); });
-  const lb = ['en', 'fr'].map((l) => `<button aria-pressed="${l === lang}" data-lang="${l}">${l.toUpperCase()}</button>`).join('');
-  $('#alang').innerHTML = lb; $('#alang2').innerHTML = lb;
+  const opts = [{ id: 'en', short: 'EN', name: 'English' }, { id: 'fr', short: 'FR', name: 'Français' }];
+  $('#alang').innerHTML = langDropdown({ options: opts, current: lang, open: ddOpen === 'alang', label: t('language'), cls: 'up' });
+  $('#alang2').innerHTML = langDropdown({ options: opts, current: lang, open: ddOpen === 'alang2', label: t('language'), cls: 'light' });
 }
 function renderTabs() {
   const s = db.get();
@@ -229,9 +231,13 @@ const toMin = (v) => { const [a, b] = v.split(':').map(Number); return a * 60 + 
 
 function wire() {
   document.addEventListener('click', (e) => {
+    const tg = e.target.closest('[data-ddtoggle]');
+    const host = tg ? tg.closest('.dd').parentElement.id : null;
+    if (ddOpen && host !== ddOpen) { ddOpen = null; document.querySelectorAll('.dd.open').forEach((x) => { x.classList.remove('open'); x.querySelector('[data-ddtoggle]').setAttribute('aria-expanded', 'false'); }); }
+    if (tg) { ddOpen = ddOpen === host ? null : host; tg.closest('.dd').classList.toggle('open', ddOpen === host); tg.setAttribute('aria-expanded', String(ddOpen === host)); return; }
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.tab) { tab = b.dataset.tab; sessionStorage.setItem('nour-admin-tab', tab); render(); window.scrollTo(0, 0); }
-    else if (b.dataset.lang) { lang = b.dataset.lang; sessionStorage.setItem('nour-admin-lang', lang); render(); }
+    else if (b.dataset.lang) { ddOpen = null; lang = b.dataset.lang; sessionStorage.setItem('nour-admin-lang', lang); render(); }
     else if (b.dataset.adv) { const o = db.get().orders.find((x) => x.id === b.dataset.adv); fresh.delete(o.id); db.setStatus(o.id, NEXT[o.status]); render(); }
     else if (b.dataset.cancel) { db.setStatus(b.dataset.cancel, 'cancelled'); render(); }
     else if (b.dataset.wait) { db.update((s) => { s.settings.wait = Math.max(1, Math.min(45, s.settings.wait + Number(b.dataset.wait))); }); render(); }
