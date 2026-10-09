@@ -1,0 +1,10 @@
+{
+  "name": "LALLA Beauty House (demo)",
+  "short_name": "LALLA",
+  "start_url": "/demo/beauty",
+  "scope": "/demo/beauty",
+  "display": "standalone",
+  "background_color": "#fbf3ee",
+  "theme_color": "#fbf3ee",
+  "icons": [{ "src": "/demos/beauty/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

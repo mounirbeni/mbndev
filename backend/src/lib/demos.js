@@ -15,6 +15,7 @@ const bcrypt = require('bcryptjs');
 const CATALOG = [
   { slug: 'coffee', name: 'NOUR Coffee Atelier', path: '/demo/coffee', adminPath: '/demo/coffee/admin', defaultPin: '2468' },
   { slug: 'barber', name: 'TARZ Barber Club', path: '/demo/barber', adminPath: '/demo/barber/admin', defaultPin: '1357' },
+  { slug: 'beauty', name: 'LALLA Beauty House', path: '/demo/beauty', adminPath: '/demo/beauty/admin', defaultPin: '2580' },
 ];
 
 const catalogEntry = (slug) => CATALOG.find((d) => d.slug === slug) || null;
