@@ -302,7 +302,7 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
 .knob::after { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: var(--sun); }
 .knob:active { cursor: grabbing; }
 .match { display: grid; grid-template-columns: 130px 1fr; gap: 18px; align-content: start; background: var(--paper); border: 1px solid var(--line); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); min-width: 0; }
-.match .bagart .art { width: 100%; height: auto; }
+.match .bagart img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 18px; display: block; box-shadow: 0 10px 24px -14px rgba(23, 18, 14, 0.5); }
 .match h3 { margin: 4px 0 6px; font: 650 30px/1.05 var(--display); }
 .match .notes { font-weight: 600; margin: 0; }
 .specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
@@ -314,9 +314,9 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
 .badge { display: inline-block; font: 700 10px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; background: var(--sun); color: #fff; }
 .badge.alt { background: var(--ink); color: var(--sun-2); }
 .bean-row { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: thin; margin-top: 26px; padding-bottom: 8px; scroll-snap-type: x mandatory; }
-.bean-card { flex: 0 0 min(78%, 250px); scroll-snap-align: start; display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; text-align: start; padding: 12px; border-radius: 18px; border: 1.5px solid var(--line); background: var(--paper); }
+.bean-card { flex: 0 0 min(78%, 270px); scroll-snap-align: start; display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; text-align: start; padding: 12px; border-radius: 18px; border: 1.5px solid var(--line); background: var(--paper); }
 .bean-card[aria-pressed='true'] { border-color: var(--ink); }
-.bean-card .art { width: 56px; height: auto; }
+.bean-card img { width: 64px; height: 64px; object-fit: cover; border-radius: 14px; display: block; }
 .bean-card b { display: block; font: 650 16px/1.15 var(--display); }
 .bean-card small { color: var(--muted); font-size: 12px; display: block; }
 

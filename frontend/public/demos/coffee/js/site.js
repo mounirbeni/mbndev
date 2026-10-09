@@ -1,5 +1,5 @@
 // NOUR Coffee Atelier — public site. Vanilla JS modules, no build step.
-import { CAFE, CATEGORIES, MENU, OPTS, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, BREW, EVENTS, GIFT_AMOUNTS, GIFT_DESIGNS, AMENITIES, photoOf } from './data.js';
+import { CAFE, CATEGORIES, MENU, OPTS, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, BREW, EVENTS, GIFT_AMOUNTS, GIFT_DESIGNS, AMENITIES, photoOf, beanPhoto } from './data.js';
 import { LANGS, STR } from './i18n.js';
 import { drinkSVG, foodSVG, artFor, bagSVG } from './art.js';
 import * as db from './store.js';
@@ -20,6 +20,7 @@ const locale = () => LANGS.find((x) => x.id === lang).locale;
 const dateFmt = (d, o) => new Intl.DateTimeFormat(locale(), o).format(d);
 
 const photo = (id, cls = 'photo') => { const src = photoOf(id); return src ? `<img class="${cls}" src="${src}" alt="" loading="lazy" decoding="async"/>` : ''; };
+const beanImg = (b, cls = 'photo') => `<img class="${cls}" src="${beanPhoto(b.id)}" alt="${esc(L(b.origin))}" loading="lazy" decoding="async"/>`;
 const TINT = { espresso: '#f3dcc4', slow: '#e3eadf', cold: '#dfe9f1', notcoffee: '#e8efd8', bakery: '#f6e3c3', brunch: '#f1dccf' };
 
 function applyStatic() {
@@ -280,7 +281,7 @@ function lineView(l) {
   if (l.kind === 'beans') {
     const b = BEANS.find((x) => x.id === l.id);
     const sub = [BEAN_SIZES.find((x) => x.id === l.size).label, L(GRINDS.find((g) => g.id === l.grind).label), L(SUB_PLANS.find((p) => p.id === l.plan).label)].join(' · ');
-    return { name: L(b.origin), sub, art: bagSVG(b.color, b.id.toUpperCase()), tint: '#efe4d3' };
+    return { name: L(b.origin), sub, art: beanImg(b), tint: '#f4e8dc' };
   }
   const m = MENU.find((x) => x.id === l.id);
   const sub = [selSummary(m, l.sel), l.note && `“${l.note}”`].filter(Boolean).join(' · ');
@@ -411,7 +412,7 @@ function renderTracker() {
     : o.status === 'ready' ? (o.mode === 'table' ? t('trackReadyTable', { n: o.table }) : o.mode === 'delivery' ? t('trackReadyDelivery') : t('trackReady')) : t('trackCollected');
   const first = o.items.find((x) => x.drink) || o.items[0];
   const m = MENU.find((x) => x.id === first?.id);
-  const art = m ? (photo(m.id) || (m.kind === 'drink' ? drinkSVG(m, artSel(m, first.sel || {})) : foodSVG(m.art))) : bagSVG('#d9a05b', 'BEANS');
+  const art = m ? (photo(m.id) || (m.kind === 'drink' ? drinkSVG(m, artSel(m, first.sel || {})) : foodSVG(m.art))) : (first?.kind === 'beans' && BEANS.find((x) => x.id === first.id) ? beanImg(BEANS.find((x) => x.id === first.id)) : bagSVG('#d9a05b', 'BEANS'));
   $('#tracker').innerHTML = `${head(t('orderNo', { n: o.no }))}
     <div class="trk">
       <span class="live-dot">${t('liveTrack')}</span>
@@ -450,7 +451,7 @@ function renderCompass() {
   const badge = best.badge ? `<span class="badge ${best.badge === 'espresso' ? 'alt' : ''}">${t(`b_${best.badge}`)}</span>` : '';
   const pills = (key, list, cur) => list.map((x) => `<button class="pill" aria-pressed="${x.id === cur}" data-bean="${key}" data-val="${x.id}">${esc(typeof x.label === 'string' ? x.label : L(x.label))}</button>`).join('');
   $('#match').innerHTML = `
-    <div class="bagart">${bagSVG(best.color, best.id.toUpperCase())}</div>
+    <div class="bagart">${beanImg(best)}</div>
     <div style="min-width:0"><span class="kicker" style="margin:0">${t('bestMatch')}</span> ${badge}
       <h3>${esc(L(best.origin))}</h3><p class="notes">${esc(L(best.notes))}</p></div>
     <div class="full">
@@ -461,7 +462,7 @@ function renderCompass() {
       <button class="btn sun wide" id="beanAdd" data-id="${best.id}">${t('addBag', { p: money(unit) })}</button>
       <p class="hint">${t('subNote')}</p>
     </div>`;
-  $('#beanRow').innerHTML = BEANS.map((b) => `<button class="bean-card" aria-pressed="${b === best}" data-goto="${b.id}">${bagSVG(b.color, b.id.toUpperCase())}<span style="min-width:0"><b>${esc(L(b.origin))}</b><small>${esc(L(b.notes))}</small><small>${money(b.price)} · 250 g</small></span></button>`).join('');
+  $('#beanRow').innerHTML = BEANS.map((b) => `<button class="bean-card" aria-pressed="${b === best}" data-goto="${b.id}">${beanImg(b)}<span style="min-width:0"><b>${esc(L(b.origin))}</b><small>${esc(L(b.notes))}</small><small>${money(b.price)} · 250 g</small></span></button>`).join('');
 }
 function compassDrag() {
   const pad = $('#pad');

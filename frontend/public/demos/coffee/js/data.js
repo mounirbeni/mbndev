@@ -252,6 +252,7 @@ export const GIFT_DESIGNS = [
 // Product photos (img/<id>.webp, 800 × 800). Items not listed keep their drawn art.
 export const PHOTOS = new Set(['esp', 'cortado', 'flat', 'capp', 'latte', 'spanish', 'mocha', 'v60', 'aero', 'icedlatte', 'frappe', 'matcha', 'choc', 'chai', 'orangemint', 'lemonade', 'infusion', 'batch', 'coldbrew', 'tonic', 'blossom', 'atay', 'croissant', 'painchoc', 'almondcr', 'msemen', 'banana', 'bun', 'avo', 'shak', 'granola', 'eggs']);
 export const photoOf = (id) => (PHOTOS.has(id) ? `/demos/coffee/img/${id}.webp` : null);
+export const beanPhoto = (id) => `/demos/coffee/img/bean-${id}.webp`;
 
 export const AMENITIES = [
   ['wifi', L('Fast Wi-Fi', 'Wi-Fi rapide', 'واي فاي سريع')],
