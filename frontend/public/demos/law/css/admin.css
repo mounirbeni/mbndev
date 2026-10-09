@@ -461,3 +461,37 @@ html[dir='rtl'] .sw span::after, [lang='ar'] .sw span::after { left: auto; right
 .board.b1 { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); overflow: visible; }
 @media (min-width: 900px) { .board.b1 .bcol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 10px; } .board.b1 .bcol-h, .board.b1 .empty-col { grid-column: 1 / -1; } }
 .grid1 { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+
+/* ── secretary desk ── */
+.hello { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.hello h2 { font: 600 28px/1.1 var(--display); color: var(--ink); margin: 0 0 4px; }
+.hello p { margin: 0; color: var(--muted); font-size: 14px; }
+.deskgrid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.deskgrid .col { display: grid; gap: 16px; min-width: 0; }
+@media (min-width: 1000px) { .deskgrid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); } }
+.drow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.drow:first-of-type { border-top: 0; }
+.drow > div { flex: 1; min-width: 0; }
+.drow > div > b, .drow > div > small { display: block; overflow-wrap: anywhere; }
+.drow > div > small { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.drow .tm { flex: 0 0 52px; font: 600 13px var(--mono); color: var(--wax); }
+.drow .btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.drow.court { background: rgba(176, 138, 74, .1); margin: 0 -10px; padding: 10px; border-radius: 10px; border-top: 0; }
+.ic-c { flex: 0 0 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: rgba(23, 41, 74, .08); color: var(--ink-2); }
+.ic-c .ic { width: 17px; height: 17px; }
+.card label.chk { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 14px; }
+.card textarea.in { width: 100%; resize: vertical; min-height: 76px; }
+.msgs { display: grid; gap: 10px; }
+.msg { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--paper); }
+.msg.urgent { border-color: rgba(183, 121, 31, .55); background: #fff7e8; }
+.msg.done { opacity: .6; }
+.msg-h { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.msg-h small { margin-inline-start: auto; color: var(--muted); }
+.msg p { margin: 6px 0 10px; font-size: 14px; overflow-wrap: anywhere; }
+.msg-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.msg-f > span { display: flex; gap: 6px; }
+.card label { display: grid; gap: 4px; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+.card label.chk { display: flex; font-weight: 600; }
+.card .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.card label .in { width: 100%; min-width: 0; }
+@media (max-width: 520px) { .card .two { grid-template-columns: minmax(0, 1fr); } .drow .btns { flex-basis: 100%; justify-content: flex-start; } .drow { flex-wrap: wrap; } }

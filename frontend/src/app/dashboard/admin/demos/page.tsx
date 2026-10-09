@@ -140,6 +140,9 @@ function DemoCard({ demo, onSaved }: { demo: DemoSite; onSaved: (d: DemoSite) =>
         <div className="flex flex-wrap gap-2">
           <a href={demo.path} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-300 hover:border-white/25"><ExternalLink className="h-3.5 w-3.5" /> Website</a>
           <a href={demo.adminPath} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-300 hover:border-white/25"><KeyRound className="h-3.5 w-3.5" /> Owner dashboard</a>
+          {demo.deskPath && (
+            <a href={demo.deskPath} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-300 hover:border-white/25"><KeyRound className="h-3.5 w-3.5" /> Secretary desk</a>
+          )}
           <button onClick={copyLink} className="flex items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-300 hover:border-white/25">
             {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />} {copied ? 'Copied' : 'Copy link'}
           </button>

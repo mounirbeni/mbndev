@@ -806,6 +806,7 @@ export interface DemoSite {
   name: string;
   path: string;
   adminPath: string;
+  deskPath: string | null;
   enabled: boolean;
   state: 'live' | 'disabled' | 'expired';
   showPin: boolean;

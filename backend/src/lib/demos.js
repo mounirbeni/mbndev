@@ -12,11 +12,12 @@
 const bcrypt = require('bcryptjs');
 
 // Add a demo here (and ship its static files) to make it appear in the dashboard.
+// Office-type demos (law, clinic…) also ship a secretary desk: set `deskPath` so it is linked from the manager.
 const CATALOG = [
   { slug: 'coffee', name: 'NOUR Coffee Atelier', path: '/demo/coffee', adminPath: '/demo/coffee/admin', defaultPin: '2468' },
   { slug: 'barber', name: 'TARZ Barber Club', path: '/demo/barber', adminPath: '/demo/barber/admin', defaultPin: '1357' },
   { slug: 'beauty', name: 'LALLA Beauty House', path: '/demo/beauty', adminPath: '/demo/beauty/admin', defaultPin: '2580' },
-  { slug: 'law', name: 'Cabinet Alaoui (solo lawyer)', path: '/demo/law', adminPath: '/demo/law/admin', defaultPin: '4821' },
+  { slug: 'law', name: 'Cabinet Alaoui (solo lawyer)', path: '/demo/law', adminPath: '/demo/law/admin', deskPath: '/demo/law/secretary', defaultPin: '4821' },
 ];
 
 const catalogEntry = (slug) => CATALOG.find((d) => d.slug === slug) || null;
@@ -52,6 +53,7 @@ const adminView = (row, entry, now = new Date()) => ({
   name: row.name,
   path: entry?.path ?? `/demo/${row.slug}`,
   adminPath: entry?.adminPath ?? `/demo/${row.slug}/admin`,
+  deskPath: entry?.deskPath ?? null, // optional secretary / reception desk (office-type demos)
   enabled: row.enabled,
   state: stateOf(row, now),
   showPin: Boolean(row.publicPin),

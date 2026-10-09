@@ -1,6 +1,6 @@
 // Cabinet Alaoui owner dashboard (demo). Reads and writes the same localStorage document as the site,
 // so appointments, callback requests and client uploads made on the website appear here live (and back).
-import { SHOP, AREAS, MEETINGS, MODES, TEAM, PLANS, STAGES, COURTS } from './data.js';
+import { SHOP, AREAS, MEETINGS, MODES, TEAM, PLANS, STAGES, COURTS, SECRETARY } from './data.js';
 import * as db from './store.js';
 import { icon, langDropdown } from './icons.js';
 import { fetchConfig, verifyPin } from './gate.js';
@@ -10,6 +10,13 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 
 const A = {
   en: {
+    s_casesSec: 'Every file: stage, hearings and documents. Notes and fees stay with the lawyer.', newMsg: 'New message from reception: {n}', deskRole: 'Secretary desk', toDesk: 'Secretary desk', t_desk: 'Front desk', s_desk: 'Arrivals, calls to return and everything waiting for the front desk.',
+    hello_morning: 'Good morning, {n}', hello_afternoon: 'Good afternoon, {n}', hello_evening: 'Good evening, {n}', helloSub: 'Here is what needs you today.',
+    k_arr: 'Expected today', k_conf: 'To confirm', k_calls: 'Calls to return', k_docs: 'New documents', k_msgs: 'Notes for the lawyer',
+    deskArrivals: 'Today’s arrivals', deskConfirm: 'Appointments to confirm', deskCalls: 'Calls to return', deskDocs: 'Documents received', noArrivals: 'No more arrivals today.', allClear: 'All clear.', openFile: 'Open file',
+    padT: 'Message pad', padS: 'Take a message for Me Alaoui. It appears on his dashboard at once.', mgName: 'Caller', mgPhone: 'Phone', mgText: 'Message', mgUrgent: 'Urgent', mgSave: 'Send to Me Alaoui', mgSent: 'Message sent to Me Alaoui.', mgNeed: 'Name, phone and message are needed.',
+    msgsT: 'Messages from reception', noMsgs: 'No messages from reception.', msgDone: 'Done', msgReopen: 'Reopen', byDesk: 'Reception',
+    lawyerNow: 'Where is Me Alaoui?', tellCallers: 'In court: offer a callback instead of transferring.', deskScope: 'Fees, internal notes and insights stay with the lawyer.', balanceDue: 'Balance due: {n}', settled: 'Settled', feesPrivate: 'Billing is handled by the lawyer.',
     owner: 'Owner dashboard', pinLabel: 'Enter your PIN', pinHintN: 'Demo PIN: {pin}', unlock: 'Unlock', backSite: 'Back to the website', language: 'Language',
     tooMany: 'Too many attempts — try again in a few minutes.', offline: 'Cannot reach the server — check your connection.', badPin: 'Wrong PIN.',
     offTitle: 'This demo is switched off', offBody: 'Ask MBN DEV to open it again.', offExpired: 'This demo has expired',
@@ -20,7 +27,7 @@ const A = {
     s_team: 'Your practice areas, working hours and today’s numbers.', s_stats: 'Revenue, practice areas and the busiest hours.', s_set: 'Opening hours, consultation fees and how online booking behaves.',
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], cur: '{n} MAD', min: '{n} min', none: '—', free: 'Free',
     k_rev: 'Revenue today', k_appt: 'Appointments today', k_hear: 'Hearings today', k_req: 'New requests', k_out: 'Outstanding fees', k_open: 'Open cases', expected: 'of {n} expected',
-    floorT: 'The firm right now', stFree: 'Available', stBusy: 'In a meeting', stCourt: 'In court', stOff: 'Off', withC: 'With {n} until {t}', inHearing: 'Hearing at {t}', nextAt: 'Next at {t}', nothingNext: 'Nothing else today',
+    floorT: 'Right now', stFree: 'Available', stBusy: 'In a meeting', stCourt: 'In court', stOff: 'Off', withC: 'With {n} until {t}', inHearing: 'Hearing at {t}', nextAt: 'Next at {t}', nothingNext: 'Nothing else today',
     columnEmpty: 'Nothing scheduled.', confirm: 'Confirm', checkin: 'Arrived', startS: 'Start', complete: 'Complete', noshow: 'No-show', cancel: 'Cancel', decline: 'Decline',
     st_pending: 'To confirm', st_confirmed: 'Confirmed', st_arrived: 'Arrived', st_inprogress: 'In progress', st_done: 'Completed', st_noshow: 'No-show', st_cancelled: 'Cancelled',
     hearingWord: 'Hearing', online: 'Online', manual: 'By phone', newBooking: 'New appointment: {n} at {t}', newReq: 'New request: {n}', newDoc: '{n} uploaded a document',
@@ -49,6 +56,13 @@ const A = {
     dataT: 'Demo data', exportCsv: 'Export appointments (CSV)', resetD: 'Reset demo data', resetS: 'Reset all demo data?', resetDone: 'Demo data reset.', saved: 'Saved.', lawyersWord: 'lawyers',
   },
   fr: {
+    s_casesSec: 'Chaque dossier : étape, audiences et documents. Notes et honoraires restent à l’avocat.', newMsg: 'Nouveau message de l’accueil : {n}', deskRole: 'Poste secrétariat', toDesk: 'Espace secrétaire', t_desk: 'Accueil', s_desk: 'Arrivées, appels à rappeler et tout ce qui attend l’accueil.',
+    hello_morning: 'Bonjour {n}', hello_afternoon: 'Bon après-midi {n}', hello_evening: 'Bonsoir {n}', helloSub: 'Voici ce qui vous attend aujourd’hui.',
+    k_arr: 'Attendus aujourd’hui', k_conf: 'À confirmer', k_calls: 'Appels à rappeler', k_docs: 'Nouveaux documents', k_msgs: 'Notes pour l’avocat',
+    deskArrivals: 'Arrivées du jour', deskConfirm: 'Rendez-vous à confirmer', deskCalls: 'Appels à rappeler', deskDocs: 'Documents reçus', noArrivals: 'Plus d’arrivée aujourd’hui.', allClear: 'Rien en attente.', openFile: 'Ouvrir le dossier',
+    padT: 'Bloc-notes des messages', padS: 'Prenez un message pour Me Alaoui. Il apparaît aussitôt sur son tableau de bord.', mgName: 'Appelant', mgPhone: 'Téléphone', mgText: 'Message', mgUrgent: 'Urgent', mgSave: 'Envoyer à Me Alaoui', mgSent: 'Message envoyé à Me Alaoui.', mgNeed: 'Nom, téléphone et message requis.',
+    msgsT: 'Messages de l’accueil', noMsgs: 'Aucun message de l’accueil.', msgDone: 'Traité', msgReopen: 'Rouvrir', byDesk: 'Accueil',
+    lawyerNow: 'Où est Me Alaoui ?', tellCallers: 'Au tribunal : proposez un rappel plutôt qu’un transfert.', deskScope: 'Honoraires, notes internes et statistiques restent réservés à l’avocat.', balanceDue: 'Solde dû : {n}', settled: 'Soldé', feesPrivate: 'La facturation est gérée par l’avocat.',
     owner: 'Espace gérant', pinLabel: 'Entrez votre code', pinHintN: 'Code démo : {pin}', unlock: 'Déverrouiller', backSite: 'Retour au site', language: 'Langue',
     tooMany: 'Trop d’essais — réessayez dans quelques minutes.', offline: 'Serveur injoignable — vérifiez votre connexion.', badPin: 'Code incorrect.',
     offTitle: 'Cette démo est désactivée', offBody: 'Demandez à MBN DEV de la rouvrir.', offExpired: 'Cette démo a expiré',
@@ -59,7 +73,7 @@ const A = {
     s_team: 'Vos domaines, horaires et chiffres du jour.', s_stats: 'Chiffre d’affaires, domaines et heures de pointe.', s_set: 'Horaires, tarifs des consultations et comportement de la réservation en ligne.',
     days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'], cur: '{n} MAD', min: '{n} min', none: '—', free: 'Gratuit',
     k_rev: 'Chiffre du jour', k_appt: 'Rendez-vous du jour', k_hear: 'Audiences du jour', k_req: 'Nouvelles demandes', k_out: 'Honoraires dus', k_open: 'Dossiers ouverts', expected: 'sur {n} prévus',
-    floorT: 'Le cabinet en ce moment', stFree: 'Disponible', stBusy: 'En rendez-vous', stCourt: 'Au tribunal', stOff: 'Absent', withC: 'Avec {n} jusqu’à {t}', inHearing: 'Audience à {t}', nextAt: 'Prochain à {t}', nothingNext: 'Plus rien aujourd’hui',
+    floorT: 'En ce moment', stFree: 'Disponible', stBusy: 'En rendez-vous', stCourt: 'Au tribunal', stOff: 'Absent', withC: 'Avec {n} jusqu’à {t}', inHearing: 'Audience à {t}', nextAt: 'Prochain à {t}', nothingNext: 'Plus rien aujourd’hui',
     columnEmpty: 'Rien de prévu.', confirm: 'Confirmer', checkin: 'Arrivé', startS: 'Démarrer', complete: 'Terminer', noshow: 'Absent', cancel: 'Annuler', decline: 'Refuser',
     st_pending: 'À confirmer', st_confirmed: 'Confirmé', st_arrived: 'Arrivé', st_inprogress: 'En cours', st_done: 'Terminé', st_noshow: 'Absent', st_cancelled: 'Annulé',
     hearingWord: 'Audience', online: 'En ligne', manual: 'Par téléphone', newBooking: 'Nouveau rendez-vous : {n} à {t}', newReq: 'Nouvelle demande : {n}', newDoc: '{n} a déposé un document',
@@ -88,7 +102,10 @@ const A = {
     dataT: 'Données de démo', exportCsv: 'Exporter les rendez-vous (CSV)', resetD: 'Réinitialiser la démo', resetS: 'Réinitialiser toutes les données de démo ?', resetDone: 'Démo réinitialisée.', saved: 'Enregistré.', lawyersWord: 'avocats',
   },
 };
-let lang = sessionStorage.getItem('law-admin-lang') || ((navigator.language || '').startsWith('fr') ? 'fr' : 'en');
+// The same script runs the owner dashboard and the secretary's desk; <html data-role="secretary"> narrows what she can see and do.
+const SEC = document.documentElement.dataset.role === 'secretary';
+const SK = SEC ? 'law-sec' : 'law-admin';
+let lang = sessionStorage.getItem(`${SK}-lang`) || ((navigator.language || '').startsWith('fr') ? 'fr' : 'en');
 const t = (k, v = {}) => String(A[lang][k] ?? A.en[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? '');
 const loc = () => (lang === 'fr' ? 'fr-FR' : 'en-GB');
 const money = (n) => t('cur', { n: (Math.round(n * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 }) });
@@ -104,8 +121,10 @@ const HOURS = Array.from({ length: 23 }, (_, i) => 360 + i * 30);
 const timeSel = (attr, minutes, disabled) => `<select class="in" data-${attr} ${disabled ? 'disabled' : ''}>${HOURS.map((m) => `<option value="${hm(m)}" ${m === minutes ? 'selected' : ''}>${hm(m)}</option>`).join('')}</select>`;
 const dateTxt = (date, o) => { const [y, m, d] = date.split('-').map(Number); return new Intl.DateTimeFormat(loc(), { ...o, timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d))); };
 
-let tab = sessionStorage.getItem('law-admin-tab') || 'live';
-const TABS = [['live', 'landmark'], ['cal', 'calendar'], ['cases', 'folder'], ['clients', 'users'], ['req', 'phone'], ['bill', 'receipt'], ['team', 'scale'], ['stats', 'chart'], ['set', 'sliders']];
+const TABS = SEC ? [['desk', 'clipboard'], ['cal', 'calendar'], ['cases', 'folder'], ['clients', 'users'], ['req', 'phone']]
+  : [['live', 'landmark'], ['cal', 'calendar'], ['cases', 'folder'], ['clients', 'users'], ['req', 'phone'], ['bill', 'receipt'], ['team', 'scale'], ['stats', 'chart'], ['set', 'sliders']];
+let tab = sessionStorage.getItem(`${SK}-tab`);
+if (!TABS.some(([id]) => id === tab)) tab = TABS[0][0];
 let calDate = null; let clientQ = ''; let caseQ = ''; let caseFilter = 'open'; let caseLawyer = 'all'; let billFilter = 'due';
 let fresh = new Set();
 
@@ -146,17 +165,18 @@ function renderTabs() {
   const newReq = s.requests.filter((r) => r.status === 'new').length;
   const newDocs = s.cases.reduce((a, c) => a + c.docs.filter((d) => d.isNew).length, 0);
   const dueInv = s.invoices.filter((i) => i.status === 'due').length;
-  const badge = { live: pending, cal: pending, cases: newDocs, req: newReq, bill: dueInv };
+  const openMsgs = (s.messages || []).filter((m) => !m.done).length;
+  const badge = SEC ? { desk: pending + newReq + newDocs, cal: pending, cases: newDocs, req: newReq } : { live: pending + openMsgs, cal: pending, cases: newDocs, req: newReq, bill: dueInv };
   $('#tabs').innerHTML = TABS.map(([id, ic]) => `<button data-tab="${id}" ${id === tab ? 'aria-current="page"' : ''}>${icon(ic)}${t(`t_${id}`)}${badge[id] ? `<span class="n">${badge[id]}</span>` : ''}</button>`).join('');
   $('#pageTitle').textContent = t(`t_${tab}`);
-  $('#pageSub').textContent = t(`s_${tab}`);
+  $('#pageSub').textContent = SEC && tab === 'cases' ? t('s_casesSec') : t(`s_${tab}`);
   $('#liveState').textContent = `${t('live')} · ${hm(n.minutes)}`;
   $('#soundBtn').innerHTML = `${icon(s.settings.sound ? 'bell' : 'bellOff')}<span>${t(s.settings.sound ? 'soundOn' : 'soundOff')}</span>`;
 }
 
 // ── appointments and hearings: cards and board ─────────────────────────────
 const NEXT = { pending: ['confirmed', 'confirm'], confirmed: ['arrived', 'checkin'], arrived: ['inprogress', 'startS'], inprogress: ['done', 'complete'] };
-const srcLabel = (b) => (b.source === 'manual' ? t('manual') : t('online'));
+const srcLabel = (b) => (b.source === 'secretary' ? t('byDesk') : b.source === 'manual' ? t('manual') : t('online'));
 function bkCard(b) {
   const next = NEXT[b.status];
   const closed = ['done', 'noshow', 'cancelled'].includes(b.status);
@@ -215,7 +235,73 @@ function viewLive() {
       <div class="kpi"><span>${t('k_out')}</span><b>${money(ins.outstanding)}</b></div>
     </div>
     <div class="card" style="margin-bottom:16px"><h2>${t('floorT')}</h2><div class="chairs">${rows}</div></div>
+    <div class="card" style="margin-bottom:16px"><h2>${t('msgsT')} <small>${(s.messages || []).filter((m) => !m.done).length}</small></h2>${msgList((s.messages || []).slice(0, 6))}</div>
     ${board(n.date)}`;
+}
+
+// ── secretary desk ─────────────────────────────────────────────────────────
+function lawyerRow() {
+  const c = db.floor()[0]; const m = memberById(c.member);
+  const sub = c.state === 'off' ? '' : c.state === 'court' ? t('inHearing', { t: c.hearing.hearing.time }) : c.with ? t('withC', { n: esc(c.with.name), t: hm(c.until ?? (c.with.start + c.with.dur)) }) : c.next ? t('nextAt', { t: hm(c.next) }) : t('nothingNext');
+  return `<div class="chair"><span class="av" style="--c:${m.color}">${esc(m.short[0])}</span><div><b>${esc(m.name)}</b><small>${sub}${c.state === 'court' ? ` · ${t('tellCallers')}` : ''}</small></div><span class="pillst ${c.state}">${t({ free: 'stFree', busy: 'stBusy', court: 'stCourt', off: 'stOff' }[c.state])}</span></div>`;
+}
+const msgAgo = (m) => { const n = db.shopNow(); const d = Math.max(0, n.epoch - m.at); return d < 60 ? `${Math.round(d)} min` : d < 1440 ? `${Math.round(d / 60)} h` : dateTxt(db.addDays(n.date, -Math.round(d / 1440)), { day: 'numeric', month: 'short' }); };
+function msgList(list) {
+  return list.length ? `<div class="msgs">${list.map((m) => {
+    const d = db.digits(m.phone);
+    return `<article class="msg ${m.urgent && !m.done ? 'urgent' : ''} ${m.done ? 'done' : ''}"><div class="msg-h"><b>${esc(m.name)}</b>${m.urgent ? `<span class="chip warn">${t('mgUrgent')}</span>` : ''}<small>${msgAgo(m)}</small></div>
+      <p>${esc(m.text)}</p><div class="msg-f"><bdi dir="ltr" class="ro">${esc(m.phone)}</bdi><span><a class="abtn ghost sm" href="tel:+212${d.replace(/^0/, '')}" aria-label="${t('callWord')}">${icon('phone')}</a><button class="abtn ${m.done ? 'ghost' : 'ok'} sm" data-msg="${m.id}" data-done="${m.done ? '0' : '1'}">${t(m.done ? 'msgReopen' : 'msgDone')}</button></span></div></article>`;
+  }).join('')}</div>` : `<div class="empty-col">${t('noMsgs')}</div>`;
+}
+function viewDesk() {
+  const s = db.get(); const n = db.shopNow();
+  const todays = s.bookings.filter((b) => b.date === n.date && !['cancelled', 'noshow'].includes(b.status)).sort((a, b) => a.start - b.start);
+  const hears = s.cases.filter((c) => !c.closed && c.hearing && c.hearing.date === n.date);
+  const expect = todays.filter((b) => b.status === 'confirmed' || b.status === 'pending');
+  const toConfirm = s.bookings.filter((b) => b.status === 'pending').sort((a, b) => db.epochOf(a.date, a.start) - db.epochOf(b.date, b.start));
+  const calls = s.requests.filter((r) => r.status === 'new');
+  const docs = s.cases.filter((c) => c.docs.some((d) => d.isNew));
+  const openMsgs = (s.messages || []).filter((m) => !m.done);
+  const part = n.minutes < 720 ? 'morning' : n.minutes < 1080 ? 'afternoon' : 'evening';
+  const arrRows = expect.map((b) => `<div class="drow"><b class="tm">${hm(b.start)}</b><div><b>${esc(b.name)}</b><small>${esc(L(meetingById(b.meeting).name))} · ${esc(L(areaById(b.area).name))}</small></div>
+      ${b.status === 'pending' ? `<button class="abtn pri sm" data-b="${b.id}" data-to="confirmed">${t('confirm')}</button>` : `<button class="abtn ok sm" data-b="${b.id}" data-to="arrived">${t('checkin')}</button>`}</div>`).join('');
+  const hearRows = hears.map((c) => `<div class="drow court"><b class="tm">${esc(c.hearing.time)}</b><div><b>${esc(c.name)}</b><small>${t('k_hear')} · ${esc(L(COURTS[c.hearing.court]))}</small></div><span class="chip">${icon('gavel')}</span></div>`).join('');
+  const confRows = toConfirm.map((b) => `<div class="drow"><b class="tm">${b.date === n.date ? hm(b.start) : dateTxt(b.date, { day: 'numeric', month: 'short' })}</b><div><b>${esc(b.name)}</b><small>${hm(b.start)} · ${esc(L(meetingById(b.meeting).name))} · ${esc(L(areaById(b.area).name))}</small></div>
+      <span class="btns"><button class="abtn danger sm" data-b="${b.id}" data-to="cancelled">${t('decline')}</button><button class="abtn pri sm" data-b="${b.id}" data-to="confirmed">${t('confirm')}</button></span></div>`).join('');
+  const callRows = calls.map((r) => {
+    const d = db.digits(r.phone);
+    return `<div class="drow"><span class="ic-c">${icon('phone')}</span><div><b>${esc(r.name)}</b><small><bdi dir="ltr">${esc(r.phone)}</bdi>${r.area ? ` · ${esc(L(areaById(r.area)?.name))}` : ''}</small></div>
+      <span class="btns"><a class="abtn ghost sm" href="tel:+212${d.replace(/^0/, '')}" aria-label="${t('callWord')}">${icon('phone')}</a><button class="abtn pri sm" data-rq="${r.id}" data-to="contacted">${t('markContacted')}</button></span></div>`;
+  }).join('');
+  const docRows = docs.map((c) => `<div class="drow"><span class="ic-c">${icon('fileText')}</span><div><b>${esc(c.name)}</b><small>${esc(c.ref)} · ${t('k_docs')}: ${c.docs.filter((d) => d.isNew).length}</small></div><button class="abtn ghost sm" data-case="${c.id}">${t('openFile')}</button></div>`).join('');
+  const block = (title, count, rows, empty) => `<div class="card"><h2>${title} <small>${count}</small></h2>${rows || `<div class="empty-col">${empty}</div>`}</div>`;
+  return `<div class="hello"><div><h2>${t(`hello_${part}`, { n: esc(SECRETARY.short) })}</h2><p>${t('helloSub')}</p></div><button class="abtn pri" data-addbk>${icon('plus')} ${t('addBooking')}</button></div>
+    <div class="kpis">
+      <div class="kpi"><span>${t('k_arr')}</span><b>${expect.length}</b></div>
+      <div class="kpi"><span>${t('k_conf')}</span><b>${toConfirm.length}</b></div>
+      <div class="kpi"><span>${t('k_calls')}</span><b>${calls.length}</b></div>
+      <div class="kpi"><span>${t('k_docs')}</span><b>${docs.reduce((a, c) => a + c.docs.filter((d) => d.isNew).length, 0)}</b></div>
+      <div class="kpi"><span>${t('k_msgs')}</span><b>${openMsgs.length}</b></div>
+    </div>
+    <div class="deskgrid">
+      <div class="col">
+        <div class="card"><h2>${t('lawyerNow')}</h2><div class="chairs">${lawyerRow()}</div></div>
+        ${block(t('deskArrivals'), expect.length + hears.length, hearRows + arrRows, t('noArrivals'))}
+        ${block(t('deskConfirm'), toConfirm.length, confRows, t('allClear'))}
+      </div>
+      <div class="col">
+        <div class="card"><h2>${t('padT')}</h2><p class="who" style="margin:0 0 10px">${t('padS')}</p>
+          <div class="two"><label>${t('mgName')}<input class="in" id="mgName" autocomplete="off" /></label><label>${t('mgPhone')}<input class="in" id="mgPhone" inputmode="tel" dir="ltr" autocomplete="off" /></label></div>
+          <label>${t('mgText')}<textarea class="in" id="mgText" rows="3"></textarea></label>
+          <label class="chk"><input type="checkbox" id="mgUrgent" /> ${t('mgUrgent')}</label>
+          <p class="err" id="mgErr" role="alert"></p>
+          <button class="abtn pri" data-msgsave>${icon('message')} ${t('mgSave')}</button>
+          <p class="who" style="margin:12px 0 0"><small class="muted">${t('deskScope')}</small></p></div>
+        ${block(t('deskCalls'), calls.length, callRows, t('allClear'))}
+        ${block(t('deskDocs'), docs.length, docRows, t('allClear'))}
+        <div class="card"><h2>${t('msgsT')} <small>${(s.messages || []).length}</small></h2>${msgList((s.messages || []).slice(0, 6))}</div>
+      </div>
+    </div>`;
 }
 
 function viewCal() {
@@ -264,13 +350,13 @@ function viewClients() {
   const q = clientQ.trim().toLowerCase();
   const list = Object.values(s.clients).filter((c) => !q || c.name.toLowerCase().includes(q) || c.phone.includes(q.replace(/\D/g, '') || '§')).sort((a, b) => b.visits - a.visits);
   const rows = list.map((c) => `<tr>
-    <td><b>${esc(c.name)}</b><div class="muted"><bdi dir="ltr">${esc(c.phone)}</bdi>${c.email ? ` · ${esc(c.email)}` : ''}</div></td><td class="num">${c.visits}</td><td class="num">${money(c.spent)}</td><td class="num">${c.matters || '—'}</td>
+    <td><b>${esc(c.name)}</b><div class="muted"><bdi dir="ltr">${esc(c.phone)}</bdi>${c.email ? ` · ${esc(c.email)}` : ''}</div></td><td class="num">${c.visits}</td>${SEC ? '' : `<td class="num">${money(c.spent)}</td>`}<td class="num">${c.matters || '—'}</td>
     <td class="num">${c.last ? dateTxt(c.last, { day: 'numeric', month: 'short' }) : '—'}</td><td class="num">${c.noShows || '—'}</td>
     <td><input class="in" data-note="${c.phone}" value="${esc(c.notes)}" placeholder="${t('notesPh')}" style="min-width:170px" /></td></tr>`).join('');
   return `<div class="card"><h2>${t('clientsT')} <small>${list.length}</small></h2>
       <input class="in search" id="clientQ" placeholder="${t('search')}" value="${esc(clientQ)}" style="margin-bottom:10px" />
-      <div class="tbl-wrap"><table class="t"><thead><tr><th>${t('c_name')}</th><th>${t('c_visits')}</th><th>${t('c_spent')}</th><th>${t('c_matters')}</th><th>${t('c_last')}</th><th>${t('c_ns')}</th><th>${t('c_notes')}</th></tr></thead>
-      <tbody>${rows || `<tr><td colspan="7" class="muted">${t('noClients')}</td></tr>`}</tbody></table></div></div>`;
+      <div class="tbl-wrap"><table class="t"><thead><tr><th>${t('c_name')}</th><th>${t('c_visits')}</th>${SEC ? '' : `<th>${t('c_spent')}</th>`}<th>${t('c_matters')}</th><th>${t('c_last')}</th><th>${t('c_ns')}</th><th>${t('c_notes')}</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="${SEC ? 6 : 7}" class="muted">${t('noClients')}</td></tr>`}</tbody></table></div></div>`;
 }
 
 function viewReq() {
@@ -366,7 +452,7 @@ function viewSet() {
       <h2 style="margin-top:18px">${t('dataT')}</h2><div class="frow" style="border:0"><button class="abtn ghost" data-export>${icon('download')} ${t('exportCsv')}</button><button class="abtn danger" data-reset>${icon('refresh')} ${t('resetD')}</button></div></div></div>`;
 }
 
-const VIEWS = { live: viewLive, cal: viewCal, cases: viewCases, clients: viewClients, req: viewReq, bill: viewBill, team: viewTeam, stats: viewStats, set: viewSet };
+const VIEWS = { desk: viewDesk, live: viewLive, cal: viewCal, cases: viewCases, clients: viewClients, req: viewReq, bill: viewBill, team: viewTeam, stats: viewStats, set: viewSet };
 let modal = null; // { type: 'booking' | 'case' | 'newcase', id? }
 function render() { applyStatic(); renderTabs(); $('#view').innerHTML = VIEWS[tab](); if (modal) renderModal(); }
 
@@ -408,7 +494,7 @@ function saveNb() {
   if (nb.name.trim().length < 2 || db.digits(nb.phone).length < 9) { err.textContent = t('needName'); return; }
   if (!nb.area || !nb.meeting) { err.textContent = t('needArea'); return; }
   if (nb.start == null) { err.textContent = t('needSlot'); return; }
-  const r = db.book({ date: nb.date, start: nb.start, member: nb.who, meeting: nb.meeting, area: nb.area, mode: nb.mode, name: nb.name.trim(), phone: nb.phone, source: 'manual' });
+  const r = db.book({ date: nb.date, start: nb.start, member: nb.who, meeting: nb.meeting, area: nb.area, mode: nb.mode, name: nb.name.trim(), phone: nb.phone, source: SEC ? 'secretary' : 'manual' });
   if (r.error) { err.textContent = t('slotTaken'); return; }
   closeModal(); toast(t('booked')); render();
 }
@@ -440,23 +526,24 @@ function renderCase() {
   const hr = c.hearing;
   $('#amodal').innerHTML = `<div class="box caseline"><h2>${t('caseT', { r: esc(c.ref) })}<button class="xb" data-closemodal aria-label="${t('close')}">${icon('x')}</button></h2>
     <div><b>${esc(c.name)}</b> · <bdi dir="ltr" class="ro">${esc(c.phone)}</bdi><div class="ro">${esc(L(c.title))} — ${esc(L(a.name))} · ${esc(m.name)}</div></div>
-    <p class="sec-t">${t('stageT')}</p>
+    ${SEC ? `<p class="sec-t">${t('stageT')}</p><div class="ro"><span class="chip pri">${esc(L(STAGES[c.stage].label))}</span></div>` : `<p class="sec-t">${t('stageT')}</p>
     <div class="stagebar">${STAGES.map((s, i) => `<button data-stage="${i}" class="${i < c.stage ? 'done' : i === c.stage ? 'cur' : ''}">${esc(L(s.label))}</button>`).join('')}</div>
+    `}
     <p class="sec-t">${t('hearingT')}</p>
     <div class="inline-form"><input class="in" type="date" data-hdate value="${hr?.date || ''}" />${timeSelOpt('hseltime', hr ? db.parseHm(hr.time) : 570)}
       <select class="in" data-hcourt>${Object.keys(COURTS).map((k) => `<option value="${k}" ${hr?.court === k ? 'selected' : ''}>${esc(L(COURTS[k]))}</option>`).join('')}</select>
       <button class="abtn pri sm" data-hsave>${t('save')}</button>${hr ? `<button class="abtn ghost sm" data-hclear>${t('clearHearing')}</button>` : ''}</div>
-    <p class="sec-t">${t('updateT')}</p>
-    <div class="inline-form"><input class="in" id="cuText" placeholder="${esc(t('updatePh'))}" /><button class="abtn pri sm" data-sendupd>${icon('message')} ${t('sendUpdate')}</button></div>
+    ${SEC ? '' : `<p class="sec-t">${t('updateT')}</p>
+    <div class="inline-form"><input class="in" id="cuText" placeholder="${esc(t('updatePh'))}" /><button class="abtn pri sm" data-sendupd>${icon('message')} ${t('sendUpdate')}</button></div>`}
     <div class="cols2"><div><p class="sec-t">${t('docsT')} <span class="chip">${c.docs.length}</span></p>
       <ul class="docs-list">${c.docs.slice().reverse().map((d) => `<li>${icon('fileText')}<span style="flex:1;min-width:0;word-break:break-word"><b>${esc(d.name)}</b> <small>· ${d.by === 'client' ? t('byClient') : t('byFirm')} · ${dateTxt(d.date, { day: 'numeric', month: 'short' })}</small></span>${d.isNew ? `<span class="newb">${t('newTag')}</span>` : ''}</li>`).join('')}</ul>
       <div class="inline-form" style="margin-top:8px"><input class="in" id="cdName" placeholder="${esc(t('docPh'))}" /><button class="abtn ghost sm" data-adddoc>${icon('plus')} ${t('addDoc')}</button></div></div>
-    <div><p class="sec-t">${t('notesT')}</p>
+    ${SEC ? '' : `<div><p class="sec-t">${t('notesT')}</p>
       <ul class="notes-list">${c.notes.map((n) => `<li>${icon('lock')}<span><b>${esc(memberById(n.by)?.short || '·')}</b> <small class="muted">${dateTxt(n.date, { day: 'numeric', month: 'short' })}</small><br/>${esc(n.text)}</span></li>`).join('')}</ul>
-      <div class="inline-form" style="margin-top:8px"><input class="in" id="cnText" placeholder="${esc(t('notePh'))}" /><button class="abtn ghost sm" data-addnote>${t('addNote')}</button></div></div></div>
-    <p class="sec-t">${t('feesT')}</p>
+      <div class="inline-form" style="margin-top:8px"><input class="in" id="cnText" placeholder="${esc(t('notePh'))}" /><button class="abtn ghost sm" data-addnote>${t('addNote')}</button></div></div>`}</div>
+    ${SEC ? `<p class="sec-t">${t('feesT')}</p><div class="ro">${invs.some((i) => i.status === 'due') ? `<span class="chip warn">${t('balanceDue', { n: money(invs.filter((i) => i.status === 'due').reduce((a, i) => a + i.amount, 0)) })}</span>` : `<span class="chip ok">${t('settled')}</span>`} <small class="muted">${t('feesPrivate')}</small></div>` : `<p class="sec-t">${t('feesT')}</p>
     <ul class="docs-list">${invs.length ? invs.map((i) => `<li>${icon('receipt')}<span style="flex:1;min-width:0"><b>${esc(i.no)}</b> <small>· ${esc(L(i.desc))}</small></span><span class="chip ${i.status === 'paid' ? 'ok' : 'warn'}">${money(i.amount)} · ${t(i.status === 'paid' ? 'paid' : 'due')}</span>${i.status === 'due' ? `<button class="abtn pri sm" data-paid="${i.id}">${t('markPaid')}</button>` : ''}</li>`).join('') : `<li class="muted">${t('noInvoice')}</li>`}</ul>
-    <div class="inline-form"><input class="in" id="ciDesc" placeholder="${esc(t('invDescPh'))}" /><input class="in" id="ciAmt" type="number" min="0" step="100" placeholder="${esc(t('invAmount'))}" style="flex:0 1 160px" /><button class="abtn ghost sm" data-addinv>${icon('plus')} ${t('issueInvoice')}</button></div>
+    <div class="inline-form"><input class="in" id="ciDesc" placeholder="${esc(t('invDescPh'))}" /><input class="in" id="ciAmt" type="number" min="0" step="100" placeholder="${esc(t('invAmount'))}" style="flex:0 1 160px" /><button class="abtn ghost sm" data-addinv>${icon('plus')} ${t('issueInvoice')}</button></div>`}
     <p class="err" id="cErr" role="alert"></p></div>`;
   if (c.docs.some((d) => d.isNew)) db.markDocsSeen(c.id);
 }
@@ -483,8 +570,8 @@ function wire() {
       return;
     }
     if (ddOpen && !g('.dd')) { ddOpen = null; document.querySelectorAll('.dd.open').forEach((d) => { d.classList.remove('open'); d.querySelector('[data-ddtoggle]').setAttribute('aria-expanded', 'false'); }); }
-    if ((x = g('[data-lang]'))) { ddOpen = null; lang = x.dataset.lang; sessionStorage.setItem('law-admin-lang', lang); render(); return; }
-    if ((x = g('[data-tab]'))) { tab = x.dataset.tab; sessionStorage.setItem('law-admin-tab', tab); render(); window.scrollTo(0, 0); return; }
+    if ((x = g('[data-lang]'))) { ddOpen = null; lang = x.dataset.lang; sessionStorage.setItem(`${SK}-lang`, lang); render(); return; }
+    if ((x = g('[data-tab]'))) { tab = x.dataset.tab; sessionStorage.setItem(`${SK}-tab`, tab); render(); window.scrollTo(0, 0); return; }
     if ((x = g('[data-b]'))) { fresh.delete(x.dataset.b); db.setStatus(x.dataset.b, x.dataset.to); render(); return; }
     if ((x = g('[data-rq]'))) { fresh.delete(x.dataset.rq); db.update((s) => { s.requests.find((r) => r.id === x.dataset.rq).status = x.dataset.to; }); render(); return; }
     if ((x = g('[data-caldate]'))) { calDate = x.dataset.caldate; const keep = $('#calStrip')?.scrollLeft; render(); if (keep) $('#calStrip').scrollLeft = keep; return; }
@@ -502,6 +589,12 @@ function wire() {
     if (g('[data-nbsave]')) { saveNb(); return; }
     if (g('[data-newcase]')) { openNewCase(); return; }
     if (g('[data-ncsave]')) { saveNc(); return; }
+    if (g('[data-msgsave]')) {
+      const name = $('#mgName').value.trim(); const phone = $('#mgPhone').value.trim(); const text = $('#mgText').value.trim();
+      if (name.length < 2 || db.digits(phone).length < 9 || text.length < 3) { $('#mgErr').textContent = t('mgNeed'); return; }
+      db.addMessage({ name, phone, text, urgent: $('#mgUrgent').checked }); toast(t('mgSent')); render(); return;
+    }
+    if ((x = g('[data-msg]'))) { db.setMessageDone(x.dataset.msg, x.dataset.done === '1'); render(); return; }
     if ((x = g('[data-case]'))) { openModal({ type: 'case', id: x.dataset.case }); return; }
     if ((x = g('[data-cfilter]'))) { caseFilter = x.dataset.cfilter; render(); return; }
     if ((x = g('[data-bfilter]'))) { billFilter = x.dataset.bfilter; render(); return; }
@@ -566,14 +659,15 @@ function wire() {
 
   // live updates from the website (another tab) and the demo auto-flow
   let known = new Set(db.get().bookings.map((b) => b.id)); let knownR = new Set(db.get().requests.map((r) => r.id));
-  let knownDocs = new Set(db.get().cases.flatMap((c) => c.docs.map((d) => d.id)));
+  let knownDocs = new Set(db.get().cases.flatMap((c) => c.docs.map((d) => d.id))); let knownM = new Set((db.get().messages || []).map((m) => m.id));
   db.subscribe((s, src) => {
     if (src === 'remote') {
       s.bookings.filter((b) => !known.has(b.id)).forEach((b) => { fresh.add(b.id); ding(); toast(t('newBooking', { n: b.name, t: hm(b.start) }), 'pri'); });
       s.requests.filter((r) => !knownR.has(r.id)).forEach((r) => { fresh.add(r.id); ding(); toast(t('newReq', { n: r.name }), 'pri'); });
       s.cases.forEach((c) => c.docs.filter((d) => !knownDocs.has(d.id)).forEach(() => { ding(); toast(t('newDoc', { n: c.name }), 'pri'); }));
+      if (!SEC) (s.messages || []).filter((m) => !knownM.has(m.id)).forEach((m) => { ding(); toast(t('newMsg', { n: m.name }), 'pri'); });
     }
-    known = new Set(s.bookings.map((b) => b.id)); knownR = new Set(s.requests.map((r) => r.id)); knownDocs = new Set(s.cases.flatMap((c) => c.docs.map((d) => d.id)));
+    known = new Set(s.bookings.map((b) => b.id)); knownR = new Set(s.requests.map((r) => r.id)); knownDocs = new Set(s.cases.flatMap((c) => c.docs.map((d) => d.id))); knownM = new Set((s.messages || []).map((m) => m.id));
     const active = document.activeElement;
     if (active && active.matches('input, select, textarea') && ($('#view').contains(active) || $('#amodal').contains(active))) { renderTabs(); return; } // don't clobber a field being edited
     render();
@@ -588,8 +682,8 @@ applyStatic();
 wire();
 fetchConfig().then((cfg) => {
   gateCfg = cfg; renderGateText();
-  if (cfg.ok && !cfg.live) { sessionStorage.removeItem('law-admin'); return; }
-  if (cfg.ok && sessionStorage.getItem('law-admin') === '1') unlock();
+  if (cfg.ok && !cfg.live) { sessionStorage.removeItem(SK); return; }
+  if (cfg.ok && sessionStorage.getItem(SK) === '1') unlock();
   else if (!cfg.ok) $('#pinErr').textContent = t('offline');
 });
 $('#gateForm').addEventListener('submit', async (e) => {
@@ -598,7 +692,7 @@ $('#gateForm').addEventListener('submit', async (e) => {
   btn.disabled = true; err.textContent = '';
   const res = await verifyPin($('#pin').value.trim());
   btn.disabled = false;
-  if (res === 'ok') { sessionStorage.setItem('law-admin', '1'); unlock(); return; }
+  if (res === 'ok') { sessionStorage.setItem(SK, '1'); unlock(); return; }
   if (res === 'unavailable') { gateCfg = { ok: true, live: false, state: 'disabled' }; renderGateText(); return; }
   err.textContent = t(res === 'bad' ? 'badPin' : res === 'limited' ? 'tooMany' : 'offline');
   const f = $('#gateForm'); f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); $('#pin').select();

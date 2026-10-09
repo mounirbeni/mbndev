@@ -157,6 +157,10 @@ function seed() {
       { id: 'q1', no: 1, type: 'callback', name: 'Soukaina Alaoui', phone: '0677665544', area: 'labour', note: 'Dismissed on Friday without notice. Please call after 5 pm.', at: now.epoch - 60 * 3, status: 'new' },
       { id: 'q2', no: 2, type: 'plan', name: 'Atlas Boutique', phone: '0600112233', area: 'debt', note: 'Business plan — small shop, recurring unpaid invoices.', plan: 'business', at: now.epoch - 60 * 26, status: 'contacted' },
     ],
+    messages: [
+      { id: 'm1', name: 'Nadia Chraibi', phone: '0661778899', text: 'Asks whether the sale deed can be signed on Thursday. Please call back before noon.', urgent: false, at: now.epoch - 70, done: false },
+      { id: 'm2', name: 'Bailiff’s office (Casablanca)', phone: '0522334455', text: 'A notice for the Lahlou file will be delivered tomorrow morning.', urgent: true, at: now.epoch - 200, done: false },
+    ],
     subs: [], newsletter: ['contact@atlas-studio.example'],
     history, heat, my: { phone: '', ids: [] }, lang: null,
   };
@@ -166,7 +170,7 @@ let state = load();
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) { const s = JSON.parse(raw); if (s && s.v === 3) return s; }
+    if (raw) { const s = JSON.parse(raw); if (s && s.v === 3) return { messages: [], ...s }; }
   } catch { /* storage unavailable — keep an in-memory copy */ }
   const s = seed();
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* ignore */ }
@@ -278,7 +282,7 @@ export function book(d) {
     const n = ++s.seq;
     saved = { id: `b${n}`, code: `RV-${n}`, at: shopNow().epoch, date: d.date, start: d.start, dur: m.dur, member: who, anyMember: d.member === 'any', meeting: d.meeting, area: d.area, mode: d.mode, total: meetPrice(m), name: d.name, phone: digits(d.phone), email: d.email || '', note: d.note || '', status: s.settings.autoConfirm ? 'confirmed' : 'pending', source: d.source || 'online', manual: false };
     s.bookings.push(saved);
-    if (d.source !== 'manual') { s.my.ids = [saved.id, ...s.my.ids].slice(0, 8); s.my.phone = digits(d.phone); }
+    if (d.source !== 'manual' && d.source !== 'secretary') { s.my.ids = [saved.id, ...s.my.ids].slice(0, 8); s.my.phone = digits(d.phone); }
     touchClient(s, d);
   });
   return { booking: saved };
@@ -411,6 +415,14 @@ export function addRequest({ type, name, phone, area, note, plan }) {
   });
   return r;
 }
+
+// ── Reception messages (the secretary's message pad, read by the lawyer) ──
+export function addMessage({ name, phone, text, urgent }) {
+  let m;
+  update((s) => { m = { id: `m${Date.now()}`, name, phone, text, urgent: !!urgent, at: shopNow().epoch, done: false }; (s.messages ||= []).unshift(m); });
+  return m;
+}
+export function setMessageDone(id, done = true) { update((s) => { const m = (s.messages || []).find((x) => x.id === id); if (m) m.done = done; }); }
 
 // ── Insights (history + today's live data) ─────────────────────────────────
 export function insights() {

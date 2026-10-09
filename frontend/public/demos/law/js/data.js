@@ -13,6 +13,9 @@ export const SHOP = {
   address: L('Rue Ibnou Sina, Maârif — Casablanca', 'Rue Ibnou Sina, Maârif — Casablanca', 'زنقة ابن سينا، المعاريف — الدار البيضاء'),
 };
 
+// The secretary who runs the front desk (has her own dashboard: /demo/law/secretary).
+export const SECRETARY = { id: 'salma', name: 'Salma Bennis', short: 'Salma', role: L('Office secretary', 'Secrétaire du cabinet', 'سكرتيرة المكتب') };
+
 // Practice areas. A lawyer can only be booked for the areas listed in her/his `skills`.
 export const AREAS = [
   { id: 'family', icon: 'handHeart', name: L('Family & divorce', 'Famille & divorce', 'الأسرة والطلاق'),
