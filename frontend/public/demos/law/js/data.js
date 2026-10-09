@@ -59,7 +59,7 @@ export const MODES = [
 ];
 
 export const TEAM = [
-  { id: 'alaoui', name: 'Me Karim Alaoui', short: 'Karim', color: '#17294a', rating: 4.9, reviews: 412, years: 18, langs: ['AR', 'FR', 'EN'],
+  { id: 'alaoui', name: 'Me Karim Alaoui', short: 'Karim', color: '#0f2a24', rating: 4.9, reviews: 412, years: 18, langs: ['AR', 'FR', 'EN'],
     role: L('Lawyer at the Casablanca Bar', 'Avocat au Barreau de Casablanca', 'محامٍ بهيئة الدار البيضاء'), skills: ['family', 'property', 'inheritance', 'labour', 'criminal', 'debt'],
     bio: L('Eighteen years at the Casablanca Bar. A personal practice built on one idea: you speak to the lawyer who handles your file, from the first call to the decision.', 'Dix-huit ans au Barreau de Casablanca. Un cabinet personnel fondé sur une idée : vous parlez à l’avocat qui traite votre dossier, du premier appel à la décision.', 'ثمانية عشر عاماً بهيئة الدار البيضاء. مكتب شخصي قائم على فكرة واحدة: تتحدث مع المحامي الذي يتولى ملفك من المكالمة الأولى إلى الحكم.'),
     week: [null, [540, 1080], [540, 1080], [540, 1080], [540, 1080], [540, 1020], [540, 780]] },
