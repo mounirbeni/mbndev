@@ -8,6 +8,7 @@ import { fetchConfig } from './gate.js';
 import { $, $$, esc, ui, t, L, money, mins, dayWord, dayNames, toast, openSheet, closeSheet, sheetHead, avatar, openedSheet } from './ui.js';
 import { openBooking, openMine, refreshSheets, wireBooking } from './booking.js';
 import { initFx, petalField, burst } from './fx.js';
+import { flowerSvg, mountDefs } from './deco.js';
 
 const svcById = (id) => SERVICES.find((s) => s.id === id);
 const memberById = (id) => TEAM.find((m) => m.id === id);
@@ -93,6 +94,7 @@ const SHAPES = ['#heroArt', '#heroOrb', '#heroBean'];
 function renderHero() {
   const photos = photoOf.hero();
   const col = $('#collage');
+  $('#bloomBg').innerHTML = flowerSvg();
   col.classList.toggle('nophoto', photos.length === 0);
   if (!photos.length) { $('#heroArt').innerHTML = heroArt(); return; }
   if ($('#heroArt img')) return; // already built — the rotation keeps running across language changes
@@ -143,7 +145,7 @@ function renderTeam() {
     const st = fl.find((c) => c.member === m.id)?.state || 'off';
     const ph = photoOf.team(m.id);
     return `<article class="member" style="--c:${m.color}">
-      <div class="portrait">${ph ? `<img src="${ph}" alt="${esc(m.name)}" loading="lazy" decoding="async" />` : `<b aria-hidden="true">${esc(m.name[0])}</b>`}<span class="state ${st}">${t(st === 'free' ? 'statusFree' : st === 'busy' ? 'statusBusy' : 'statusOff')}</span></div>
+      <div class="portrait">${flowerSvg()}<div class="ph">${ph ? `<img src="${ph}" alt="${esc(m.name)}" loading="lazy" decoding="async" />` : `<b aria-hidden="true">${esc(m.name[0])}</b>`}</div><span class="state ${st}">${t(st === 'free' ? 'statusFree' : st === 'busy' ? 'statusBusy' : 'statusOff')}</span></div>
       <div class="m-info"><h3>${esc(m.name)}</h3><p class="role">${esc(L(m.role))}</p><div class="rate-row">${stars(m.rating)}<b>${m.rating.toFixed(1)}</b><small>(${m.reviews})</small></div></div>
       <div class="skills">${m.skills.map((c) => `<span>${esc(catName(c))}</span>`).join('')}</div>
       <p class="bio">${esc(L(m.bio))}</p>
@@ -180,7 +182,7 @@ function renderBridalPic() {
   const photos = photoOf.hero(); const el = $('#bridalPic');
   el.classList.toggle('nophoto', photos.length < 4);
   if (photos.length < 4) return;
-  el.innerHTML = `<div class="shape"><img class="on" src="${photos[3]}" alt="" loading="lazy" decoding="async" /></div><span class="chip"><b>${esc(t('newThisMonth'))}</b><small>${esc(t('brides'))}</small></span>`;
+  el.innerHTML = `${flowerSvg()}<div class="shape"><div class="m"><img class="on" src="${photos[3]}" alt="" loading="lazy" decoding="async" /></div></div><span class="chip"><b>${esc(t('newThisMonth'))}</b><small>${esc(t('brides'))}</small></span>`;
 }
 function renderBridal() {
   renderBridalPic();
@@ -429,6 +431,7 @@ function wire() {
   secs.forEach((el) => el && tabIo.observe(el));
 }
 
+mountDefs();
 renderAll();
 wire();
 petalField($('#petalField'));
