@@ -96,6 +96,9 @@ The dashboard layout wraps content in a `motion.div` with a CSS transform. This 
 #### i18n
 **English-only.** The translation dictionary lives in `lib/i18n/translations.ts`; `LanguageContext` provides `t(key)` (a thin wrapper, kept so component code stays unchanged). There is no language switcher and no fr/ar locale files — do not reintroduce them.
 
+### Demo sites manager
+Static demos live in `frontend/public/demos/*` (see `frontend/public/demos/coffee`). The owner controls them from `/dashboard/admin/demos`: dashboard PIN (bcrypt hash in `DemoSite`, plain copy kept only while "show on login screen" is on), on/off switch, expiry date, notes. The demo pages call the public `GET /api/demos/:slug/config` and `POST /api/demos/:slug/unlock` (10 wrong tries / 15 min / IP); admin routes are `GET /api/demos` and `PATCH /api/demos/:slug`. Catalog of known demos: `backend/src/lib/demos.js` (`CATALOG`) — add an entry there to make a new demo manageable. The `DemoSite` table is created lazily (`CREATE TABLE IF NOT EXISTS`, same as careers) and also by `prisma/migrate21.js`. Demo data itself (orders, bookings…) stays in each visitor's localStorage.
+
 ### Data model highlights (Prisma)
 
 - `User` — roles: `admin | client`. Plans: `starter | pro | premium | custom`. Has `adminNotes` (private, admin-only), `passwordChangedAt` (token invalidation), `deletionRequestedAt`.

@@ -557,3 +557,10 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
 .sc-bottom > span { display: inline-flex; align-items: center; gap: 6px; }
 .stamp.gift .ic { width: 58%; height: 58%; }
 .specs dt .ic, .brew-out dt .ic { width: 16px; height: 16px; vertical-align: -3px; }
+
+/* Demo switched off from the MBN DEV dashboard */
+.demo-off { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 24px; text-align: center; background: var(--milk); }
+.demo-off > div { display: grid; gap: 14px; max-width: 420px; justify-items: center; }
+.demo-off b { font: 700 28px var(--display); }
+.demo-off h1 { margin: 0; font: 600 clamp(26px, 6vw, 38px)/1.1 var(--display); }
+.demo-off p { margin: 0; color: var(--muted); }

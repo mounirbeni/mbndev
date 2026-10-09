@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
   Settings, LogOut, Users, Package, BarChart2,
-  ChevronRight, ShoppingBag, ExternalLink, Receipt, Activity, Target, Mail, Briefcase,
+  ChevronRight, ShoppingBag, ExternalLink, Receipt, Activity, Target, Mail, Briefcase, MonitorPlay,
 } from 'lucide-react';
 import Logo3D from '@/components/ui/Logo3D';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +35,7 @@ const adminNavDef: NavItem[] = [
   { labelKey: 'dash.nav.leads',      href: '/dashboard/admin/leads',      icon: Target },
   { labelKey: 'dash.nav.careers',    href: '/dashboard/admin/careers',    icon: Briefcase },
   { labelKey: 'dash.nav.broadcast',  href: '/dashboard/admin/broadcast',  icon: Mail },
+  { labelKey: 'dash.nav.demos',      href: '/dashboard/admin/demos',      icon: MonitorPlay },
   { labelKey: 'dash.nav.settings',   href: '/dashboard/admin/settings',   icon: Settings },
 ];
 

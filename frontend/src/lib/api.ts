@@ -801,6 +801,36 @@ export const careersAPI = {
   cv:       (id: string) => api.get(`/careers/applications/${id}/cv`, { responseType: 'blob' }),
 };
 
+export interface DemoSite {
+  slug: string;
+  name: string;
+  path: string;
+  adminPath: string;
+  enabled: boolean;
+  state: 'live' | 'disabled' | 'expired';
+  showPin: boolean;
+  pin: string | null;
+  expiresAt: string | null;
+  notes: string;
+  unlocks: number;
+  lastUnlockAt: string | null;
+  updatedAt: string;
+}
+
+export interface DemoSitePatch {
+  name?: string;
+  enabled?: boolean;
+  pin?: string;
+  showPin?: boolean;
+  expiresAt?: string | null;
+  notes?: string;
+}
+
+export const demosAPI = {
+  list:   ()                                   => api.get<{ demos: DemoSite[] }>('/demos'),
+  update: (slug: string, data: DemoSitePatch)  => api.patch<{ demo: DemoSite }>(`/demos/${slug}`, data),
+};
+
 export const searchAPI = {
   global:   (q: string)                  => api.get('/search', { params: { q } }),
   activity: (params?: ActivityListParams) => api.get('/search/activity', { params }),

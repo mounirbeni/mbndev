@@ -232,3 +232,8 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 .dd.light .dd-menu button { color: var(--ink); }
 .dd.light .dd-menu button:hover, .dd.light .dd-menu button[aria-selected='true'] { background: #f1e8dc; }
 .dd.light .dd-menu { inset-inline-end: auto; inset-inline-start: 0; }
+
+/* Demo switched off */
+.gate-off { text-align: center; }
+.gate-off h1 { margin: 0; font-size: 22px; }
+.gate-off p { margin: 0; color: var(--muted); }

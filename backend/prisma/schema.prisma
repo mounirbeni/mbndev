@@ -868,3 +868,23 @@ model JobApplication {
   @@index([status, createdAt])
   @@index([role, createdAt])
 }
+
+// ─── Demo sites (static showcase apps under /demo/*) ─────────────────────────
+// Managed from /dashboard/admin/demos. The demo pages are static, so the PIN
+// gate and the on/off switch are enforced through the public /api/demos routes.
+// Created lazily by lib/demos.js (see prisma/migrate21.sql.js).
+
+model DemoSite {
+  id           String    @id @default(cuid())
+  slug         String    @unique          // key from the catalog in lib/demos.js
+  name         String
+  enabled      Boolean   @default(true)
+  pinHash      String                     // bcrypt of the owner-dashboard PIN
+  publicPin    String?                    // plain PIN, stored ONLY while it is shown on the gate
+  expiresAt    DateTime?
+  notes        String?
+  unlocks      Int       @default(0)
+  lastUnlockAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

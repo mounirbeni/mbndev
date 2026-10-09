@@ -8,7 +8,7 @@ import { m as motion, AnimatePresence, useMotionValue, useTransform, useDragCont
 import {
   LayoutDashboard, FolderOpen, MessageSquare, CreditCard,
   Settings, LogOut, Users, Package, BarChart2, ShoppingBag,
-  FileText, X, ExternalLink, LayoutGrid, Activity, Target, Briefcase, Mail,
+  FileText, X, ExternalLink, LayoutGrid, Activity, Target, Briefcase, Mail, MonitorPlay,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -53,6 +53,7 @@ const adminSheetDef: NavItem[] = [
   { labelKey: 'dash.nav.leads',     href: '/dashboard/admin/leads',     icon: Target },
   { labelKey: 'dash.nav.careers',   href: '/dashboard/admin/careers',   icon: Briefcase },
   { labelKey: 'dash.nav.broadcast', href: '/dashboard/admin/broadcast', icon: Mail },
+  { labelKey: 'dash.nav.demos',     href: '/dashboard/admin/demos',     icon: MonitorPlay },
   { labelKey: 'dash.nav.settings',  href: '/dashboard/admin/settings',  icon: Settings },
 ];
 

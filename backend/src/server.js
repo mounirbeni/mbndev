@@ -117,6 +117,7 @@ app.use('/api/auth',  express.urlencoded({ extended: false, limit: '32kb' }));
 // Everything else: 256kb (generous but bounded)
 // A whole menu (hundreds of dishes in several languages) is saved in one request.
 app.use('/api/menu', express.json({ limit: '1mb' }));
+app.use('/api/demos', express.json({ limit: '8kb' }));
 app.use(express.json({ limit: '256kb' }));
 app.use(express.urlencoded({ extended: true, limit: '256kb' }));
 
@@ -207,6 +208,7 @@ app.use('/api/realtime',      require('./routes/realtime'));
 app.use('/api/search',        require('./routes/search'));
 app.use('/api/leads',         require('./routes/leads'));
 app.use('/api/careers',       require('./routes/careers'));
+app.use('/api/demos',         require('./routes/demos'));
 
 // ─── Health check (verifies DB + realtime stats) ─────────────────────────────
 app.get('/api/health', async (req, res) => {

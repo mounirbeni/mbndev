@@ -3,14 +3,14 @@
 import { CAFE, CATEGORIES, MENU, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, EVENTS, GIFT_DESIGNS } from './data.js';
 import * as db from './store.js';
 import { icon, langDropdown } from './icons.js';
+import { fetchConfig, verifyPin } from './gate.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const PIN = '2468';
 
 const A = {
   en: {
-    owner: 'Owner dashboard', pinLabel: 'Enter your PIN', pinHint: 'Demo PIN: 2468', unlock: 'Unlock', backSite: 'Back to the website', language: 'Language', badPin: 'Wrong PIN — try 2468.',
+    owner: 'Owner dashboard', pinLabel: 'Enter your PIN', unlock: 'Unlock', backSite: 'Back to the website', language: 'Language', badPin: 'Wrong PIN.', pinHintN: 'Demo PIN: {pin}', tooMany: 'Too many attempts — try again in a few minutes.', offline: 'Cannot reach the server — check your connection.', offTitle: 'This demo is switched off', offBody: 'Ask MBN DEV to open it again.', offExpired: 'This demo has expired', checking: 'Checking…',
     viewSite: 'View website', demoTag: 'Demo by MBN DEV', live: 'Live', soundOn: 'Sound on', soundOff: 'Sound off',
     t_live: 'Live orders', t_menu: 'Menu & stock', t_book: 'Bookings', t_people: 'Customers', t_stats: 'Insights', t_set: 'Settings',
     s_live: 'New orders arrive here instantly — tap to move them along.', s_menu: 'Prices and sold-out items update on the website immediately.', s_book: 'Workshop seats and catering requests.', s_people: 'Stamp cards, gift cards, bean subscriptions and newsletter.', s_stats: 'How the café is doing.', s_set: 'Opening hours, online ordering and the banner.',
@@ -28,7 +28,7 @@ const A = {
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], cur: '{n} dh', free: 'Free', sub_once: 'One-time', sub_w2: 'Every 2 weeks', sub_w4: 'Every 4 weeks', ty_office: 'Office', ty_event: 'Event', ty_wedding: 'Wedding',
   },
   fr: {
-    owner: 'Espace gérant', pinLabel: 'Entrez votre code', pinHint: 'Code démo : 2468', unlock: 'Déverrouiller', backSite: 'Retour au site', language: 'Langue', badPin: 'Code incorrect — essayez 2468.',
+    owner: 'Espace gérant', pinLabel: 'Entrez votre code', unlock: 'Déverrouiller', backSite: 'Retour au site', language: 'Langue', badPin: 'Code incorrect.', pinHintN: 'Code démo : {pin}', tooMany: 'Trop d’essais — réessayez dans quelques minutes.', offline: 'Serveur injoignable — vérifiez votre connexion.', offTitle: 'Cette démo est désactivée', offBody: 'Demandez à MBN DEV de la rouvrir.', offExpired: 'Cette démo a expiré', checking: 'Vérification…',
     viewSite: 'Voir le site', demoTag: 'Démo par MBN DEV', live: 'En direct', soundOn: 'Son activé', soundOff: 'Son coupé',
     t_live: 'Commandes', t_menu: 'Carte & stock', t_book: 'Réservations', t_people: 'Clients', t_stats: 'Statistiques', t_set: 'Réglages',
     s_live: 'Les nouvelles commandes arrivent ici instantanément — touchez pour les faire avancer.', s_menu: 'Prix et ruptures sont mis à jour immédiatement sur le site.', s_book: 'Places aux ateliers et demandes traiteur.', s_people: 'Cartes de fidélité, cartes cadeaux, abonnements café et newsletter.', s_stats: 'Comment va le café.', s_set: 'Horaires, commande en ligne et bandeau.',
@@ -80,6 +80,7 @@ let ddOpen = null; // which language dropdown is open (survives re-renders)
 function applyStatic() {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-a]').forEach((el) => { el.textContent = t(el.dataset.a); });
+  renderGateText();
   const opts = [{ id: 'en', short: 'EN', name: 'English' }, { id: 'fr', short: 'FR', name: 'Français' }];
   $('#alang').innerHTML = langDropdown({ options: opts, current: lang, open: ddOpen === 'alang', label: t('language'), cls: 'up' });
   $('#alang2').innerHTML = langDropdown({ options: opts, current: lang, open: ddOpen === 'alang2', label: t('language'), cls: 'light' });
@@ -282,12 +283,34 @@ function wire() {
 }
 
 // ── gate ──────────────────────────────────────────────────────────────────
+// Whether the demo is open and which PIN hint to show come from the MBN DEV dashboard.
+let gateCfg = null;
+function renderGateText() {
+  const h = $('#pinHint'); if (!h) return;
+  const pin = gateCfg?.ok && gateCfg.live ? gateCfg.pinHint : null;
+  h.hidden = !pin; h.textContent = pin ? t('pinHintN', { pin }) : '';
+  const off = gateCfg?.ok && !gateCfg.live;
+  $('#gateForm').hidden = off; $('#gateOff').hidden = !off;
+  if (off) { $('#offTitle').textContent = t(gateCfg.state === 'expired' ? 'offExpired' : 'offTitle'); $('#offBody').textContent = t('offBody'); }
+}
 function unlock() { $('#gate').hidden = true; $('#app').hidden = false; render(); }
 applyStatic();
-if (sessionStorage.getItem('nour-admin') === '1') unlock();
-$('#gateForm').addEventListener('submit', (e) => {
+wire();
+fetchConfig().then((cfg) => {
+  gateCfg = cfg; renderGateText();
+  if (cfg.ok && !cfg.live) { sessionStorage.removeItem('nour-admin'); return; }
+  if (cfg.ok && sessionStorage.getItem('nour-admin') === '1') unlock();
+  else if (!cfg.ok) $('#pinErr').textContent = t('offline');
+});
+$('#gateForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  if ($('#pin').value === PIN) { sessionStorage.setItem('nour-admin', '1'); unlock(); try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch { /* no audio */ } } else { $('#pinErr').textContent = t('badPin'); $('#gateForm').classList.remove('shake'); void $('#gateForm').offsetWidth; $('#gateForm').classList.add('shake'); $('#pin').select(); }
+  const btn = $('#gateForm button[type="submit"]'); const err = $('#pinErr');
+  btn.disabled = true; err.textContent = '';
+  const res = await verifyPin($('#pin').value.trim());
+  btn.disabled = false;
+  if (res === 'ok') { sessionStorage.setItem('nour-admin', '1'); unlock(); try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch { /* no audio */ } return; }
+  if (res === 'unavailable') { gateCfg = { ok: true, live: false, state: 'disabled' }; renderGateText(); return; }
+  err.textContent = t(res === 'bad' ? 'badPin' : res === 'limited' ? 'tooMany' : 'offline');
+  const f = $('#gateForm'); f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); $('#pin').select();
 });
 $('#pin').focus();
-wire();

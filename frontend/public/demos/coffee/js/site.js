@@ -4,6 +4,7 @@ import { LANGS, STR } from './i18n.js';
 import { drinkSVG, foodSVG, artFor, bagSVG } from './art.js';
 import * as db from './store.js';
 import { icon, langDropdown } from './icons.js';
+import { fetchConfig } from './gate.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -772,3 +773,14 @@ function wire() {
 
 renderAll();
 wire();
+
+// The owner can switch the demo off (or let it expire) from the MBN DEV dashboard.
+// If the server cannot be reached the site simply stays open: nothing here is sensitive.
+fetchConfig().then((cfg) => {
+  if (!cfg.ok || cfg.live) return;
+  const o = document.createElement('div');
+  o.className = 'demo-off'; o.setAttribute('role', 'alert');
+  o.innerHTML = `<div><b>NOUR</b><h1>${esc(t(cfg.state === 'expired' ? 'offExpired' : 'offTitle'))}</h1><p>${esc(t('offBody'))}</p><a class="btn" href="https://mbndev.ma">mbndev.ma</a></div>`;
+  document.body.append(o);
+  document.documentElement.style.overflow = 'hidden';
+});
