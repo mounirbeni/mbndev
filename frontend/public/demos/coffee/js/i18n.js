@@ -6,6 +6,7 @@ export const LANGS = [
 ];
 
 const en = {
+  discover: 'Discover', favs: 'Favorites', favEmpty: 'No favorites yet — tap ♡ on anything you love.', pick: 'NOUR’s pick', fromP: 'From {p}', filtersT: 'Filters', diet: 'Diet', sortT: 'Sort by', sort_pop: 'Popular', sort_low: 'Price ↑', sort_high: 'Price ↓', showN: 'Show {n} items', favOnly: 'Favorites only', saveFav: 'Save to favorites', resetF: 'Reset', 
   demoBar: 'Demo website by MBN DEV — fictional café, real features.', demoCta: 'Get one for your café',
   nav_order: 'Order', nav_beans: 'Beans', nav_brew: 'Brew guide', nav_loyalty: 'Card', nav_gifts: 'Gifts', nav_events: 'Workshops', nav_visit: 'Visit',
   cart: 'Bag', openNow: 'Open now · until {t}', closesSoon: 'Closing soon · {t}', closedNow: 'Closed · opens {d} {t}', today: 'today', tomorrow: 'tomorrow',
@@ -53,6 +54,7 @@ const en = {
 };
 
 const fr = {
+  discover: 'Découvrir', favs: 'Favoris', favEmpty: 'Pas encore de favoris — touchez ♡ sur ce que vous aimez.', pick: 'Choix de NOUR', fromP: 'Dès {p}', filtersT: 'Filtres', diet: 'Régime', sortT: 'Trier par', sort_pop: 'Populaire', sort_low: 'Prix ↑', sort_high: 'Prix ↓', showN: 'Voir {n} articles', favOnly: 'Favoris uniquement', saveFav: 'Ajouter aux favoris', resetF: 'Réinitialiser', 
   demoBar: 'Site démo par MBN DEV — café fictif, fonctionnalités réelles.', demoCta: 'Le même pour votre café',
   nav_order: 'Commander', nav_beans: 'Cafés', nav_brew: 'Guide', nav_loyalty: 'Carte', nav_gifts: 'Cadeaux', nav_events: 'Ateliers', nav_visit: 'Venir',
   cart: 'Panier', openNow: 'Ouvert · jusqu’à {t}', closesSoon: 'Ferme bientôt · {t}', closedNow: 'Fermé · ouvre {d} {t}', today: 'aujourd’hui', tomorrow: 'demain',
@@ -100,6 +102,7 @@ const fr = {
 };
 
 const ar = {
+  discover: 'اكتشف', favs: 'المفضلة', favEmpty: 'لا مفضلات بعد — اضغط ♡ على ما تحب.', pick: 'اختيار NOUR', fromP: 'ابتداءً من {p}', filtersT: 'التصفية', diet: 'النظام الغذائي', sortT: 'الترتيب', sort_pop: 'الأكثر طلباً', sort_low: 'السعر ↑', sort_high: 'السعر ↓', showN: 'عرض {n} منتجاً', favOnly: 'المفضلة فقط', saveFav: 'أضف إلى المفضلة', resetF: 'إعادة تعيين', 
   demoBar: 'موقع تجريبي من MBN DEV — مقهى خيالي وميزات حقيقية.', demoCta: 'احصل على مثله لمقهاك',
   nav_order: 'اطلب', nav_beans: 'البن', nav_brew: 'دليل التحضير', nav_loyalty: 'البطاقة', nav_gifts: 'الهدايا', nav_events: 'الورشات', nav_visit: 'زورونا',
   cart: 'السلة', openNow: 'مفتوح الآن · حتى {t}', closesSoon: 'يغلق قريباً · {t}', closedNow: 'مغلق · يفتح {d} {t}', today: 'اليوم', tomorrow: 'غداً',

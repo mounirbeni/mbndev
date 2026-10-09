@@ -97,29 +97,49 @@ function renderMarquee() {
 // ── menu ──────────────────────────────────────────────────────────────────
 let filter = 'all';
 let query = '';
-function renderMenu() {
-  $('#filters').innerHTML = ['all', 'v', 'gf', 'df'].map((f) => `<button class="pill" aria-pressed="${f === filter}" data-filter="${f}">${t(`f_${f}`)}</button>`).join('');
+let sort = 'pop';
+let favOnly = false;
+const favs = () => new Set(db.get().favs || []);
+function menuItems() {
   const q = query.trim().toLowerCase();
-  const items = MENU.filter((m) => !db.itemState(m.id).hidden)
+  const fv = favs();
+  const list = MENU.filter((m) => !db.itemState(m.id).hidden)
     .filter((m) => filter === 'all' || m.tags.includes(filter))
+    .filter((m) => !favOnly || fv.has(m.id))
     .filter((m) => !q || [m.name.en, m.name.fr, m.name.ar, m.desc.en, m.desc.fr, m.desc.ar].some((x) => x.toLowerCase().includes(q)));
+  if (sort !== 'pop') list.sort((a, b) => (sort === 'low' ? 1 : -1) * (db.priceOf(a) - db.priceOf(b)));
+  return list;
+}
+function renderMenu() {
+  $('#filters').innerHTML = ['all', 'v', 'gf', 'df'].map((f) => `<button class="pill" aria-pressed="${f === filter}" data-filter="${f}">${t(`f_${f}`)}</button>`).join('')
+    + `<button class="pill" aria-pressed="${favOnly}" data-favonly>♡ ${t('favs')}</button>`;
+  $('#filterDot').hidden = filter === 'all' && sort === 'pop' && !favOnly;
+  const items = menuItems();
   const cats = CATEGORIES.filter((c) => items.some((m) => m.cat === c.id));
   $('#cats').innerHTML = cats.map((c, i) => `<a href="#cat-${c.id}" class="${i === 0 ? 'on' : ''}" data-cat="${c.id}">${esc(L(c.name))}</a>`).join('');
   $('#menuList').innerHTML = cats.length ? cats.map((c) => `
     <div class="cat-block" id="cat-${c.id}" data-catblock="${c.id}">
       <h3>${esc(L(c.name))} <small>${items.filter((m) => m.cat === c.id).length}</small></h3>
       <div class="grid">${items.filter((m) => m.cat === c.id).map(card).join('')}</div>
-    </div>`).join('') : `<p class="empty">${t('noResults')}</p>`;
+    </div>`).join('') : `<p class="empty">${favOnly && !favs().size ? t('favEmpty') : t('noResults')}</p>`;
   watchCats();
+  renderTabbar();
 }
+const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>';
 function card(m) {
   const sold = db.isSoldOut(m.id);
-  const tags = m.tags.map((x) => `<span class="tag ${x}">${t(`t_${x}`)}</span>`).join('');
-  return `<button class="item ${sold ? 'sold' : ''}" data-item="${m.id}" style="--tint:${TINT[m.cat]}" ${sold ? 'aria-disabled="true"' : ''}>
-    <div class="stage ${photoOf(m.id) ? 'has-photo' : ''}"><div class="tags">${tags}</div>${photo(m.id) || artFor(m, {})}</div>
+  const fav = favs().has(m.id);
+  const pill = m.tags.includes('sig') ? t('pick') : m.tags.includes('v') ? t('t_v') : '';
+  const sized = (m.opts || []).includes('size');
+  return `<article class="item ${sold ? 'sold' : ''}" data-item="${m.id}" tabindex="0" role="button" aria-label="${esc(L(m.name))}" style="--tint:${TINT[m.cat]}" ${sold ? 'aria-disabled="true"' : ''}>
+    <div class="stage ${photoOf(m.id) ? 'has-photo' : ''}">${photo(m.id) || artFor(m, {})}
+      ${m.tags.includes('new') ? `<span class="badge-new">${t('t_new')}</span>` : ''}
+      ${pill ? `<span class="pick">${esc(pill)}</span>` : ''}
+      <button class="fav" type="button" data-fav="${m.id}" aria-pressed="${fav}" aria-label="${esc(t('saveFav'))}">${HEART}</button>
+      ${sold ? `<span class="sold-veil">${t('soldOut')}</span>` : ''}</div>
     <div class="body"><h4>${esc(L(m.name))}</h4><p>${esc(L(m.desc))}</p>
-      <div class="ifoot"><span class="price">${money(db.priceOf(m))}</span>${sold ? `<span class="sold-badge">${t('soldOut')}</span>` : '<span class="plus" aria-hidden="true">+</span>'}</div></div>
-  </button>`;
+      <div class="ifoot"><span class="price">${sized ? t('fromP', { p: `<b>${money(db.priceOf(m) - 4)}</b>` }) : `<b>${money(db.priceOf(m))}</b>`}</span>${sold ? '' : '<span class="plus" aria-hidden="true">+</span>'}</div></div>
+  </article>`;
 }
 let catObs;
 function watchCats() {
@@ -134,6 +154,25 @@ function watchCats() {
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
   $$('[data-catblock]').forEach((el) => catObs.observe(el));
+}
+
+// ── filter sheet (app-style) ──────────────────────────────────────────────
+function renderFilterSheet() {
+  const n = menuItems().length;
+  $('#filterSheet').innerHTML = `${head(t('filtersT'))}<div class="sheet-body" style="display:grid;gap:18px">
+    <div class="opt"><span>${t('diet')}</span><div class="pills">${['all', 'v', 'gf', 'df'].map((f) => `<button class="pill" aria-pressed="${f === filter}" data-filter="${f}">${t(`f_${f}`)}</button>`).join('')}</div></div>
+    <div class="opt"><span>${t('sortT')}</span><div class="seg">${['pop', 'low', 'high'].map((x) => `<button aria-pressed="${x === sort}" data-sort="${x}">${t(`sort_${x}`)}</button>`).join('')}</div></div>
+    <label class="reward" style="background:var(--paper);border-style:solid;border-color:var(--line)"><input type="checkbox" id="favOnlyChk" ${favOnly ? 'checked' : ''}/> ♡ ${t('favOnly')}</label>
+  </div><div class="sheet-foot" style="display:flex;gap:10px"><button class="btn ghost" data-freset>${t('resetF')}</button><button class="btn sun" style="flex:1" data-close data-autofocus>${t('showN', { n })}</button></div>`;
+}
+function toggleFav(id) {
+  db.update((s) => { const f = new Set(s.favs || []); f.has(id) ? f.delete(id) : f.add(id); s.favs = [...f]; });
+  $$(`[data-fav="${id}"]`).forEach((b) => { b.setAttribute('aria-pressed', String(favs().has(id))); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); });
+  if (favOnly) renderMenu();
+}
+let activeTab = 'order';
+function renderTabbar() {
+  $$('.tabbar [data-tabbar]').forEach((el) => el.classList.toggle('on', favOnly ? el.dataset.tabbar === 'favs' : el.dataset.tabbar === activeTab));
 }
 
 // ── builder (customiser) ──────────────────────────────────────────────────
@@ -667,8 +706,12 @@ function wire() {
   document.addEventListener('click', (e) => {
     const lb = e.target.closest('[data-lang]'); if (lb) { setLang(lb.dataset.lang); return; }
     if (e.target.closest('[data-close]')) { close(); return; }
+    const fv = e.target.closest('[data-fav]'); if (fv) { e.stopPropagation(); toggleFav(fv.dataset.fav); return; }
     const it = e.target.closest('[data-item]'); if (it) { openBuilder(it.dataset.item); return; }
-    const f = e.target.closest('[data-filter]'); if (f) { filter = f.dataset.filter; renderMenu(); return; }
+    const f = e.target.closest('[data-filter]'); if (f) { filter = f.dataset.filter; renderMenu(); if (openSheet === $('#filterSheet')) renderFilterSheet(); return; }
+    const so = e.target.closest('[data-sort]'); if (so) { sort = so.dataset.sort; renderMenu(); renderFilterSheet(); return; }
+    if (e.target.closest('[data-freset]')) { filter = 'all'; sort = 'pop'; favOnly = false; renderMenu(); renderFilterSheet(); return; }
+    if (e.target.closest('[data-favonly]')) { favOnly = !favOnly; renderMenu(); return; }
     const bk = e.target.closest('[data-book]'); if (bk) { openBooking(bk.dataset.book); return; }
     const bb = e.target.closest('[data-bean]'); if (bb) { bean[bb.dataset.bean] = bb.dataset.val; renderCompass(); return; }
     const go = e.target.closest('[data-goto]'); if (go) { const b = BEANS.find((x) => x.id === go.dataset.goto); bean.x = b.x; bean.y = b.y; renderCompass(); $('#compass').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
@@ -676,6 +719,16 @@ function wire() {
     const me = e.target.closest('[data-method]'); if (me) { brew.m = me.dataset.method; brewReset(); renderBrew(); return; }
   });
   $('#scrim').addEventListener('click', close);
+  $('#filterBtn').addEventListener('click', () => { renderFilterSheet(); open($('#filterSheet')); });
+  $('#filterSheet').addEventListener('change', (e) => { if (e.target.id === 'favOnlyChk') { favOnly = e.target.checked; renderMenu(); renderFilterSheet(); } });
+  $('#favTab').addEventListener('click', () => { favOnly = !favOnly; renderMenu(); $('#order').scrollIntoView({ behavior: 'smooth' }); });
+  document.addEventListener('keydown', (e) => { const it = e.target.closest?.('[data-item]'); if (it && (e.key === 'Enter' || e.key === ' ') && e.target === it) { e.preventDefault(); openBuilder(it.dataset.item); } });
+  // tab bar follows the section in view
+  const tio = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { activeTab = { order: 'order', beans: 'order', brew: 'order', card: 'card', gifts: 'card', events: 'visit', visit: 'visit' }[en.target.id] || 'order'; renderTabbar(); } }), { rootMargin: '-45% 0px -50% 0px' });
+  ['order', 'beans', 'brew', 'card', 'gifts', 'events', 'visit'].forEach((id) => tio.observe($(`#${id}`)));
+  // phone: the header slides away while scrolling down, like an app
+  let lastY = scrollY;
+  window.addEventListener('scroll', () => { const y = scrollY; document.body.classList.toggle('navhide', y > 260 && y > lastY + 2 ? true : y < lastY - 2 ? false : document.body.classList.contains('navhide')); lastY = y; }, { passive: true });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   $('#builder').addEventListener('click', builderClick);
   $('#bag').addEventListener('click', bagClick);
