@@ -208,7 +208,7 @@ export const PHOTOS = {
   hero: 4,                                   // img/hero-1.webp … hero-4.webp (rotating, 4:5)
   shop: false,
   barber: SET('younes', 'anas', 'ilyas', 'soufiane'),    // img/barber-<id>.webp
-  style: SET('skinfade', 'taper', 'classic', 'long', 'beardfull'), // img/style-<id>.webp (no 'crop' photo yet)
+  style: SET('skinfade', 'taper', 'classic', 'crop', 'long', 'beardfull'), // img/style-<id>.webp
   product: SET('clay', 'pomade', 'salt', 'oil', 'balm', 'after', 'shampoo', 'comb'), // img/prod-<id>.webp
 };
 export const photoOf = {
