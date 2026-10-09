@@ -1,5 +1,5 @@
 // NOUR Coffee Atelier — public site. Vanilla JS modules, no build step.
-import { CAFE, CATEGORIES, MENU, OPTS, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, BREW, EVENTS, GIFT_AMOUNTS, GIFT_DESIGNS, AMENITIES } from './data.js';
+import { CAFE, CATEGORIES, MENU, OPTS, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, BREW, EVENTS, GIFT_AMOUNTS, GIFT_DESIGNS, AMENITIES, photoOf } from './data.js';
 import { LANGS, STR } from './i18n.js';
 import { drinkSVG, foodSVG, artFor, bagSVG } from './art.js';
 import * as db from './store.js';
@@ -19,6 +19,7 @@ const money = (n) => t('currency', { n: fmt(n) });
 const locale = () => LANGS.find((x) => x.id === lang).locale;
 const dateFmt = (d, o) => new Intl.DateTimeFormat(locale(), o).format(d);
 
+const photo = (id, cls = 'photo') => { const src = photoOf(id); return src ? `<img class="${cls}" src="${src}" alt="" loading="lazy" decoding="async"/>` : ''; };
 const TINT = { espresso: '#f3dcc4', slow: '#e3eadf', cold: '#dfe9f1', notcoffee: '#e8efd8', bakery: '#f6e3c3', brunch: '#f1dccf' };
 
 function applyStatic() {
@@ -115,7 +116,7 @@ function card(m) {
   const sold = db.isSoldOut(m.id);
   const tags = m.tags.map((x) => `<span class="tag ${x}">${t(`t_${x}`)}</span>`).join('');
   return `<button class="item ${sold ? 'sold' : ''}" data-item="${m.id}" style="--tint:${TINT[m.cat]}" ${sold ? 'aria-disabled="true"' : ''}>
-    <div class="stage"><div class="tags">${tags}</div>${artFor(m, {})}</div>
+    <div class="stage ${photoOf(m.id) ? 'has-photo' : ''}"><div class="tags">${tags}</div>${photo(m.id) || artFor(m, {})}</div>
     <div class="body"><h4>${esc(L(m.name))}</h4><p>${esc(L(m.desc))}</p>
       <div class="ifoot"><span class="price">${money(db.priceOf(m))}</span>${sold ? `<span class="sold-badge">${t('soldOut')}</span>` : '<span class="plus" aria-hidden="true">+</span>'}</div></div>
   </button>`;
@@ -192,7 +193,9 @@ function renderBuilder() {
   $('#builder').setAttribute('aria-label', L(item.name));
   $('#builder').innerHTML = `${head(L(item.name))}
     <div class="sheet-body builder">
-      <div class="preview" style="--tint:${TINT[item.cat]}">${item.kind === 'drink' ? drinkSVG(item, artSel(item, sel)) : foodSVG(item.art)}<span class="meta">${item.kcal} ${t('kcal')}</span></div>
+      <div class="preview ${photoOf(item.id) ? 'has-photo' : ''}" style="--tint:${TINT[item.cat]}">${photoOf(item.id)
+        ? `${photo(item.id)}${item.kind === 'drink' ? `<div class="mini">${drinkSVG(item, artSel(item, sel), { steam: false })}</div>` : ''}`
+        : item.kind === 'drink' ? drinkSVG(item, artSel(item, sel)) : foodSVG(item.art)}<span class="meta">${item.kcal} ${t('kcal')}</span></div>
       <div>
         <p class="desc">${esc(L(item.desc))}</p>
         ${groups}
@@ -242,7 +245,7 @@ function lineView(l) {
   }
   const m = MENU.find((x) => x.id === l.id);
   const sub = [selSummary(m, l.sel), l.note && `“${l.note}”`].filter(Boolean).join(' · ');
-  return { name: L(m.name), sub, art: m.kind === 'drink' ? drinkSVG(m, artSel(m, l.sel), { steam: false }) : foodSVG(m.art), tint: TINT[m.cat], editable: true };
+  return { name: L(m.name), sub, art: photo(m.id) || (m.kind === 'drink' ? drinkSVG(m, artSel(m, l.sel), { steam: false }) : foodSVG(m.art)), tint: TINT[m.cat], editable: true };
 }
 function totals() {
   const s = db.get();
@@ -369,7 +372,7 @@ function renderTracker() {
     : o.status === 'ready' ? (o.mode === 'table' ? t('trackReadyTable', { n: o.table }) : o.mode === 'delivery' ? t('trackReadyDelivery') : t('trackReady')) : t('trackCollected');
   const first = o.items.find((x) => x.drink) || o.items[0];
   const m = MENU.find((x) => x.id === first?.id);
-  const art = m ? (m.kind === 'drink' ? drinkSVG(m, artSel(m, first.sel || {})) : foodSVG(m.art)) : bagSVG('#d9a05b', 'BEANS');
+  const art = m ? (photo(m.id) || (m.kind === 'drink' ? drinkSVG(m, artSel(m, first.sel || {})) : foodSVG(m.art))) : bagSVG('#d9a05b', 'BEANS');
   $('#tracker').innerHTML = `${head(t('orderNo', { n: o.no }))}
     <div class="trk">
       <span class="live-dot">${t('liveTrack')}</span>

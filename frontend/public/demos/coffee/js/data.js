@@ -237,6 +237,10 @@ export const GIFT_DESIGNS = [
   { id: 'night', label: L('Night shift', 'Service de nuit', 'المناوبة الليلية') },
 ];
 
+// Product photos (img/<id>.webp, 800 × 800). Items not listed keep their drawn art.
+export const PHOTOS = new Set(['esp', 'cortado', 'flat']);
+export const photoOf = (id) => (PHOTOS.has(id) ? `/demos/coffee/img/${id}.webp` : null);
+
 export const AMENITIES = [
   ['wifi', L('Fast Wi-Fi', 'Wi-Fi rapide', 'واي فاي سريع')],
   ['plug', L('Sockets at every table', 'Prises à chaque table', 'مقابس في كل طاولة')],
