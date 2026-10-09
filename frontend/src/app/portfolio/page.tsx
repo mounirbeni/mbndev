@@ -247,9 +247,9 @@ const projects: {
     type: 'Moroccan Cuisine Ordering',
     description: 'Online ordering platform for authentic Moroccan cuisine in Marrakech — tajines, couscous, briwat and salads, with free delivery.',
     tags: ['Next.js', 'Online Ordering'],
-    gradient: 'from-lime-600/30 to-green-400/15',
-    accent: 'text-lime-400',
-    border: 'border-lime-500/20',
+    gradient: 'from-orange-700/30 to-amber-400/15',
+    accent: 'text-orange-300',
+    border: 'border-orange-500/20',
     stats: [
       { label: 'Cuisine',  value: 'Moroccan' },
       { label: 'City',     value: 'Marrakech'},
