@@ -617,3 +617,38 @@ input[inputmode='tel'] { direction: ltr; }
 .member.solo .m-info h3 { font-size: clamp(34px, 4.6vw, 52px); }
 .member.solo footer { justify-content: flex-start; gap: 18px; }
 @media (min-width: 860px) { .member.solo { grid-template-columns: minmax(280px, 420px) minmax(0, 1fr); gap: 56px; } }
+
+/* ═══ Design pass: legal identity, paper, framed portrait, fee ledger ═══ */
+body { counter-reset: sec; }
+/* faint paper grain over the whole page */
+body::before { content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.05; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .14 0 0 0 0 .22 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.sec { padding: clamp(52px, 7vw, 100px) 0; }
+/* section marks: § 01, § 02 … in place of a plain rule */
+.sec .eyebrow .rule { width: auto; height: auto; background: none; display: inline-flex; align-items: center; gap: 10px; }
+.sec .eyebrow .rule::before { counter-increment: sec; content: '§ ' counter(sec, decimal-leading-zero); font: 700 13px/1 var(--mono); letter-spacing: 0.08em; color: var(--brass); }
+.sec .eyebrow .rule::after { content: ''; width: 28px; height: 1.5px; background: var(--brass); }
+.sec.navy .eyebrow .rule::before { color: var(--brass-2); }
+.sec-head h2::after { content: ''; display: block; width: 56px; height: 3px; margin-top: 18px; background: linear-gradient(90deg, var(--wax) 0 40%, var(--brass) 40% 100%); }
+.sec.navy .sec-head h2::after, .track-intro h2::after { display: none; }
+/* the opened practice area no longer repeats its summary on wide screens */
+@media (min-width: 900px) { .area-body > div > p { display: none; } }
+
+/* portrait stage: frame-in-frame with fluted-column light, whether it holds a photo or the artwork */
+.frame { box-shadow: 16px 16px 0 var(--brass-2), 0 30px 60px -28px rgba(15, 28, 51, .55); }
+.frame::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 2px, transparent 2px 22px), linear-gradient(180deg, rgba(255, 255, 255, .08), transparent 38%, rgba(0, 0, 0, .28)); }
+.frame::after { content: ''; position: absolute; inset: 14px; z-index: 3; pointer-events: none; border: 1px solid rgba(232, 211, 162, .55); }
+.frame.art { background: radial-gradient(120% 90% at 50% 0%, #2a4676 0%, var(--navy) 55%, #0f1c33 100%); }
+
+/* fee schedule as a ledger rather than a pile of boxes */
+.meets { gap: 0; border-top: 2px solid var(--navy); margin-bottom: 56px; }
+.meet { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; padding: 24px 6px; position: relative; transition: background 0.2s; }
+.meet:hover { border-color: var(--line); box-shadow: none; background: rgba(255, 253, 248, .7); }
+.meet.pop { border-color: var(--line); background: var(--card); }
+.meet.pop::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 0; width: 4px; background: var(--wax); }
+.meet.pop { padding-inline-start: 22px; }
+.meet h3 { font-size: 28px; }
+
+/* less chrome on phones: the demo notice stays, the announcement strip goes */
+@media (max-width: 700px) { #announce { display: none !important; } }
