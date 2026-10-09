@@ -2,6 +2,7 @@
 import { SHOP, SERVICES, CATEGORIES, TEAM, photoOf } from './data.js';
 import * as db from './store.js';
 import { icon } from './icons.js';
+import { burst } from './fx.js';
 import { $, esc, t, L, money, mins, dateText, dayWord, toast, openSheet, sheetHead, avatar, openedSheet } from './ui.js';
 
 const sheet = () => $('#sheet');
@@ -65,7 +66,7 @@ function stepServices() {
     <p class="mixed" id="mixedNote" hidden>${icon('sparkles')} ${t('mixed')}</p>
     <div class="rows">${list.map((s) => {
     const on = bk.services.includes(s.id);
-    return `<button class="row ${on ? 'on' : ''}" data-bksvc="${s.id}" aria-pressed="${on}">
+    return `<button class="row c-${s.cat} ${on ? 'on' : ''}" data-bksvc="${s.id}" aria-pressed="${on}">
         <span class="tick">${on ? icon('check') : ''}</span>
         <span class="row-main"><b>${esc(L(s.name))}</b><small>${mins(s.dur)}${s.pop ? ` · ${t('popular')}` : ''}</small></span>
         <span class="row-price">${money(s.price)}</span></button>`;
@@ -163,6 +164,7 @@ function renderDone() {
     </div>
     <p class="hint">${b.status === 'pending' ? t('pendingNote') : t('confirmedNote')}</p>
   </div></div><div class="sheet-foot wrap-foot"><button class="btn ghost" data-ics="${b.id}">${icon('download')} ${t('addCalendar')}</button><button class="btn ghost" data-demo="WhatsApp">${icon('message')} ${t('shareWa')}</button><button class="btn rose" data-mine>${t('myBookings')}</button></div>`;
+  burst(sheet().querySelector('.done-ic'));
 }
 
 function icsFor(b) {

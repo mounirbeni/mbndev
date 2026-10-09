@@ -6,6 +6,7 @@ export const LANGS = [
 ];
 
 const en = {
+  iWant: 'I’d love…', pickTreatment: 'Choose a treatment', findMyTime: 'Find my time', tapToBook: 'Tap to book', badgeText: 'women only · Casablanca · hair · nails · skin · hammam · ', quickLabel: 'Quick booking', swipeHint: 'Swipe', momentsEyebrow: 'Moments', momentsA: 'A day at', momentsB: 'LALLA.', momentsSub: 'Mint tea, warm towels and good company.', reviewsLoved: 'Loved by', newThisMonth: 'Wedding season', brides: '12 brides booked this month', yourPick: 'Your pick',
   days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   currency: '{n} MAD', min: '{n} min', hm: '{h} h{m}',
   demoBar: 'Demo website by MBN DEV — fictional beauty centre, real features.', demoCta: 'Get one for your centre',
@@ -64,6 +65,7 @@ const en = {
 };
 
 const fr = {
+  iWant: 'Je voudrais…', pickTreatment: 'Choisir un soin', findMyTime: 'Trouver mon heure', tapToBook: 'Touchez pour réserver', badgeText: 'espace femmes · Casablanca · cheveux · ongles · peau · hammam · ', quickLabel: 'Réservation express', swipeHint: 'Glissez', momentsEyebrow: 'Instants', momentsA: 'Une journée chez', momentsB: 'LALLA.', momentsSub: 'Thé à la menthe, serviettes chaudes et bonne compagnie.', reviewsLoved: 'Adorée par', newThisMonth: 'Saison des mariages', brides: '12 mariées réservées ce mois-ci', yourPick: 'Votre choix',
   days: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
   currency: '{n} MAD', min: '{n} min', hm: '{h} h{m}',
   demoBar: 'Site de démonstration par MBN DEV — centre de beauté fictif, fonctions réelles.', demoCta: 'Un site comme celui-ci pour votre centre',
@@ -121,6 +123,7 @@ const fr = {
 };
 
 const ar = {
+  iWant: 'أريد…', pickTreatment: 'اختاري علاجًا', findMyTime: 'اعثري على موعدي', tapToBook: 'اضغطي للحجز', badgeText: 'للنساء فقط · الدار البيضاء · شعر · أظافر · بشرة · حمّام · ', quickLabel: 'حجز سريع', swipeHint: 'اسحبي', momentsEyebrow: 'لحظات', momentsA: 'يوم في', momentsB: 'لالّة.', momentsSub: 'أتاي بالنعناع ومناشف دافئة وصحبة طيبة.', reviewsLoved: 'محبوبة من', newThisMonth: 'موسم الأعراس', brides: '١٢ عروسًا حجزن هذا الشهر', yourPick: 'اختيارك',
   days: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
   currency: '{n} د.م', min: '{n} د', hm: '{h} س{m}',
   demoBar: 'موقع تجريبي من MBN DEV — مركز تجميل وهمي ومزايا حقيقية.', demoCta: 'احصلي على موقع مثله لمركزك',

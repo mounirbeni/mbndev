@@ -7,6 +7,7 @@ import { serviceArt, productArt, heroArt, stars } from './art.js';
 import { fetchConfig } from './gate.js';
 import { $, $$, esc, ui, t, L, money, mins, dayWord, dayNames, toast, openSheet, closeSheet, sheetHead, avatar, openedSheet } from './ui.js';
 import { openBooking, openMine, refreshSheets, wireBooking } from './booking.js';
+import { initFx, petalField, burst } from './fx.js';
 
 const svcById = (id) => SERVICES.find((s) => s.id === id);
 const memberById = (id) => TEAM.find((m) => m.id === id);
@@ -19,6 +20,8 @@ function applyStatic() {
   document.documentElement.lang = ui.lang; document.documentElement.dir = lg.dir;
   $$('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
   $$('[data-t-ph]').forEach((el) => { el.placeholder = t(el.dataset.tPh); });
+  $$('[data-t-aria]').forEach((el) => { el.setAttribute('aria-label', t(el.dataset.tAria)); });
+  splitHero(); renderStamp();
   $$('[data-ic]').forEach((el) => { el.innerHTML = icon(el.dataset.ic); });
   $('#langs').innerHTML = langDropdown({ options: LANGS.map((x) => ({ id: x.id, short: x.label, name: x.name })), current: ui.lang, label: t('language') });
   $('#myBtn').innerHTML = `${icon('calendar')}<span class="dotn" id="myDot" hidden></span>`;
@@ -26,6 +29,23 @@ function applyStatic() {
   const s = db.get().settings;
   const a = $('#announce'); a.hidden = !(s.banner && (s.bannerText || t('announce')));
   $('#announceText').textContent = s.bannerText || t('announce');
+}
+// headline words rise in one by one
+function splitHero() {
+  let i = 0;
+  $$('#heroTitle > [data-t]').forEach((el) => {
+    el.innerHTML = el.textContent.split(' ').filter(Boolean).map((w) => `<span class="w" style="--i:${i++}">${esc(w)}</span>`).join(' ');
+  });
+}
+function renderStamp() {
+  const tp = $('#stampText'); if (!tp) return;
+  const ar = ui.lang === 'ar'; const txt = ar ? t('badgeText') : t('badgeText').toUpperCase();
+  tp.textContent = txt;
+  if (!ar) { tp.setAttribute('textLength', '286'); tp.setAttribute('lengthAdjust', 'spacing'); tp.parentElement.style.fontSize = ''; return; }
+  // Arabic letters must stay joined, so scale the type to fill the ring instead of stretching it
+  tp.removeAttribute('textLength'); tp.removeAttribute('lengthAdjust');
+  const fit = () => { const el = tp.parentElement; el.style.fontSize = '10px'; const len = tp.getComputedTextLength(); if (len) el.style.fontSize = `${Math.min(15, (10 * 284) / len).toFixed(2)}px`; };
+  fit(); document.fonts?.ready.then(() => { if (ui.lang === 'ar') fit(); });
 }
 function setLang(l) { ui.lang = l; db.update((s) => { s.lang = l; }); renderAll(); }
 
@@ -42,6 +62,8 @@ function renderStatus() {
   $('#chipOpen').innerHTML = dot; $('#navStatus').innerHTML = dot;
   const nf = db.nextFree('any', 30);
   $('#chipNext').innerHTML = nf ? `${icon('clock')}<span>${t('nextFreeSlot', { w: esc(dayWord(nf.date)), t: db.hhmm(nf.start) })}</span>` : `${icon('clock')}<span>${t('noSlots')}</span>`;
+  const tot = TEAM.reduce((n, m) => n + m.reviews, 0); const avg = TEAM.reduce((n, m) => n + m.rating * m.reviews, 0) / tot;
+  $('#chipRate').innerHTML = `${icon('star')}<b>${avg.toFixed(1)}</b><span>${t('reviewsCount', { n: tot })}</span>`;
   const mineCount = myUpcoming();
   const dotn = $('#myDot'); if (dotn) { dotn.hidden = !mineCount; dotn.textContent = mineCount; }
   renderLive();
@@ -56,10 +78,9 @@ function renderLive() {
   const rows = fl.map((c) => {
     const m = memberById(c.member);
     const txt = c.state === 'off' ? t('statusOff') : c.state === 'busy' ? (c.until ? t('busyUntil', { t: db.hhmm(c.until) }) : t('statusBusy')) : t('statusFree');
-    return `<li class="${c.state}"><span class="dotc" style="--c:${m.color}"></span><b>${esc(m.name)}</b><small>${esc(catName(m.skills[0]))}</small><em>${txt}</em></li>`;
+    return `<li><button class="bubble ${c.state}" data-member="${m.id}" ${c.state === 'off' ? 'disabled' : ''} aria-label="${esc(m.name)} — ${esc(txt)}"><span class="ring-av">${avatar(m, photoOf.team(m.id))}</span><b>${esc(m.name)}</b><small>${esc(txt)}</small></button></li>`;
   }).join('');
-  $('#liveCard').innerHTML = `<header><span class="pulse"></span><b>${t('liveT')}</b><small>${esc(free ? t('freeNow', { n: free }) : t('noneFree'))}</small></header><ul>${rows}</ul>
-    <button class="btn ghost block" id="liveBook">${icon('calendar')} ${t('bookTreatment')}</button>`;
+  $('#liveCard').innerHTML = `<header><span class="pulse"></span><b>${t('liveT')}</b><small>${esc(free ? t('freeNow', { n: free }) : t('noneFree'))}</small></header><ul class="bubbles">${rows}</ul>`;
 }
 function renderMarquee() {
   const list = SERVICES.map((x) => `<span>${esc(L(x.name))}</span>`).join('');
@@ -68,34 +89,44 @@ function renderMarquee() {
 
 let heroTimer = null;
 let heroI = 0;
+const SHAPES = ['#heroArt', '#heroOrb', '#heroBean'];
 function renderHero() {
   const photos = photoOf.hero();
-  const el = $('#heroArt');
-  el.classList.toggle('photo', photos.length > 0);
-  if (!photos.length) { el.innerHTML = heroArt(); return; }
-  if (el.querySelector('img')) return; // already built — the rotation keeps running across language changes
-  el.innerHTML = photos.map((src, i) => `<img src="${src}" alt="" class="${i === 0 ? 'on' : ''}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`).join('');
+  const col = $('#collage');
+  col.classList.toggle('nophoto', photos.length === 0);
+  if (!photos.length) { $('#heroArt').innerHTML = heroArt(); return; }
+  if ($('#heroArt img')) return; // already built — the rotation keeps running across language changes
+  SHAPES.forEach((sel, k) => {
+    $(sel).innerHTML = photos.map((src, i) => `<img src="${src}" alt="" class="${i === k % photos.length ? 'on' : ''}" ${k === 0 && i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`).join('');
+  });
   clearInterval(heroTimer);
   if (photos.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     heroTimer = setInterval(() => {
-      const imgs = $$('#heroArt img'); if (!imgs.length) return;
-      imgs[heroI].classList.remove('on'); heroI = (heroI + 1) % imgs.length; imgs[heroI].classList.add('on');
-    }, 4200);
+      heroI = (heroI + 1) % photos.length;
+      SHAPES.forEach((sel, k) => $$(`${sel} img`).forEach((im, i) => im.classList.toggle('on', i === (heroI + k) % photos.length)));
+    }, 4400);
   }
+}
+/** Quick booking bar: pick a treatment, then jump straight to the specialist step. */
+function renderQuick() {
+  const sel = $('#quickSvc'); const keep = sel.value;
+  sel.innerHTML = `<option value="">${esc(t('pickTreatment'))}</option>` + CATEGORIES.map((c) => `<optgroup label="${esc(L(c.name))}">${db.services().filter((s) => s.cat === c.id).map((s) => `<option value="${s.id}">${esc(L(s.name))} · ${money(s.price)}</option>`).join('')}</optgroup>`).join('');
+  sel.value = keep;
 }
 
 // ── treatments ─────────────────────────────────────────────────────────────
 let svcFilter = 'all';
 const svcVisual = (s) => { const p = photoOf.service(s.id); return p ? `<img class="svc-photo" src="${p}" alt="" loading="lazy" decoding="async" />` : serviceArt(s.art); };
 function renderServices() {
-  const cats = [{ id: 'all', name: { en: t('all'), fr: t('all'), ar: t('all') } }, ...CATEGORIES];
-  $('#svcFilters').innerHTML = cats.map((c) => `<button class="pill ${svcFilter === c.id ? 'on' : ''}" role="tab" aria-selected="${svcFilter === c.id}" data-svcfilter="${c.id}">${esc(L(c.name))}</button>`).join('');
+  const cats = [{ id: 'all', icon: 'sparkles', name: { en: t('all'), fr: t('all'), ar: t('all') } }, ...CATEGORIES];
+  $('#svcFilters').innerHTML = cats.map((c) => `<button class="bub c-${c.id} ${svcFilter === c.id ? 'on' : ''}" role="tab" aria-selected="${svcFilter === c.id}" data-svcfilter="${c.id}"><span class="bub-ic">${icon(c.icon)}</span><small>${esc(L(c.name))}</small></button>`).join('');
   const list = db.services().filter((s) => svcFilter === 'all' || s.cat === svcFilter);
-  $('#svcGrid').innerHTML = list.map((s) => `<article class="svc ${s.pop ? 'pop' : ''}">
+  $('#svcGrid').innerHTML = list.map((s) => `<article class="svc c-${s.cat} ${s.pop ? 'pop' : ''}">
       <div class="svc-art">${svcVisual(s)}${s.pop ? `<span class="badge">${t('popular')}</span>` : ''}</div>
       <div class="svc-body"><h3>${esc(L(s.name))}</h3><p>${esc(L(s.desc))}</p></div>
       <footer><span class="meta"><b>${money(s.price)}</b><small>${icon('clock')} ${mins(s.dur)}</small></span><button class="btn rose sm" data-svc="${s.id}">${t('book')}</button></footer>
     </article>`).join('');
+  stagger('#svcGrid .svc');
 }
 
 // ── team ───────────────────────────────────────────────────────────────────
@@ -104,10 +135,12 @@ function renderTeam() {
   $('#teamGrid').innerHTML = TEAM.filter((m) => db.memberActive(m.id)).map((m) => {
     const nf = db.nextFree(m.id, 30, m.skills);
     const st = fl.find((c) => c.member === m.id)?.state || 'off';
-    return `<article class="member">
-      <div class="m-top">${avatar(m, photoOf.team(m.id))}<div><h3>${esc(m.name)}</h3><p>${esc(L(m.role))}</p><div class="rate-row">${stars(m.rating)}<b>${m.rating.toFixed(1)}</b><small>(${m.reviews})</small></div></div><span class="state ${st}">${t(st === 'free' ? 'statusFree' : st === 'busy' ? 'statusBusy' : 'statusOff')}</span></div>
-      <p class="bio">${esc(L(m.bio))}</p>
+    const ph = photoOf.team(m.id);
+    return `<article class="member" style="--c:${m.color}">
+      <div class="portrait">${ph ? `<img src="${ph}" alt="${esc(m.name)}" loading="lazy" decoding="async" />` : `<b aria-hidden="true">${esc(m.name[0])}</b>`}<span class="state ${st}">${t(st === 'free' ? 'statusFree' : st === 'busy' ? 'statusBusy' : 'statusOff')}</span></div>
+      <div class="m-info"><h3>${esc(m.name)}</h3><p class="role">${esc(L(m.role))}</p><div class="rate-row">${stars(m.rating)}<b>${m.rating.toFixed(1)}</b><small>(${m.reviews})</small></div></div>
       <div class="skills">${m.skills.map((c) => `<span>${esc(catName(c))}</span>`).join('')}</div>
+      <p class="bio">${esc(L(m.bio))}</p>
       <footer><span class="next">${icon('clock')} ${nf ? `${t('nextFree')}: <b>${esc(dayWord(nf.date))} ${db.hhmm(nf.start)}</b>` : t('noSlots')}</span><button class="btn rose sm" data-member="${m.id}">${t('bookWith', { n: esc(m.name) })}</button></footer>
     </article>`;
   }).join('');
@@ -116,7 +149,10 @@ function renderTeam() {
 // ── find your ritual ───────────────────────────────────────────────────────
 const fnd = { goal: 'glow', time: 'quick' };
 function renderFinder() {
-  const row = (key, label) => `<div class="q"><h4>${t(label)}</h4><div class="opts">${FINDER[key].map((o) => `<button class="pill ${fnd[key] === o.id ? 'on' : ''}" data-fnd="${key}" data-val="${o.id}" aria-pressed="${fnd[key] === o.id}">${esc(L(o.label))}</button>`).join('')}</div></div>`;
+  const GOAL = { glow: ['skin', 'sparkles'], relax: ['spa', 'flower'], hair: ['hair', 'scissors'], nails: ['nails', 'gem'], event: ['makeup', 'crown'] };
+  const row = (key, label) => (key === 'goal'
+    ? `<div class="q"><h4>${t(label)}</h4><div class="tiles">${FINDER.goal.map((o) => `<button class="tile c-${GOAL[o.id][0]} ${fnd.goal === o.id ? 'on' : ''}" data-fnd="goal" data-val="${o.id}" aria-pressed="${fnd.goal === o.id}"><span class="ti">${icon(GOAL[o.id][1])}</span>${esc(L(o.label))}</button>`).join('')}</div></div>`
+    : `<div class="q"><h4>${t(label)}</h4><div class="opts">${FINDER[key].map((o) => `<button class="pill ${fnd[key] === o.id ? 'on' : ''}" data-fnd="${key}" data-val="${o.id}" aria-pressed="${fnd[key] === o.id}">${esc(L(o.label))}</button>`).join('')}</div></div>`);
   const r = RITUALS.find((x) => x.goal === fnd.goal && x.time === fnd.time);
   const ids = r.services; const first = svcById(ids[0]);
   const who = db.qualified(ids).map(memberById);
@@ -134,7 +170,14 @@ function renderFinder() {
 // ── bridal & events ────────────────────────────────────────────────────────
 const quoteState = { type: 'wedding', date: '', people: 4, needs: new Set(['makeup', 'hair']), name: '', phone: '', note: '', sent: null };
 const NEEDS = ['makeup', 'hair', 'hammam', 'nails', 'home'];
+function renderBridalPic() {
+  const photos = photoOf.hero(); const el = $('#bridalPic');
+  el.classList.toggle('nophoto', photos.length < 4);
+  if (photos.length < 4) return;
+  el.innerHTML = `<div class="shape"><img class="on" src="${photos[3]}" alt="" loading="lazy" decoding="async" /></div><span class="chip"><b>${esc(t('newThisMonth'))}</b><small>${esc(t('brides'))}</small></span>`;
+}
 function renderBridal() {
+  renderBridalPic();
   $('#bridalGrid').innerHTML = BRIDAL.map((p) => `<article class="pack ${p.best ? 'best' : ''}">${p.best ? `<span class="badge">${t('bestValue')}</span>` : ''}
     <h4>${esc(L(p.name))}</h4><div class="price"><small>${t('fromWord')}</small><b>${money(p.from)}</b></div>
     <ul>${p.items.map((x) => `<li>${icon('check')} ${esc(L(x))}</li>`).join('')}</ul></article>`).join('');
@@ -146,7 +189,7 @@ function renderBridal() {
   const min = db.addDays(db.shopNow().date, 1);
   $('#quoteBox').innerHTML = `<h3>${t('requestT')}</h3><p class="sub">${t('requestSub')}</p>
     <form class="form" id="quoteForm">
-      <div class="q"><h4>${t('eventType')}</h4><div class="opts">${EVENT_TYPES.map((e) => `<button type="button" class="pill ${q.type === e.id ? 'on' : ''}" data-qtype="${e.id}" aria-pressed="${q.type === e.id}">${esc(L(e.label))}</button>`).join('')}</div></div>
+      <div class="q"><h4>${t('eventType')}</h4><div class="tiles">${EVENT_TYPES.map((e) => `<button type="button" class="tile ev-${e.id === 'wedding' ? 'wedding' : e.id} ${q.type === e.id ? 'on' : ''}" data-qtype="${e.id}" aria-pressed="${q.type === e.id}"><span class="ti">${icon({ wedding: 'gem', engagement: 'heart', henna: 'flower', party: 'sparkles' }[e.id] || 'sparkles')}</span>${esc(L(e.label))}</button>`).join('')}</div></div>
       <div class="two"><label>${t('eventDate')}<input type="date" data-qf="date" min="${min}" value="${esc(q.date)}" required /></label><label>${t('guests')}<input type="number" data-qf="people" min="1" max="40" value="${q.people}" inputmode="numeric" /></label></div>
       <div class="q"><h4>${t('needHelp')}</h4><div class="opts">${NEEDS.map((k) => `<button type="button" class="pill ${q.needs.has(k) ? 'on' : ''}" data-qneed="${k}" aria-pressed="${q.needs.has(k)}">${t('need_' + k)}</button>`).join('')}</div></div>
       <div class="two"><label>${t('yourName')}<input data-qf="name" value="${esc(q.name)}" autocomplete="name" required /></label><label>${t('yourPhone')}<input data-qf="phone" value="${esc(q.phone)}" inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78" required /></label></div>
@@ -214,7 +257,7 @@ function renderProducts() {
   const s = db.get();
   $('#prodGrid').innerHTML = `<div class="shop-bar"><span>${icon('bag')} ${t('shopNote')}</span><button class="btn ghost sm" id="bagBtn">${t('bag')} <b id="bagCount">${cartQty()}</b></button></div>` + PRODUCTS.map((p) => {
     const stock = s.stock[p.id] ?? 0; const ph = photoOf.product(p.id);
-    return `<article class="prod ${stock ? '' : 'out'}">
+    return `<article class="prod ${stock ? '' : 'out'}" style="--tint:${p.tint}">
       <div class="p-art">${ph ? `<img src="${ph}" alt="${esc(L(p.name))}" loading="lazy" />` : productArt(p.art, p.tint)}${stock && stock <= 3 ? `<span class="badge warn">${t('onlyLeft', { n: stock })}</span>` : ''}</div>
       <h3>${esc(L(p.name))}</h3><p>${esc(L(p.note))}</p>
       <footer><b>${money(p.price)}</b><button class="btn ${stock ? 'rose' : 'ghost'} sm" data-addprod="${p.id}" ${stock ? '' : 'disabled'}>${stock ? `${icon('plus')} ${t('add')}` : t('soldOut')}</button></footer></article>`;
@@ -244,7 +287,8 @@ function renderReviews() {
   const total = TEAM.reduce((n, m) => n + m.reviews, 0);
   const avg = TEAM.reduce((n, m) => n + m.rating * m.reviews, 0) / total;
   $('#revTop').innerHTML = `<div class="big-rate"><b>${avg.toFixed(1)}</b><div>${stars(avg)}<small>${t('reviewsCount', { n: total })}</small></div></div>`;
-  $('#revGrid').innerHTML = REVIEWS.map((r) => `<figure class="rev"><div>${stars(r.stars)}</div><blockquote>${esc(L(r.text))}</blockquote><figcaption>${esc(r.name)}</figcaption></figure>`).join('');
+  const cards = REVIEWS.map((r) => `<figure class="rev"><div>${stars(r.stars)}</div><blockquote>${esc(L(r.text))}</blockquote><figcaption>${esc(r.name)}</figcaption></figure>`).join('');
+  $('#revGrid').innerHTML = cards + cards;
 }
 function renderVisit() {
   const s = db.get(); const n = db.shopNow(); const o = openText();
@@ -257,12 +301,23 @@ function renderVisit() {
   $('#faq').innerHTML = `<h3>${t('faqT')}</h3>${FAQ.map((f) => `<details><summary>${esc(L(f.q))}${icon('chevron')}</summary><p>${esc(L(f.a))}</p></details>`).join('')}`;
 }
 
+// ── moments: a mosaic of every photo we have (shown once there are enough) ──
+function renderMoments() {
+  const pics = [...photoOf.hero(), ...[...new Set(SERVICES.map((x) => photoOf.service(x.id)).filter(Boolean))]].slice(0, 8);
+  const sec = $('#moments'); sec.hidden = pics.length < 6;
+  if (sec.hidden) return;
+  $('#mosaic').innerHTML = pics.map((src) => `<figure><img src="${src}" alt="" loading="lazy" decoding="async" /></figure>`).join('');
+}
+
 // ── render everything ──────────────────────────────────────────────────────
 function renderAll() {
-  applyStatic(); renderStatus(); renderHero(); renderMarquee(); renderServices(); renderTeam(); renderFinder(); renderBridal();
-  renderPointsCard(); renderGift(); renderPlans(); renderProducts(); renderReviews(); renderVisit();
+  applyStatic(); renderStatus(); renderHero(); renderQuick(); renderMarquee(); renderServices(); renderTeam(); renderFinder(); renderBridal();
+  renderPointsCard(); renderGift(); renderPlans(); renderProducts(); renderReviews(); renderMoments(); renderVisit();
   if (openedSheet() === $('#bag')) renderBag();
 }
+
+/** Stagger the reveal of siblings. */
+function stagger(sel) { $$(sel).forEach((el, i) => el.style.setProperty('--d', `${(i % 6) * 70}ms`)); }
 
 // ── events ─────────────────────────────────────────────────────────────────
 function copy(text) { try { navigator.clipboard.writeText(text); toast(t('copied')); } catch { toast(text); } }
@@ -278,7 +333,8 @@ function wire() {
     if ((x = g('[data-member]'))) { const m = memberById(x.dataset.member); openBooking({ member: m.id }); return; }
     if ((x = g('[data-ritual]'))) { const r = RITUALS.find((y) => y.id === x.dataset.ritual); openBooking({ services: r.services }); return; }
     if (g('[data-goquote]')) { document.getElementById('bridal').scrollIntoView({ behavior: 'smooth' }); return; }
-    if (g('#heroBook, #navBook, #tabBook, #liveBook')) { openBooking(); return; }
+    if (g('#heroBook')) { const v = $('#quickSvc').value; openBooking(v ? { services: [v] } : {}); return; }
+    if (g('#navBook, #tabBook')) { openBooking(); return; }
     if (g('#heroBridal')) { document.getElementById('bridal').scrollIntoView({ behavior: 'smooth' }); return; }
     if (g('#myBtn')) { openMine(); return; }
     if ((x = g('[data-svcfilter]'))) { svcFilter = x.dataset.svcfilter; renderServices(); return; }
@@ -291,7 +347,7 @@ function wire() {
     if (g('[data-giftagain]')) { gift = { ...gift, to: '', from: '', msg: '', code: '' }; renderGift(); return; }
     if ((x = g('[data-copy]'))) { copy(x.dataset.copy); return; }
     if ((x = g('[data-plan]'))) { openPlan(x.dataset.plan); return; }
-    if ((x = g('[data-addprod]'))) { addProduct(x.dataset.addprod); toast(t('addedToBag')); return; }
+    if ((x = g('[data-addprod]'))) { addProduct(x.dataset.addprod); toast(t('addedToBag')); requestAnimationFrame(() => $('#bagBtn')?.classList.add('bump')); return; }
     if (g('#bagBtn')) { renderBag(); openSheet($('#bag')); return; }
     if ((x = g('[data-bagplus]'))) { addProduct(x.dataset.bagplus, 1); renderBag(); return; }
     if ((x = g('[data-bagminus]'))) { addProduct(x.dataset.bagminus, -1); renderBag(); return; }
@@ -304,7 +360,7 @@ function wire() {
       e.preventDefault();
       gift.to = gift.to.trim(); gift.from = gift.from.trim();
       gift.code = db.createGift({ amount: gift.amount, design: gift.design, to: gift.to, from: gift.from, msg: '' }).code;
-      renderGift(); return;
+      renderGift(); burst($('#giftBox .gcard')); return;
     }
     if (f.id === 'quoteForm') {
       e.preventDefault();
@@ -356,7 +412,8 @@ function wire() {
 
   // reveal on scroll + tab bar highlight
   const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
-  $$('.sec-head, .svc, .member, .prod, .plan, .rev, .visit-card, .finder, .points-card, .gift-box, .pack, .quote-box').forEach((el) => { el.classList.add('rv'); io.observe(el); });
+  $$('.sec-head, .svc, .member, .prod, .plan, .visit-card, .finder, .points-card, .gift-box, .pack, .quote-box, .bridal-top, .mosaic figure').forEach((el) => { el.classList.add('rv'); io.observe(el); });
+  ['.member', '.prod', '.plan', '.pack', '.visit-card', '.mosaic figure'].forEach(stagger);
   const secs = ['top', 'team', 'bridal', 'club', 'visit'].map((id) => document.getElementById(id));
   const tabIo = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { $$('.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === en.target.id)); } }), { rootMargin: '-45% 0px -50% 0px' });
   secs.forEach((el) => el && tabIo.observe(el));
@@ -364,6 +421,8 @@ function wire() {
 
 renderAll();
 wire();
+petalField($('#petalField'));
+initFx();
 
 // The owner can switch the demo off (or let it expire) from the MBN DEV dashboard.
 // If the server cannot be reached the site simply stays open: nothing here is sensitive.
