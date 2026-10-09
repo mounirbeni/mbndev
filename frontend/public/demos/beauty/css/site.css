@@ -811,3 +811,4 @@ input[inputmode='tel'] { direction: ltr; }
 @media (min-width: 900px) { .bridal-pic { width: 300px; } }
 @media (min-width: 900px) { .bridal-pic { width: 340px; } }
 .bridal-pic .shape { inset: 0 2%; }
+.svc-photo { object-position: 50% 24%; }
