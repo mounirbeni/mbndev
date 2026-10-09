@@ -389,7 +389,7 @@ function place(btn) {
   const go = () => {
     const order = db.placeOrder({
       items, subtotal: tot.sub, discount: tot.promo + tot.rewardVal, fee: tot.fee, total: tot.total, promo: co.promoOff ? co.promo : '',
-      mode: co.mode, slot: co.mode === 'pickup' ? co.slot : '', table: co.table.trim(), address: co.address.trim(), name: co.name.trim(), phone: co.phone.trim(),
+      mode: co.mode, slot: co.mode === 'pickup' ? co.slot : '', table: co.mode === 'table' ? co.table.trim() : '', address: co.mode === 'delivery' ? co.address.trim() : '', name: co.name.trim(), phone: co.phone.trim(),
       pay: co.pay, stamps, usedReward: !!tot.rewardVal, lang,
     });
     // beans on a schedule become subscriptions the owner can see

@@ -23,7 +23,7 @@ const A = {
     workshops: 'Workshops & events', seats: 'Seats', booked: 'Booked', guests: 'Guests', when: 'When', name: 'Name', phone: 'Phone', none: 'No bookings yet.', quotes: 'Catering requests', company: 'Company', people: 'People', type: 'Type', date: 'Date',
     members: 'Stamp-card members', stamps: 'Stamps', visits: 'Visits', rewards: 'Rewards', since: 'Since', addStamp: '+1', giftCards: 'Gift cards sold', code: 'Code', amount: 'Amount', to: 'To', from: 'From', design: 'Design', subs: 'Bean subscriptions', bean: 'Bean', plan: 'Plan', news: 'Newsletter', subscribers: '{n} subscribers', export: 'Export CSV',
     rev14: 'Revenue · last 14 days', top: 'Best sellers', modes: 'How guests order', pays: 'Payment', byHour: 'Orders by hour · today',
-    pause: 'Pause online orders', pauseS: 'Guests can still browse the menu; the order button is disabled.', banner: 'Announcement banner', bannerS: 'Shown at the top of the website.', bannerPh: 'Leave empty for the default seasonal message', hours: 'Opening hours', closed: 'Closed', reset: 'Reset demo data', resetS: 'Puts every order, member and setting back to the start.', resetDone: 'Demo data reset',
+    pause: 'Pause online orders', pauseS: 'Guests can still browse the menu; the order button is disabled.', banner: 'Announcement banner', bannerS: 'Shown at the top of the website.', bannerPh: 'Empty = default message', hours: 'Opening hours', closed: 'Closed', reset: 'Reset demo data', resetS: 'Puts every order, member and setting back to the start.', resetDone: 'Demo data reset',
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], cur: '{n} dh', free: 'Free', sub_once: 'One-time', sub_w2: 'Every 2 weeks', sub_w4: 'Every 4 weeks', ty_office: 'Office', ty_event: 'Event', ty_wedding: 'Wedding',
   },
   fr: {
@@ -41,7 +41,7 @@ const A = {
     workshops: 'Ateliers & soirées', seats: 'Places', booked: 'Réservées', guests: 'Pers.', when: 'Quand', name: 'Nom', phone: 'Téléphone', none: 'Aucune réservation.', quotes: 'Demandes traiteur', company: 'Société', people: 'Personnes', type: 'Type', date: 'Date',
     members: 'Membres fidélité', stamps: 'Tampons', visits: 'Visites', rewards: 'Offertes', since: 'Depuis', addStamp: '+1', giftCards: 'Cartes cadeaux vendues', code: 'Code', amount: 'Montant', to: 'Pour', from: 'De', design: 'Design', subs: 'Abonnements café', bean: 'Café', plan: 'Formule', news: 'Newsletter', subscribers: '{n} abonnés', export: 'Exporter CSV',
     rev14: 'CA · 14 derniers jours', top: 'Meilleures ventes', modes: 'Mode de commande', pays: 'Paiement', byHour: 'Commandes par heure · aujourd’hui',
-    pause: 'Mettre en pause la commande en ligne', pauseS: 'Les clients voient la carte ; le bouton commander est désactivé.', banner: 'Bandeau d’annonce', bannerS: 'Affiché en haut du site.', bannerPh: 'Laisser vide pour le message de saison', hours: 'Horaires', closed: 'Fermé', reset: 'Réinitialiser la démo', resetS: 'Remet commandes, membres et réglages à zéro.', resetDone: 'Démo réinitialisée',
+    pause: 'Mettre en pause la commande en ligne', pauseS: 'Les clients voient la carte ; le bouton commander est désactivé.', banner: 'Bandeau d’annonce', bannerS: 'Affiché en haut du site.', bannerPh: 'Vide = message par défaut', hours: 'Horaires', closed: 'Fermé', reset: 'Réinitialiser la démo', resetS: 'Remet commandes, membres et réglages à zéro.', resetDone: 'Démo réinitialisée',
     days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'], cur: '{n} dh', free: 'Gratuit', sub_once: 'Une fois', sub_w2: 'Toutes les 2 semaines', sub_w4: 'Toutes les 4 semaines', ty_office: 'Bureau', ty_event: 'Événement', ty_wedding: 'Mariage',
   },
 };
@@ -143,7 +143,7 @@ function viewMenu() {
   const beanOpts = BEANS.map((b) => `<option value="${b.id}" ${b.id === s.settings.todayBean ? 'selected' : ''}>${esc(nm(b.origin))}</option>`).join('');
   return `<div class="card" style="margin-bottom:14px"><div class="frow"><div><b>${t('todayBean')}</b><small>${t('todayBeanS')}</small></div><select class="in" data-bean>${beanOpts}</select></div>
       <div class="frow"><div><b>${t('wait')}</b><small>${t('waitS')}</small></div><div class="stepper"><button data-wait="-1">−</button><output>${s.settings.wait}</output><button data-wait="1">+</button></div></div></div>
-    ${CATEGORIES.map((c) => `<div class="card" style="margin-bottom:14px"><h2>${esc(nm(c.name))}</h2><div class="tbl-wrap"><table class="t">
+    ${CATEGORIES.map((c) => `<div class="card" style="margin-bottom:14px"><h2>${esc(nm(c.name))}</h2><div class="tbl-wrap"><table class="t fit">
       <thead><tr><th>${t('item')}</th><th>${t('price')}</th><th>${t('soldOut')}</th><th>${t('hidden')}</th></tr></thead><tbody>
       ${MENU.filter((m) => m.cat === c.id).map((m) => { const st = db.itemState(m.id); return `<tr><td><b>${esc(nm(m.name))}</b>${st.soldOut ? ' <span class="chip sun">' + t('soldOut') + '</span>' : ''}</td>
         <td><input class="price-in" type="number" min="0" step="0.5" value="${db.priceOf(m)}" data-price="${m.id}" aria-label="${t('price')}"/></td>

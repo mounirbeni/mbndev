@@ -92,7 +92,11 @@ a { color: inherit; }
 .ord li b { font-weight: 800; }
 .ord li small { display: block; color: var(--muted); font-size: 12px; }
 .ord li em { color: #b45309; font-style: normal; font-weight: 700; }
-.ord-f { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.ord-f { display: grid; gap: 8px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.ord-f > span { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
+.ord-f > div { display: flex; gap: 8px; }
+.ord-f > div .abtn { flex: 1 1 auto; }
+.ord-f > div .abtn.danger { flex: 0 0 auto; }
 .ord-f span { font-weight: 800; font-variant-numeric: tabular-nums; }
 .ord-f small { font-weight: 600; color: var(--muted); font-size: 12px; }
 .empty-col { text-align: center; color: var(--muted); font-size: 13px; padding: 18px 8px; border: 1.5px dashed var(--line); border-radius: 14px; }
@@ -181,3 +185,21 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 @media (min-width: 900px) { .only-small { display: none; } }
 .top-r { flex-wrap: wrap; }
 @media (max-width: 899px) { .kpis .kpi:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+
+/* phones: wide tables scroll sideways inside their card instead of squeezing the columns */
+@media (max-width: 700px) {
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.t { min-width: 540px; }
+  .t td:first-child, .t th:first-child { position: sticky; inset-inline-start: 0; background: var(--paper); z-index: 1; box-shadow: 8px 0 8px -8px rgba(23, 18, 14, 0.12); }
+}
+
+@media (max-width: 700px) {
+  table.t.fit { min-width: 0; }
+  .t.fit td:first-child, .t.fit th:first-child { position: static; box-shadow: none; background: none; }
+  .t.fit td, .t.fit th { padding-inline: 6px; }
+  .price-in { width: 72px; }
+  /* opening hours: day · switch · open · close on one row, all inputs fully readable */
+  .hours-grid div { grid-template-columns: 44px 46px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+  .hours-grid .in { padding: 0 4px 0 8px; font-size: 14px; min-height: 40px; }
+  .hours-grid input[type='time']::-webkit-calendar-picker-indicator { display: none; }
+}
