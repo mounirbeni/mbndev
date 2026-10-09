@@ -209,7 +209,7 @@ export const PHOTOS = {
   shop: false,
   barber: SET('younes', 'anas', 'ilyas', 'soufiane'),    // img/barber-<id>.webp
   style: SET('skinfade', 'taper', 'classic', 'long', 'beardfull'), // img/style-<id>.webp (no 'crop' photo yet)
-  product: SET(),                            // img/prod-<id>.webp
+  product: SET('clay', 'pomade', 'salt', 'oil', 'balm', 'after', 'shampoo', 'comb'), // img/prod-<id>.webp
 };
 export const photoOf = {
   hero: () => Array.from({ length: PHOTOS.hero || 0 }, (_, i) => `/demos/barber/img/hero-${i + 1}.webp`),

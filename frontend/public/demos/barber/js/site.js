@@ -206,7 +206,7 @@ function renderBag() {
   const lines = s.cart.map((i) => { const p = PRODUCTS.find((x) => x.id === i.id); return { ...i, p }; });
   const total = lines.reduce((n, l) => n + l.p.price * l.qty, 0);
   const el = $('#bag');
-  el.innerHTML = `${sheetHead(t('yourBag'), t('shopNote'))}<div class="sheet-body">${lines.length ? lines.map((l) => `<div class="bag-line"><div class="bl-art">${productArt(l.p.art, l.p.tint)}</div><div><b>${esc(L(l.p.name))}</b><small>${money(l.p.price)}</small></div>
+  el.innerHTML = `${sheetHead(t('yourBag'), t('shopNote'))}<div class="sheet-body">${lines.length ? lines.map((l) => `<div class="bag-line"><div class="bl-art">${photoOf.product(l.p.id) ? `<img src="${photoOf.product(l.p.id)}" alt="" />` : productArt(l.p.art, l.p.tint)}</div><div><b>${esc(L(l.p.name))}</b><small>${money(l.p.price)}</small></div>
       <div class="qty"><button data-bagminus="${l.id}" aria-label="−">${icon('minus')}</button><span>${l.qty}</span><button data-bagplus="${l.id}" aria-label="+">${icon('plus')}</button></div></div>`).join('')
     + `<form class="form" id="bagForm"><label>${t('yourName')}<input name="name" required autocomplete="name" /></label><label>${t('yourPhone')}<input name="phone" required inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78" /></label>
        <div class="sum"><div class="tot"><span>${t('total')}</span><b>${money(total)}</b></div></div><p class="pay-note">${icon('wallet')} ${t('payInShop')}</p><button class="btn gold block" type="submit">${t('reserve')}</button></form>`
