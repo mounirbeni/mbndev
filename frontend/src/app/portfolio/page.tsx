@@ -30,6 +30,25 @@ const projects: {
   highlight: string;
 }[] = [
   {
+    id: 23,
+    title: 'TARZ Barber Club',
+    image: '/images/portfolio/tarz-barber.png',
+    url: 'https://mbndev.ma/demo/barber',
+    category: 'Hospitality',
+    type: 'Barbershop Booking + Owner Dashboard',
+    description: 'Barbershop concept with real-time online booking per barber, a live walk-in queue, a style finder, stamp card, gift cards, monthly plans and a click-and-collect shop — plus an owner dashboard for the chairs, calendar, clients and insights. English, French and Arabic.',
+    tags: ['Online Booking', 'Live Queue', 'Owner Dashboard', 'EN / FR / AR'],
+    gradient: 'from-amber-700/35 to-emerald-900/25',
+    accent: 'text-amber-300',
+    border: 'border-amber-500/20',
+    stats: [
+      { label: 'Booking',   value: 'Real-time' },
+      { label: 'Includes',  value: 'Dashboard' },
+      { label: 'Languages', value: 'EN/FR/AR'  },
+    ],
+    highlight: 'Booking engine, live queue and owner dashboard in one demo',
+  },
+  {
     id: 22,
     title: 'NOUR Coffee Atelier',
     image: '/images/portfolio/nour-coffee.png',
