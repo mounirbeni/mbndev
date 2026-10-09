@@ -14,6 +14,7 @@ const bcrypt = require('bcryptjs');
 // Add a demo here (and ship its static files) to make it appear in the dashboard.
 const CATALOG = [
   { slug: 'coffee', name: 'NOUR Coffee Atelier', path: '/demo/coffee', adminPath: '/demo/coffee/admin', defaultPin: '2468' },
+  { slug: 'barber', name: 'TARZ Barber Club', path: '/demo/barber', adminPath: '/demo/barber/admin', defaultPin: '1357' },
 ];
 
 const catalogEntry = (slug) => CATALOG.find((d) => d.slug === slug) || null;

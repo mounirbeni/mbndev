@@ -1,0 +1,10 @@
+{
+  "name": "TARZ Barber Club (demo)",
+  "short_name": "TARZ",
+  "start_url": "/demo/barber",
+  "scope": "/demo/barber",
+  "display": "standalone",
+  "background_color": "#0d1210",
+  "theme_color": "#0d1210",
+  "icons": [{ "src": "/demos/barber/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
