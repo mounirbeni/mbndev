@@ -220,4 +220,4 @@ export const photoOf = {
 };
 
 // Which style photo illustrates which service card (the others keep their drawn icon).
-export const SERVICE_PHOTO = { fade: 'skinfade', classic: 'classic', taper: 'taper', scissor: 'long', cutbeard: 'beardfull', beardsculpt: 'beardfull' };
+export const SERVICE_PHOTO = { fade: 'skinfade', classic: 'classic', taper: 'taper', buzz: 'crop', scissor: 'long', cutbeard: 'beardfull', beardsculpt: 'beardfull' };
