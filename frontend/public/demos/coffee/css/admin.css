@@ -173,3 +173,11 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 @media (max-width: 899px) {
   .side .s-brand small { display: none; }
 }
+
+/* language switch in the top bar on phones/tablets (the sidebar footer is hidden there) */
+.seg.on-light { background: rgba(23, 18, 14, 0.07); }
+.seg.on-light button { color: var(--muted); }
+.seg.on-light button[aria-pressed='true'] { background: var(--ink); color: #fff; }
+@media (min-width: 900px) { .only-small { display: none; } }
+.top-r { flex-wrap: wrap; }
+@media (max-width: 899px) { .kpis .kpi:last-child:nth-child(odd) { grid-column: 1 / -1; } }

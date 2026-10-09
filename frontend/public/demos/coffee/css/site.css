@@ -123,7 +123,7 @@ html[dir='rtl'] .hero h1 em { font-style: normal; font-weight: 800; }
 .hero-glass { position: relative; width: 68%; aspect-ratio: 1; border-radius: 50%; overflow: hidden; z-index: 2; border: 4px solid var(--milk); box-shadow: 0 14px 30px -12px rgba(23, 18, 14, 0.5); background: #f4e8dc; }
 .hero-glass .hp { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.7s, transform 0.7s cubic-bezier(.2, .8, .2, 1); }
 .hero-glass .hp.out { opacity: 0; transform: scale(1.08); }
-.hero-label { position: absolute; top: 9%; inset-inline-end: -2%; z-index: 3; background: var(--ink); color: var(--paper); border-radius: 16px; padding: 10px 14px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); transform: rotate(3deg); max-width: 56%; }
+.hero-label { position: absolute; top: 9%; inset-inline-end: 3%; z-index: 3; background: var(--ink); color: var(--paper); border-radius: 16px; padding: 10px 14px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); transform: rotate(3deg); max-width: 56%; }
 .hero-label b { display: block; font: 700 18px/1.1 var(--display); }
 .hero-label small { color: var(--sun-2); font-family: var(--mono); }
 .steam path { animation: steam 2.8s ease-in-out infinite; }
@@ -184,15 +184,17 @@ html[dir='rtl'] .marquee .track { animation-name: marquee-rtl; }
 .fav.pop svg { animation: heart 0.45s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes heart { 40% { transform: scale(1.3); } }
 .sold-veil { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; background: rgba(23, 18, 14, 0.45); color: #fff; font-weight: 800; font-size: 14px; }
-.item .body { padding: 12px 4px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
-.item h4 { margin: 0; font: 650 18px/1.2 var(--display); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item .body { padding: 12px 4px 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.item h4 { margin: 0; font: 650 18px/1.2 var(--display); letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 html[dir='rtl'] .item h4 { font-size: 16px; }
-.item p { margin: 0; font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.item .ifoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.price { font: 500 15px/1.2 var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.price b { color: var(--ink); font-weight: 700; }
+.item p { margin: 0; font-size: 13.5px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item .ifoot { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 8px; }
+.price { font: 700 17px/1 var(--ui); font-variant-numeric: tabular-nums; }
 .price small { font-size: 12px; color: var(--muted); font-weight: 600; }
-.plus { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-size: 19px; line-height: 1; flex-shrink: 0; transition: background 0.2s, transform 0.2s; }
+.item .price { display: flex; flex-direction: column; font: 500 15px/1.2 var(--ui); color: var(--muted); min-width: 0; }
+.item .price > small { font-size: 11.5px; line-height: 1.2; }
+.item .price b { color: var(--ink); font-weight: 700; white-space: nowrap; }
+.plus { width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-size: 19px; line-height: 1; flex-shrink: 0; transition: background 0.2s, transform 0.2s; }
 .item:hover .plus { background: var(--sun); transform: rotate(90deg); }
 .item.sold { opacity: 0.7; }
 .item.sold .plus { display: none; }
@@ -282,6 +284,7 @@ html[dir='rtl'] .livepill { translate: 50% 0; }
 
 /* ── beans ────────────────────────────────────────────────────────────── */
 .compass-grid { display: grid; gap: 24px; }
+.compass { width: min(100%, 520px); margin-inline: auto; }
 .compass { position: relative; padding: 30px 30px; }
 .ax { position: absolute; font: 700 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
 html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
@@ -303,9 +306,9 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
 .knob { position: absolute; width: 46px; height: 46px; translate: -50% -50%; border-radius: 50%; border: 3px solid var(--paper); background: var(--ink); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 0 0 10px rgba(23, 18, 14, 0.12); cursor: grab; z-index: 3; touch-action: none; }
 .knob::after { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: var(--sun); }
 .knob:active { cursor: grabbing; }
-.match { display: grid; grid-template-columns: 130px 1fr; gap: 18px; align-content: start; background: var(--paper); border: 1px solid var(--line); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); min-width: 0; }
+.match { container-type: inline-size; display: grid; grid-template-columns: minmax(0, 130px) minmax(0, 1fr); gap: 18px; align-content: start; background: var(--paper); border: 1px solid var(--line); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); min-width: 0; }
 .match .bagart img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 18px; display: block; box-shadow: 0 10px 24px -14px rgba(23, 18, 14, 0.5); }
-.match h3 { margin: 4px 0 6px; font: 650 30px/1.05 var(--display); }
+.match h3 { margin: 4px 0 6px; font: 650 clamp(21px, 8.2cqi, 30px)/1.1 var(--display); overflow-wrap: anywhere; }
 .match .notes { font-weight: 600; margin: 0; }
 .specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
 .specs div { background: var(--milk); border-radius: 12px; padding: 8px 10px; min-width: 0; }
@@ -480,7 +483,8 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
   .item .stage { border-radius: 22px; }
   .item h4 { font-size: 16px; font-family: var(--ui); font-weight: 700; letter-spacing: 0; }
   .item p { display: none; }
-  .price { font-size: 14px; }
+  .item .price { font-size: 14px; }
+  .item .price > small { font-size: 11px; }
   .pick { font-size: 12px; padding: 6px 11px; bottom: 10px; inset-inline-start: 10px; }
   .badge-new { font-size: 12px; padding: 6px 12px; top: 10px; inset-inline-start: 10px; }
   .fav svg { width: 28px; height: 28px; }
@@ -499,7 +503,6 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
   .builder .preview > .art { height: 360px; }
   .builder .preview img.photo { min-height: 420px; }
   .status { display: inline-flex; }
-  .compass-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
   .brew-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .loy-grid, .gift-grid, .visit-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .catering { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: start; }
@@ -512,6 +515,7 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
   .foot { padding-bottom: 56px; }
 }
 @media (min-width: 1024px) {
+  .compass-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
   .hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
   .links { display: flex; }
   .menu-wrap { grid-template-columns: 200px minmax(0, 1fr); align-items: start; }
@@ -523,7 +527,7 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
 }
 @media (max-width: 420px) {
   .two { grid-template-columns: 1fr; }
-  .match { grid-template-columns: 90px 1fr; padding: 16px; }
+  .match { grid-template-columns: minmax(0, 90px) minmax(0, 1fr); padding: 16px; }
   .specs { grid-template-columns: repeat(2, 1fr); }
   .nav { gap: 10px; }
   .brand small { display: none; }

@@ -139,7 +139,7 @@ function card(m) {
       <button class="fav" type="button" data-fav="${m.id}" aria-pressed="${fav}" aria-label="${esc(t('saveFav'))}">${HEART}</button>
       ${sold ? `<span class="sold-veil">${t('soldOut')}</span>` : ''}</div>
     <div class="body"><h4>${esc(L(m.name))}</h4><p>${esc(L(m.desc))}</p>
-      <div class="ifoot"><span class="price">${sized ? t('fromP', { p: `<b>${money(db.priceOf(m) - 4)}</b>` }) : `<b>${money(db.priceOf(m))}</b>`}</span>${sold ? '' : '<span class="plus" aria-hidden="true">+</span>'}</div></div>
+      <div class="ifoot"><span class="price">${sized ? `<small>${t('from')}</small>` : ''}<b>${money(sized ? db.priceOf(m) - 4 : db.priceOf(m))}</b></span>${sold ? '' : '<span class="plus" aria-hidden="true">+</span>'}</div></div>
   </article>`;
 }
 let catObs;
@@ -438,12 +438,13 @@ function renderLivePill() {
 }
 
 // ── beans: flavour compass ────────────────────────────────────────────────
-const bean = { x: -0.35, y: -0.25, size: '250', grind: 'filter', plan: 'once' };
+const bean = { x: -0.1, y: -0.55, size: '250', grind: 'filter', plan: 'once' };
 const nearest = () => BEANS.map((b) => ({ b, d: Math.hypot(b.x - bean.x, b.y - bean.y) })).sort((a, z) => a.d - z.d);
+const shortName = (b) => { const n = L(b.origin).split('·').pop().trim(); return n.length > 12 ? n.split(' ')[0] : n; };
 function renderCompass() {
   const best = nearest()[0].b;
   const pos = (v) => `${((v + 1) / 2) * 84 + 8}%`;
-  $('#beanDots').innerHTML = BEANS.map((b) => `<div class="bdot ${b === best ? 'best' : ''}" style="left:${pos(b.x)};top:${pos(b.y)};--c:${b.color}"><i></i><span>${esc(L(b.origin).split('·').pop().trim())}</span></div>`).join('');
+  $('#beanDots').innerHTML = BEANS.map((b) => `<div class="bdot ${b === best ? 'best' : ''}" style="left:${pos(b.x)};top:${pos(b.y)};--c:${b.color}"><i></i><span>${esc(shortName(b))}</span></div>`).join('');
   const k = $('#knob'); k.style.left = pos(bean.x); k.style.top = pos(bean.y);
   const size = BEAN_SIZES.find((x) => x.id === bean.size);
   const plan = SUB_PLANS.find((p) => p.id === bean.plan);

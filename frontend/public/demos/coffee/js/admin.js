@@ -78,7 +78,8 @@ function ding() {
 function applyStatic() {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-a]').forEach((el) => { el.textContent = t(el.dataset.a); });
-  $('#alang').innerHTML = ['en', 'fr'].map((l) => `<button aria-pressed="${l === lang}" data-lang="${l}">${l.toUpperCase()}</button>`).join('');
+  const lb = ['en', 'fr'].map((l) => `<button aria-pressed="${l === lang}" data-lang="${l}">${l.toUpperCase()}</button>`).join('');
+  $('#alang').innerHTML = lb; $('#alang2').innerHTML = lb;
 }
 function renderTabs() {
   const s = db.get();
