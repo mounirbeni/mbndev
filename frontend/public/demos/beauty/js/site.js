@@ -114,25 +114,34 @@ function renderQuick() {
 }
 
 // ── treatments ─────────────────────────────────────────────────────────────
-let svcFilter = 'all';
-let svcAll = false;
-const SVC_PREVIEW = 12;
-const svcVisual = (s) => { const p = photoOf.service(s.id); return p ? `<img class="svc-photo" src="${p}" alt="" loading="lazy" decoding="async" />` : serviceArt(s.art); };
+let svcFilter = 'hair';
+let svcQuery = '';
+/** One calm cover photo per category: the most-booked treatment that has a photo. */
+function coverOf(catId) {
+  const list = db.services().filter((s) => s.cat === catId);
+  const hit = list.find((s) => s.pop && photoOf.service(s.id)) || list.find((s) => photoOf.service(s.id));
+  return hit ? photoOf.service(hit.id) : '';
+}
+/** The treatment menu: a refined list by category (like a spa menu), searchable, no repeated photos. */
 function renderServices() {
-  const cats = [{ id: 'all', icon: 'sparkles', name: { en: t('all'), fr: t('all'), ar: t('all') } }, ...CATEGORIES];
-  $('#svcFilters').innerHTML = cats.map((c) => `<button class="bub c-${c.id} ${svcFilter === c.id ? 'on' : ''}" role="tab" aria-selected="${svcFilter === c.id}" data-svcfilter="${c.id}"><span class="bub-ic">${icon(c.icon)}</span><small>${esc(L(c.name))}</small></button>`).join('');
-  const hot = new Set(db.services().filter((s) => s.pop).slice(0, 3).map((s) => s.id)); // the label only means something when it is rare
-  let list = db.services().filter((s) => svcFilter === 'all' || s.cat === svcFilter);
-  const total = list.length;
-  // the full menu is long: start with the most-booked ones and let her open the rest
-  const preview = svcFilter === 'all' && !svcAll && total > SVC_PREVIEW;
-  if (preview) list = [...list].sort((a, b) => (b.pop ? 1 : 0) - (a.pop ? 1 : 0)).slice(0, SVC_PREVIEW);
-  $('#svcGrid').innerHTML = list.map((s) => `<article class="svc c-${s.cat} ${hot.has(s.id) ? 'pop' : ''}">
-      <div class="svc-art">${svcVisual(s)}${hot.has(s.id) ? `<span class="badge">${t('popular')}</span>` : ''}</div>
-      <div class="svc-body"><h3>${esc(L(s.name))}</h3><p>${esc(L(s.desc))}</p></div>
-      <footer><span class="meta"><b>${money(s.price)}</b><small>${icon('clock')} ${mins(s.dur)}</small></span><button class="btn rose sm" data-svc="${s.id}">${t('book')}</button></footer>
-    </article>`).join('') + (svcFilter === 'all' && total > SVC_PREVIEW ? `<div class="more-row"><button class="btn ghost" data-svcmore>${preview ? t('showAll', { n: total }) : t('showLess')} ${icon('chevron')}</button></div>` : '');
-  stagger('#svcGrid .svc');
+  const q = svcQuery.trim().toLowerCase();
+  const all = db.services();
+  const hot = new Set(all.filter((s) => s.pop).slice(0, 3).map((s) => s.id)); // the label only means something when it is rare
+  $('#svcFilters').innerHTML = CATEGORIES.map((c) => {
+    const on = !q && svcFilter === c.id;
+    return `<button class="mcat ${on ? 'on' : ''}" role="tab" aria-selected="${on}" data-svcfilter="${c.id}"><span class="mcat-nm">${esc(L(c.name))}</span><small>${all.filter((s) => s.cat === c.id).length}</small></button>`;
+  }).join('');
+  const list = q ? all.filter((s) => `${L(s.name)} ${L(s.desc)}`.toLowerCase().includes(q)) : all.filter((s) => s.cat === svcFilter);
+  const cat = CATEGORIES.find((c) => c.id === svcFilter);
+  $('#menuTitle').textContent = q ? t('searchResults', { n: list.length }) : L(cat.name);
+  const cover = q ? '' : coverOf(svcFilter);
+  const cv = $('#menuCover'); cv.hidden = !cover;
+  cv.innerHTML = cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async" /><figcaption>${esc(L(cat.name))}</figcaption>` : '';
+  $('#svcGrid').innerHTML = list.length ? list.map((s) => `<article class="mrow">
+      <div class="mrow-main"><h4>${esc(L(s.name))}${hot.has(s.id) ? `<em class="hot">${t('popular')}</em>` : ''}</h4><p>${esc(L(s.desc))}</p></div>
+      <div class="mrow-side"><b>${money(s.price)}</b><small>${icon('clock')} ${mins(s.dur)}</small></div>
+      <button class="mrow-book" data-svc="${s.id}">${t('book')}<span aria-hidden="true">${icon('arrowRight')}</span></button>
+    </article>`).join('') : `<p class="menu-empty">${t('noMatch')}</p>`;
 }
 
 // ── team ───────────────────────────────────────────────────────────────────
@@ -353,8 +362,7 @@ function wire() {
     if (g('#navBook, #tabBook')) { openBooking(); return; }
     if (g('#heroBridal')) { document.getElementById('bridal').scrollIntoView({ behavior: 'smooth' }); return; }
     if (g('#myBtn')) { openMine(); return; }
-    if ((x = g('[data-svcfilter]'))) { svcFilter = x.dataset.svcfilter; renderServices(); return; }
-    if (g('[data-svcmore]')) { svcAll = !svcAll; renderServices(); return; }
+    if ((x = g('[data-svcfilter]'))) { svcFilter = x.dataset.svcfilter; svcQuery = ''; const si = $('#svcSearch'); if (si) si.value = ''; renderServices(); return; }
     if ((x = g('[data-fnd]'))) { fnd[x.dataset.fnd] = x.dataset.val; renderFinder(); return; }
     if ((x = g('[data-qtype]'))) { quoteState.type = x.dataset.qtype; renderBridal(); return; }
     if ((x = g('[data-qneed]'))) { const k = x.dataset.qneed; if (quoteState.needs.has(k)) quoteState.needs.delete(k); else quoteState.needs.add(k); renderBridal(); return; }
@@ -406,6 +414,7 @@ function wire() {
   });
   document.addEventListener('input', (e) => {
     const d = e.target.dataset || {};
+    if (e.target.id === 'svcSearch') { svcQuery = e.target.value; renderServices(); return; }
     if (d.gf) gift[d.gf] = e.target.value;
     if (d.qf) quoteState[d.qf] = e.target.value;
   });
@@ -429,7 +438,7 @@ function wire() {
 
   // reveal on scroll + tab bar highlight
   const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
-  $$('.sec-head, .svc, .member, .prod, .plan, .visit-card, .finder, .points-card, .gift-box, .pack, .quote-box, .bridal-top, .mosaic figure').forEach((el) => { el.classList.add('rv'); io.observe(el); });
+  $$('.sec-head, .mrow, .member, .prod, .plan, .visit-card, .finder, .points-card, .gift-box, .pack, .quote-box, .bridal-top, .mosaic figure').forEach((el) => { el.classList.add('rv'); io.observe(el); });
   ['.member', '.prod', '.plan', '.pack', '.visit-card', '.mosaic figure'].forEach(stagger);
   const secs = ['top', 'team', 'bridal', 'more', 'visit'].map((id) => document.getElementById(id));
   const tabIo = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { $$('.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === en.target.id)); } }), { rootMargin: '-45% 0px -50% 0px' });

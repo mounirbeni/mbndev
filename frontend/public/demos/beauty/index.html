@@ -77,8 +77,19 @@
   <section class="sec" id="book">
     <div class="wrap">
       <div class="sec-head rv"><p class="eyebrow" data-t="s_book_eyebrow"></p><h2><span data-t="s_book_a"></span> <em data-t="s_book_b"></em></h2><p class="sub" data-t="s_book_sub"></p></div>
-      <div class="filters" id="svcFilters" role="tablist"></div>
-      <div class="svc-grid" id="svcGrid"></div>
+      <div class="menu">
+        <aside class="menu-side">
+          <div class="menu-cats" id="svcFilters" role="tablist"></div>
+          <figure class="menu-cover" id="menuCover" hidden></figure>
+        </aside>
+        <div class="menu-main">
+          <div class="menu-head">
+            <h3 id="menuTitle"></h3>
+            <input class="menu-search" id="svcSearch" type="search" autocomplete="off" data-t-ph="searchTreat" data-t-aria="searchTreat" />
+          </div>
+          <div class="menu-list" id="svcGrid"></div>
+        </div>
+      </div>
       <details class="ritual" id="ritual">
         <summary><span data-ic="sparkles"></span><span data-t="ritualHelp"></span><span class="chev" data-ic="chevron"></span></summary>
         <div class="finder" id="finder"></div>
