@@ -918,3 +918,19 @@ input[inputmode='tel'] { direction: ltr; }
 .gift-box { grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .gift-box > *, .gift-box .form > * { min-width: 0; }
 .gcard { width: 100%; max-width: min(350px, 100%); }
+/* header: between 900 and 1180px there is room for the links or for the CTA, not both */
+@media (min-width: 900px) and (max-width: 1179px) { .nav-end .hide-s { display: none; } .links a { padding: 9px 10px; } .nav { gap: 10px; } }
+/* result card and shop cards: grid items may shrink instead of pushing their neighbours out */
+.finder, .result { min-width: 0; }
+.finder > * { min-width: 0; }
+@media (min-width: 900px) { .finder { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); } .result { grid-template-columns: 220px minmax(0, 1fr); } }
+.r-art, .r-body { min-width: 0; }
+.prod > * { min-width: 0; }
+.prod footer { flex-wrap: wrap; row-gap: 8px; }
+.prod footer .btn { flex: 1 1 auto; min-width: 0; }
+.prod h3, .prod p, .r-body h3, .r-body p, .r-body li { overflow-wrap: anywhere; }
+.btn { max-width: 100%; }
+.r-body .btn { white-space: normal; text-align: center; }
+@media (min-width: 900px) and (max-width: 1100px) { .quick .btn { padding-inline: 16px; } }
+.portrait .state { max-width: calc(100% - 20px); white-space: normal; text-align: center; line-height: 1.15; justify-content: center; }
+.quick .btn { flex: 0 1 auto; min-width: 0; white-space: normal; text-align: center; line-height: 1.2; }
