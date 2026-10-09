@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Bennani &amp; Associés — Law firm in Casablanca · Demo</title>
+<meta name="description" content="Book a consultation with the right lawyer, follow your case online and upload documents securely. A demo law-firm website by MBN DEV." />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#17294a" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Bennani" />
+<link rel="icon" href="/demos/law/icon.svg" type="image/svg+xml" />
+<link rel="manifest" href="/demos/law/manifest.webmanifest" />
+<meta property="og:title" content="Bennani &amp; Associés — demo by MBN DEV" />
+<meta property="og:description" content="A law-firm website with lawyer-by-specialty booking, online case tracking, secure document upload and a full owner dashboard." />
+<link rel="preload" href="/demos/law/fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/demos/law/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/demos/law/css/fonts.css" />
+<link rel="stylesheet" href="/demos/law/css/site.css" />
+</head>
+<body>
+<a class="skip" href="#areas">Skip to practice areas</a>
+<div class="sprog" aria-hidden="true"></div>
+
+<!-- Demo notice (MBN DEV) -->
+<div class="demobar" id="demobar">
+  <span class="dot"></span><span data-t="demoBar"></span>
+  <a href="https://mbndev.ma/contact" target="_blank" rel="noopener" data-t="demoCta"></a>
+  <button class="x" id="demobarClose" aria-label="Close">×</button>
+</div>
+<div class="announce" id="announce" hidden><span id="announceText"></span></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="Bennani &amp; Associés">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#17294a"/><path d="M9 29h22M12 29V17m5 12V17m6 12V17m5 12V17M8 17l12-8 12 8Z" fill="none" stroke="#e8d3a2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>BENNANI<small data-t="brandSub"></small></span>
+  </a>
+  <nav class="links" aria-label="Sections">
+    <a href="#areas" data-t="nav_areas"></a><a href="#team" data-t="nav_team"></a><a href="#track" data-t="nav_track"></a>
+    <a href="#fees" data-t="nav_fees"></a><a href="#contact" data-t="nav_contact"></a>
+  </nav>
+  <div class="nav-end">
+    <span class="status" id="navStatus"></span>
+    <div id="langs"></div>
+    <button class="iconbtn" id="myBtn" aria-label="My appointments"></button>
+    <a class="btn ghost sm hide-s" href="#track" data-t="trackCase"></a>
+    <button class="btn pri sm hide-s" id="navBook" data-t="bookConsult"></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="rule"></span><span data-t="heroEyebrow"></span></p>
+        <h1 id="heroTitle"><span data-t="heroA"></span> <em data-t="heroB"></em></h1>
+        <p class="lead" data-t="heroLead"></p>
+        <div class="quick" role="group">
+          <label class="quick-field"><small data-t="iNeedHelp"></small><select id="quickArea"></select></label>
+          <button class="btn pri" id="heroBook"><span data-t="findTime"></span><span data-ic="arrowRight"></span></button>
+        </div>
+        <div class="hero-links">
+          <button class="link-btn" id="heroCall"><span data-ic="phone"></span><span data-t="freeCall"></span></button>
+          <a class="link-btn" href="#track"><span data-ic="folder"></span><span data-t="trackCase"></span></a>
+        </div>
+      </div>
+      <div class="stage" id="stage">
+        <div class="frame" id="heroFrame"></div>
+        <aside class="live" id="liveCard" aria-live="polite"></aside>
+        <div class="badge-card"><span data-ic="lock"></span><div><b data-t="secrecyT"></b><small data-t="secrecyS"></small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="facts" aria-label="Key figures"><div class="wrap" id="facts"></div></section>
+
+  <section class="sec" id="areas">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_areas_eyebrow"></span></p><h2><span data-t="s_areas_a"></span> <em data-t="s_areas_b"></em></h2><p class="sub" data-t="s_areas_sub"></p></div>
+      <div class="areas" id="areasList"></div>
+    </div>
+  </section>
+
+  <section class="sec tint" id="finder">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_find_eyebrow"></span></p><h2><span data-t="s_find_a"></span> <em data-t="s_find_b"></em></h2><p class="sub" data-t="s_find_sub"></p></div>
+      <div class="finder" id="finderBox"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="team">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_team_eyebrow"></span></p><h2><span data-t="s_team_a"></span> <em data-t="s_team_b"></em></h2><p class="sub" data-t="s_team_sub"></p></div>
+      <div class="team-grid" id="teamGrid"></div>
+    </div>
+  </section>
+
+  <section class="sec navy" id="track">
+    <div class="wrap">
+      <div class="track-grid">
+        <div class="track-intro rv">
+          <p class="eyebrow"><span class="rule"></span><span data-t="s_track_eyebrow"></span></p>
+          <h2><span data-t="s_track_a"></span> <em data-t="s_track_b"></em></h2>
+          <p class="sub" data-t="s_track_sub"></p>
+          <form class="lookup" id="trackForm">
+            <label><span data-t="fileNo"></span><input id="trackRef" autocomplete="off" autocapitalize="characters" placeholder="DOS-2026-0142" dir="ltr" /></label>
+            <label><span data-t="yourPhone"></span><input id="trackPhone" inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78" /></label>
+            <p class="err" id="trackErr" role="alert"></p>
+            <div class="row-btns"><button class="btn pri" type="submit"><span data-ic="search"></span><span data-t="openFile"></span></button><button class="btn ghost-light" type="button" id="trackDemo" data-t="useDemo"></button></div>
+            <ul class="perks"><li><span data-ic="check"></span><span data-t="trackPerk1"></span></li><li><span data-ic="check"></span><span data-t="trackPerk2"></span></li><li><span data-ic="check"></span><span data-t="trackPerk3"></span></li></ul>
+          </form>
+        </div>
+        <div class="casefile rv" id="caseFile"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="how">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_how_eyebrow"></span></p><h2><span data-t="s_how_a"></span> <em data-t="s_how_b"></em></h2></div>
+      <ol class="steps4" id="howSteps"></ol>
+    </div>
+  </section>
+
+  <section class="sec tint" id="fees">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_fees_eyebrow"></span></p><h2><span data-t="s_fees_a"></span> <em data-t="s_fees_b"></em></h2><p class="sub" data-t="s_fees_sub"></p></div>
+      <div class="meets" id="meetList"></div>
+      <h3 class="mini-h" data-t="plansT"></h3>
+      <p class="sub plans-sub" data-t="plansSub"></p>
+      <div class="plans" id="plans"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="reviews">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_rev_eyebrow"></span></p><h2><span data-t="s_rev_a"></span> <em data-t="s_rev_b"></em></h2></div>
+      <div class="rev-top" id="revTop"></div>
+      <div class="rev-grid" id="revGrid"></div>
+    </div>
+  </section>
+
+  <section class="sec tint office" id="office" hidden>
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_office_eyebrow"></span></p><h2><span data-t="s_office_a"></span> <em data-t="s_office_b"></em></h2></div>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="contact">
+    <div class="wrap">
+      <div class="sec-head rv"><p class="eyebrow"><span class="rule"></span><span data-t="s_contact_eyebrow"></span></p><h2><span data-t="s_contact_a"></span> <em data-t="s_contact_b"></em></h2></div>
+      <div class="contact-grid">
+        <div class="card faq" id="faq"></div>
+        <div class="card visit" id="visitCard"></div>
+        <div class="card callback" id="callbackCard"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-row"><b>BENNANI &amp; ASSOCIÉS</b><span data-t="footTag"></span></div>
+    <p class="fine" data-t="footFine"></p>
+    <p class="fine"><a href="/demo/law/admin" data-t="ownerLink"></a> · <a href="https://mbndev.ma" target="_blank" rel="noopener">MBN DEV</a></p>
+  </div>
+</footer>
+
+<nav class="tabbar" aria-label="Quick">
+  <a href="#top" data-tab="top"><span data-ic="home"></span><small data-t="tab_home"></small></a>
+  <a href="#areas" data-tab="areas"><span data-ic="scale"></span><small data-t="nav_areas"></small></a>
+  <button class="tab-book" id="tabBook" aria-label="Book"><span data-ic="calendar"></span></button>
+  <a href="#track" data-tab="track"><span data-ic="folder"></span><small data-t="tab_track"></small></a>
+  <a href="#contact" data-tab="contact"><span data-ic="phone"></span><small data-t="nav_contact"></small></a>
+</nav>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet modal" id="sheet" role="dialog" aria-modal="true" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="/demos/law/js/site.js"></script>
+</body>
+</html>

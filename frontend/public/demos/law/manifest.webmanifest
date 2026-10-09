@@ -1,0 +1,11 @@
+{
+  "name": "Bennani & Associés — Demo",
+  "short_name": "Bennani",
+  "description": "Demo law-firm website by MBN DEV",
+  "start_url": "/demo/law",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f2ea",
+  "theme_color": "#17294a",
+  "icons": [{ "src": "/demos/law/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

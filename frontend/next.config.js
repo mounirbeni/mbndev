@@ -76,6 +76,8 @@ const nextConfig = {
       { source: '/demo/barber/admin', destination: '/demos/barber/admin.html' },
       { source: '/demo/beauty',       destination: '/demos/beauty/index.html' },
       { source: '/demo/beauty/admin', destination: '/demos/beauty/admin.html' },
+      { source: '/demo/law',          destination: '/demos/law/index.html' },
+      { source: '/demo/law/admin',    destination: '/demos/law/admin.html' },
     ];
     return isProd
       ? demos // /api is handled by vercel.json rewrites in prod
