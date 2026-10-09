@@ -83,11 +83,11 @@ let heroI = 0;
 function renderHero() {
   const item = MENU.find((m) => m.id === HERO[heroI % HERO.length]);
   const box = $('#heroGlass');
-  const old = box.querySelector('.art');
-  box.insertAdjacentHTML('beforeend', drinkSVG(item, {}, { cls: 'out' }));
+  const old = box.querySelector('.hp');
+  box.insertAdjacentHTML('beforeend', `<img class="hp out" src="${photoOf(item.id)}" alt="" decoding="async"/>`);
   const neu = box.lastElementChild;
   requestAnimationFrame(() => requestAnimationFrame(() => { neu.classList.remove('out'); old?.classList.add('out'); }));
-  setTimeout(() => old?.remove(), 700);
+  setTimeout(() => old?.remove(), 800);
   $('#heroLabel').innerHTML = `<small>${esc(CATEGORIES.find((c) => c.id === item.cat) ? L(CATEGORIES.find((c) => c.id === item.cat).name) : '')}</small><b>${esc(L(item.name))}</b>${money(db.priceOf(item))}`;
 }
 function renderMarquee() {
@@ -603,7 +603,7 @@ function renderEvents() {
     const left = db.seatsLeft(ev);
     const pct = Math.round(((ev.seats - left) / ev.seats) * 100);
     return `<article class="event" style="--c:${ev.color}">
-      <div class="date"><b>${d.getDate()}</b><span>${esc(dateFmt(d, { weekday: 'long' }))}<br/>${esc(dateFmt(d, { month: 'short' }))} · ${db.hhmm(ev.at)}</span></div>
+      <div class="date"><img class="evimg" src="/demos/coffee/img/ev-${ev.id}.webp" alt="" loading="lazy" decoding="async"/><b>${d.getDate()}</b><span>${esc(dateFmt(d, { weekday: 'long' }))}<br/>${esc(dateFmt(d, { month: 'short' }))} · ${db.hhmm(ev.at)}</span></div>
       <div class="ev-body"><h4>${esc(L(ev.name))}</h4><p>${esc(L(ev.desc))}</p></div>
       <div class="ev-foot"><div class="seatbar"><i style="width:${pct}%"></i></div>
         <div class="ev-meta"><span>${left ? t('seatsLeft', { n: left }) : t('full')}</span><span>${ev.price ? money(ev.price) : t('free')}</span></div>
