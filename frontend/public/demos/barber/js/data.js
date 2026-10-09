@@ -209,6 +209,7 @@ export const PHOTOS = {
   shop: false,
   barber: SET('younes', 'anas', 'ilyas', 'soufiane'),    // img/barber-<id>.webp
   style: SET('skinfade', 'taper', 'classic', 'crop', 'long', 'beardfull'), // img/style-<id>.webp
+  service: SET('beardtrim', 'shave', 'royal', 'facial', 'wash', 'grey', 'kids'), // img/svc-<id>.webp
   product: SET('clay', 'pomade', 'salt', 'oil', 'balm', 'after', 'shampoo', 'comb'), // img/prod-<id>.webp
 };
 export const photoOf = {
@@ -216,6 +217,7 @@ export const photoOf = {
   shop: () => (PHOTOS.shop ? '/demos/barber/img/shop.webp' : ''),
   barber: (id) => (PHOTOS.barber.has(id) ? `/demos/barber/img/barber-${id}.webp` : ''),
   style: (id) => (PHOTOS.style.has(id) ? `/demos/barber/img/style-${id}.webp` : ''),
+  service: (id) => (PHOTOS.service.has(id) ? `/demos/barber/img/svc-${id}.webp` : ''),
   product: (id) => (PHOTOS.product.has(id) ? `/demos/barber/img/prod-${id}.webp` : ''),
 };
 

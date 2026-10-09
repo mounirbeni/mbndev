@@ -90,7 +90,7 @@ function renderHero() {
 
 // ── services ───────────────────────────────────────────────────────────────
 let svcFilter = 'all';
-const svcVisual = (s) => { const p = SERVICE_PHOTO[s.id] && photoOf.style(SERVICE_PHOTO[s.id]); return p ? `<img class="svc-photo" src="${p}" alt="" loading="lazy" decoding="async" />` : serviceArt(s.art); };
+const svcVisual = (s) => { const p = photoOf.service(s.id) || (SERVICE_PHOTO[s.id] && photoOf.style(SERVICE_PHOTO[s.id])); return p ? `<img class="svc-photo" src="${p}" alt="" loading="lazy" decoding="async" />` : serviceArt(s.art); };
 function renderServices() {
   const cats = [{ id: 'all', name: { en: t('all'), fr: t('all'), ar: t('all') } }, ...CATEGORIES];
   $('#svcFilters').innerHTML = cats.map((c) => `<button class="pill ${svcFilter === c.id ? 'on' : ''}" role="tab" aria-selected="${svcFilter === c.id}" data-svcfilter="${c.id}">${esc(L(c.name))}</button>`).join('');
