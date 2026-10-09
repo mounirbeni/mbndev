@@ -303,7 +303,10 @@ function renderVisit() {
 
 // ── moments: a mosaic of every photo we have (shown once there are enough) ──
 function renderMoments() {
-  const pics = [...photoOf.hero(), ...[...new Set(SERVICES.map((x) => photoOf.service(x.id)).filter(Boolean))]].slice(0, 8);
+  const h = photoOf.hero(); const tm = (id) => photoOf.team(id);
+  const svc = [...new Set(SERVICES.map((x) => photoOf.service(x.id)).filter(Boolean))];
+  // portrait shots land in the tall tiles, squares in the round and small ones
+  const pics = [h[0], tm('kenza'), h[1], h[2], tm('hajar'), tm('nada'), ...svc].filter(Boolean).slice(0, 6);
   const sec = $('#moments'); sec.hidden = pics.length < 6;
   if (sec.hidden) return;
   $('#mosaic').innerHTML = pics.map((src) => `<figure><img src="${src}" alt="" loading="lazy" decoding="async" /></figure>`).join('');

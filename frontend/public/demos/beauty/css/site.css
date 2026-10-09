@@ -722,3 +722,5 @@ input[inputmode='tel'] { direction: ltr; }
 .stamp text { direction: ltr; }
 [dir='rtl'] .stamp text { font-family: 'Noto Kufi Arabic', var(--mono); font-size: 10px; }
 .hero h1 em .w { padding: 0.04em 0.06em 0.16em; margin: -0.04em -0.06em -0.16em; }
+.portrait img { object-position: 50% 22%; }
+.avatar { object-position: 50% 25%; }
