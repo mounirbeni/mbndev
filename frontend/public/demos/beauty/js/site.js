@@ -7,7 +7,7 @@ import { serviceArt, productArt, heroArt, stars } from './art.js';
 import { fetchConfig } from './gate.js';
 import { $, $$, esc, ui, t, L, money, mins, dayWord, dayNames, toast, openSheet, closeSheet, sheetHead, avatar, openedSheet } from './ui.js';
 import { openBooking, openMine, refreshSheets, wireBooking } from './booking.js';
-import { initFx, petalField, burst } from './fx.js';
+import { initFx, burst } from './fx.js';
 import { flowerSvg, mountDefs } from './deco.js';
 
 const svcById = (id) => SERVICES.find((s) => s.id === id);
@@ -62,7 +62,7 @@ function renderStatus() {
   const dot = `<i class="${o.cls}"></i>${esc(o.txt)}`;
   $('#chipOpen').innerHTML = dot; $('#navStatus').innerHTML = dot;
   const nf = db.nextFree('any', 30);
-  $('#chipNext').innerHTML = nf ? `${icon('clock')}<span>${t('nextFreeSlot', { w: esc(dayWord(nf.date)), t: db.hhmm(nf.start) })}</span>` : `${icon('clock')}<span>${t('noSlots')}</span>`;
+  const cn = $('#chipNext'); if (cn) cn.innerHTML = nf ? `${icon('clock')}<span>${t('nextFreeSlot', { w: esc(dayWord(nf.date)), t: db.hhmm(nf.start) })}</span>` : `${icon('clock')}<span>${t('noSlots')}</span>`;
   const tot = TEAM.reduce((n, m) => n + m.reviews, 0); const avg = TEAM.reduce((n, m) => n + m.rating * m.reviews, 0) / tot;
   $('#chipRate').innerHTML = `${icon('star')}<b>${avg.toFixed(1)}</b><span>${t('reviewsCount', { n: tot })}</span>`;
   const mineCount = myUpcoming();
@@ -74,6 +74,7 @@ function myUpcoming() {
   return s.bookings.filter((b) => s.my.ids.includes(b.id) && ['pending', 'confirmed', 'arrived', 'inchair'].includes(b.status) && db.epochOf(b.date, b.start + b.dur) >= n.epoch).length;
 }
 function renderLive() {
+  const el = $('#liveCard'); if (!el) return; // the "today" band was folded into the specialists section
   const fl = db.floor();
   const free = fl.filter((c) => c.state === 'free').length;
   const rows = fl.map((c) => {
@@ -81,11 +82,7 @@ function renderLive() {
     const txt = c.state === 'off' ? t('statusOff') : c.state === 'busy' ? (c.until ? t('busyUntil', { t: db.hhmm(c.until) }) : t('statusBusy')) : t('statusFree');
     return `<li><button class="bubble ${c.state}" data-member="${m.id}" ${c.state === 'off' ? 'disabled' : ''} aria-label="${esc(m.name)} — ${esc(txt)}"><span class="ring-av">${avatar(m, photoOf.team(m.id))}</span><b>${esc(m.name)}</b><small>${esc(txt)}</small></button></li>`;
   }).join('');
-  $('#liveCard').innerHTML = `<header><span class="pulse"></span><b>${t('liveT')}</b><small>${esc(free ? t('freeNow', { n: free }) : t('noneFree'))}</small></header><ul class="bubbles">${rows}</ul>`;
-}
-function renderMarquee() {
-  const list = SERVICES.map((x) => `<span>${esc(L(x.name))}</span>`).join('');
-  $('#marquee').innerHTML = list + list;
+  el.innerHTML = `<header><span class="pulse"></span><b>${t('liveT')}</b><small>${esc(free ? t('freeNow', { n: free }) : t('noneFree'))}</small></header><ul class="bubbles">${rows}</ul>`;
 }
 
 let heroTimer = null;
@@ -124,13 +121,14 @@ const svcVisual = (s) => { const p = photoOf.service(s.id); return p ? `<img cla
 function renderServices() {
   const cats = [{ id: 'all', icon: 'sparkles', name: { en: t('all'), fr: t('all'), ar: t('all') } }, ...CATEGORIES];
   $('#svcFilters').innerHTML = cats.map((c) => `<button class="bub c-${c.id} ${svcFilter === c.id ? 'on' : ''}" role="tab" aria-selected="${svcFilter === c.id}" data-svcfilter="${c.id}"><span class="bub-ic">${icon(c.icon)}</span><small>${esc(L(c.name))}</small></button>`).join('');
+  const hot = new Set(db.services().filter((s) => s.pop).slice(0, 3).map((s) => s.id)); // the label only means something when it is rare
   let list = db.services().filter((s) => svcFilter === 'all' || s.cat === svcFilter);
   const total = list.length;
   // the full menu is long: start with the most-booked ones and let her open the rest
   const preview = svcFilter === 'all' && !svcAll && total > SVC_PREVIEW;
   if (preview) list = [...list].sort((a, b) => (b.pop ? 1 : 0) - (a.pop ? 1 : 0)).slice(0, SVC_PREVIEW);
-  $('#svcGrid').innerHTML = list.map((s) => `<article class="svc c-${s.cat} ${s.pop ? 'pop' : ''}">
-      <div class="svc-art">${svcVisual(s)}${s.pop ? `<span class="badge">${t('popular')}</span>` : ''}</div>
+  $('#svcGrid').innerHTML = list.map((s) => `<article class="svc c-${s.cat} ${hot.has(s.id) ? 'pop' : ''}">
+      <div class="svc-art">${svcVisual(s)}${hot.has(s.id) ? `<span class="badge">${t('popular')}</span>` : ''}</div>
       <div class="svc-body"><h3>${esc(L(s.name))}</h3><p>${esc(L(s.desc))}</p></div>
       <footer><span class="meta"><b>${money(s.price)}</b><small>${icon('clock')} ${mins(s.dur)}</small></span><button class="btn rose sm" data-svc="${s.id}">${t('book')}</button></footer>
     </article>`).join('') + (svcFilter === 'all' && total > SVC_PREVIEW ? `<div class="more-row"><button class="btn ghost" data-svcmore>${preview ? t('showAll', { n: total }) : t('showLess')} ${icon('chevron')}</button></div>` : '');
@@ -296,7 +294,7 @@ function renderReviews() {
   const avg = TEAM.reduce((n, m) => n + m.rating * m.reviews, 0) / total;
   $('#revTop').innerHTML = `<div class="big-rate"><b>${avg.toFixed(1)}</b><div>${stars(avg)}<small>${t('reviewsCount', { n: total })}</small></div></div>`;
   const cards = REVIEWS.map((r) => `<figure class="rev"><div>${stars(r.stars)}</div><blockquote>${esc(L(r.text))}</blockquote><figcaption>${esc(r.name)}</figcaption></figure>`).join('');
-  $('#revGrid').innerHTML = cards + cards;
+  $('#revGrid').innerHTML = cards;
 }
 function renderVisit() {
   const s = db.get(); const n = db.shopNow(); const o = openText();
@@ -320,9 +318,15 @@ function renderMoments() {
   $('#mosaic').innerHTML = pics.map((src) => `<figure><img src="${src}" alt="" loading="lazy" decoding="async" /></figure>`).join('');
 }
 
+// ── club / shelf tabs ──
+function showMore(id) {
+  $$('.tab2').forEach((b) => { const on = b.dataset.moretab === id; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+  $$('#more .pane').forEach((p) => { p.hidden = p.id !== id; });
+}
+
 // ── render everything ──────────────────────────────────────────────────────
 function renderAll() {
-  applyStatic(); renderStatus(); renderHero(); renderQuick(); renderMarquee(); renderServices(); renderTeam(); renderFinder(); renderBridal();
+  applyStatic(); renderStatus(); renderHero(); renderQuick(); renderServices(); renderTeam(); renderFinder(); renderBridal();
   renderPointsCard(); renderGift(); renderPlans(); renderProducts(); renderReviews(); renderMoments(); renderVisit();
   if (openedSheet() === $('#bag')) renderBag();
 }
@@ -343,6 +347,7 @@ function wire() {
     if ((x = g('[data-svc]'))) { openBooking({ services: [x.dataset.svc] }); return; }
     if ((x = g('[data-member]'))) { const m = memberById(x.dataset.member); openBooking({ member: m.id }); return; }
     if ((x = g('[data-ritual]'))) { const r = RITUALS.find((y) => y.id === x.dataset.ritual); openBooking({ services: r.services }); return; }
+    if ((x = g('[data-moretab]'))) { showMore(x.dataset.moretab); return; }
     if (g('[data-goquote]')) { document.getElementById('bridal').scrollIntoView({ behavior: 'smooth' }); return; }
     if (g('#heroBook')) { const v = $('#quickSvc').value; openBooking(v ? { services: [v] } : {}); return; }
     if (g('#navBook, #tabBook')) { openBooking(); return; }
@@ -426,7 +431,7 @@ function wire() {
   const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
   $$('.sec-head, .svc, .member, .prod, .plan, .visit-card, .finder, .points-card, .gift-box, .pack, .quote-box, .bridal-top, .mosaic figure').forEach((el) => { el.classList.add('rv'); io.observe(el); });
   ['.member', '.prod', '.plan', '.pack', '.visit-card', '.mosaic figure'].forEach(stagger);
-  const secs = ['top', 'team', 'bridal', 'club', 'visit'].map((id) => document.getElementById(id));
+  const secs = ['top', 'team', 'bridal', 'more', 'visit'].map((id) => document.getElementById(id));
   const tabIo = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { $$('.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === en.target.id)); } }), { rootMargin: '-45% 0px -50% 0px' });
   secs.forEach((el) => el && tabIo.observe(el));
 }
@@ -434,7 +439,6 @@ function wire() {
 mountDefs();
 renderAll();
 wire();
-petalField($('#petalField'));
 initFx();
 
 // The owner can switch the demo off (or let it expire) from the MBN DEV dashboard.

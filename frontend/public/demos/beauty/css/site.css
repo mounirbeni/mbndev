@@ -812,3 +812,49 @@ input[inputmode='tel'] { direction: ltr; }
 @media (min-width: 900px) { .bridal-pic { width: 340px; } }
 .bridal-pic .shape { inset: 0 2%; }
 .svc-photo { object-position: 50% 24%; }
+
+/* ═══ Declutter pass: fewer sections, one rhythm, no decoration that competes with the content ═══ */
+.sec::before, .sec:not(.plum)::after { display: none !important; }              /* wave dividers and floating blobs */
+.sec { padding: clamp(52px, 7vw, 96px) 0; }
+.svc:nth-child(even) { margin-top: 0 !important; }                              /* straight grid, no staggered cards */
+/* one accent for every treatment card (the category colour stays on the filter bubbles) */
+.svc .btn.rose, .svc[class*='c-'] .btn.rose { background: linear-gradient(135deg, #c25a7b, var(--rose)) !important; }
+.svc .meta b, .svc[class*='c-'] .meta b { color: var(--plum) !important; }
+.svc .meta small { color: var(--muted); }
+
+/* "Find your ritual" lives under the treatments instead of being a section of its own */
+.ritual { margin-top: 34px; border: 1.5px dashed rgba(59, 29, 46, 0.22); border-radius: 28px; background: rgba(255, 255, 255, 0.6); }
+.ritual > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 18px 22px; font-weight: 800; color: var(--plum); }
+.ritual > summary::-webkit-details-marker { display: none; }
+.ritual > summary .ic { width: 20px; height: 20px; color: var(--rose); }
+.ritual > summary .chev { margin-inline-start: auto; transition: transform 0.25s; }
+.ritual[open] > summary .chev { transform: rotate(180deg); }
+.ritual[open] { border-style: solid; background: #fff; }
+.ritual .finder { padding: 8px 22px 26px; }
+
+/* Glow Club and the shelf share one section behind two tabs */
+.tabs2 { display: inline-flex; gap: 4px; padding: 5px; margin-bottom: 30px; border-radius: 999px; background: rgba(59, 29, 46, 0.07); }
+.tab2 { min-height: 44px; padding: 0 26px; border-radius: 999px; font-weight: 800; font-size: 15px; color: var(--plum); transition: background 0.2s, color 0.2s; }
+.tab2.on { background: var(--plum); color: #fff; box-shadow: 0 8px 18px rgba(59, 29, 46, 0.2); }
+.pane[hidden] { display: none !important; }
+
+/* "A day at LALLA": one calm row of photos instead of a collage section */
+.moments { padding: clamp(36px, 5vw, 64px) 0; }
+.moments .sec-head { display: none; }
+.mosaic { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; padding-bottom: 6px; scrollbar-width: none; }
+.mosaic::-webkit-scrollbar { display: none; }
+.mosaic figure, .mosaic figure:nth-child(n) { flex: 0 0 clamp(150px, 22vw, 230px); height: clamp(190px, 26vw, 280px); grid-row: auto; border-radius: 26px; scroll-snap-align: start; }
+@media (min-width: 1100px) { .mosaic { overflow: visible; } .mosaic figure, .mosaic figure:nth-child(n) { flex: 1 1 0; } }
+
+
+/* reviews: a calm grid instead of a moving strip */
+.rev-marquee { overflow: visible; -webkit-mask: none; mask: none; }
+.rev-marquee .track { animation: none !important; display: grid; width: auto; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); }
+.rev-marquee .rev { transform: none !important; flex: none; width: auto; }
+.rev, .rev:nth-child(n) { rotate: 0deg; background: #fff; }
+.rev:nth-child(3n+1) { background: var(--pink); }
+.rev:nth-child(3n) { background: #fff; }
+
+.rev-marquee { margin-inline: 0; padding: 4px 0 0; }
+.rev-marquee .track { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); padding-inline: 0; }
+@media (min-width: 1100px) { #chipOpen { display: none; } } /* the open/closed state is already in the header */
