@@ -291,7 +291,7 @@ const SET = (...ids) => new Set(ids);
 export const PHOTOS = {
   hero: 4,        // img/hero-1.webp … hero-N.webp (rotating, 4:5)
   team: SET('salma', 'meriem', 'kenza', 'imane', 'hajar', 'zineb', 'nada'), // img/team-<id>.webp
-  service: SET(), // img/svc-<key>.webp (see SERVICE_PHOTO for which services share a photo)
+  service: SET('blowdry', 'colour', 'hairtreat', 'facial', 'gelnails', 'massage'), // img/svc-<key>.webp (see SERVICE_PHOTO for which services share a photo)
   product: SET(), // img/prod-<id>.webp
 };
 // Several services share one photo.
