@@ -116,16 +116,22 @@ function renderQuick() {
 
 // ── treatments ─────────────────────────────────────────────────────────────
 let svcFilter = 'all';
+let svcAll = false;
+const SVC_PREVIEW = 12;
 const svcVisual = (s) => { const p = photoOf.service(s.id); return p ? `<img class="svc-photo" src="${p}" alt="" loading="lazy" decoding="async" />` : serviceArt(s.art); };
 function renderServices() {
   const cats = [{ id: 'all', icon: 'sparkles', name: { en: t('all'), fr: t('all'), ar: t('all') } }, ...CATEGORIES];
   $('#svcFilters').innerHTML = cats.map((c) => `<button class="bub c-${c.id} ${svcFilter === c.id ? 'on' : ''}" role="tab" aria-selected="${svcFilter === c.id}" data-svcfilter="${c.id}"><span class="bub-ic">${icon(c.icon)}</span><small>${esc(L(c.name))}</small></button>`).join('');
-  const list = db.services().filter((s) => svcFilter === 'all' || s.cat === svcFilter);
+  let list = db.services().filter((s) => svcFilter === 'all' || s.cat === svcFilter);
+  const total = list.length;
+  // the full menu is long: start with the most-booked ones and let her open the rest
+  const preview = svcFilter === 'all' && !svcAll && total > SVC_PREVIEW;
+  if (preview) list = [...list].sort((a, b) => (b.pop ? 1 : 0) - (a.pop ? 1 : 0)).slice(0, SVC_PREVIEW);
   $('#svcGrid').innerHTML = list.map((s) => `<article class="svc c-${s.cat} ${s.pop ? 'pop' : ''}">
       <div class="svc-art">${svcVisual(s)}${s.pop ? `<span class="badge">${t('popular')}</span>` : ''}</div>
       <div class="svc-body"><h3>${esc(L(s.name))}</h3><p>${esc(L(s.desc))}</p></div>
       <footer><span class="meta"><b>${money(s.price)}</b><small>${icon('clock')} ${mins(s.dur)}</small></span><button class="btn rose sm" data-svc="${s.id}">${t('book')}</button></footer>
-    </article>`).join('');
+    </article>`).join('') + (svcFilter === 'all' && total > SVC_PREVIEW ? `<div class="more-row"><button class="btn ghost" data-svcmore>${preview ? t('showAll', { n: total }) : t('showLess')} ${icon('chevron')}</button></div>` : '');
   stagger('#svcGrid .svc');
 }
 
@@ -341,6 +347,7 @@ function wire() {
     if (g('#heroBridal')) { document.getElementById('bridal').scrollIntoView({ behavior: 'smooth' }); return; }
     if (g('#myBtn')) { openMine(); return; }
     if ((x = g('[data-svcfilter]'))) { svcFilter = x.dataset.svcfilter; renderServices(); return; }
+    if (g('[data-svcmore]')) { svcAll = !svcAll; renderServices(); return; }
     if ((x = g('[data-fnd]'))) { fnd[x.dataset.fnd] = x.dataset.val; renderFinder(); return; }
     if ((x = g('[data-qtype]'))) { quoteState.type = x.dataset.qtype; renderBridal(); return; }
     if ((x = g('[data-qneed]'))) { const k = x.dataset.qneed; if (quoteState.needs.has(k)) quoteState.needs.delete(k); else quoteState.needs.add(k); renderBridal(); return; }
