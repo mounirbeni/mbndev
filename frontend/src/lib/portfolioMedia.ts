@@ -32,6 +32,7 @@ export const PROJECT_MEDIA: Record<string, ProjectMedia> = {
   calogym:          { mockup: M('calogym'),          palette: ['#e11d48', '#22c55e', '#22d3ee'] },
   'nour-coffee':    { mockup: M('nour-coffee'),      palette: ['#c2410c', '#ff5a1f', '#ffb547'] },
   'tarz-barber':    { mockup: M('tarz-barber'),      palette: ['#7a5a1e', '#c9a24d', '#e6c987'] },
+  'lalla-beauty':   { mockup: M('lalla-beauty'),     palette: ['#b0516f', '#e79bb0', '#fbdde6'] },
   'lueur-skin':     { mockup: M('lueur-skin'),       palette: ['#9f1239', '#f9a8d4', '#fce7f3'] },
   'yed-lmiima':     { mockup: M('yed-lmiima'),       palette: ['#9a3412', '#c2693f', '#f4c095'] },
 };

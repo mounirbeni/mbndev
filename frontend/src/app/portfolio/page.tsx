@@ -30,6 +30,25 @@ const projects: {
   highlight: string;
 }[] = [
   {
+    id: 24,
+    title: 'LALLA Beauty House',
+    image: '/images/portfolio/lalla-beauty.png',
+    url: 'https://mbndev.ma/demo/beauty',
+    category: 'Hospitality',
+    type: 'Beauty Centre Booking + Owner Dashboard',
+    description: 'Women-only beauty centre with specialist-based booking (each treatment is only offered with the staff trained for it), a ritual finder, bridal and event quote requests, Glow points, gift cards, plans and a click-and-collect shop — plus an owner dashboard for the floor, calendar, clients, quote requests and insights. English, French and Arabic.',
+    tags: ['Specialist Booking', 'Bridal Requests', 'Owner Dashboard', 'EN / FR / AR'],
+    gradient: 'from-pink-400/35 to-rose-900/25',
+    accent: 'text-pink-300',
+    border: 'border-pink-400/20',
+    stats: [
+      { label: 'Treatments', value: '55'        },
+      { label: 'Includes',   value: 'Dashboard' },
+      { label: 'Languages',  value: 'EN/FR/AR'  },
+    ],
+    highlight: 'Skills-based booking, bridal requests and an owner dashboard in one demo',
+  },
+  {
     id: 23,
     title: 'TARZ Barber Club',
     image: '/images/portfolio/tarz-barber.png',
