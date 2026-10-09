@@ -289,7 +289,7 @@ export const AMENITIES = [
 // Photos live in img/ and are listed here once they exist; until then the site draws its own art.
 const SET = (...ids) => new Set(ids);
 export const PHOTOS = {
-  hero: 0,        // img/hero-1.webp … hero-N.webp (rotating, 4:5)
+  hero: 4,        // img/hero-1.webp … hero-N.webp (rotating, 4:5)
   team: SET(),    // img/team-<id>.webp
   service: SET(), // img/svc-<key>.webp (see SERVICE_PHOTO for which services share a photo)
   product: SET(), // img/prod-<id>.webp
