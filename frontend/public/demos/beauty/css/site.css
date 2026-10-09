@@ -909,3 +909,12 @@ input[inputmode='tel'] { direction: ltr; }
   [dir='rtl'] .mcat.on { box-shadow: inset -3px 0 0 var(--gold); }
   .menu-cover { aspect-ratio: 4 / 5; margin-top: 26px; }
 }
+
+/* ═══ Containment: nothing may hang outside the card or frame it belongs to ═══ */
+.pack.best, .plan.best { padding-top: 52px; }
+.pack .badge, .plan .badge { inset-block-start: 14px; }
+.bridal-pic .chip { inset-inline-start: 12px; inset-inline-end: auto; bottom: 14px; max-width: calc(100% - 24px); }
+.shape, .shape.main, .shape.fpic, .shape.petal { translate: none !important; } /* no parallax: each frame stays inside the collage */
+.gift-box { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.gift-box > *, .gift-box .form > * { min-width: 0; }
+.gcard { width: 100%; max-width: min(350px, 100%); }
