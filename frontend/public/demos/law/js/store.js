@@ -3,7 +3,7 @@
 // instantly, and a case stage changed on the dashboard updates the client's "Track my case" page.
 import { SHOP, MEETINGS, AREAS, TEAM, STAGES } from './data.js';
 
-const KEY = 'bennani-demo-v1';
+const KEY = 'alaoui-demo-v1';
 const listeners = new Set();
 
 // ── Office clock ───────────────────────────────────────────────────────────
@@ -44,18 +44,18 @@ function seed() {
 
   // 28 days of history (aggregated) so the insights are alive from the first second
   const w = { 0: 0, 1: 1.1, 2: 1, 3: 1, 4: 1.05, 5: 0.9, 6: 0.45 };
-  const mix = { family: 0.2, property: 0.17, business: 0.16, labour: 0.12, criminal: 0.08, inheritance: 0.1, debt: 0.1, immigration: 0.07 };
+  const mix = { family: 0.26, property: 0.2, labour: 0.16, criminal: 0.1, inheritance: 0.16, debt: 0.12 };
   const history = [];
   for (let i = 28; i >= 1; i--) {
     const date = D(i); const day = weekdayOf(date);
-    const n = Math.round((7 + R() * 5) * w[day]);
+    const n = Math.round((4 + R() * 3) * w[day]);
     const areas = {}; let rev = 0;
     for (let k = 0; k < n; k++) {
       let r = R(); let pick = 'family';
       for (const [id, p] of Object.entries(mix)) { r -= p; if (r <= 0) { pick = id; break; } }
       areas[pick] = (areas[pick] || 0) + 1; rev += [300, 300, 500, 600, 700][Math.floor(R() * 5)];
     }
-    const fees = day === 0 ? 0 : Math.round((2500 + R() * 6500) * w[day] / 100) * 100;
+    const fees = day === 0 ? 0 : Math.round((1500 + R() * 3500) * w[day] / 100) * 100;
     history.push({ date, n, rev: rev + fees, fees, noshow: R() < 0.35 ? 1 : 0, areas });
   }
   const heat = Array.from({ length: 7 }, (_, d) => Array.from({ length: 10 }, (_, h) => {
@@ -85,14 +85,9 @@ function seed() {
 
   // today's appointments: [lawyer, start, meeting, area, mode, name, phone]
   const plan = [
-    ['bennani', 540, 'review', 'business', 'office', 'Hind Kabbaj', '0677889900'], ['alaoui', 570, 'initial', 'family', 'office', 'Rania Tazi', '0633112233'],
-    ['chraibi', 600, 'contract', 'property', 'office', 'Omar Chraibi', '0699887766'], ['tazi', 600, 'initial', 'labour', 'video', 'Mehdi Fassi', '0600000001'],
-    ['idrissi', 630, 'urgent', 'criminal', 'office', 'Yassine Lahlou', '0655443322'], ['fassi', 600, 'initial', 'immigration', 'video', 'Karim El Idrissi', '0611998877'],
-    ['alaoui', 660, 'review', 'inheritance', 'office', 'Salma Berrada', '0661223344'], ['bennani', 690, 'initial', 'debt', 'phone', 'Ghita Skalli', '0600000002'],
-    ['tazi', 720, 'contract', 'business', 'office', 'Houda Sbai', '0666554433'], ['chraibi', 780, 'initial', 'property', 'video', 'Nouha Rhazi', '0644221100'],
-    ['alaoui', 840, 'initial', 'family', 'phone', 'Lamia Ouazzani', '0688776655'], ['bennani', 870, 'review', 'business', 'office', 'Imane Mansouri', '0622334455'],
-    ['tazi', 900, 'initial', 'labour', 'office', 'Hind Kabbaj', '0677889900'], ['idrissi', 930, 'initial', 'criminal', 'video', 'Karim El Idrissi', '0611998877'],
-    ['fassi', 960, 'review', 'immigration', 'office', 'Rania Tazi', '0633112233'], ['chraibi', 990, 'urgent', 'debt', 'office', 'Omar Chraibi', '0699887766'],
+    ['alaoui', 540, 'review', 'property', 'office', 'Hind Kabbaj', '0677889900'], ['alaoui', 840, 'initial', 'family', 'office', 'Rania Tazi', '0633112233'],
+    ['alaoui', 900, 'contract', 'property', 'video', 'Omar Chraibi', '0699887766'], ['alaoui', 990, 'initial', 'labour', 'phone', 'Mehdi Fassi', '0600000001'],
+    ['alaoui', 1020, 'urgent', 'criminal', 'office', 'Yassine Lahlou', '0655443322'],
   ];
   const bookings = [];
   let seq = 4200;
@@ -101,8 +96,8 @@ function seed() {
     bookings.push({ id: `b${++seq}`, code: `RV-${seq}`, at: epochOf(date, start) - 60 * 24 - Math.floor(R() * 600), date, start, dur: m.dur, member: who, anyMember: false, meeting, area, mode, total: m.price, name, phone, email: '', note: '', status: done ? 'done' : 'confirmed', source: 'online', manual: false });
   };
   plan.forEach((p) => mk(today, p));
-  [['alaoui', 540, 'initial', 'family', 'office', 'Hind Kabbaj', '0677889900'], ['chraibi', 600, 'review', 'property', 'video', 'Salma Berrada', '0661223344'], ['bennani', 660, 'contract', 'business', 'office', 'Yassine Lahlou', '0655443322'],
-    ['idrissi', 720, 'initial', 'criminal', 'office', 'Omar Chraibi', '0699887766'], ['tazi', 780, 'initial', 'labour', 'video', 'Rania Tazi', '0633112233'], ['fassi', 840, 'initial', 'immigration', 'phone', 'Karim El Idrissi', '0611998877']]
+  [['alaoui', 570, 'initial', 'family', 'office', 'Hind Kabbaj', '0677889900'], ['alaoui', 660, 'review', 'inheritance', 'video', 'Salma Berrada', '0661223344'], ['alaoui', 840, 'contract', 'property', 'office', 'Yassine Lahlou', '0655443322'],
+    ['alaoui', 930, 'initial', 'debt', 'office', 'Omar Chraibi', '0699887766'], ['alaoui', 990, 'initial', 'labour', 'video', 'Rania Tazi', '0633112233']]
     .forEach((p) => mk(addDays(today, 1), p));
 
   // cases
@@ -115,27 +110,27 @@ function seed() {
       [['Death certificate.pdf', 'client', D(38)], ['Family record book.pdf', 'client', D(36)], ['Draft heirs statement.docx', 'firm', D(20)]],
       [{ date: D(5), text: L3('Heirs statement filed. The court has set the first hearing.', 'Acte d’hérédité déposé. Le tribunal a fixé la première audience.', 'تم إيداع إراثة الورثة. وحددت المحكمة الجلسة الأولى.') }],
       [{ id: 'n1', date: D(12), text: 'Two heirs abroad; need powers of attorney.', by: 'alaoui' }]),
-    mkCase(2, 'DOS-2026-0151', '0677889900', 'Hind Kabbaj', 'business', L3('Shareholders’ agreement — Kabbaj Studio', 'Pacte d’associés — Kabbaj Studio', 'اتفاقية الشركاء — Kabbaj Studio'), 'bennani', 1, D(14), null,
-      [['Company statutes.pdf', 'client', D(12)], ['Term sheet.docx', 'client', D(9)]],
-      [{ date: D(3), text: L3('First draft sent for your comments.', 'Premier projet envoyé pour vos commentaires.', 'أُرسلت المسودة الأولى لتعليقاتك.') }],
-      [{ id: 'n2', date: D(6), text: 'Founders disagree on vesting. Meeting Thursday.', by: 'bennani' }]),
-    mkCase(3, 'DOS-2026-0133', '0622334455', 'Imane Mansouri', 'property', L3('Purchase of apartment — Ain Diab', 'Achat d’appartement — Ain Diab', 'شراء شقة — عين الذئاب'), 'chraibi', 3, D(55), { date: today, time: '11:00', court: 'tpi' },
+    mkCase(2, 'DOS-2026-0151', '0677889900', 'Hind Kabbaj', 'property', L3('Commercial lease — Kabbaj Studio premises', 'Bail commercial — locaux Kabbaj Studio', 'عقد كراء تجاري — محلات Kabbaj Studio'), 'alaoui', 1, D(14), null,
+      [['Lease draft.pdf', 'client', D(12)], ['Landlord letter.pdf', 'client', D(9)]],
+      [{ date: D(3), text: L3('Lease comments sent for your review.', 'Observations sur le bail envoyées pour votre revue.', 'أُرسلت ملاحظات عقد الكراء لمراجعتك.') }],
+      [{ id: 'n2', date: D(6), text: 'Landlord asks for a higher deposit. Meeting Thursday.', by: 'alaoui' }]),
+    mkCase(3, 'DOS-2026-0133', '0622334455', 'Imane Mansouri', 'property', L3('Purchase of apartment — Ain Diab', 'Achat d’appartement — Ain Diab', 'شراء شقة — عين الذئاب'), 'alaoui', 3, D(55), { date: today, time: '11:00', court: 'tpi' },
       [['Promise to sell.pdf', 'client', D(52)], ['Land title extract.pdf', 'firm', D(47)], ['Notary quote.pdf', 'firm', D(33)]],
-      [{ date: D(2), text: L3('Hearing is today at the Court of First Instance. We will update you right after.', 'L’audience est aujourd’hui au tribunal de première instance. Nous vous informons juste après.', 'الجلسة اليوم بالمحكمة الابتدائية. سنوافيك بالمستجدات مباشرة بعدها.') }], []),
-    mkCase(4, 'DOS-2026-0160', '0655443322', 'Yassine Lahlou', 'criminal', L3('Defence — traffic accident complaint', 'Défense — plainte accident de la route', 'دفاع — شكاية حادثة سير'), 'idrissi', 3, D(30), { date: today, time: '14:30', court: 'tpi' },
+      [{ date: D(2), text: L3('The hearing is today at the Court of First Instance. We will update you right after.', 'L’audience est aujourd’hui au tribunal de première instance. Nous vous informons juste après.', 'الجلسة اليوم بالمحكمة الابتدائية. سنوافيك بالمستجدات مباشرة بعدها.') }], []),
+    mkCase(4, 'DOS-2026-0160', '0655443322', 'Yassine Lahlou', 'criminal', L3('Defence — traffic accident complaint', 'Défense — plainte accident de la route', 'دفاع — شكاية حادثة سير'), 'alaoui', 3, D(30), { date: addDays(today, 2), time: '14:30', court: 'tpi' },
       [['Police report.pdf', 'client', D(29)], ['Witness statements.pdf', 'firm', D(21)]], [], []),
     mkCase(5, 'DOS-2026-0129', '0633112233', 'Rania Tazi', 'family', L3('Divorce by mutual consent', 'Divorce par consentement mutuel', 'طلاق بالاتفاق'), 'alaoui', 4, D(62), null,
       [['Marriage certificate.pdf', 'client', D(60)], ['Agreement draft.docx', 'firm', D(40)], ['Signed agreement.pdf', 'client', D(25)]],
       [{ date: D(1), text: L3('The judgment has been issued. We are collecting the certified copy.', 'Le jugement a été rendu. Nous récupérons la copie certifiée.', 'صدر الحكم. نقوم بسحب النسخة المصادق عليها.') }], []),
-    mkCase(6, 'DOS-2026-0166', '0611998877', 'Karim El Idrissi', 'immigration', L3('Family reunification file', 'Dossier de regroupement familial', 'ملف التجمع العائلي'), 'fassi', 1, D(11), null,
-      [['Passport copy.pdf', 'client', D(10)]], [{ date: D(4), text: L3('Please upload your latest payslips and housing certificate.', 'Merci de déposer vos derniers bulletins de paie et attestation de logement.', 'المرجو رفع آخر كشوف الأجر وشهادة السكن.') }], []),
-    mkCase(7, 'DOS-2026-0120', '0666554433', 'Houda Sbai', 'labour', L3('Unfair dismissal claim', 'Contentieux licenciement abusif', 'دعوى الفصل التعسفي'), 'tazi', 3, D(70), { date: addDays(today, 3), time: '09:30', court: 'social' },
+    mkCase(6, 'DOS-2026-0166', '0611998877', 'Karim El Idrissi', 'inheritance', L3('Estate with heirs abroad', 'Succession avec héritiers à l’étranger', 'تركة بورثة بالخارج'), 'alaoui', 1, D(11), null,
+      [['Passport copy.pdf', 'client', D(10)], ['Death certificate.pdf', 'client', D(9)]], [{ date: D(4), text: L3('Please upload the powers of attorney signed by your brother abroad.', 'Merci de déposer les procurations signées par votre frère à l’étranger.', 'المرجو رفع التوكيلات الموقعة من أخيك بالخارج.') }], []),
+    mkCase(7, 'DOS-2026-0120', '0666554433', 'Houda Sbai', 'labour', L3('Unfair dismissal claim', 'Contentieux licenciement abusif', 'دعوى الفصل التعسفي'), 'alaoui', 3, D(70), { date: addDays(today, 3), time: '09:30', court: 'social' },
       [['Employment contract.pdf', 'client', D(68)], ['Dismissal letter.pdf', 'client', D(68)], ['Payslips 2025.pdf', 'client', D(60)]],
       [{ date: D(8), text: L3('Settlement offer received. Hearing date confirmed.', 'Offre de transaction reçue. Date d’audience confirmée.', 'تم التوصل بعرض تسوية. وتأكد تاريخ الجلسة.') }], []),
-    mkCase(8, 'DOS-2026-0148', '0699887766', 'Omar Chraibi', 'debt', L3('Recovery of unpaid invoices — 184,000 MAD', 'Recouvrement de factures impayées — 184 000 MAD', 'استخلاص فواتير غير مؤداة — 184,000 درهم'), 'bennani', 2, D(36), null,
+    mkCase(8, 'DOS-2026-0148', '0699887766', 'Omar Chraibi', 'debt', L3('Recovery of unpaid invoices — 184,000 MAD', 'Recouvrement de factures impayées — 184 000 MAD', 'استخلاص فواتير غير مؤداة — 184,000 درهم'), 'alaoui', 2, D(36), null,
       [['Invoices 2025.xlsx', 'client', D(35)], ['Formal notice.pdf', 'firm', D(28)]],
       [{ date: D(6), text: L3('Payment order requested from the Commercial Court.', 'Injonction de payer demandée au tribunal de commerce.', 'تم طلب أمر بالأداء من المحكمة التجارية.') }], []),
-    mkCase(9, 'DOS-2026-0099', '0600000001', 'Mehdi Fassi', 'labour', L3('Employment contract dispute', 'Litige contrat de travail', 'نزاع حول عقد الشغل'), 'tazi', 5, D(120), null,
+    mkCase(9, 'DOS-2026-0099', '0600000001', 'Mehdi Fassi', 'labour', L3('Employment contract dispute', 'Litige contrat de travail', 'نزاع حول عقد الشغل'), 'alaoui', 5, D(120), null,
       [['Final agreement.pdf', 'firm', D(30)]], [{ date: D(18), text: L3('The file is closed. Thank you for your trust.', 'Le dossier est clôturé. Merci de votre confiance.', 'تم إغلاق الملف. شكراً على ثقتكم.') }], []),
   ];
 
@@ -144,7 +139,7 @@ function seed() {
   const invoices = [
     inv(21, 'c1', '0661223344', 6000, L3('Fees — stage 1 (opening and heirs statement)', 'Honoraires — étape 1 (ouverture et acte d’hérédité)', 'أتعاب — المرحلة 1 (فتح الملف وإراثة الورثة)'), D(38), 'paid'),
     inv(22, 'c1', '0661223344', 5000, L3('Fees — stage 2 (court filing)', 'Honoraires — étape 2 (dépôt au tribunal)', 'أتعاب — المرحلة 2 (التقديم للمحكمة)'), D(5), 'due'),
-    inv(23, 'c2', '0677889900', 8000, L3('Fees — draft shareholders’ agreement', 'Honoraires — projet de pacte d’associés', 'أتعاب — مسودة اتفاقية الشركاء'), D(9), 'due'),
+    inv(23, 'c2', '0677889900', 8000, L3('Fees — commercial lease review', 'Honoraires — revue du bail commercial', 'أتعاب — مراجعة عقد الكراء التجاري'), D(9), 'due'),
     inv(24, 'c3', '0622334455', 9000, L3('Fees — sale contract and registration', 'Honoraires — contrat de vente et enregistrement', 'أتعاب — عقد البيع والتسجيل'), D(33), 'paid'),
     inv(25, 'c4', '0655443322', 7500, L3('Fees — defence, first instance', 'Honoraires — défense, première instance', 'أتعاب — الدفاع، الدرجة الأولى'), D(21), 'paid'),
     inv(26, 'c5', '0633112233', 6500, L3('Fees — divorce by mutual consent', 'Honoraires — divorce par consentement mutuel', 'أتعاب — الطلاق بالاتفاق'), D(25), 'paid'),
@@ -154,13 +149,13 @@ function seed() {
   cases.forEach((c) => { clients[c.phone].matters += 1; });
 
   return {
-    v: 2, seq, caseSeq: 170, invSeq: 29,
+    v: 3, seq, caseSeq: 170, invSeq: 29,
     settings: { paused: false, autoConfirm: true, autoFlow: true, buffer: 0, banner: true, bannerText: '', hours: JSON.parse(JSON.stringify(SHOP.hours)), sound: true },
     meet: {}, members: {},
     bookings, clients, cases, invoices,
     requests: [
       { id: 'q1', no: 1, type: 'callback', name: 'Soukaina Alaoui', phone: '0677665544', area: 'labour', note: 'Dismissed on Friday without notice. Please call after 5 pm.', at: now.epoch - 60 * 3, status: 'new' },
-      { id: 'q2', no: 2, type: 'plan', name: 'Atlas Studio SARL', phone: '0600112233', area: 'business', note: 'Business plan — 12 employees.', plan: 'business', at: now.epoch - 60 * 26, status: 'contacted' },
+      { id: 'q2', no: 2, type: 'plan', name: 'Atlas Boutique', phone: '0600112233', area: 'debt', note: 'Business plan — small shop, recurring unpaid invoices.', plan: 'business', at: now.epoch - 60 * 26, status: 'contacted' },
     ],
     subs: [], newsletter: ['contact@atlas-studio.example'],
     history, heat, my: { phone: '', ids: [] }, lang: null,
@@ -171,7 +166,7 @@ let state = load();
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) { const s = JSON.parse(raw); if (s && s.v === 2) return s; }
+    if (raw) { const s = JSON.parse(raw); if (s && s.v === 3) return s; }
   } catch { /* storage unavailable — keep an in-memory copy */ }
   const s = seed();
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* ignore */ }

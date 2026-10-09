@@ -13,19 +13,21 @@ const STATUS = { pending: 'st_pending', confirmed: 'st_confirmed', arrived: 'st_
 const chip = (s) => `<span class="st st-${s}">${t(STATUS[s])}</span>`;
 const formatPhone = (p) => String(p).replace(/(\d{2})(?=\d)/g, '$1 ').trim();
 
+const SOLO = TEAM.length === 1;
+const FLOW = SOLO ? [1, 2, 4, 5] : [1, 2, 3, 4, 5];
 let bk = null;
 let view = ''; // 'book' | 'mine' | ''
 
 /** preset: { area?, meeting?, member?, resched? (a booking) } */
 export function openBooking(preset = {}) {
   const my = db.get().my;
-  bk = { step: 1, area: preset.area || '', meeting: preset.meeting || '', mode: 'office', member: preset.member || 'any', date: null, start: null, name: '', phone: my.phone ? formatPhone(my.phone) : '', email: '', note: '', resched: null, dur: 0, done: null };
+  bk = { step: 1, area: preset.area || '', meeting: preset.meeting || '', mode: 'office', member: preset.member || (SOLO ? TEAM[0].id : 'any'), date: null, start: null, name: '', phone: my.phone ? formatPhone(my.phone) : '', email: '', note: '', resched: null, dur: 0, done: null };
   const known = my.phone ? db.clientOf(my.phone) : null;
   if (known) { bk.name = known.name; bk.email = known.email || ''; }
   if (preset.resched) {
     const b = preset.resched;
     Object.assign(bk, { resched: b.id, area: b.area, meeting: b.meeting, mode: b.mode, member: b.anyMember ? 'any' : b.member, dur: b.dur, step: 4 });
-  } else if (bk.area && bk.meeting) bk.step = bk.member !== 'any' ? 4 : 3;
+  } else if (bk.area && bk.meeting) bk.step = SOLO || bk.member !== 'any' ? 4 : 3;
   else if (bk.area) bk.step = 2;
   if (bk.member !== 'any' && bk.area && !db.canDo(bk.member, bk.area)) bk.member = 'any';
   view = 'book';
@@ -48,8 +50,7 @@ function ensureDate() {
 
 function stepsHtml() {
   if (bk.resched) return '';
-  const labels = ['bkStep1', 'bkStep2', 'bkStep3', 'bkStep4', 'bkStep5'];
-  return `<ol class="steps" aria-label="Steps">${labels.map((l, i) => `<li class="${i + 1 === bk.step ? 'on' : i + 1 < bk.step ? 'ok' : ''}"><span>${i + 1 < bk.step ? icon('check') : i + 1}</span><em>${t(l)}</em></li>`).join('')}</ol>`;
+  return `<ol class="steps" aria-label="Steps">${FLOW.map((st, i) => `<li class="${st === bk.step ? 'on' : st < bk.step ? 'ok' : ''}"><span>${st < bk.step ? icon('check') : i + 1}</span><em>${t(`bkStep${st}`)}</em></li>`).join('')}</ol>`;
 }
 
 function renderBooking() {
@@ -163,8 +164,8 @@ function renderDone() {
 function icsFor(b) {
   const m = memberById(b.member);
   const stamp = (date, mm) => `${date.replace(/-/g, '')}T${String(Math.floor(mm / 60)).padStart(2, '0')}${String(mm % 60).padStart(2, '0')}00`;
-  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Bennani & Associes//Demo//EN', 'BEGIN:VEVENT', `UID:${b.id}@bennani-demo`, `DTSTAMP:${stamp(db.shopNow().date, db.shopNow().minutes)}`,
-    `DTSTART:${stamp(b.date, b.start)}`, `DTEND:${stamp(b.date, b.start + b.dur)}`, `SUMMARY:Bennani & Associés — ${L(meetingById(b.meeting).name)}`, `LOCATION:${L(SHOP.address)}`, `DESCRIPTION:With ${m.name}. Booking ${b.code}.`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Cabinet Alaoui//Demo//EN', 'BEGIN:VEVENT', `UID:${b.id}@alaoui-demo`, `DTSTAMP:${stamp(db.shopNow().date, db.shopNow().minutes)}`,
+    `DTSTART:${stamp(b.date, b.start)}`, `DTEND:${stamp(b.date, b.start + b.dur)}`, `SUMMARY:Cabinet Alaoui — ${L(meetingById(b.meeting).name)}`, `LOCATION:${L(SHOP.address)}`, `DESCRIPTION:With ${m.name}. Booking ${b.code}.`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
 }
 function downloadIcs(id) {
   const b = db.get().bookings.find((x) => x.id === id); if (!b) return;
@@ -253,8 +254,8 @@ export function wireBooking() {
       if ((x = g('[data-bkwho]'))) { bk.member = x.dataset.bkwho; bk.start = null; renderBooking(); return; }
       if ((x = g('[data-bkdate]'))) { bk.date = x.dataset.bkdate; bk.start = null; const keep = $('#dayStrip').scrollLeft; renderBooking(); $('#dayStrip').scrollLeft = keep; return; }
       if ((x = g('[data-bkslot]'))) { bk.start = Number(x.dataset.bkslot); const keep = $('#dayStrip').scrollLeft; renderBooking(); $('#dayStrip').scrollLeft = keep; $('#bkFoot [data-bknext], #bkFoot [data-bkmove]')?.focus(); return; }
-      if (g('[data-bknext]')) { bk.step += 1; if (bk.step === 4) bk.start = null; renderBooking(); $('#bkBody').scrollTop = 0; return; }
-      if (g('[data-bkback]')) { bk.step -= 1; renderBooking(); return; }
+      if (g('[data-bknext]')) { bk.step = FLOW[FLOW.indexOf(bk.step) + 1]; if (bk.step === 4) bk.start = null; renderBooking(); $('#bkBody').scrollTop = 0; return; }
+      if (g('[data-bkback]')) { bk.step = FLOW[FLOW.indexOf(bk.step) - 1]; renderBooking(); return; }
       if (g('[data-bkconfirm]')) { confirmBooking(); return; }
       if (g('[data-bkmove]')) { moveBooking(); return; }
     }

@@ -1,15 +1,15 @@
-// Bennani & Associés — demo law firm (fictional). Content shared by the website and the owner dashboard.
+// Cabinet Alaoui — demo solo lawyer's practice (fictional). Content shared by the website and the owner dashboard.
 // Everything here is demo copy, not legal advice.
 const L = (en, fr, ar) => ({ en, fr, ar });
 
 export const SHOP = {
-  name: 'Bennani & Associés',
-  short: 'BENNANI',
+  name: 'Cabinet Alaoui',
+  short: 'ALAOUI',
   timezone: 'Africa/Casablanca',
   // weekday (0 = Sunday) → [open, close] in minutes, or null when closed
   hours: { 0: null, 1: [540, 1080], 2: [540, 1080], 3: [540, 1080], 4: [540, 1080], 5: [540, 1020], 6: [540, 780] },
   step: 30, lead: 120, horizon: 21, cancelHours: 24,
-  phone: '05 22 00 00 00', urgentLine: '06 61 00 00 00', email: 'contact@bennani-avocats.example',
+  phone: '05 22 00 00 00', urgentLine: '06 61 00 00 00', email: 'contact@cabinet-alaoui.example',
   address: L('Rue Ibnou Sina, Maârif — Casablanca', 'Rue Ibnou Sina, Maârif — Casablanca', 'زنقة ابن سينا، المعاريف — الدار البيضاء'),
 };
 
@@ -21,9 +21,6 @@ export const AREAS = [
   { id: 'property', icon: 'key', name: L('Real estate', 'Immobilier', 'العقار'),
     desc: L('Buying, selling, renting and disputes: contracts checked before you sign.', 'Achat, vente, location et litiges : vos contrats vérifiés avant de signer.', 'الشراء والبيع والكراء والنزاعات: عقودك تُراجَع قبل التوقيع.'),
     cases: [L('Sale or purchase agreement', 'Compromis de vente ou d’achat', 'عقد البيع أو الشراء'), L('Rent dispute or eviction', 'Litige locatif ou expulsion', 'نزاع الكراء أو الإفراغ'), L('Title and registration', 'Titre foncier et immatriculation', 'الرسم العقاري والتحفيظ')] },
-  { id: 'business', icon: 'briefcase', name: L('Business & contracts', 'Affaires & contrats', 'الأعمال والعقود'),
-    desc: L('Company setup, shareholder agreements, commercial contracts and ongoing legal support.', 'Création de société, pactes d’associés, contrats commerciaux et accompagnement juridique.', 'تأسيس الشركات واتفاقيات الشركاء والعقود التجارية والمواكبة القانونية.'),
-    cases: [L('Starting a company', 'Création de société', 'تأسيس شركة'), L('Partners and shareholders', 'Associés et actionnaires', 'الشركاء والمساهمون'), L('Commercial contracts', 'Contrats commerciaux', 'العقود التجارية')] },
   { id: 'labour', icon: 'users2', name: L('Employment', 'Droit du travail', 'قانون الشغل'),
     desc: L('Dismissal, unpaid wages, contracts and workplace disputes for employees and employers.', 'Licenciement, salaires impayés, contrats et conflits du travail, côté salarié comme employeur.', 'الفصل والأجور غير المؤداة والعقود ونزاعات الشغل للأجير والمشغّل.'),
     cases: [L('Dismissal and compensation', 'Licenciement et indemnités', 'الفصل والتعويضات'), L('Unpaid wages', 'Salaires impayés', 'الأجور غير المؤداة'), L('Employment contracts', 'Contrats de travail', 'عقود الشغل')] },
@@ -36,9 +33,6 @@ export const AREAS = [
   { id: 'debt', icon: 'receipt', name: L('Debt recovery', 'Recouvrement', 'استخلاص الديون'),
     desc: L('Unpaid invoices and cheques: formal notices, payment orders and enforcement.', 'Factures et chèques impayés : mises en demeure, injonctions de payer et exécution.', 'الفواتير والشيكات غير المؤداة: الإنذارات وأوامر الأداء والتنفيذ.'),
     cases: [L('Unpaid invoices', 'Factures impayées', 'فواتير غير مؤداة'), L('Bounced cheques', 'Chèques sans provision', 'شيكات بدون رصيد'), L('Enforcing a judgment', 'Exécution d’un jugement', 'تنفيذ حكم')] },
-  { id: 'immigration', icon: 'plane', name: L('Residency & abroad', 'Séjour & étranger', 'الإقامة والخارج'),
-    desc: L('Residence permits, family reunification, nationality files and Moroccans living abroad.', 'Titres de séjour, regroupement familial, nationalité et Marocains résidant à l’étranger.', 'بطاقات الإقامة والتجمع العائلي والجنسية والمغاربة المقيمون بالخارج.'),
-    cases: [L('Residence permit', 'Titre de séjour', 'بطاقة الإقامة'), L('Family reunification', 'Regroupement familial', 'التجمع العائلي'), L('Documents for use abroad', 'Documents pour l’étranger', 'وثائق للاستعمال بالخارج')] },
 ];
 
 // Meeting types. `price` in MAD, `dur` in minutes, `modes` where it can take place.
@@ -62,30 +56,10 @@ export const MODES = [
 ];
 
 export const TEAM = [
-  { id: 'bennani', name: 'Me Youssef Bennani', short: 'Youssef', color: '#1e3a5f', rating: 4.9, reviews: 318, years: 22, langs: ['AR', 'FR', 'EN'],
-    role: L('Founding partner · Business & debt', 'Associé fondateur · Affaires & recouvrement', 'الشريك المؤسس · الأعمال والاستخلاص'), skills: ['business', 'debt'],
-    bio: L('Twenty-two years advising founders and family firms. Known for contracts that prevent the dispute before it starts.', 'Vingt-deux ans auprès de fondateurs et d’entreprises familiales. Reconnu pour des contrats qui évitent le litige avant qu’il ne naisse.', 'اثنان وعشرون عاماً في مواكبة المؤسسين والشركات العائلية. معروف بعقود تمنع النزاع قبل أن يبدأ.'),
-    week: [null, [540, 1080], [540, 1080], [540, 1080], [540, 1080], [540, 960], null] },
-  { id: 'alaoui', name: 'Me Salma Alaoui', short: 'Salma', color: '#8c2f39', rating: 4.9, reviews: 271, years: 16, langs: ['AR', 'FR'],
-    role: L('Partner · Family & inheritance', 'Associée · Famille & successions', 'شريكة · الأسرة والإرث'), skills: ['family', 'inheritance'],
-    bio: L('Sixteen years in family courts. Calm, direct and fluent in the human side of every file.', 'Seize ans devant les juridictions familiales. Calme, directe et attentive à la dimension humaine de chaque dossier.', 'ستة عشر عاماً أمام أقسام قضاء الأسرة. هادئة ومباشرة وحريصة على الجانب الإنساني لكل ملف.'),
-    week: [null, [540, 1080], [540, 1080], null, [540, 1080], [540, 1020], [540, 780]] },
-  { id: 'chraibi', name: 'Me Reda Chraibi', short: 'Reda', color: '#2c6f69', rating: 4.8, reviews: 204, years: 12, langs: ['AR', 'FR', 'EN'],
-    role: L('Real estate & disputes', 'Immobilier & contentieux', 'العقار والمنازعات'), skills: ['property', 'debt'],
-    bio: L('From the first promise to sell to the land registry. Twelve years of purchases, rentals and property litigation.', 'De la promesse de vente à la conservation foncière. Douze ans d’achats, de locations et de contentieux immobilier.', 'من وعد البيع إلى المحافظة العقارية. اثنا عشر عاماً من الشراء والكراء والمنازعات العقارية.'),
-    week: [null, [600, 1080], [540, 1080], [540, 1080], [540, 1080], [540, 960], null] },
-  { id: 'tazi', name: 'Me Meryem Tazi', short: 'Meryem', color: '#6b4a8c', rating: 4.8, reviews: 163, years: 9, langs: ['AR', 'FR', 'EN'],
-    role: L('Employment law', 'Droit du travail', 'قانون الشغل'), skills: ['labour', 'business'],
-    bio: L('Employees and employers both trust Meryem for practical advice, firm negotiation and fair settlements.', 'Salariés et employeurs lui font confiance pour ses conseils concrets, sa négociation ferme et des accords équitables.', 'يثق بها الأجراء والمشغّلون لنصائحها العملية وتفاوضها الحازم وتسوياتها المنصفة.'),
-    week: [null, [540, 1080], [540, 1080], [540, 1080], null, [540, 1020], [540, 780]] },
-  { id: 'idrissi', name: 'Me Anas Idrissi', short: 'Anas', color: '#37424f', rating: 4.9, reviews: 192, years: 14, langs: ['AR', 'FR'],
-    role: L('Criminal defence', 'Défense pénale', 'الدفاع الجنائي'), skills: ['criminal'],
-    bio: L('Available from the first hour of police custody. Fourteen years of hearings, appeals and careful preparation.', 'Disponible dès la première heure de garde à vue. Quatorze ans d’audiences, d’appels et de préparation rigoureuse.', 'متاح منذ الساعة الأولى للحراسة النظرية. أربعة عشر عاماً من الجلسات والاستئنافات والتحضير الدقيق.'),
+  { id: 'alaoui', name: 'Me Karim Alaoui', short: 'Karim', color: '#17294a', rating: 4.9, reviews: 412, years: 18, langs: ['AR', 'FR', 'EN'],
+    role: L('Lawyer at the Casablanca Bar', 'Avocat au Barreau de Casablanca', 'محامٍ بهيئة الدار البيضاء'), skills: ['family', 'property', 'inheritance', 'labour', 'criminal', 'debt'],
+    bio: L('Eighteen years at the Casablanca Bar. A personal practice built on one idea: you speak to the lawyer who handles your file, from the first call to the decision.', 'Dix-huit ans au Barreau de Casablanca. Un cabinet personnel fondé sur une idée : vous parlez à l’avocat qui traite votre dossier, du premier appel à la décision.', 'ثمانية عشر عاماً بهيئة الدار البيضاء. مكتب شخصي قائم على فكرة واحدة: تتحدث مع المحامي الذي يتولى ملفك من المكالمة الأولى إلى الحكم.'),
     week: [null, [540, 1080], [540, 1080], [540, 1080], [540, 1080], [540, 1020], [540, 780]] },
-  { id: 'fassi', name: 'Me Hind Fassi', short: 'Hind', color: '#a8742f', rating: 4.8, reviews: 118, years: 8, langs: ['AR', 'FR', 'EN', 'ES'],
-    role: L('Residency & international', 'Séjour & international', 'الإقامة والقضايا الدولية'), skills: ['immigration', 'inheritance'],
-    bio: L('Cross-border files for families and Moroccans abroad: residence, reunification, nationality and estates in two countries.', 'Dossiers transfrontaliers pour les familles et les MRE : séjour, regroupement, nationalité et successions dans deux pays.', 'ملفات عابرة للحدود للأسر والمغاربة بالخارج: الإقامة والتجمع والجنسية والتركات في بلدين.'),
-    week: [null, [540, 1080], null, [540, 1080], [540, 1080], [540, 960], [540, 780]] },
 ];
 
 // "What is your situation?" → the right area and meeting type.
@@ -99,9 +73,9 @@ export const PLANS = [
   { id: 'essential', price: 1500, name: L('Essential', 'Essentiel', 'أساسي'),
     perks: [L('Unlimited phone and email questions', 'Questions téléphone et e-mail illimitées', 'أسئلة هاتفية وبالبريد بدون حدود'), L('2 contract reviews a month', '2 revues de contrat par mois', 'مراجعتان للعقود شهرياً'), L('Reply within one working day', 'Réponse sous un jour ouvré', 'رد خلال يوم عمل')] },
   { id: 'business', price: 4500, best: 1, name: L('Business', 'Business', 'الأعمال'),
-    perks: [L('A named lawyer for your company', 'Un avocat dédié à votre société', 'محامٍ مخصص لشركتك'), L('Up to 8 contracts and documents a month', 'Jusqu’à 8 contrats et documents par mois', 'حتى 8 عقود ووثائق شهرياً'), L('Same-day callback', 'Rappel le jour même', 'معاودة الاتصال في اليوم نفسه'), L('Debt reminders drafted for you', 'Relances d’impayés rédigées pour vous', 'صياغة تذكيرات الديون')] },
-  { id: 'corporate', price: 0, name: L('Corporate', 'Corporate', 'المؤسسات'),
-    perks: [L('Your own legal team on call', 'Une équipe juridique à votre disposition', 'فريق قانوني رهن إشارتك'), L('Court representation included', 'Représentation devant les tribunaux incluse', 'التمثيل أمام المحاكم مشمول'), L('Priority line, 7 days a week', 'Ligne prioritaire 7 jours sur 7', 'خط أولوية 7 أيام في الأسبوع')] },
+    perks: [L('Your own lawyer for your business', 'Votre avocat pour votre activité', 'محاميك الخاص لنشاطك'), L('Up to 8 contracts and documents a month', 'Jusqu’à 8 contrats et documents par mois', 'حتى 8 عقود ووثائق شهرياً'), L('Same-day callback', 'Rappel le jour même', 'معاودة الاتصال في اليوم نفسه'), L('Debt reminders drafted for you', 'Relances d’impayés rédigées pour vous', 'صياغة تذكيرات الديون')] },
+  { id: 'corporate', price: 0, name: L('Premium', 'Premium', 'مميّز'),
+    perks: [L('Direct line to the lawyer', 'Ligne directe avec l’avocat', 'خط مباشر مع المحامي'), L('Court representation included', 'Représentation devant les tribunaux incluse', 'التمثيل أمام المحاكم مشمول'), L('Priority line, 7 days a week', 'Ligne prioritaire 7 jours sur 7', 'خط أولوية 7 أيام في الأسبوع')] },
 ];
 
 export const GUIDES = [
@@ -116,12 +90,12 @@ export const GUIDES = [
   { q: L('Can I follow my case online?', 'Puis-je suivre mon dossier en ligne ?', 'هل يمكنني تتبع ملفي عبر الإنترنت؟'),
     a: L('Yes. Enter your file number and phone on the “Track my case” page: you see the stage, the next hearing, your documents and any invoice.', 'Oui. Saisissez votre numéro de dossier et votre téléphone sur la page « Suivre mon dossier » : étape, prochaine audience, documents et factures.', 'نعم. أدخل رقم ملفك وهاتفك في صفحة «تتبع ملفي»: ترى المرحلة والجلسة المقبلة ووثائقك وأي فاتورة.') },
   { q: L('Which languages do you work in?', 'Dans quelles langues travaillez-vous ?', 'بأي لغات تشتغلون؟'),
-    a: L('Arabic, French, English and Spanish. Documents can be drafted in the language the court or the other party requires.', 'Arabe, français, anglais et espagnol. Les actes peuvent être rédigés dans la langue exigée par le tribunal ou la partie adverse.', 'العربية والفرنسية والإنجليزية والإسبانية. ويمكن تحرير الوثائق بلغة تطلبها المحكمة أو الطرف الآخر.') },
+    a: L('Arabic, French and English. Documents can be drafted in the language the court or the other party requires.', 'Arabe, français et anglais. Les actes peuvent être rédigés dans la langue exigée par le tribunal ou la partie adverse.', 'العربية والفرنسية والإنجليزية. ويمكن تحرير الوثائق بلغة تطلبها المحكمة أو الطرف الآخر.') },
 ];
 
 export const REVIEWS = [
   { name: 'N. B. — Casablanca', stars: 5, text: L('Clear from the first call. They told me honestly what to expect and what it would cost, and then did exactly that.', 'Clair dès le premier appel. On m’a dit honnêtement à quoi m’attendre et ce que cela coûterait, puis tout s’est passé ainsi.', 'واضحون منذ المكالمة الأولى. قالوا لي بصدق ما أتوقعه وكم سيكلّف، ثم نفّذوا ذلك بالضبط.') },
-  { name: 'A. E. — Founder, Rabat', stars: 5, text: L('Our shareholder agreement was ready in a week and has already saved us one argument.', 'Notre pacte d’associés était prêt en une semaine et nous a déjà évité une dispute.', 'اتفاقية الشركاء كانت جاهزة في أسبوع وجنّبتنا خلافاً بالفعل.') },
+  { name: 'A. E. — Shop owner, Rabat', stars: 5, text: L('Our lease agreement was reviewed in two days and has already saved us one argument.', 'Notre contrat de bail a été revu en deux jours et nous a déjà évité une dispute.', 'تمت مراجعة عقد الكراء في يومين وجنّبنا خلافاً بالفعل.') },
   { name: 'S. M. — Marrakech', stars: 5, text: L('Following my file online meant I stopped calling to ask. I always knew the next date.', 'Suivre mon dossier en ligne m’a évité d’appeler sans cesse. Je connaissais toujours la prochaine date.', 'تتبع ملفي عبر الإنترنت أغناني عن الاتصال. كنت أعرف دائماً التاريخ المقبل.') },
   { name: 'K. R. — Employee, Tangier', stars: 5, text: L('I was dismissed without notice. Within two weeks there was a fair settlement.', 'J’ai été licencié sans préavis. En deux semaines, un accord équitable était signé.', 'فُصلت دون إشعار. وخلال أسبوعين تم توقيع تسوية منصفة.') },
   { name: 'Y. L. — Lyon', stars: 5, text: L('Living abroad, I could do everything by video and upload my papers. Effortless.', 'Vivant à l’étranger, j’ai tout fait en visio et déposé mes papiers en ligne. Sans effort.', 'وأنا مقيم بالخارج أنجزت كل شيء بالفيديو ورفعت أوراقي إلكترونياً. بلا عناء.') },
@@ -132,7 +106,7 @@ export const AMENITIES = [
   { icon: 'lock', label: L('Private meeting rooms', 'Salles de réunion privées', 'قاعات اجتماعات خاصة') },
   { icon: 'video', label: L('Video meetings', 'Visioconférence', 'اجتماعات بالفيديو') },
   { icon: 'upload', label: L('Secure document upload', 'Dépôt sécurisé de documents', 'رفع آمن للوثائق') },
-  { icon: 'globe', label: L('Arabic · French · English · Spanish', 'Arabe · français · anglais · espagnol', 'العربية · الفرنسية · الإنجليزية · الإسبانية') },
+  { icon: 'globe', label: L('Arabic · French · English', 'Arabe · français · anglais', 'العربية · الفرنسية · الإنجليزية') },
 ];
 
 export const STAGES = [
@@ -145,9 +119,9 @@ export const STAGES = [
 ];
 
 export const FACTS = [
-  { n: 22, suffix: '', label: L('years of practice', 'ans de pratique', 'سنة من الممارسة') },
-  { n: 2400, suffix: '+', label: L('clients advised', 'clients conseillés', 'موكل تمت مواكبتهم') },
-  { n: 4, suffix: '', label: L('working languages', 'langues de travail', 'لغات عمل') },
+  { n: 18, suffix: '', label: L('years at the Bar', 'ans au Barreau', 'سنة بالهيئة') },
+  { n: 1800, suffix: '+', label: L('clients advised', 'clients conseillés', 'موكل تمت مواكبتهم') },
+  { n: 3, suffix: '', label: L('working languages', 'langues de travail', 'لغات عمل') },
   { n: 1, suffix: ' h', label: L('average reply time', 'délai de réponse moyen', 'متوسط مدة الرد') },
 ];
 

@@ -16,7 +16,7 @@ const CATALOG = [
   { slug: 'coffee', name: 'NOUR Coffee Atelier', path: '/demo/coffee', adminPath: '/demo/coffee/admin', defaultPin: '2468' },
   { slug: 'barber', name: 'TARZ Barber Club', path: '/demo/barber', adminPath: '/demo/barber/admin', defaultPin: '1357' },
   { slug: 'beauty', name: 'LALLA Beauty House', path: '/demo/beauty', adminPath: '/demo/beauty/admin', defaultPin: '2580' },
-  { slug: 'law', name: 'Bennani & Associés (law firm)', path: '/demo/law', adminPath: '/demo/law/admin', defaultPin: '4821' },
+  { slug: 'law', name: 'Cabinet Alaoui (solo lawyer)', path: '/demo/law', adminPath: '/demo/law/admin', defaultPin: '4821' },
 ];
 
 const catalogEntry = (slug) => CATALOG.find((d) => d.slug === slug) || null;

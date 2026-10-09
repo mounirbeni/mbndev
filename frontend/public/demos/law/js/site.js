@@ -1,4 +1,4 @@
-// Bennani & Associés — public site. Vanilla JS modules, no build step.
+// Cabinet Alaoui — public site. Vanilla JS modules, no build step.
 import { SHOP, AREAS, MEETINGS, MODES, TEAM, URGENCY, PLANS, GUIDES, REVIEWS, AMENITIES, STAGES, FACTS, COURTS, photoOf } from './data.js';
 import { LANGS } from './i18n.js';
 import * as db from './store.js';
@@ -11,6 +11,7 @@ import { openBooking, openMine, refreshSheets, wireBooking } from './booking.js'
 const areaById = (id) => AREAS.find((a) => a.id === id);
 const memberById = (id) => TEAM.find((m) => m.id === id);
 const meetingById = (id) => MEETINGS.find((m) => m.id === id);
+const SOLO = TEAM.length === 1;
 const DEMO_REF = 'DOS-2026-0142'; const DEMO_PHONE = '0661223344';
 
 // ── language ───────────────────────────────────────────────────────────────
@@ -57,14 +58,20 @@ function myUpcoming() {
 const STATE_KEY = { free: 'stFree', busy: 'stBusy', court: 'stCourt', off: 'stOff' };
 function renderLive() {
   const fl = db.floor();
+  const nf = db.nextFree('any', 30, '');
+  const next = `<p class="live-next">${icon('clock')} ${nf ? t('nextFreeSlot', { w: esc(dayWord(nf.date)), t: db.hhmm(nf.start) }) : t('noSlots')}</p>`;
+  if (SOLO) {
+    const f = fl[0]; const m = memberById(f.member);
+    $('#liveCard').innerHTML = `<header><span class="pulse"></span><b>${t('liveT')}</b></header>
+      <div class="live-solo f-${f.state}">${avatar(m, photoOf.team(m.id))}<p><b>${esc(m.name)}</b><span class="stline s-${f.state}">${t(STATE_KEY[f.state])}${f.state === 'court' && f.hearing ? ` · ${f.hearing.hearing.time}` : ''}</span></p></div>${next}`;
+    return;
+  }
   const free = fl.filter((c) => c.state === 'free').length;
   const court = fl.filter((c) => c.state === 'court').length;
-  const nf = db.nextFree('any', 30, '');
   const faces = fl.map((c) => { const m = memberById(c.member); return `<li class="f-${c.state}" title="${esc(m.name)} — ${esc(t(STATE_KEY[c.state]))}">${avatar(m, photoOf.team(m.id))}</li>`; }).join('');
   $('#liveCard').innerHTML = `<header><span class="pulse"></span><b>${t('liveT')}</b></header>
     <ul class="faces">${faces}</ul>
-    <p class="live-line"><b>${free ? t('freeNow', { n: free }) : t('noneFree')}</b>${court ? ` · ${t('inCourtN', { n: court })}` : ''}</p>
-    <p class="live-next">${icon('clock')} ${nf ? t('nextFreeSlot', { w: esc(dayWord(nf.date)), t: db.hhmm(nf.start) }) : t('noSlots')}</p>`;
+    <p class="live-line"><b>${free ? t('freeNow', { n: free }) : t('noneFree')}</b>${court ? ` · ${t('inCourtN', { n: court })}` : ''}</p>${next}`;
 }
 
 let heroTimer = null; let heroI = 0;
@@ -115,7 +122,7 @@ function renderAreas() {
       <div class="area-body" id="ap-${a.id}" ${on ? '' : 'hidden'}><div>
         <p>${esc(L(a.desc))}</p>
         <ul class="cases">${a.cases.map((c) => `<li>${icon('check')} ${esc(L(c))}</li>`).join('')}</ul>
-        <div class="area-foot"><span class="who">${who.map((m) => `<span class="mini-av" title="${esc(m.name)}">${avatar(m, photoOf.team(m.id))}</span>`).join('')}<small>${who.map((m) => esc(m.name)).join(' · ')}</small></span>
+        <div class="area-foot ${SOLO ? 'solo' : ''}">${SOLO ? '' : `<span class="who">${who.map((m) => `<span class="mini-av" title="${esc(m.name)}">${avatar(m, photoOf.team(m.id))}</span>`).join('')}<small>${who.map((m) => esc(m.name)).join(' · ')}</small></span>`}
         <button class="btn pri sm" data-book-area="${a.id}">${t('bookArea')} ${icon('arrowRight')}</button></div>
       </div></div>
     </article>`;
@@ -137,7 +144,7 @@ function renderFinder() {
       <p>${esc(L(a.desc))}</p>
       <ul>
         <li>${icon('calendar')} <span><b>${esc(L(m.name))}</b> · ${mins(m.dur)} · ${m.price ? money(m.price) : t('free')}</span></li>
-        <li>${icon('user')} <span>${t('bestWith', { n: esc(who.map((w) => w.name).join(' / ')) })}</span></li>
+        ${SOLO ? '' : `<li>${icon('user')} <span>${t('bestWith', { n: esc(who.map((w) => w.name).join(' / ')) })}</span></li>`}
         <li>${icon('clock')} <span>${nf ? t('nextFreeSlot', { w: esc(dayWord(nf.date)), t: db.hhmm(nf.start) }) : t('noSlots')}</span></li>
       </ul>
       <button class="btn pri" data-book-area="${a.id}" data-book-meeting="${m.id}">${t('bookThis')} ${icon('arrowRight')}</button>
@@ -147,18 +154,20 @@ function renderFinder() {
 // ── team ───────────────────────────────────────────────────────────────────
 function renderTeam() {
   const fl = db.floor();
-  $('#teamGrid').innerHTML = TEAM.filter((m) => db.memberActive(m.id)).map((m) => {
+  const grid = $('#teamGrid'); grid.classList.toggle('solo', SOLO);
+  grid.innerHTML = TEAM.filter((m) => db.memberActive(m.id)).map((m) => {
     const nf = db.nextFree(m.id, 30, m.skills[0]);
     const st = fl.find((c) => c.member === m.id)?.state || 'off';
     const ph = photoOf.team(m.id);
-    return `<article class="member" style="--c:${m.color}">
+    return `<article class="member ${SOLO ? 'solo' : ''}" style="--c:${m.color}">
       <div class="portrait">${ph ? `<img src="${ph}" alt="${esc(m.name)}" loading="lazy" decoding="async" />` : `<b aria-hidden="true">${esc(m.short[0])}</b>`}<span class="state ${st}">${t(STATE_KEY[st])}</span></div>
+      <div class="m-body">
       <div class="m-info"><h3>${esc(m.name)}</h3><p class="role">${esc(L(m.role))}</p>
         <div class="rate-row">${stars(m.rating)}<b>${m.rating.toFixed(1)}</b><small>(${m.reviews})</small><span class="yrs">${t('yearsN', { n: m.years })}</span></div></div>
       <p class="bio">${esc(L(m.bio))}</p>
       <div class="skills">${m.skills.map((s) => `<span>${esc(L(areaById(s).name))}</span>`).join('')}</div>
       <p class="langs">${icon('globe')} ${m.langs.join(' · ')}</p>
-      <footer><span class="next">${icon('clock')} ${nf ? `<b>${esc(dayWord(nf.date))} ${db.hhmm(nf.start)}</b>` : t('noSlots')}</span><button class="btn pri sm" data-member="${m.id}">${t('bookWith', { n: esc(m.short) })}</button></footer>
+      <footer><span class="next">${icon('clock')} ${nf ? `<b>${esc(dayWord(nf.date))} ${db.hhmm(nf.start)}</b>` : t('noSlots')}</span><button class="btn pri sm" data-member="${m.id}">${SOLO ? t('bookConsult') : t('bookWith', { n: esc(m.short) })}</button></footer></div>
     </article>`;
   }).join('');
 }
@@ -366,7 +375,7 @@ fetchConfig().then((cfg) => {
   if (!cfg.ok || cfg.live) return;
   const o = document.createElement('div');
   o.className = 'demo-off'; o.setAttribute('role', 'alert');
-  o.innerHTML = `<div><b>BENNANI</b><h1>${esc(t(cfg.state === 'expired' ? 'offExpired' : 'offTitle'))}</h1><p>${esc(t('offBody'))}</p><a class="btn pri" href="https://mbndev.ma">mbndev.ma</a></div>`;
+  o.innerHTML = `<div><b>ALAOUI</b><h1>${esc(t(cfg.state === 'expired' ? 'offExpired' : 'offTitle'))}</h1><p>${esc(t('offBody'))}</p><a class="btn pri" href="https://mbndev.ma">mbndev.ma</a></div>`;
   document.body.append(o);
   document.documentElement.style.overflow = 'hidden';
 });

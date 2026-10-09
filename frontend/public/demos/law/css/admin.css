@@ -1,4 +1,4 @@
-/* Bennani & Associés owner dashboard (demo). Navy sidebar, wax-red actions and brass hairlines on warm paper. */
+/* Cabinet Alaoui owner dashboard (demo). Navy sidebar, wax-red actions and brass hairlines on warm paper. */
 :root {
   --bg: #efeae0; --paper: #fffdf8; --ink: #0f1c33; --ink-2: #1a2d4f; --muted: #5f6b7d; --line: rgba(15, 28, 51, 0.13);
   --wax: #8c2f39; --wax-2: #a43a46; --brass: #b08a4a; --brass-2: #e8d3a2; --ok: #2b7a57; --warn: #b7791f; --bad: #b3362b; --sage: #2c6f69;
@@ -335,7 +335,7 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 .mini-kpis span { font-size: 9.5px; letter-spacing: 0.03em; }
 @media (min-width: 900px) and (max-width: 1279px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-/* ── Bennani-specific ───────────────────────────────────────────── */
+/* ── Alaoui-specific ───────────────────────────────────────────── */
 .gate-card, .card, .kpi, .ord, .bcol, .amodal .box, .chair, .cf-card { border-radius: 6px; }
 .g-brand svg, .s-brand svg { border-radius: 8px; }
 .g-brand b, .s-brand b { font-family: var(--display); font-weight: 700; letter-spacing: 0.2em; }
@@ -456,3 +456,8 @@ html[dir='rtl'] .sw span::after, [lang='ar'] .sw span::after { left: auto; right
 .docs-list li > span > small { display: block; }
 .ord-h .st { flex-shrink: 0; }
 .req .ord-h { flex-wrap: wrap; }
+
+/* ── solo practice: one wide diary column and a single office card ── */
+.board.b1 { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); overflow: visible; }
+@media (min-width: 900px) { .board.b1 .bcol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 10px; } .board.b1 .bcol-h, .board.b1 .empty-col { grid-column: 1 / -1; } }
+.grid1 { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); max-width: 760px; }

@@ -1,4 +1,4 @@
-// Bennani & Associés owner dashboard (demo). Reads and writes the same localStorage document as the site,
+// Cabinet Alaoui owner dashboard (demo). Reads and writes the same localStorage document as the site,
 // so appointments, callback requests and client uploads made on the website appear here live (and back).
 import { SHOP, AREAS, MEETINGS, MODES, TEAM, PLANS, STAGES, COURTS } from './data.js';
 import * as db from './store.js';
@@ -14,10 +14,10 @@ const A = {
     tooMany: 'Too many attempts — try again in a few minutes.', offline: 'Cannot reach the server — check your connection.', badPin: 'Wrong PIN.',
     offTitle: 'This demo is switched off', offBody: 'Ask MBN DEV to open it again.', offExpired: 'This demo has expired',
     viewSite: 'View website', demoTag: 'Demo by MBN DEV', live: 'Live', soundOn: 'Sound on', soundOff: 'Sound off',
-    t_live: 'Today', t_cal: 'Calendar', t_cases: 'Cases', t_clients: 'Clients', t_req: 'Requests', t_bill: 'Billing', t_team: 'Lawyers', t_stats: 'Insights', t_set: 'Settings',
-    s_live: 'Appointments and hearings of the day, and where every lawyer is right now.', s_cal: 'Any day, any lawyer. Add appointments and set days off.', s_cases: 'Every file: stage, hearings, documents, notes and fees.',
+    t_live: 'Today', t_cal: 'Calendar', t_cases: 'Cases', t_clients: 'Clients', t_req: 'Requests', t_bill: 'Billing', t_team: 'My office', t_stats: 'Insights', t_set: 'Settings',
+    s_live: 'Appointments and hearings of the day, and where you are right now.', s_cal: 'Any day. Add appointments and set days off.', s_cases: 'Every file: stage, hearings, documents, notes and fees.',
     s_clients: 'Who consults, how often, and the history behind each client.', s_req: 'Callback requests and retainer enquiries from the website.', s_bill: 'Invoices, payments and what is still outstanding.',
-    s_team: 'Practice areas, working hours and today’s numbers per lawyer.', s_stats: 'Revenue, practice areas and the busiest hours.', s_set: 'Opening hours, consultation fees and how online booking behaves.',
+    s_team: 'Your practice areas, working hours and today’s numbers.', s_stats: 'Revenue, practice areas and the busiest hours.', s_set: 'Opening hours, consultation fees and how online booking behaves.',
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], cur: '{n} MAD', min: '{n} min', none: '—', free: 'Free',
     k_rev: 'Revenue today', k_appt: 'Appointments today', k_hear: 'Hearings today', k_req: 'New requests', k_out: 'Outstanding fees', k_open: 'Open cases', expected: 'of {n} expected',
     floorT: 'The firm right now', stFree: 'Available', stBusy: 'In a meeting', stCourt: 'In court', stOff: 'Off', withC: 'With {n} until {t}', inHearing: 'Hearing at {t}', nextAt: 'Next at {t}', nothingNext: 'Nothing else today',
@@ -53,10 +53,10 @@ const A = {
     tooMany: 'Trop d’essais — réessayez dans quelques minutes.', offline: 'Serveur injoignable — vérifiez votre connexion.', badPin: 'Code incorrect.',
     offTitle: 'Cette démo est désactivée', offBody: 'Demandez à MBN DEV de la rouvrir.', offExpired: 'Cette démo a expiré',
     viewSite: 'Voir le site', demoTag: 'Démo par MBN DEV', live: 'En direct', soundOn: 'Son activé', soundOff: 'Son coupé',
-    t_live: 'Aujourd’hui', t_cal: 'Calendrier', t_cases: 'Dossiers', t_clients: 'Clients', t_req: 'Demandes', t_bill: 'Facturation', t_team: 'Avocats', t_stats: 'Statistiques', t_set: 'Réglages',
-    s_live: 'Rendez-vous et audiences du jour, et où se trouve chaque avocat en ce moment.', s_cal: 'N’importe quel jour, n’importe quel avocat. Ajoutez des rendez-vous et des congés.', s_cases: 'Chaque dossier : étape, audiences, documents, notes et honoraires.',
+    t_live: 'Aujourd’hui', t_cal: 'Calendrier', t_cases: 'Dossiers', t_clients: 'Clients', t_req: 'Demandes', t_bill: 'Facturation', t_team: 'Mon cabinet', t_stats: 'Statistiques', t_set: 'Réglages',
+    s_live: 'Rendez-vous et audiences du jour, et où vous en êtes en ce moment.', s_cal: 'N’importe quel jour. Ajoutez des rendez-vous et des congés.', s_cases: 'Chaque dossier : étape, audiences, documents, notes et honoraires.',
     s_clients: 'Qui consulte, à quelle fréquence, et l’historique de chaque client.', s_req: 'Demandes de rappel et d’abonnement venues du site.', s_bill: 'Factures, paiements et ce qui reste dû.',
-    s_team: 'Domaines, horaires et chiffres du jour par avocat.', s_stats: 'Chiffre d’affaires, domaines et heures de pointe.', s_set: 'Horaires, tarifs des consultations et comportement de la réservation en ligne.',
+    s_team: 'Vos domaines, horaires et chiffres du jour.', s_stats: 'Chiffre d’affaires, domaines et heures de pointe.', s_set: 'Horaires, tarifs des consultations et comportement de la réservation en ligne.',
     days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'], cur: '{n} MAD', min: '{n} min', none: '—', free: 'Gratuit',
     k_rev: 'Chiffre du jour', k_appt: 'Rendez-vous du jour', k_hear: 'Audiences du jour', k_req: 'Nouvelles demandes', k_out: 'Honoraires dus', k_open: 'Dossiers ouverts', expected: 'sur {n} prévus',
     floorT: 'Le cabinet en ce moment', stFree: 'Disponible', stBusy: 'En rendez-vous', stCourt: 'Au tribunal', stOff: 'Absent', withC: 'Avec {n} jusqu’à {t}', inHearing: 'Audience à {t}', nextAt: 'Prochain à {t}', nothingNext: 'Plus rien aujourd’hui',
@@ -93,6 +93,7 @@ const t = (k, v = {}) => String(A[lang][k] ?? A.en[k] ?? k).replace(/\{(\w+)\}/g
 const loc = () => (lang === 'fr' ? 'fr-FR' : 'en-GB');
 const money = (n) => t('cur', { n: (Math.round(n * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 }) });
 const memberById = (id) => TEAM.find((m) => m.id === id);
+const SOLO = TEAM.length === 1;
 const areaById = (id) => AREAS.find((a) => a.id === id);
 const meetingById = (id) => MEETINGS.find((m) => m.id === id);
 const modeById = (id) => MODES.find((m) => m.id === id);
@@ -190,7 +191,7 @@ function board(date) {
     return `<div class="bcol" style="--c:${m.color}"><div class="bcol-h"><i></i><div><b>${esc(m.short)}</b><small>${esc(L(m.role))}</small></div>${off ? `<small class="pillst off">${t('stOff')}</small>` : ''}<span>${list.filter((x) => x.status !== 'cancelled').length + hears.length}</span></div>
       ${items.length ? items.map((i) => i.h).join('') : `<div class="empty-col">${t('columnEmpty')}</div>`}</div>`;
   }).join('');
-  return `<div class="board b4">${cols}</div>`;
+  return `<div class="board ${SOLO ? 'b1' : 'b4'}">${cols}</div>`;
 }
 
 // ── views ──────────────────────────────────────────────────────────────────
@@ -246,15 +247,15 @@ function viewCases() {
   const rows = list.map((c) => {
     const due = dueOf(c.id); const newDocs = c.docs.filter((d) => d.isNew).length;
     return `<tr class="case-row" data-case="${c.id}"><td><b>${esc(c.ref)}</b>${newDocs ? `<span class="badge-new">${t('newTag')}</span>` : ''}<div class="muted">${esc(L(c.title))}</div></td>
-      <td><b>${esc(c.name)}</b><div class="muted"><bdi dir="ltr">${esc(c.phone)}</bdi></div></td><td>${esc(L(areaById(c.area).name))}</td><td>${esc(memberById(c.lawyer).short)}</td>
+      <td><b>${esc(c.name)}</b><div class="muted"><bdi dir="ltr">${esc(c.phone)}</bdi></div></td><td>${esc(L(areaById(c.area).name))}</td>${SOLO ? '' : `<td>${esc(memberById(c.lawyer).short)}</td>`}
       <td><span class="chip ${c.closed ? '' : 'pri'}">${esc(L(STAGES[c.stage].label))}</span></td>
       <td class="num">${c.hearing ? `${dateTxt(c.hearing.date, { day: 'numeric', month: 'short' })} · ${c.hearing.time}` : '—'}</td><td class="num">${due ? `<span class="chip warn">${money(due)}</span>` : '—'}</td></tr>`;
   }).join('');
   return `<div class="cases-top"><div class="segs">${[['open', 'fOpen'], ['closed', 'fClosed'], ['all', 'fAll']].map(([id, k]) => `<button data-cfilter="${id}" aria-pressed="${caseFilter === id}">${t(k)}</button>`).join('')}</div>
       <div class="inline-form" style="flex:1 1 320px;justify-content:flex-end"><input class="in search" id="caseQ" placeholder="${t('search')}" value="${esc(caseQ)}" style="flex:1 1 200px" />
-      <select class="in" data-clawyer><option value="all">${t('allLawyers')}</option>${TEAM.map((m) => `<option value="${m.id}" ${caseLawyer === m.id ? 'selected' : ''}>${esc(m.short)}</option>`).join('')}</select>
+      ${SOLO ? '' : `<select class="in" data-clawyer><option value="all">${t('allLawyers')}</option>${TEAM.map((m) => `<option value="${m.id}" ${caseLawyer === m.id ? 'selected' : ''}>${esc(m.short)}</option>`).join('')}</select>`}
       <button class="abtn pri" data-newcase>${icon('plus')} ${t('newCase')}</button></div></div>
-    <div class="card"><h2>${t('casesT')} <small>${list.length}</small></h2><div class="tbl-wrap"><table class="t"><thead><tr><th>${t('c_file')}</th><th>${t('c_client')}</th><th>${t('c_area')}</th><th>${t('c_lawyer')}</th><th>${t('c_stage')}</th><th>${t('c_hearing')}</th><th>${t('c_due')}</th></tr></thead>
+    <div class="card"><h2>${t('casesT')} <small>${list.length}</small></h2><div class="tbl-wrap"><table class="t"><thead><tr><th>${t('c_file')}</th><th>${t('c_client')}</th><th>${t('c_area')}</th>${SOLO ? '' : `<th>${t('c_lawyer')}</th>`}<th>${t('c_stage')}</th><th>${t('c_hearing')}</th><th>${t('c_due')}</th></tr></thead>
     <tbody>${rows || `<tr><td colspan="7" class="muted">${t('noCases')}</td></tr>`}</tbody></table></div></div>`;
 }
 
@@ -315,7 +316,7 @@ function viewBill() {
 
 function viewTeam() {
   const s = db.get(); const n = db.shopNow();
-  return `<div class="grid2">${TEAM.map((m) => {
+  return `<div class="${SOLO ? 'grid1' : 'grid2'}">${TEAM.map((m) => {
     const week = db.memberWeek(m.id);
     const done = s.bookings.filter((x) => x.member === m.id && x.date === n.date && x.status === 'done');
     const rev = done.reduce((a, x) => a + x.total, 0);
@@ -396,8 +397,8 @@ function renderAddBooking() {
     <div class="two"><label>${t('client')}<input class="in" data-nb="name" value="${esc(nb.name)}" /></label><label>${t('phone')}<input class="in" data-nb="phone" value="${esc(nb.phone)}" inputmode="tel" /></label></div>
     <div class="two"><label>${t('area')}<select class="in" data-nb="area"><option value="">—</option>${AREAS.map((a) => `<option value="${a.id}" ${nb.area === a.id ? 'selected' : ''}>${esc(L(a.name))}</option>`).join('')}</select></label>
     <label>${t('meeting')}<select class="in" data-nb="meeting"><option value="">—</option>${db.meetings().map((x) => `<option value="${x.id}" ${nb.meeting === x.id ? 'selected' : ''}>${esc(L(x.name))} · ${t('min', { n: x.dur })}</option>`).join('')}</select></label></div>
-    <div class="two"><label>${t('mode')}<select class="in" data-nb="mode">${MODES.filter((md) => !m || m.modes.includes(md.id)).map((md) => `<option value="${md.id}" ${nb.mode === md.id ? 'selected' : ''}>${esc(L(md.name))}</option>`).join('')}</select></label>
-    <label>${t('lawyer')}<select class="in" data-nb="who"><option value="any" ${nb.who === 'any' ? 'selected' : ''}>${t('anyone')}</option>${qual.map((id) => `<option value="${id}" ${nb.who === id ? 'selected' : ''}>${esc(memberById(id).name)}</option>`).join('')}</select></label></div>
+    <div class="${SOLO ? '' : 'two'}"><label>${t('mode')}<select class="in" data-nb="mode">${MODES.filter((md) => !m || m.modes.includes(md.id)).map((md) => `<option value="${md.id}" ${nb.mode === md.id ? 'selected' : ''}>${esc(L(md.name))}</option>`).join('')}</select></label>
+    ${SOLO ? '' : `<label>${t('lawyer')}<select class="in" data-nb="who"><option value="any" ${nb.who === 'any' ? 'selected' : ''}>${t('anyone')}</option>${qual.map((id) => `<option value="${id}" ${nb.who === id ? 'selected' : ''}>${esc(memberById(id).name)}</option>`).join('')}</select></label>`}</div>
     <label>${t('date')}<select class="in" data-nb="date">${dates.map((d) => `<option value="${d}" ${nb.date === d ? 'selected' : ''}>${dateTxt(d, { weekday: 'short', day: 'numeric', month: 'short' })}</option>`).join('')}</select></label>
     <div class="lbl">${t('time')}${slotsHtml}</div>
     <p class="err" id="nbErr" role="alert"></p><div class="foot"><button class="abtn ghost" data-closemodal>${t('cancel')}</button><button class="abtn pri" data-nbsave>${t('save')}</button></div></div>`;
@@ -420,8 +421,8 @@ function renderNewCase() {
   if (!qual.includes(nc.lawyer)) nc.lawyer = qual[0];
   $('#amodal').innerHTML = `<div class="box"><h2>${t('newCaseT')}<button class="xb" data-closemodal aria-label="${t('close')}">${icon('x')}</button></h2>
     <div class="two"><label>${t('client')}<input class="in" data-nc="name" value="${esc(nc.name)}" /></label><label>${t('phone')}<input class="in" data-nc="phone" value="${esc(nc.phone)}" inputmode="tel" /></label></div>
-    <div class="two"><label>${t('area')}<select class="in" data-nc="area">${AREAS.map((a) => `<option value="${a.id}" ${nc.area === a.id ? 'selected' : ''}>${esc(L(a.name))}</option>`).join('')}</select></label>
-    <label>${t('lawyer')}<select class="in" data-nc="lawyer">${qual.map((id) => `<option value="${id}" ${nc.lawyer === id ? 'selected' : ''}>${esc(memberById(id).name)}</option>`).join('')}</select></label></div>
+    <div class="${SOLO ? '' : 'two'}"><label>${t('area')}<select class="in" data-nc="area">${AREAS.map((a) => `<option value="${a.id}" ${nc.area === a.id ? 'selected' : ''}>${esc(L(a.name))}</option>`).join('')}</select></label>
+    ${SOLO ? '' : `<label>${t('lawyer')}<select class="in" data-nc="lawyer">${qual.map((id) => `<option value="${id}" ${nc.lawyer === id ? 'selected' : ''}>${esc(memberById(id).name)}</option>`).join('')}</select></label>`}</div>
     <label>${t('matterTitle')}<input class="in" data-nc="title" value="${esc(nc.title)}" /></label>
     <p class="err" id="ncErr" role="alert"></p><div class="foot"><button class="abtn ghost" data-closemodal>${t('cancel')}</button><button class="abtn pri" data-ncsave>${t('save')}</button></div></div>`;
 }
@@ -466,7 +467,7 @@ function exportCsv() {
   const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows = [['code', 'date', 'start', 'end', 'lawyer', 'client', 'phone', 'area', 'meeting', 'format', 'fee', 'status', 'source'].join(',')]
     .concat(db.get().bookings.slice().sort((a, b) => db.epochOf(a.date, a.start) - db.epochOf(b.date, b.start)).map((b) => [b.code, b.date, hm(b.start), hm(b.start + b.dur), memberById(b.member).name, b.name, b.phone, L(areaById(b.area).name), L(meetingById(b.meeting).name), b.mode, b.total, b.status, b.source].map(q).join(',')));
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' })); a.download = 'bennani-appointments.csv';
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' })); a.download = 'alaoui-appointments.csv';
   document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
