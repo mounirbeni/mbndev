@@ -91,6 +91,9 @@ export const MENU = [
   { id: 'blossom', cat: 'cold', kind: 'drink', price: 36, kcal: 90, tags: ['v', 'gf', 'df', 'sig'], cup: 'tall', iced: true,
     name: L('Orange-blossom cold brew', 'Cold brew fleur d’oranger', 'كولد برو بماء الزهر'), desc: L('Cold brew, fresh orange and a drop of Moroccan orange-blossom water.', 'Cold brew, orange pressée et une goutte d’eau de fleur d’oranger.', 'كولد برو وبرتقال طازج وقطرة من ماء الزهر المغربي.'),
     layers: [['orange', 0.32], ['coldbrew', 0.68]], opts: ['size', 'sugar'] },
+  { id: 'frappe', cat: 'cold', kind: 'drink', price: 34, kcal: 320, tags: ['gf', 'new'], cup: 'tall', iced: true,
+    name: L('Salted caramel frappé', 'Frappé caramel salé', 'فرابيه بالكراميل المملّح'), desc: L('Espresso blended with ice and milk, salted caramel, whipped cream and praline crumble.', 'Espresso mixé avec glace et lait, caramel salé, chantilly et éclats de praliné.', 'إسبريسو مخلوط بالثلج والحليب مع كراميل مملّح وكريمة وفتات البرالين.'),
+    layers: [['syrup', 0.12], ['milk', 0.58], ['cream', 0.3]], opts: ['size', 'milk', 'shots'] },
   // ── Not coffee
   { id: 'matcha', cat: 'notcoffee', kind: 'drink', price: 34, kcal: 130, tags: ['gf'], cup: 'glass',
     name: L('Matcha latte', 'Matcha latte', 'ماتشا لاتيه'), desc: L('Ceremonial-grade matcha whisked to order.', 'Matcha de grade cérémonial fouetté à la minute.', 'ماتشا فاخرة تُخفق عند الطلب.'),
@@ -238,7 +241,7 @@ export const GIFT_DESIGNS = [
 ];
 
 // Product photos (img/<id>.webp, 800 × 800). Items not listed keep their drawn art.
-export const PHOTOS = new Set(['esp', 'cortado', 'flat']);
+export const PHOTOS = new Set(['esp', 'cortado', 'flat', 'capp', 'latte', 'spanish', 'mocha', 'v60', 'aero', 'icedlatte', 'frappe', 'matcha']);
 export const photoOf = (id) => (PHOTOS.has(id) ? `/demos/coffee/img/${id}.webp` : null);
 
 export const AMENITIES = [
