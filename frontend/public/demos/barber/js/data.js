@@ -207,8 +207,8 @@ const SET = (...ids) => new Set(ids);
 export const PHOTOS = {
   hero: 4,                                   // img/hero-1.webp … hero-4.webp (rotating, 4:5)
   shop: false,
-  barber: SET('younes', 'anas', 'ilyas'),    // img/barber-<id>.webp
-  style: SET(),                              // img/style-<id>.webp
+  barber: SET('younes', 'anas', 'ilyas', 'soufiane'),    // img/barber-<id>.webp
+  style: SET('skinfade', 'taper', 'classic', 'long', 'beardfull'), // img/style-<id>.webp (no 'crop' photo yet)
   product: SET(),                            // img/prod-<id>.webp
 };
 export const photoOf = {
@@ -218,3 +218,6 @@ export const photoOf = {
   style: (id) => (PHOTOS.style.has(id) ? `/demos/barber/img/style-${id}.webp` : ''),
   product: (id) => (PHOTOS.product.has(id) ? `/demos/barber/img/prod-${id}.webp` : ''),
 };
+
+// Which style photo illustrates which service card (the others keep their drawn icon).
+export const SERVICE_PHOTO = { fade: 'skinfade', classic: 'classic', taper: 'taper', scissor: 'long', cutbeard: 'beardfull', beardsculpt: 'beardfull' };

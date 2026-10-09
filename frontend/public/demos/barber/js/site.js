@@ -1,5 +1,5 @@
 // TARZ Barber Club — public site. Vanilla JS modules, no build step.
-import { SHOP, CATEGORIES, SERVICES, BARBERS, STYLES, FINDER, matchStyle, PLANS, GIFT_AMOUNTS, GIFT_DESIGNS, PRODUCTS, REVIEWS, FAQ, AMENITIES, photoOf } from './data.js';
+import { SHOP, CATEGORIES, SERVICES, BARBERS, STYLES, FINDER, matchStyle, PLANS, GIFT_AMOUNTS, GIFT_DESIGNS, PRODUCTS, REVIEWS, FAQ, AMENITIES, SERVICE_PHOTO, photoOf } from './data.js';
 import { LANGS } from './i18n.js';
 import * as db from './store.js';
 import { icon, langDropdown } from './icons.js';
@@ -90,12 +90,13 @@ function renderHero() {
 
 // ── services ───────────────────────────────────────────────────────────────
 let svcFilter = 'all';
+const svcVisual = (s) => { const p = SERVICE_PHOTO[s.id] && photoOf.style(SERVICE_PHOTO[s.id]); return p ? `<img class="svc-photo" src="${p}" alt="" loading="lazy" decoding="async" />` : serviceArt(s.art); };
 function renderServices() {
   const cats = [{ id: 'all', name: { en: t('all'), fr: t('all'), ar: t('all') } }, ...CATEGORIES];
   $('#svcFilters').innerHTML = cats.map((c) => `<button class="pill ${svcFilter === c.id ? 'on' : ''}" role="tab" aria-selected="${svcFilter === c.id}" data-svcfilter="${c.id}">${esc(L(c.name))}</button>`).join('');
   const list = db.services().filter((s) => svcFilter === 'all' || s.cat === svcFilter);
   $('#svcGrid').innerHTML = list.map((s) => `<article class="svc ${s.pop ? 'pop' : ''}">
-      <div class="svc-art">${serviceArt(s.art)}${s.pop ? `<span class="badge">${t('popular')}</span>` : ''}</div>
+      <div class="svc-art">${svcVisual(s)}${s.pop ? `<span class="badge">${t('popular')}</span>` : ''}</div>
       <div class="svc-body"><h3>${esc(L(s.name))}</h3><p>${esc(L(s.desc))}</p></div>
       <footer><span class="meta"><b>${money(s.price)}</b><small>${icon('clock')} ${mins(s.dur)}</small></span><button class="btn gold sm" data-svc="${s.id}">${t('book')}</button></footer>
     </article>`).join('');

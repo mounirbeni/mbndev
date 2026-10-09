@@ -149,6 +149,7 @@ ul, ol { padding: 0; list-style: none; }
 .svc.pop { border-color: rgba(201, 162, 77, 0.45); }
 .svc-art { grid-area: art; position: relative; align-self: start; }
 .svc-art .art { width: 84px; height: 84px; }
+.svc-photo { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201, 162, 77, 0.55); }
 .badge { position: absolute; inset-block-start: -6px; inset-inline-start: -6px; padding: 3px 9px; border-radius: 999px; background: var(--brass); color: var(--ink); font: 700 10px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
 .badge.warn { background: var(--warn); }
 .svc-body { grid-area: body; min-width: 0; }
@@ -338,7 +339,7 @@ ul, ol { padding: 0; list-style: none; }
   .brand svg { width: 36px; height: 36px; }
   .brand span { font-size: 21px; }
   .svc { grid-template-columns: 72px minmax(0, 1fr); padding: 14px; }
-  .svc-art .art { width: 72px; height: 72px; }
+  .svc-art .art, .svc-photo { width: 72px; height: 72px; }
   .stamps { gap: 8px; }
   .two { grid-template-columns: 1fr; }
   .toast { bottom: calc(var(--tabbar) + 10px) !important; }
