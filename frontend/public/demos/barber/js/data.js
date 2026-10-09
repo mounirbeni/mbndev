@@ -205,14 +205,14 @@ export const AMENITIES = [
 // Photos live in img/ and are listed here once they exist; until then the site draws its own art.
 const SET = (...ids) => new Set(ids);
 export const PHOTOS = {
-  hero: false,
+  hero: 4,                                   // img/hero-1.webp … hero-4.webp (rotating, 4:5)
   shop: false,
-  barber: SET(),   // img/barber-<id>.webp
-  style: SET(),    // img/style-<id>.webp
-  product: SET(),  // img/prod-<id>.webp
+  barber: SET('younes', 'anas', 'ilyas'),    // img/barber-<id>.webp
+  style: SET(),                              // img/style-<id>.webp
+  product: SET(),                            // img/prod-<id>.webp
 };
 export const photoOf = {
-  hero: () => (PHOTOS.hero ? '/demos/barber/img/hero.webp' : ''),
+  hero: () => Array.from({ length: PHOTOS.hero || 0 }, (_, i) => `/demos/barber/img/hero-${i + 1}.webp`),
   shop: () => (PHOTOS.shop ? '/demos/barber/img/shop.webp' : ''),
   barber: (id) => (PHOTOS.barber.has(id) ? `/demos/barber/img/barber-${id}.webp` : ''),
   style: (id) => (PHOTOS.style.has(id) ? `/demos/barber/img/style-${id}.webp` : ''),

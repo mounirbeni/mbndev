@@ -59,7 +59,7 @@ function renderLive() {
     const txt = c.state === 'off' ? t('chairOff') : c.state === 'busy' ? (c.until ? t('chairBusyUntil', { t: db.hhmm(c.until) }) : t('chairBusy')) : t('chairFree');
     return `<li class="${c.state}"><span class="dotc" style="--c:${b.color}"></span><b>${esc(b.name)}</b><em>${txt}</em></li>`;
   }).join('');
-  const summary = q.waiting ? t('waitingSummary', { n: q.waiting, m: q.wait }) : (q.free ? t('noWait') : t('allBusy'));
+  const summary = q.wait ? t('waitingSummary', { n: q.waiting, m: q.wait }) : (q.free ? t('noWait') : t('allBusy'));
   $('#liveCard').innerHTML = `<header><span class="pulse"></span><b>${t('liveT')}</b><small>${esc(summary)}</small></header><ul>${rows}</ul>
     ${mine ? `<button class="btn gold block" id="liveTicket">${icon('armchair')} ${mine.status === 'inchair' ? t('yourTurn') : t('yourPositionN', { n: db.positionOf(mine.id) })}</button>`
     : `<button class="btn ghost block" id="liveJoin">${icon('users')} ${t('joinQueue')}</button>`}`;
@@ -70,10 +70,22 @@ function renderMarquee() {
   $('#marquee').innerHTML = names + names;
 }
 
+let heroTimer = null;
+let heroI = 0;
 function renderHero() {
-  const photo = photoOf.hero();
-  $('#heroArt').innerHTML = photo ? `<img src="${photo}" alt="" fetchpriority="high" />` : heroArt();
-  $('#heroArt').classList.toggle('photo', !!photo);
+  const photos = photoOf.hero();
+  const el = $('#heroArt');
+  el.classList.toggle('photo', photos.length > 0);
+  if (!photos.length) { el.innerHTML = heroArt(); return; }
+  if (el.querySelector('img')) return; // already built — the rotation keeps running across language changes
+  el.innerHTML = photos.map((src, i) => `<img src="${src}" alt="" class="${i === 0 ? 'on' : ''}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`).join('');
+  clearInterval(heroTimer);
+  if (photos.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    heroTimer = setInterval(() => {
+      const imgs = $$('#heroArt img'); if (!imgs.length) return;
+      imgs[heroI].classList.remove('on'); heroI = (heroI + 1) % imgs.length; imgs[heroI].classList.add('on');
+    }, 4200);
+  }
 }
 
 // ── services ───────────────────────────────────────────────────────────────
