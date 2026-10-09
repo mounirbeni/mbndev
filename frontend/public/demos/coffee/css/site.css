@@ -502,7 +502,6 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
   .builder .preview { position: sticky; top: 0; min-height: 420px; }
   .builder .preview > .art { height: 360px; }
   .builder .preview img.photo { min-height: 420px; }
-  .status { display: inline-flex; }
   .brew-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .loy-grid, .gift-grid, .visit-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .catering { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: start; }
@@ -513,6 +512,9 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
   .livepill { bottom: 24px; }
   .toast { bottom: 40px; }
   .foot { padding-bottom: 56px; }
+}
+@media (min-width: 1280px) {
+  .status { display: inline-flex; }
 }
 @media (min-width: 1024px) {
   .compass-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }

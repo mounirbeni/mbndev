@@ -23,14 +23,14 @@ a { color: inherit; }
 .abtn:active { transform: scale(0.97); }
 
 /* gate */
-.gate { min-height: 100svh; display: grid; place-items: center; padding: 20px; background: radial-gradient(circle at 80% 10%, rgba(255, 90, 31, 0.25), transparent 40%), var(--ink); }
-.gate-card { width: min(380px, 100%); background: var(--paper); border-radius: 28px; padding: 28px; display: grid; gap: 12px; text-align: center; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+.gate { min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 20px; background: radial-gradient(circle at 80% 10%, rgba(255, 90, 31, 0.25), transparent 40%), var(--ink); }
+.gate-card { box-sizing: border-box; width: min(380px, 100%); min-width: 0; background: var(--paper); border-radius: 28px; padding: 28px; display: grid; gap: 12px; text-align: center; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
 .g-brand { display: grid; justify-items: center; gap: 6px; margin-bottom: 8px; }
 .g-brand svg { width: 52px; height: 52px; }
 .g-brand b { font: 800 26px/1 var(--display); }
 .g-brand span { font: 600 11px var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
 .gate label { font-weight: 700; }
-#pin { text-align: center; font: 700 32px/1 var(--mono); letter-spacing: 0.5em; padding: 14px 0 14px 0.5em; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; }
+#pin { width: 100%; min-width: 0; box-sizing: border-box; text-align: center; font: 700 32px/1 var(--mono); letter-spacing: 0.5em; padding: 14px 0 14px 0.5em; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; }
 .g-hint { margin: 0; font-size: 13px; color: var(--muted); }
 .g-err { margin: 0; color: var(--bad); font-weight: 600; min-height: 1.2em; }
 .g-back { font-size: 13px; color: var(--muted); }
