@@ -28,7 +28,7 @@ export const INK = {
   espresso: '#3a2215', crema: '#b36a2c', milk: '#f1e6d4', oat: '#ead9bd', almond: '#f0e2cc', lactosefree: '#f4ead9',
   foam: '#fcf8f1', water: '#6b4429', ice: 'rgba(255,255,255,0.55)', coldbrew: '#2b1a10', tonic: '#efe9cf',
   orange: '#f4a43c', chocolate: '#5a321d', matcha: '#86ad55', chai: '#c68a55', tea: '#b9762a', condensed: '#f3dfae',
-  syrup: '#c98b3a', cream: '#fff7ea',
+  syrup: '#c98b3a', cream: '#fff7ea', lemon: '#f1e6a0',
 };
 
 /*
@@ -94,6 +94,12 @@ export const MENU = [
   { id: 'frappe', cat: 'cold', kind: 'drink', price: 34, kcal: 320, tags: ['gf', 'new'], cup: 'tall', iced: true,
     name: L('Salted caramel frappé', 'Frappé caramel salé', 'فرابيه بالكراميل المملّح'), desc: L('Espresso blended with ice and milk, salted caramel, whipped cream and praline crumble.', 'Espresso mixé avec glace et lait, caramel salé, chantilly et éclats de praliné.', 'إسبريسو مخلوط بالثلج والحليب مع كراميل مملّح وكريمة وفتات البرالين.'),
     layers: [['syrup', 0.12], ['milk', 0.58], ['cream', 0.3]], opts: ['size', 'milk', 'shots'] },
+  { id: 'orangemint', cat: 'cold', kind: 'drink', price: 26, kcal: 110, tags: ['v', 'gf', 'df', 'new'], cup: 'tall', iced: true,
+    name: L('Orange & mint cooler', 'Rafraîchissement orange & menthe', 'منعش البرتقال والنعناع'), desc: L('Fresh-pressed orange, crushed mint, sparkling water and ice. No coffee.', 'Orange pressée, menthe écrasée, eau pétillante et glaçons. Sans café.', 'برتقال معصور ونعناع مهروس وماء فوار وثلج. بدون قهوة.'),
+    layers: [['orange', 1]], opts: ['size', 'sugar'] },
+  { id: 'lemonade', cat: 'cold', kind: 'drink', price: 24, kcal: 90, tags: ['v', 'gf', 'df'], cup: 'tall', iced: true,
+    name: L('Mint lemonade', 'Citronnade à la menthe', 'ليموناضة بالنعناع'), desc: L('Fresh lemon, mint and a drop of orange-blossom water, shaken over ice.', 'Citron frais, menthe et une goutte de fleur d’oranger, secoués sur glace.', 'ليمون طازج ونعناع وقطرة ماء الزهر، مرجوجة على الثلج.'),
+    layers: [['lemon', 1]], opts: ['size', 'sugar'] },
   // ── Not coffee
   { id: 'matcha', cat: 'notcoffee', kind: 'drink', price: 34, kcal: 130, tags: ['gf'], cup: 'glass',
     name: L('Matcha latte', 'Matcha latte', 'ماتشا لاتيه'), desc: L('Ceremonial-grade matcha whisked to order.', 'Matcha de grade cérémonial fouetté à la minute.', 'ماتشا فاخرة تُخفق عند الطلب.'),
@@ -107,6 +113,9 @@ export const MENU = [
   { id: 'choc', cat: 'notcoffee', kind: 'drink', price: 28, kcal: 280, tags: ['gf'], cup: 'mug',
     name: L('Hot chocolate', 'Chocolat chaud', 'شوكولاتة ساخنة'), desc: L('Real 70% chocolate, not powder. Whipped cream on request.', 'Vrai chocolat 70 %, pas de poudre. Chantilly sur demande.', 'شوكولاتة حقيقية 70% وليست بودرة. كريمة عند الطلب.'),
     layers: [['chocolate', 0.82], ['cream', 0.18]], opts: ['size', 'milk'] },
+  { id: 'infusion', cat: 'notcoffee', kind: 'drink', price: 20, kcal: 15, tags: ['v', 'gf', 'df'], cup: 'mug',
+    name: L('Mint & lemon infusion', 'Infusion menthe & citron', 'منقوع النعناع والليمون'), desc: L('Fresh mint and lemon steeped in hot water, honey on the side. Caffeine-free.', 'Menthe fraîche et citron infusés, miel à part. Sans caféine.', 'نعناع طازج وليمون منقوعان في ماء ساخن مع العسل جانباً. بدون كافيين.'),
+    layers: [['tea', 1]], opts: ['size', 'sugar'] },
   // ── Bakery
   { id: 'croissant', cat: 'bakery', kind: 'food', art: 'croissant', price: 16, kcal: 280, tags: [],
     name: L('Butter croissant', 'Croissant au beurre', 'كرواسون بالزبدة'), desc: L('Laminated in-house every morning, 27 layers.', 'Feuilleté chez nous chaque matin, 27 couches.', 'يُحضّر عندنا كل صباح، 27 طبقة.'), opts: ['warm'] },
@@ -241,7 +250,7 @@ export const GIFT_DESIGNS = [
 ];
 
 // Product photos (img/<id>.webp, 800 × 800). Items not listed keep their drawn art.
-export const PHOTOS = new Set(['esp', 'cortado', 'flat', 'capp', 'latte', 'spanish', 'mocha', 'v60', 'aero', 'icedlatte', 'frappe', 'matcha']);
+export const PHOTOS = new Set(['esp', 'cortado', 'flat', 'capp', 'latte', 'spanish', 'mocha', 'v60', 'aero', 'icedlatte', 'frappe', 'matcha', 'choc', 'chai', 'orangemint', 'lemonade', 'infusion']);
 export const photoOf = (id) => (PHOTOS.has(id) ? `/demos/coffee/img/${id}.webp` : null);
 
 export const AMENITIES = [
