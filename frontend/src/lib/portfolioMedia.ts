@@ -30,6 +30,7 @@ export const PROJECT_MEDIA: Record<string, ProjectMedia> = {
   'clinic-manager': { mockup: M('clinic-manager'),   palette: ['#1d4ed8', '#3b82f6', '#facc15'] },
   'edu-platform':   { mockup: M('edu-platform'),     palette: ['#1e40af', '#3b82f6', '#4ade80'] },
   calogym:          { mockup: M('calogym'),          palette: ['#e11d48', '#22c55e', '#22d3ee'] },
+  'nour-coffee':    { mockup: M('nour-coffee'),      palette: ['#c2410c', '#ff5a1f', '#ffb547'] },
   // No presentation shot yet: the upscaled homepage capture stands in.
   'lueur-skin':     { mockup: '/images/portfolio/hd/lueur-skin.webp', palette: ['#9f1239', '#f9a8d4', '#fce7f3'] },
   'yed-lmiima':     {                                palette: ['#7c3aed', '#a855f7', '#06b6d4'] },

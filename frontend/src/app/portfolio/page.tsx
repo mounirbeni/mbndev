@@ -30,6 +30,25 @@ const projects: {
   highlight: string;
 }[] = [
   {
+    id: 22,
+    title: 'NOUR Coffee Atelier',
+    image: '/images/portfolio/nour-coffee.png',
+    url: 'https://mbndev.ma/demo/coffee',
+    category: 'Hospitality',
+    type: 'Coffee Shop Website + Owner Dashboard',
+    description: 'Specialty coffee shop concept with an order-ahead menu, live order tracking, loyalty card, bean finder, gifts, workshop bookings and a full owner dashboard — in English, French and Arabic, built as an installable app-style experience.',
+    tags: ['Order Ahead', 'Owner Dashboard', 'Loyalty', 'EN / FR / AR'],
+    gradient: 'from-orange-600/35 to-amber-400/20',
+    accent: 'text-orange-400',
+    border: 'border-orange-500/20',
+    stats: [
+      { label: 'Languages', value: 'EN/FR/AR'  },
+      { label: 'Includes',  value: 'Dashboard' },
+      { label: 'Style',     value: 'App-like'  },
+    ],
+    highlight: 'Order ahead, live tracking and an owner dashboard in one demo',
+  },
+  {
     id: 2,
     title: 'Lueur Skin',
     image: '/images/portfolio/lueur-skin.png',
