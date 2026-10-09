@@ -203,3 +203,11 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
   .hours-grid .in { padding: 0 4px 0 8px; font-size: 14px; min-height: 40px; }
   .hours-grid input[type='time']::-webkit-calendar-picker-indicator { display: none; }
 }
+
+/* Icons (inline SVG, inherit the text colour) */
+.ic { width: 1.15em; height: 1.15em; flex-shrink: 0; vertical-align: -0.2em; }
+.tabs button .ic { width: 19px; height: 19px; }
+.chip .ic, .mode .ic { width: 1.1em; height: 1.1em; }
+.g-back, .s-foot a { display: inline-flex; align-items: center; gap: 6px; }
+.who .ic { width: 14px; height: 14px; vertical-align: -2px; color: var(--muted); }
+#soundBtn .ic { width: 16px; height: 16px; }

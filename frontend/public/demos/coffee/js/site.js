@@ -3,6 +3,7 @@ import { CAFE, CATEGORIES, MENU, OPTS, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, BRE
 import { LANGS, STR } from './i18n.js';
 import { drinkSVG, foodSVG, artFor, bagSVG } from './art.js';
 import * as db from './store.js';
+import { icon } from './icons.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -68,7 +69,7 @@ function renderStatus() {
   const o = openText();
   $('#navStatus').className = `status ${o.cls}`; $('#navStatus').innerHTML = `<i></i>${esc(o.txt)}`;
   $('#chipOpen').className = `chip ${o.cls}`; $('#chipOpen').innerHTML = `<i></i>${esc(o.txt)}`;
-  $('#chipWait').textContent = `⏱ ${t('wait', { n: s.wait })}`;
+  $('#chipWait').innerHTML = `${icon('clock')}<span>${esc(t('wait', { n: s.wait }))}</span>`;
   const bean = BEANS.find((b) => b.id === s.todayBean) || BEANS[0];
   $('#chipBean').innerHTML = `${esc(t('onBar'))}: <b>${esc(L(bean.origin))}</b>`;
   const banner = s.banner;
@@ -113,7 +114,7 @@ function menuItems() {
 }
 function renderMenu() {
   $('#filters').innerHTML = ['all', 'v', 'gf', 'df'].map((f) => `<button class="pill" aria-pressed="${f === filter}" data-filter="${f}">${t(`f_${f}`)}</button>`).join('')
-    + `<button class="pill" aria-pressed="${favOnly}" data-favonly>♡ ${t('favs')}</button>`;
+    + `<button class="pill" aria-pressed="${favOnly}" data-favonly>${icon('heart')}<span>${t('favs')}</span></button>`;
   $('#filterDot').hidden = filter === 'all' && sort === 'pop' && !favOnly;
   const items = menuItems();
   const cats = CATEGORIES.filter((c) => items.some((m) => m.cat === c.id));
@@ -163,7 +164,7 @@ function renderFilterSheet() {
   $('#filterSheet').innerHTML = `${head(t('filtersT'))}<div class="sheet-body" style="display:grid;gap:18px">
     <div class="opt"><span>${t('diet')}</span><div class="pills">${['all', 'v', 'gf', 'df'].map((f) => `<button class="pill" aria-pressed="${f === filter}" data-filter="${f}">${t(`f_${f}`)}</button>`).join('')}</div></div>
     <div class="opt"><span>${t('sortT')}</span><div class="seg">${['pop', 'low', 'high'].map((x) => `<button aria-pressed="${x === sort}" data-sort="${x}">${t(`sort_${x}`)}</button>`).join('')}</div></div>
-    <label class="reward" style="background:var(--paper);border-style:solid;border-color:var(--line)"><input type="checkbox" id="favOnlyChk" ${favOnly ? 'checked' : ''}/> ♡ ${t('favOnly')}</label>
+    <label class="reward" style="background:var(--paper);border-style:solid;border-color:var(--line)"><input type="checkbox" id="favOnlyChk" ${favOnly ? 'checked' : ''}/> ${icon('heart')}<span>${t('favOnly')}</span></label>
   </div><div class="sheet-foot" style="display:flex;gap:10px"><button class="btn ghost" data-freset>${t('resetF')}</button><button class="btn sun" style="flex:1" data-close data-autofocus>${t('showN', { n })}</button></div>`;
 }
 function toggleFav(id) {
@@ -328,21 +329,21 @@ function renderBag() {
   el.innerHTML = `${head(t('bag'), 'bagTitle')}
     <div class="sheet-body">
       <div class="bag-lines">${lines}</div>
-      ${hasBeans ? `<p class="hint">📦 ${t('beansShip')}</p>` : ''}
+      ${hasBeans ? `<p class="hint">${icon('box')}<span>${t('beansShip')}</span></p>` : ''}
       <div class="bag-section"><span>${t('how')}</span><div class="seg" role="group">${modes}</div>
         ${co.mode === 'pickup' ? `<span>${t('when')}</span>${sl.closed ? `<p class="hint" style="margin:0">${t('closedPre')}</p>` : ''}<div class="slots"><button class="pill" aria-pressed="${co.slot === 'asap'}" data-slot="asap">${esc(sl.asap)}</button>${sl.list.map((x) => `<button class="pill" aria-pressed="${co.slot === x}" data-slot="${x}">${x}</button>`).join('')}</div>` : ''}
         ${co.mode === 'table' ? `<label class="field"><span>${t('tableNo')}</span><input id="coTable" inputmode="numeric" maxlength="4" value="${esc(co.table)}" placeholder="7"/></label>` : ''}
         ${co.mode === 'delivery' ? `<label class="field"><span>${t('address')}</span><input id="coAddress" maxlength="120" value="${esc(co.address)}" placeholder="${esc(t('addressPh'))}" autocomplete="street-address"/></label>` : ''}
         <div class="two"><label class="field"><span>${t('name')}</span><input id="coName" maxlength="40" value="${esc(co.name)}" autocomplete="given-name"/></label>
           <label class="field"><span>${t('phone')}</span><input id="coPhone" type="tel" inputmode="tel" maxlength="20" value="${esc(co.phone)}" placeholder="06 12 34 56 78" autocomplete="tel"/></label></div>
-        ${tot.canReward ? `<label class="reward"><input type="checkbox" id="coReward" ${co.useReward ? 'checked' : ''}/> 🎁 ${t('freeDrink', { p: money(tot.rewardVal || Math.min(...s.cart.filter((l) => l.kind === 'menu').map((l) => l.unit))) })}</label>` : ''}
+        ${tot.canReward ? `<label class="reward"><input type="checkbox" id="coReward" ${co.useReward ? 'checked' : ''}/> ${icon('gift')}<span>${t('freeDrink', { p: money(tot.rewardVal || Math.min(...s.cart.filter((l) => l.kind === 'menu').map((l) => l.unit))) })}</span></label>` : ''}
         <span>${t('promo')}</span>
         <div class="promo-row"><div class="field" style="flex:1"><input id="coPromo" maxlength="12" value="${esc(co.promo)}" placeholder="${esc(t('promoHint'))}" autocapitalize="characters"/></div><button class="btn ghost sm" id="coApply">${t('apply')}</button></div>
         <span>${t('pay')}</span><div class="seg" role="group"><button aria-pressed="${co.pay === 'counter'}" data-pay="counter">${t('payCounter')}</button><button aria-pressed="${co.pay === 'card'}" data-pay="card">${t('payCard')}</button></div>
         <p class="hint">${t('payNote')}</p>
       </div>
       <div class="totals"><div><span>${t('subtotal')}</span><span>${money(tot.sub)}</span></div>
-        ${tot.rewardVal ? `<div><span>🎁</span><span>−${money(tot.rewardVal)}</span></div>` : ''}
+        ${tot.rewardVal ? `<div><span>${icon('gift')}</span><span>−${money(tot.rewardVal)}</span></div>` : ''}
         ${tot.promo ? `<div><span>${t('discount')} (${co.promo})</span><span>−${money(tot.promo)}</span></div>` : ''}
         ${tot.fee ? `<div><span>${t('deliveryFee')}</span><span>${money(tot.fee)}</span></div>` : ''}
         <div class="grand"><span>${t('total')}</span><span>${money(tot.total)}</span></div></div>
@@ -422,7 +423,7 @@ function renderTracker() {
       <div class="track-art ${o.status === 'ready' || o.status === 'collected' ? 'ready' : ''}">${art}</div>
       <div class="bag-lines">${o.items.map((x) => `<div class="line" style="grid-template-columns:1fr auto"><div style="min-width:0"><b>${x.qty}× ${esc(nameOf(x))}</b><small>${esc(x.summary || '')}</small></div><span class="price">${money(x.unit * x.qty)}</span></div>`).join('')}</div>
       <div class="totals"><div class="grand"><span>${t('total')}</span><span>${money(o.total)}</span></div></div>
-      ${o.stamps ? `<div class="stamp-earned">☕ <span>${t('stampsEarned', { n: `<b>${o.stamps}</b>` })}</span></div>` : ''}
+      ${o.stamps ? `<div class="stamp-earned">${icon('coffee')}<span>${t('stampsEarned', { n: `<b>${o.stamps}</b>` })}</span></div>` : ''}
       <p style="margin-top:16px"><a class="btn ghost wide" href="#order" data-close>${t('orderAgain')}</a></p>
     </div>`;
 }
@@ -495,7 +496,7 @@ function renderBrew() {
   const coffee = Math.round(water / r.ratio);
   $('#brewOut').innerHTML = `<div><dt>${t('coffee')}</dt><dd>${coffee}<small>g</small></dd></div><div><dt>${t('water')}</dt><dd>${water}<small>ml</small></dd></div>
     <div><dt>${t('grind')}</dt><dd style="font-size:22px">${esc(L(r.grind))}</dd></div><div><dt>${t('temp')}</dt><dd>${r.temp}<small>°C</small></dd></div>
-    <div><dt>${t('ratio')}</dt><dd>1:${r.ratio}</dd></div><div><dt>⏱</dt><dd>${mmss(r.time)}</dd></div>`;
+    <div><dt>${t('ratio')}</dt><dd>1:${r.ratio}</dd></div><div><dt>${icon('timer', '', t('brewTime'))}</dt><dd>${mmss(r.time)}</dd></div>`;
   renderBrewTimer();
 }
 function renderBrewTimer() {
@@ -519,7 +520,7 @@ function brewToggle() {
   const t0 = Date.now() - brew.t * 1000;
   brew.timer = setInterval(() => {
     brew.t = Math.min(r.time, (Date.now() - t0) / 1000);
-    if (brew.t >= r.time) { brew.run = false; clearInterval(brew.timer); toast(`☕ ${L(r.steps[r.steps.length - 1][1])}`); }
+    if (brew.t >= r.time) { brew.run = false; clearInterval(brew.timer); toast(L(r.steps[r.steps.length - 1][1])); }
     renderBrewTimer();
   }, 250);
   renderBrewTimer();
@@ -537,11 +538,11 @@ function renderCard() {
   const reward = m && m.stamps >= CAFE.stampsForReward;
   const pretty = key.replace(/(\d{2})(?=\d)/g, '$1 ').trim();
   const circles = Array.from({ length: CAFE.stampsForReward }, (_, i) => `<span class="stamp ${i < n ? 'on' : ''}" style="--i:${i}">${i < n ? CUP : ''}</span>`).join('')
-    + `<span class="stamp gift ${reward ? 'on' : ''}" style="--i:9">${reward ? '🎁' : 'FREE'}</span>`;
+    + `<span class="stamp gift ${reward ? 'on' : ''}" style="--i:9">${reward ? icon('gift') : 'FREE'}</span>`;
   $('#stampcard').innerHTML = `
     <div class="sc-top"><div><b>NOUR</b><small>stamp card</small></div><span>${esc(m?.name || '')}<br/>${esc(pretty)}</span></div>
     <div class="stamps">${circles}</div>
-    <div class="sc-bottom"><span>${reward ? `🎁 ${t('reward')}` : esc(t('toGo', { n: CAFE.stampsForReward - n }))}</span><small>${esc(t('stampsOf', { n, m: CAFE.stampsForReward }))}</small></div>`;
+    <div class="sc-bottom"><span>${reward ? `${icon('gift')}<span>${t('reward')}</span>` : esc(t('toGo', { n: CAFE.stampsForReward - n }))}</span><small>${esc(t('stampsOf', { n, m: CAFE.stampsForReward }))}</small></div>`;
 }
 function loyalty() {
   $('#loyForm').addEventListener('submit', (e) => {

@@ -2,6 +2,7 @@
 // so orders, bookings and sign-ups made on the website appear here live (and back).
 import { CAFE, CATEGORIES, MENU, BEANS, BEAN_SIZES, GRINDS, SUB_PLANS, EVENTS, GIFT_DESIGNS } from './data.js';
 import * as db from './store.js';
+import { icon } from './icons.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -9,8 +10,8 @@ const PIN = '2468';
 
 const A = {
   en: {
-    owner: 'Owner dashboard', pinLabel: 'Enter your PIN', pinHint: 'Demo PIN: 2468', unlock: 'Unlock', backSite: '← Back to the website', badPin: 'Wrong PIN — try 2468.',
-    viewSite: 'View website ↗', demoTag: 'Demo by MBN DEV', live: 'Live', soundOn: '🔔 Sound on', soundOff: '🔕 Sound off',
+    owner: 'Owner dashboard', pinLabel: 'Enter your PIN', pinHint: 'Demo PIN: 2468', unlock: 'Unlock', backSite: 'Back to the website', badPin: 'Wrong PIN — try 2468.',
+    viewSite: 'View website', demoTag: 'Demo by MBN DEV', live: 'Live', soundOn: 'Sound on', soundOff: 'Sound off',
     t_live: 'Live orders', t_menu: 'Menu & stock', t_book: 'Bookings', t_people: 'Customers', t_stats: 'Insights', t_set: 'Settings',
     s_live: 'New orders arrive here instantly — tap to move them along.', s_menu: 'Prices and sold-out items update on the website immediately.', s_book: 'Workshop seats and catering requests.', s_people: 'Stamp cards, gift cards, bean subscriptions and newsletter.', s_stats: 'How the café is doing.', s_set: 'Opening hours, online ordering and the banner.',
     k_rev: 'Revenue today', k_orders: 'Orders', k_avg: 'Average ticket', k_drinks: 'Drinks', k_open: 'In progress',
@@ -27,8 +28,8 @@ const A = {
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], cur: '{n} dh', free: 'Free', sub_once: 'One-time', sub_w2: 'Every 2 weeks', sub_w4: 'Every 4 weeks', ty_office: 'Office', ty_event: 'Event', ty_wedding: 'Wedding',
   },
   fr: {
-    owner: 'Espace gérant', pinLabel: 'Entrez votre code', pinHint: 'Code démo : 2468', unlock: 'Déverrouiller', backSite: '← Retour au site', badPin: 'Code incorrect — essayez 2468.',
-    viewSite: 'Voir le site ↗', demoTag: 'Démo par MBN DEV', live: 'En direct', soundOn: '🔔 Son activé', soundOff: '🔕 Son coupé',
+    owner: 'Espace gérant', pinLabel: 'Entrez votre code', pinHint: 'Code démo : 2468', unlock: 'Déverrouiller', backSite: 'Retour au site', badPin: 'Code incorrect — essayez 2468.',
+    viewSite: 'Voir le site', demoTag: 'Démo par MBN DEV', live: 'En direct', soundOn: 'Son activé', soundOff: 'Son coupé',
     t_live: 'Commandes', t_menu: 'Carte & stock', t_book: 'Réservations', t_people: 'Clients', t_stats: 'Statistiques', t_set: 'Réglages',
     s_live: 'Les nouvelles commandes arrivent ici instantanément — touchez pour les faire avancer.', s_menu: 'Prix et ruptures sont mis à jour immédiatement sur le site.', s_book: 'Places aux ateliers et demandes traiteur.', s_people: 'Cartes de fidélité, cartes cadeaux, abonnements café et newsletter.', s_stats: 'Comment va le café.', s_set: 'Horaires, commande en ligne et bandeau.',
     k_rev: 'CA du jour', k_orders: 'Commandes', k_avg: 'Panier moyen', k_drinks: 'Boissons', k_open: 'En cours',
@@ -55,7 +56,7 @@ const hm = (ts) => new Date(ts).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en
 const isToday = (ts) => new Date(ts).toDateString() === new Date().toDateString();
 
 let tab = sessionStorage.getItem('nour-admin-tab') || 'live';
-const TABS = [['live', '☕'], ['menu', '📋'], ['book', '📅'], ['people', '💳'], ['stats', '📈'], ['set', '⚙️']];
+const TABS = [['live', 'coffee'], ['menu', 'clipboard'], ['book', 'calendar'], ['people', 'card'], ['stats', 'chart'], ['set', 'sliders']];
 
 let toastT;
 function toast(msg, cls = '') { const el = $('#atoast'); el.textContent = msg; el.className = `atoast on ${cls}`; clearTimeout(toastT); toastT = setTimeout(() => { el.className = 'atoast'; }, 3000); }
@@ -85,11 +86,11 @@ function renderTabs() {
   const s = db.get();
   const open = s.orders.filter((o) => ['received', 'brewing', 'ready'].includes(o.status)).length;
   const newB = s.bookings.length + s.quotes.length;
-  $('#tabs').innerHTML = TABS.map(([id, ic]) => `<button data-tab="${id}" ${id === tab ? 'aria-current="page"' : ''}><span aria-hidden="true">${ic}</span>${t(`t_${id}`)}${id === 'live' && open ? `<span class="n">${open}</span>` : ''}${id === 'book' && newB ? `<span class="n">${newB}</span>` : ''}</button>`).join('');
+  $('#tabs').innerHTML = TABS.map(([id, ic]) => `<button data-tab="${id}" ${id === tab ? 'aria-current="page"' : ''}>${icon(ic)}${t(`t_${id}`)}${id === 'live' && open ? `<span class="n">${open}</span>` : ''}${id === 'book' && newB ? `<span class="n">${newB}</span>` : ''}</button>`).join('');
   $('#pageTitle').textContent = t(`t_${tab}`);
   $('#pageSub').textContent = t(`s_${tab}`);
   $('#liveState').textContent = t('live');
-  $('#soundBtn').textContent = s.settings.sound ? t('soundOn') : t('soundOff');
+  $('#soundBtn').innerHTML = `${icon(s.settings.sound ? 'bell' : 'bellOff')}<span>${t(s.settings.sound ? 'soundOn' : 'soundOff')}</span>`;
 }
 
 // ── live orders ───────────────────────────────────────────────────────────
@@ -97,11 +98,11 @@ const NEXT = { received: 'brewing', brewing: 'ready', ready: 'collected' };
 const COLORS = { received: '#ff5a1f', brewing: '#d97706', ready: '#16a34a' };
 let fresh = new Set();
 function orderCard(o) {
-  const mode = o.mode === 'table' ? `<span class="mode table">🪑 ${t('table')} ${esc(o.table)}</span>` : o.mode === 'delivery' ? `<span class="mode delivery">🛵 ${t('delivery')}</span>` : `<span class="mode">🛍 ${t('pickup')}${o.slot && o.slot !== 'asap' ? ` · ${esc(o.slot)}` : ` · ${t('asap')}`}</span>`;
+  const mode = o.mode === 'table' ? `<span class="mode table">${icon('utensils')}${t('table')} ${esc(o.table)}</span>` : o.mode === 'delivery' ? `<span class="mode delivery">${icon('bike')}${t('delivery')}</span>` : `<span class="mode">${icon('bag')}${t('pickup')}${o.slot && o.slot !== 'asap' ? ` · ${esc(o.slot)}` : ` · ${t('asap')}`}</span>`;
   const items = o.items.map((i) => `<li><b>${i.qty}×</b> ${esc(itemName(i))}${i.summary ? `<small>${esc(i.summary).replace(/“(.*?)”/g, '<em>“$1”</em>')}</small>` : ''}</li>`).join('');
   return `<article class="ord ${fresh.has(o.id) ? 'fresh' : ''}">
     <div class="ord-h"><b>#${o.no}</b>${mode}<time>${ago(o.at)}</time></div>
-    <div class="who"><b>${esc(o.name)}</b> · ${esc(o.phone)}${o.address ? `<br/>📍 ${esc(o.address)}` : ''}</div>
+    <div class="who"><b>${esc(o.name)}</b> · ${esc(o.phone)}${o.address ? `<br/>${icon('pin')} ${esc(o.address)}` : ''}</div>
     <ul>${items}</ul>
     <div class="ord-f"><span>${money(o.total)} <small>· ${o.pay === 'card' ? t('card') : t('counter')}</small></span>
       <div style="display:flex;gap:6px">${o.status === 'received' ? `<button class="abtn danger sm" data-cancel="${o.id}">${t('cancel')}</button>` : ''}<button class="abtn ${o.status === 'ready' ? 'ok' : o.status === 'received' ? 'sun' : ''} sm" data-adv="${o.id}">${t(`a_${o.status}`)}</button></div></div>
@@ -171,7 +172,7 @@ function viewPeople() {
   const mem = Object.entries(s.members).sort((a, b) => b[1].stamps - a[1].stamps).map(([k, m]) => {
     const n = Math.min(m.stamps, CAFE.stampsForReward);
     return `<tr><td><b>${esc(m.name || '—')}</b><div class="muted">${k.replace(/(\d{2})(?=\d)/g, '$1 ')}</div></td>
-      <td><span class="stamps-mini">${Array.from({ length: CAFE.stampsForReward }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span> ${m.stamps >= CAFE.stampsForReward ? '<span class="chip ok">🎁</span>' : ''}</td>
+      <td><span class="stamps-mini">${Array.from({ length: CAFE.stampsForReward }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span> ${m.stamps >= CAFE.stampsForReward ? `<span class="chip ok">${icon('gift', '', 'Reward')}</span>` : ''}</td>
       <td class="num">${m.visits}</td><td class="num">${m.rewards}</td><td class="muted">${new Date(m.since).toLocaleDateString()}</td><td><button class="abtn ghost sm" data-stamp="${k}">${t('addStamp')}</button></td></tr>`;
   }).join('');
   const gifts = s.gifts.map((g) => `<tr><td class="num"><b>${esc(g.code)}</b></td><td class="num">${money(g.amount)}</td><td>${esc(g.to || '—')}</td><td>${esc(g.from || '—')}</td><td>${esc(nm(GIFT_DESIGNS.find((d) => d.id === g.design)?.label))}</td><td class="muted">${ago(g.at)}</td></tr>`).join('');

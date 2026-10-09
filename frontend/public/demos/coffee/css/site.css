@@ -135,7 +135,7 @@ html[dir='rtl'] .hero h1 em { font-style: normal; font-weight: 800; }
 .marquee { overflow: hidden; background: var(--ink); color: var(--paper); border-block: 1px solid var(--ink); transform: rotate(-1.2deg); margin: 10px -10px 0; }
 .marquee .track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
 .marquee span { font: 600 clamp(18px, 2.4vw, 26px)/1 var(--display); padding: 18px 20px; white-space: nowrap; display: inline-flex; align-items: center; gap: 22px; }
-.marquee span::after { content: '✺'; color: var(--sun); }
+.marquee span::after { content: ''; width: 22px; height: 22px; background: var(--sun); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='12' rx='6' ry='8.5' transform='rotate(30 12 12)'/%3E%3Cpath d='M9 6c3 3 3 9 6 12'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='12' rx='6' ry='8.5' transform='rotate(30 12 12)'/%3E%3Cpath d='M9 6c3 3 3 9 6 12'/%3E%3C/svg%3E") center / contain no-repeat; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 html[dir='rtl'] .marquee .track { animation-name: marquee-rtl; }
 @keyframes marquee-rtl { to { transform: translateX(50%); } }
@@ -271,7 +271,8 @@ html[dir='rtl'] .item h4 { font-size: 16px; }
 .track-art .art { height: 180px; width: auto; }
 .track-art img.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .track-art.ready { background: #e6f4ea; }
-.track-art.ready::after { content: '✓'; position: absolute; top: 14px; inset-inline-end: 16px; width: 40px; height: 40px; border-radius: 50%; background: #16a34a; color: #fff; display: grid; place-items: center; font-weight: 800; }
+.track-art.ready::after { content: ''; position: absolute; top: 14px; inset-inline-end: 16px; width: 40px; height: 40px; border-radius: 50%; background: #16a34a; }
+.track-art.ready::before { content: ''; position: absolute; z-index: 1; top: 14px; inset-inline-end: 16px; width: 40px; height: 40px; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / 22px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / 22px no-repeat; }
 .live-dot { display: inline-flex; align-items: center; gap: 8px; font: 600 12px var(--mono); color: var(--muted); }
 .live-dot::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; animation: blink 1.2s infinite; }
 @keyframes blink { 50% { opacity: 0.25; } }
@@ -538,3 +539,14 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   .rv { opacity: 1; transform: none; }
 }
+
+/* Icons (inline SVG, inherit the text colour) */
+.ic { width: 1.15em; height: 1.15em; flex-shrink: 0; vertical-align: -0.2em; }
+.pill .ic, .chip .ic, .reward .ic, .stamp-earned .ic, .sc-bottom .ic { width: 1.2em; height: 1.2em; }
+.pill[aria-pressed='true'] .ic { fill: currentColor; }
+.chip > span, .pill > span, .reward > span { min-width: 0; }
+.hint { display: flex; align-items: flex-start; gap: 8px; }
+.hint .ic { margin-top: 2px; }
+.sc-bottom > span { display: inline-flex; align-items: center; gap: 6px; }
+.stamp.gift .ic { width: 58%; height: 58%; }
+.specs dt .ic, .brew-out dt .ic { width: 16px; height: 16px; vertical-align: -3px; }

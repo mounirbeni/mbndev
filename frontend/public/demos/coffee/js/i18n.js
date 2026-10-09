@@ -6,14 +6,14 @@ export const LANGS = [
 ];
 
 const en = {
-  discover: 'Discover', from: 'From', favs: 'Favorites', favEmpty: 'No favorites yet — tap ♡ on anything you love.', pick: 'NOUR’s pick', fromP: 'From {p}', filtersT: 'Filters', diet: 'Diet', sortT: 'Sort by', sort_pop: 'Popular', sort_low: 'Price ↑', sort_high: 'Price ↓', showN: 'Show {n} items', favOnly: 'Favorites only', saveFav: 'Save to favorites', resetF: 'Reset', 
+  discover: 'Discover', from: 'From', favs: 'Favorites', favEmpty: 'No favorites yet — tap the heart on anything you love.', pick: 'NOUR’s pick', fromP: 'From {p}', filtersT: 'Filters', diet: 'Diet', sortT: 'Sort by', sort_pop: 'Popular', sort_low: 'Price: low to high', sort_high: 'Price: high to low', showN: 'Show {n} items', favOnly: 'Favorites only', saveFav: 'Save to favorites', resetF: 'Reset', 
   demoBar: 'Demo website by MBN DEV — fictional café, real features.', demoCta: 'Get one for your café',
   nav_order: 'Order', nav_beans: 'Beans', nav_brew: 'Brew guide', nav_loyalty: 'Card', nav_gifts: 'Gifts', nav_events: 'Workshops', nav_visit: 'Visit',
   cart: 'Bag', openNow: 'Open now · until {t}', closesSoon: 'Closing soon · {t}', closedNow: 'Closed · opens {d} {t}', today: 'today', tomorrow: 'tomorrow',
   heroKicker: 'Specialty coffee atelier · Maârif, Casablanca',
   heroL1: 'Coffee,', heroL2: 'measured', heroL3: 'in light.',
   heroSub: 'Single origins roasted in Casablanca, pastry laminated at dawn, and an order-ahead bar that has your cup ready before you walk in.',
-  heroCta1: 'Order ahead', heroCta2: 'Find your bean', wait: 'Bar wait ≈ {n} min', onBar: 'On the bar today',
+  heroCta1: 'Order ahead', heroCta2: 'Find your bean', wait: 'Bar wait ~{n} min', onBar: 'On the bar today',
   heroStat1: 'roasted', heroStat1v: 'this week', heroStat2: 'from bean', heroStat2v: 'to cup', scroll: 'Scroll',
   orderK: '01 — Order ahead', orderT: 'Skip the line.', orderS: 'Pick up at the bar, order from your table, or get it delivered around Maârif. Every drink is built the way you like it.',
   search: 'Search the menu…', f_all: 'All', f_v: 'Vegan', f_gf: 'Gluten-free', f_df: 'Dairy-free',
@@ -35,7 +35,7 @@ const en = {
   process: 'Process', altitude: 'Altitude', roast: 'Roast', r_light: 'Light', r_medium: 'Medium', 'r_medium-dark': 'Medium-dark',
   b_today: 'On the bar today', b_espresso: 'House espresso', size: 'Size', grind: 'Grind', plan: 'Delivery', addBag: 'Add to bag · {p}', subNote: 'Subscriptions: pause, skip or cancel any time.', perBag: 'per bag',
   brewK: '03 — Brew guide', brewT: 'Brew it at home.', brewS: 'Pick your method and cups — we do the maths and walk you through it with a timer.',
-  cups: 'Cups', coffee: 'Coffee', water: 'Water', temp: 'Water temp', start: 'Start', pause: 'Pause', reset: 'Reset', ratio: 'Ratio',
+  cups: 'Cups', coffee: 'Coffee', water: 'Water', temp: 'Water temp', start: 'Start', pause: 'Pause', reset: 'Reset', ratio: 'Ratio', brewTime: 'Brew time',
   loyK: '04 — Stamp card', loyT: 'The card that lives in your phone.', loyS: 'Every drink is a stamp, automatically. The tenth one is on us — no paper, no app to install.',
   phoneLabel: 'Your phone number', showCard: 'Show my card', join: 'Join free', stampsOf: '{n} of {m} stamps', reward: 'Free drink unlocked', toGo: '{n} more for a free drink',
   how1: 'Order ahead or at the bar', how2: 'Your phone number collects the stamps', how3: 'The tenth drink is free', loyDemo: 'Demo member: 06 12 34 56 78', member: 'Member since {d}', cardNotFound: 'No card yet for this number — join in one tap.', joined: 'Welcome! Your first stamp is waiting.',
@@ -54,14 +54,14 @@ const en = {
 };
 
 const fr = {
-  discover: 'Découvrir', from: 'Dès', favs: 'Favoris', favEmpty: 'Pas encore de favoris — touchez ♡ sur ce que vous aimez.', pick: 'Choix de NOUR', fromP: 'Dès {p}', filtersT: 'Filtres', diet: 'Régime', sortT: 'Trier par', sort_pop: 'Populaire', sort_low: 'Prix ↑', sort_high: 'Prix ↓', showN: 'Voir {n} articles', favOnly: 'Favoris uniquement', saveFav: 'Ajouter aux favoris', resetF: 'Réinitialiser', 
+  discover: 'Découvrir', from: 'Dès', favs: 'Favoris', favEmpty: 'Pas encore de favoris — touchez le cœur sur ce que vous aimez.', pick: 'Choix de NOUR', fromP: 'Dès {p}', filtersT: 'Filtres', diet: 'Régime', sortT: 'Trier par', sort_pop: 'Populaire', sort_low: 'Prix croissant', sort_high: 'Prix décroissant', showN: 'Voir {n} articles', favOnly: 'Favoris uniquement', saveFav: 'Ajouter aux favoris', resetF: 'Réinitialiser', 
   demoBar: 'Site démo par MBN DEV — café fictif, fonctionnalités réelles.', demoCta: 'Le même pour votre café',
   nav_order: 'Commander', nav_beans: 'Cafés', nav_brew: 'Guide', nav_loyalty: 'Carte', nav_gifts: 'Cadeaux', nav_events: 'Ateliers', nav_visit: 'Venir',
   cart: 'Panier', openNow: 'Ouvert · jusqu’à {t}', closesSoon: 'Ferme bientôt · {t}', closedNow: 'Fermé · ouvre {d} {t}', today: 'aujourd’hui', tomorrow: 'demain',
   heroKicker: 'Atelier de café de spécialité · Maârif, Casablanca',
   heroL1: 'Le café,', heroL2: 'mesuré', heroL3: 'en lumière.',
   heroSub: 'Des origines torréfiées à Casablanca, des viennoiseries feuilletées à l’aube, et un bar en click & collect qui prépare votre tasse avant votre arrivée.',
-  heroCta1: 'Commander', heroCta2: 'Trouver mon café', wait: 'Attente au bar ≈ {n} min', onBar: 'Au bar aujourd’hui',
+  heroCta1: 'Commander', heroCta2: 'Trouver mon café', wait: 'Attente au bar ~{n} min', onBar: 'Au bar aujourd’hui',
   heroStat1: 'torréfié', heroStat1v: 'cette semaine', heroStat2: 'du grain', heroStat2v: 'à la tasse', scroll: 'Défiler',
   orderK: '01 — Commander', orderT: 'Évitez la file.', orderS: 'Retrait au bar, commande depuis votre table ou livraison dans le Maârif. Chaque boisson se compose à votre goût.',
   search: 'Chercher dans la carte…', f_all: 'Tout', f_v: 'Vegan', f_gf: 'Sans gluten', f_df: 'Sans lactose',
@@ -83,7 +83,7 @@ const fr = {
   process: 'Process', altitude: 'Altitude', roast: 'Torréfaction', r_light: 'Claire', r_medium: 'Moyenne', 'r_medium-dark': 'Moyenne-foncée',
   b_today: 'Au bar aujourd’hui', b_espresso: 'Espresso maison', size: 'Format', grind: 'Mouture', plan: 'Livraison', addBag: 'Ajouter · {p}', subNote: 'Abonnements : pause, saut ou arrêt à tout moment.', perBag: 'le sachet',
   brewK: '03 — Guide', brewT: 'Faites-le chez vous.', brewS: 'Choisissez la méthode et le nombre de tasses — on fait les calculs et on vous guide avec un minuteur.',
-  cups: 'Tasses', coffee: 'Café', water: 'Eau', temp: 'Température', start: 'Démarrer', pause: 'Pause', reset: 'Réinitialiser', ratio: 'Ratio',
+  cups: 'Tasses', coffee: 'Café', water: 'Eau', temp: 'Température', start: 'Démarrer', pause: 'Pause', reset: 'Réinitialiser', ratio: 'Ratio', brewTime: 'Temps d’infusion',
   loyK: '04 — Carte de fidélité', loyT: 'La carte qui vit dans votre téléphone.', loyS: 'Chaque boisson est un tampon, automatiquement. La dixième est offerte — sans papier, sans appli.',
   phoneLabel: 'Votre numéro de téléphone', showCard: 'Voir ma carte', join: 'Rejoindre', stampsOf: '{n} sur {m} tampons', reward: 'Boisson offerte débloquée', toGo: 'Encore {n} pour une boisson offerte',
   how1: 'Commandez en ligne ou au bar', how2: 'Votre numéro collecte les tampons', how3: 'La dixième boisson est offerte', loyDemo: 'Membre démo : 06 12 34 56 78', member: 'Membre depuis {d}', cardNotFound: 'Pas encore de carte pour ce numéro — rejoignez en un clic.', joined: 'Bienvenue ! Votre premier tampon vous attend.',
@@ -102,14 +102,14 @@ const fr = {
 };
 
 const ar = {
-  discover: 'اكتشف', from: 'ابتداءً من', favs: 'المفضلة', favEmpty: 'لا مفضلات بعد — اضغط ♡ على ما تحب.', pick: 'اختيار NOUR', fromP: 'ابتداءً من {p}', filtersT: 'التصفية', diet: 'النظام الغذائي', sortT: 'الترتيب', sort_pop: 'الأكثر طلباً', sort_low: 'السعر ↑', sort_high: 'السعر ↓', showN: 'عرض {n} منتجاً', favOnly: 'المفضلة فقط', saveFav: 'أضف إلى المفضلة', resetF: 'إعادة تعيين', 
+  discover: 'اكتشف', from: 'ابتداءً من', favs: 'المفضلة', favEmpty: 'لا مفضلات بعد — اضغط على القلب عند ما تحب.', pick: 'اختيار NOUR', fromP: 'ابتداءً من {p}', filtersT: 'التصفية', diet: 'النظام الغذائي', sortT: 'الترتيب', sort_pop: 'الأكثر طلباً', sort_low: 'السعر: من الأقل', sort_high: 'السعر: من الأعلى', showN: 'عرض {n} منتجاً', favOnly: 'المفضلة فقط', saveFav: 'أضف إلى المفضلة', resetF: 'إعادة تعيين', 
   demoBar: 'موقع تجريبي من MBN DEV — مقهى خيالي وميزات حقيقية.', demoCta: 'احصل على مثله لمقهاك',
   nav_order: 'اطلب', nav_beans: 'البن', nav_brew: 'دليل التحضير', nav_loyalty: 'البطاقة', nav_gifts: 'الهدايا', nav_events: 'الورشات', nav_visit: 'زورونا',
   cart: 'السلة', openNow: 'مفتوح الآن · حتى {t}', closesSoon: 'يغلق قريباً · {t}', closedNow: 'مغلق · يفتح {d} {t}', today: 'اليوم', tomorrow: 'غداً',
   heroKicker: 'مشغل القهوة المختصة · المعاريف، الدار البيضاء',
   heroL1: 'القهوة،', heroL2: 'تُقاس', heroL3: 'بالضوء.',
   heroSub: 'قهوة أحادية المصدر نحمّصها في الدار البيضاء، ومعجنات تُحضّر عند الفجر، وبار للطلب المسبق يجهّز كوبك قبل وصولك.',
-  heroCta1: 'اطلب مسبقاً', heroCta2: 'اكتشف قهوتك', wait: 'الانتظار ≈ {n} دقائق', onBar: 'على البار اليوم',
+  heroCta1: 'اطلب مسبقاً', heroCta2: 'اكتشف قهوتك', wait: 'الانتظار ~{n} دقائق', onBar: 'على البار اليوم',
   heroStat1: 'محمّصة', heroStat1v: 'هذا الأسبوع', heroStat2: 'من الحبة', heroStat2v: 'إلى الكوب', scroll: 'مرّر',
   orderK: '01 — اطلب مسبقاً', orderT: 'تجاوز الطابور.', orderS: 'استلم من البار، أو اطلب من طاولتك، أو نوصل لك في المعاريف. كل مشروب يُحضّر كما تحب.',
   search: 'ابحث في القائمة…', f_all: 'الكل', f_v: 'نباتي', f_gf: 'بدون غلوتين', f_df: 'بدون حليب',
@@ -131,7 +131,7 @@ const ar = {
   process: 'المعالجة', altitude: 'الارتفاع', roast: 'التحميص', r_light: 'فاتح', r_medium: 'متوسط', 'r_medium-dark': 'متوسط-داكن',
   b_today: 'على البار اليوم', b_espresso: 'إسبريسو البيت', size: 'الحجم', grind: 'الطحن', plan: 'التوصيل', addBag: 'أضف للسلة · {p}', subNote: 'الاشتراك: أوقفه أو تخطَّه أو ألغِه متى شئت.', perBag: 'للكيس',
   brewK: '03 — دليل التحضير', brewT: 'حضّرها في البيت.', brewS: 'اختر الطريقة وعدد الأكواب — نحسب لك الكميات ونرافقك بمؤقّت.',
-  cups: 'الأكواب', coffee: 'البن', water: 'الماء', temp: 'حرارة الماء', start: 'ابدأ', pause: 'إيقاف', reset: 'إعادة', ratio: 'النسبة',
+  cups: 'الأكواب', coffee: 'البن', water: 'الماء', temp: 'حرارة الماء', start: 'ابدأ', pause: 'إيقاف', reset: 'إعادة', ratio: 'النسبة', brewTime: 'مدة التحضير',
   loyK: '04 — بطاقة الأختام', loyT: 'البطاقة التي تعيش في هاتفك.', loyS: 'كل مشروب ختم تلقائياً. العاشر علينا — بدون ورق وبدون تطبيق.',
   phoneLabel: 'رقم هاتفك', showCard: 'أظهر بطاقتي', join: 'انضم مجاناً', stampsOf: '{n} من {m} أختام', reward: 'مشروب مجاني متاح', toGo: 'بقي {n} للمشروب المجاني',
   how1: 'اطلب مسبقاً أو من البار', how2: 'رقم هاتفك يجمع الأختام', how3: 'المشروب العاشر مجاني', loyDemo: 'عضو تجريبي: 06 12 34 56 78', member: 'عضو منذ {d}', cardNotFound: 'لا توجد بطاقة لهذا الرقم — انضم بنقرة.', joined: 'مرحباً بك! ختمك الأول في انتظارك.',
