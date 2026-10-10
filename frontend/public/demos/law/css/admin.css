@@ -495,3 +495,9 @@ html[dir='rtl'] .sw span::after, [lang='ar'] .sw span::after { left: auto; right
 .card .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .card label .in { width: 100%; min-width: 0; }
 @media (max-width: 520px) { .card .two { grid-template-columns: minmax(0, 1fr); } .drow .btns { flex-basis: 100%; justify-content: flex-start; } .drow { flex-wrap: wrap; } }
+
+/* ── containment: numbers wrap instead of being cut, narrow cells break long words ── */
+.kpi b { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.12; }
+.heat span { min-width: 0; overflow: hidden; }
+@media (max-width: 420px) { .heat { font-size: 8px; } }
+.t td, .t th { overflow-wrap: anywhere; }

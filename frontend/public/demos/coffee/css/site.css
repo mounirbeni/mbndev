@@ -564,3 +564,13 @@ html[dir='rtl'] .ax { letter-spacing: 0; font-family: var(--ui); }
 .demo-off b { font: 700 28px var(--display); }
 .demo-off h1 { margin: 0; font: 600 clamp(26px, 6vw, 38px)/1.1 var(--display); }
 .demo-off p { margin: 0; color: var(--muted); }
+
+/* ── containment ── */
+.cats { margin-inline: 0; padding-inline: 0; }
+.stampcard { width: min(calc(100% - 6px), 460px); aspect-ratio: auto; min-height: 292px; }
+.field input[type='date'], .field input[type='time'] { min-width: 0; max-width: 100%; }
+.hero .kicker { margin-bottom: 32px; }
+.stampcard { transform: none; min-height: 322px; }
+.bdot span { max-width: 92px; overflow: hidden; text-overflow: ellipsis; }
+dd { overflow-wrap: anywhere; min-width: 0; }
+.bdot { width: max-content; max-width: 92px; } .bdot span { box-sizing: border-box; max-width: 100%; }

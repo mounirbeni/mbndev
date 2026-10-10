@@ -489,3 +489,9 @@ ul, ol { padding: 0; list-style: none; }
 input[inputmode='tel'] { direction: ltr; }
 [dir='rtl'] input[inputmode='tel'] { text-align: right; }
 .code, .gcard code { direction: ltr; unicode-bidi: isolate; }
+
+/* ── containment: badges and labels stay inside the card they belong to ── */
+.badge { inset-block-start: 6px; inset-inline-start: 6px; }
+.plan.best { padding-top: 48px; }
+.plan .badge { inset-block-start: 14px; }
+.hero h1 { margin-top: 28px; }

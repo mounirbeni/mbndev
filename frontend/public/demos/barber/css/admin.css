@@ -334,3 +334,9 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 .top h1 { line-height: 1.15; margin-bottom: 2px; }
 .mini-kpis span { font-size: 9.5px; letter-spacing: 0.03em; }
 @media (min-width: 900px) and (max-width: 1279px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* ── containment: numbers wrap instead of being cut, narrow cells break long words ── */
+.kpi b { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.12; }
+.heat span { min-width: 0; overflow: hidden; }
+@media (max-width: 420px) { .heat { font-size: 8px; } }
+.t td, .t th { overflow-wrap: anywhere; }

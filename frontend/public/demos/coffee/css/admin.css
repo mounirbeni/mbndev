@@ -237,3 +237,9 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 .gate-off { text-align: center; }
 .gate-off h1 { margin: 0; font-size: 22px; }
 .gate-off p { margin: 0; color: var(--muted); }
+
+/* ── containment: numbers wrap instead of being cut, narrow cells break long words ── */
+.kpi b { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.12; }
+.heat span { min-width: 0; overflow: hidden; }
+@media (max-width: 420px) { .heat { font-size: 8px; } }
+.t td, .t th { overflow-wrap: anywhere; }

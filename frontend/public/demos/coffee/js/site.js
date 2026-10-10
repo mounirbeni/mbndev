@@ -445,7 +445,7 @@ const nearest = () => BEANS.map((b) => ({ b, d: Math.hypot(b.x - bean.x, b.y - b
 const shortName = (b) => { const n = L(b.origin).split('·').pop().trim(); return n.length > 12 ? n.split(' ')[0] : n; };
 function renderCompass() {
   const best = nearest()[0].b;
-  const pos = (v) => `${((v + 1) / 2) * 84 + 8}%`;
+  const pos = (v) => `clamp(48px, ${((v + 1) / 2) * 84 + 8}%, calc(100% - 48px))`;
   $('#beanDots').innerHTML = BEANS.map((b) => `<div class="bdot ${b === best ? 'best' : ''}" style="left:${pos(b.x)};top:${pos(b.y)};--c:${b.color}"><i></i><span>${esc(shortName(b))}</span></div>`).join('');
   const k = $('#knob'); k.style.left = pos(bean.x); k.style.top = pos(bean.y);
   const size = BEAN_SIZES.find((x) => x.id === bean.size);

@@ -388,3 +388,9 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 .chip.ok { background: #dff3e6; color: #1f6b43; }
 html[dir='rtl'] .sw span::after, [lang='ar'] .sw span::after { left: auto; right: 3px; }
 .ord .note { background: #f8e8e2; color: #7a3a47; }
+
+/* ── containment: numbers wrap instead of being cut, narrow cells break long words ── */
+.kpi b { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.12; }
+.heat span { min-width: 0; overflow: hidden; }
+@media (max-width: 420px) { .heat { font-size: 8px; } }
+.t td, .t th { overflow-wrap: anywhere; }

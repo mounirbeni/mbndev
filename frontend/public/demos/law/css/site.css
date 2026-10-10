@@ -713,3 +713,11 @@ body::before { content: ''; position: fixed; inset: 0; z-index: 1; pointer-event
 [dir='rtl'] .hero h1 { font-weight: 700; line-height: 1.35; }
 [dir='rtl'] .sec-head h2, [dir='rtl'] .track-intro h2 { line-height: 1.3; font-weight: 700; }
 .facts b { margin-bottom: 10px; line-height: 1.08; }
+
+/* ── containment: nothing hangs outside the frame or card it belongs to ── */
+.live { inset-inline-start: 0; }
+.badge-card { max-width: calc(100% - 12px); }
+.plan.best { padding-top: 52px; }
+.plan .badge { top: 14px; }
+.btn { max-width: 100%; white-space: normal; text-align: center; }
+.area-head .nm, .area-head .brief { min-width: 0; overflow-wrap: anywhere; }
